@@ -1,0 +1,12 @@
+{
+  "AdicCompletion.abstractCompletion_coe": "The map underlying the abstract-completion package is exactly the canonical algebra map into the adic inverse limit, with the adic-topology and finite-generation hypotheses displayed above.",
+  "ValuationRing.completionIntegersCompositeResidue_apply": "After including the completed valuation integers in the completed-localization valuation subring, applying its residue map gives the underlying value of the composite residue map. The displayed nonzero-prime, nonzero-generator and separation hypotheses remain required.",
+  "ValuationRing.completionIntegersLocalizedPrime_isPrime": "This instance proves that the distinguished ideal of the completed valuation integers is prime, under the displayed nonzero-prime, nonzero-generator and principal-adic separation hypotheses.",
+  "ValuationRing.completionIntegersQuotientEquiv_mk": "On a class represented by an element of the completed valuation integers, the quotient equivalence is the completed composite residue map. This is the computation rule for the equivalence, with the displayed hypotheses unchanged.",
+  "ValuationSubring.compositeIdeal_isPrime": "The distinguished ideal of the composite valuation subring is prime. It is the pullback of the first factor's maximal ideal along the inclusion of the composite.",
+  "ValuationSubring.compositeResidue_apply": "The underlying residue-field value of the composite residue map is the residue of the same element viewed in the first valuation subring.",
+  "ValuationSubring.composite_top": "Composing a valuation subring with the whole residue field, viewed as its top valuation subring, recovers the original valuation subring.",
+  "ValuationSubring.mem_composite": "An ambient-field element belongs to the composite exactly when it belongs to the first valuation subring and its residue belongs to the second one.",
+  "ValuationSubring.mem_compositeIdeal": "An element of the composite lies in its distinguished ideal exactly when its residue in the first factor's residue field is zero.",
+  "ValuationSubring.quotientCompositeIdealEquiv_mk": "On a quotient class represented by an element of the composite, the quotient equivalence agrees with the composite residue map into the second valuation subring."
+}

@@ -1,0 +1,929 @@
+{
+  "AdicCompletion.abstractCompletion": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "fc894e080bf66f9e511d48b39720db4d51bc18616591f8a98694e28e44cb4a25",
+    "end": 103,
+    "header_sha256": "b3b746a7b9b17aefc9abefbc3c697fe19cf21ecd730089d89804598042bd21e9",
+    "kind": "def",
+    "module": "AdicModules.AdicCompletion",
+    "start": 42
+  },
+  "AdicCompletion.abstractCompletion_coe": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 110,
+    "header_sha256": "c3164ab58470887aa12945c0209ba86dd6aa21fcddeec9b5e7eb126f3c42799c",
+    "kind": "theorem",
+    "module": "AdicModules.AdicCompletion",
+    "start": 105
+  },
+  "AdicCompletion.denseRange_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "6aedefef97b2cc492b8f8b06346464b6f29efeff09d8eeb7f523d0fd4c656800",
+    "end": 133,
+    "header_sha256": "25a1033563dc03557c00db0f439ed9abf57d506a227398f45f50932f0eed8969",
+    "kind": "theorem",
+    "module": "AdicModules.AdicCompletion",
+    "start": 124
+  },
+  "AdicCompletion.isUniformInducing_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "5e020e381cbddd92c77a1ee309abf37fc78495373ba585ca9d25cb76843c9612",
+    "end": 122,
+    "header_sha256": "9487cc27292c331611aad5c4d4bbaadcc70e163dddfff1d1b13baed9787b3643",
+    "kind": "theorem",
+    "module": "AdicModules.AdicCompletion",
+    "start": 112
+  },
+  "Module.IsKilledByIdealPower": {
+    "display_kind": "def",
+    "doc_sha256": "ae0e6f9a358fb49ec0bdbc09fb55d96926e69040a7e7b2da2692f9880a99add8",
+    "end": 31,
+    "header_sha256": "1e76e835866031415c3697da60fb4f30a172e6310d0354b8a96eff8cfa657d66",
+    "kind": "def",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 28
+  },
+  "Module.IsKilledByIdealPower.extension": {
+    "display_kind": "theorem",
+    "doc_sha256": "c35adfa5b7847fd7342d214ccd09b109d9fbd10194dfb12c71e82284af31cd77",
+    "end": 151,
+    "header_sha256": "5b5cd16de7c93e68a0c1ad9a7c676d166a4d94728ed308d4290f23512c205ccb",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 144
+  },
+  "Module.IsKilledByIdealPower.of_le": {
+    "display_kind": "theorem",
+    "doc_sha256": "61255663f1f0732330b807bf7dcfb23bd40f0c74d4d0d1ec5f5a1df26afa2cde",
+    "end": 54,
+    "header_sha256": "3206b86becb02830419ccf5dc825b4efa2fc73691cc54863170d24210737dc2e",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 48
+  },
+  "Module.IsKilledByIdealPower.of_surjective": {
+    "display_kind": "theorem",
+    "doc_sha256": "458f12070c8a7e81bcfec95495745615ffd496eeaafa70ab2fa6c92efb111371",
+    "end": 72,
+    "header_sha256": "f9410a57b6fb160f5686939a6b0620cc833e2dce319bd29c079a4854a9e67703",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 64
+  },
+  "Module.IsKilledByIdealPower.quotient": {
+    "display_kind": "theorem",
+    "doc_sha256": "a99b86b41947bf122c1eada3fd86828ffa96bc99aaaec74a62f9b0aaa6de2f1c",
+    "end": 121,
+    "header_sha256": "8b65df1f9ad0553cea3a29a455c9c3ad643fefd997a4ef3a822820f9b6020c48",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 113
+  },
+  "Module.IsKilledByIdealPower.submodule": {
+    "display_kind": "theorem",
+    "doc_sha256": "a7a4625352e6732af58d9ea67783411810ea4c9641905e27a5e79461d8cc897b",
+    "end": 62,
+    "header_sha256": "566e44ab0e4e7606442e9bd2eb06c9239157704396dd7664d4b94595c8ce4a2b",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 56
+  },
+  "Module.isKilledByIdealPower_iff_exists_pow_le_annihilator": {
+    "display_kind": "theorem",
+    "doc_sha256": "a1ab5bc20a696023f1e097a9a7f978441201dc38f1fb743ebf2f570b14db86ba",
+    "end": 38,
+    "header_sha256": "6a0beef65d3aa9fe5ea16e851e3b34e308a6d4bb200dd40dcc3d741734b72c11",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 33
+  },
+  "Module.isKilledByIdealPower_iff_primaryComponent_eq_top": {
+    "display_kind": "theorem",
+    "doc_sha256": "cebe562812e67d47081782901385ce18602b2470ade1210e30402457852eb5c3",
+    "end": 103,
+    "header_sha256": "7d8539733497065ce5a7082554ddf1dd7fe09eaf56ee72be0775d8500a3d0294",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 80
+  },
+  "Module.isTorsionBySet_ideal_pow_extension": {
+    "display_kind": "theorem",
+    "doc_sha256": "91cab6770af84e2658e266d82571b06c549d8f55b3464c584740d96ec1947877",
+    "end": 142,
+    "header_sha256": "bd8306a4ddd404c1509a1242d66da943c4637e225b85e76ad756475818ced974",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 123
+  },
+  "Module.isTorsionBySet_ideal_pow_of_le": {
+    "display_kind": "theorem",
+    "doc_sha256": "05f34d59535a264aa22445fc06cb5d607912e0595449415fea608fad8917904f",
+    "end": 44,
+    "header_sha256": "c0253f619e85ad013f3e5320a638f5a26e792cd9948956eaa683f20bdb713b4f",
+    "kind": "theorem",
+    "module": "AdicModules.BoundedIdealPowerTorsion",
+    "start": 40
+  },
+  "Valuation.exists_pow_restrict_lt_of_isHausdorff": {
+    "display_kind": "theorem",
+    "doc_sha256": "c83eef918cfb5d5f2fab934c0df93a4269d7e723c627ed046e946faf6c06c215",
+    "end": 73,
+    "header_sha256": "373ba726e53fb036c25ef4e9a8334b83aaf3e863635458f7dada9a2837d93a1c",
+    "kind": "theorem",
+    "module": "AdicModules.ValuationTopology",
+    "start": 31
+  },
+  "ValuationRing.CompletionIntegers": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "0948151726b7c104f833f625e248249df5d52641b24c2b4d4bc60569dba15b94",
+    "end": 39,
+    "header_sha256": "8e8f05a9e86e64617068b9665f98999c1d2186e62253ecc57987cc3fad0dab93",
+    "kind": "def",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 32
+  },
+  "ValuationRing.algebraMap_completionIntegers_apply": {
+    "display_kind": "theorem",
+    "doc_sha256": "1782d809231343ad13e329d4f6ebed90bc2a2c72be77b39437f9ae14ed222b1d",
+    "end": 60,
+    "header_sha256": "b2fbf7343a899dabac125ae27fc4dab62e706a36905c336a029601a90cacbff9",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 54
+  },
+  "ValuationRing.coe_algebraMap_completionIntegers": {
+    "display_kind": "theorem",
+    "doc_sha256": "d98bb460d58cc4898c6c3a9781cc9831a511fd468e69f5346b3ab3149890b0e3",
+    "end": 71,
+    "header_sha256": "2ccad901dae150b1ebb65d22592e7070941805e04745912e3f22846a7d9e759a",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 62
+  },
+  "ValuationRing.coe_localizedAdicCompletionValuationSubringEquiv_apply": {
+    "display_kind": "theorem",
+    "doc_sha256": "e036091c486ea040bd777f03b6c13967b932307a534970675610dc4e61b7dfd1",
+    "end": 148,
+    "header_sha256": "c7e6f81d7675b82d42ee885590a035f7a18046cb9fb0862fca470655164fa464",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedValuationSubring",
+    "start": 133
+  },
+  "ValuationRing.completionIntegersAbstractCompletion": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "bb7012fa933ff132ba49280f01106d72019146e29d6c4edd99a558b31229dcb0",
+    "end": 189,
+    "header_sha256": "4437a7836fe966c089c92f3d3b9d5661d575029bc815615d13ddf380f82fb118",
+    "kind": "def",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 160
+  },
+  "ValuationRing.completionIntegersAlgebra": {
+    "display_kind": "noncomputable instance",
+    "doc_sha256": "690e40fe7109cc056dddd8b7ab3d8074a6f3c896e74aaecf157ab8fcb81e4a9a",
+    "end": 52,
+    "header_sha256": "0774150d5215fb820b4574fe3abbd211de87b9ef7971363bb741fb9d6844ec06",
+    "kind": "instance",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 44
+  },
+  "ValuationRing.completionIntegersCompositeResidue": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "c6c36b9353db87865bc0040205e5b6b90c82df67cf71f4f96b9f09fb6c0af89e",
+    "end": 405,
+    "header_sha256": "6f98011132557e8bca6f70e62dc5fe53a40f17b6dd1fd72c3ea87c1576e5f6be",
+    "kind": "def",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 381
+  },
+  "ValuationRing.completionIntegersCompositeResidue_apply": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 425,
+    "header_sha256": "cc8132571289e5ff136a4f4c101f55bf9b406164b2855e2b80fabfabc0755496",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 407
+  },
+  "ValuationRing.completionIntegersCompositeResidue_surjective": {
+    "display_kind": "theorem",
+    "doc_sha256": "b30297e5fbf4c86fb40a646b2b96727488080c29aa749e6cbcfc68c644c4f694",
+    "end": 460,
+    "header_sha256": "1c5ec756f20c736279c275b464e4f87e13a6b8b4c6497535466def618cc2d552",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 427
+  },
+  "ValuationRing.completionIntegersLocalizedPrime": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "58c4dd334f24feb193479b71ffd6eb82125e99d2452432d2fab5cbd641efe943",
+    "end": 344,
+    "header_sha256": "b088980e1ee2f7d87df9fd7de059da99239aae0c6a99ad408c2f72a955612f46",
+    "kind": "def",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 328
+  },
+  "ValuationRing.completionIntegersLocalizedPrime_isPrime": {
+    "display_kind": "instance",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 353,
+    "header_sha256": "b37e0985ef10a62469b3bef68163eb2e5444a8fd6fd3aab5613cbfacba991409",
+    "kind": "instance",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 346
+  },
+  "ValuationRing.completionIntegersQuotientEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "5dd2ba1621f93784b4aea2712854fcd3dd84e16da44126ccb8ea61b5b582240d",
+    "end": 508,
+    "header_sha256": "63e81c5fb0031daeb3fe0b112c59596f65712301834febc028787982a860af99",
+    "kind": "def",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 494
+  },
+  "ValuationRing.completionIntegersQuotientEquiv_mk": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 523,
+    "header_sha256": "4d51298222826dc49fe65a597b1267703d9e83afa8b990d4335f33d63a5c4a1b",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 510
+  },
+  "ValuationRing.completionIntegersValuationSubring_eq_localizedAtPrime_composite": {
+    "display_kind": "theorem",
+    "doc_sha256": "2886cc09b0e9edeaf73cc1ca7046d7e9bd8a308ada48324e83fa66030cd0f04d",
+    "end": 326,
+    "header_sha256": "44ee13e27834f2a796ac9290861097c8e84a49f18984aa177a71c530258e1fc1",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 166
+  },
+  "ValuationRing.completionIntegers_algebraMap_isLocalHom": {
+    "display_kind": "theorem",
+    "doc_sha256": "45eba888ffdc214f35df1572b6ce3cf1caa30663d027cba50e59948543028cff",
+    "end": 62,
+    "header_sha256": "4f3568d6cc90e60014a163973830e5c56832916f9083584c80e94c6d38fb340c",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 34
+  },
+  "ValuationRing.completionIntegers_exists_associated_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "eae60e5cfe83708da24849d0f673746b36ddffb5b0317b59b011b55c7cfdccb2",
+    "end": 76,
+    "header_sha256": "7aa05cc8995a5143a3b1301923f9239e11e1322103cae5dd6f331d0c08bb99d9",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 40
+  },
+  "ValuationRing.completionIntegers_le_localizedAtPrime": {
+    "display_kind": "theorem",
+    "doc_sha256": "577d1d5b3915ba63cdc0e5e36bd738c9ad8abfdc42088e1e33196c3794350ca8",
+    "end": 164,
+    "header_sha256": "ea2f7032367aea353087279631bde29ad8d1114352b9e71ff6e7c1ac036a04d0",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 126
+  },
+  "ValuationRing.completionIntegers_mem_range_localizedAdicCompletion": {
+    "display_kind": "theorem",
+    "doc_sha256": "c61b4808c30051b3e7a9e45d22f9335fbb0402ab4be90e6c910dce98b49a588f",
+    "end": 331,
+    "header_sha256": "3d1fb4ee41c34cb9956ff67351d437e941d6d317213dbe1c4e4a1be66312c902",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 286
+  },
+  "ValuationRing.completionIntegers_ofPrime_localizedPrime": {
+    "display_kind": "theorem",
+    "doc_sha256": "6eb1ad61c8598385f4c541efd083ad705ae95ab3558feed97d0853a39873b6d1",
+    "end": 379,
+    "header_sha256": "930bad425e4032a9d19b9825b7e5cd773b40b4ac616502428fd75eb3622a48c1",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 355
+  },
+  "ValuationRing.completionIntegers_residueFieldMap_bijective": {
+    "display_kind": "theorem",
+    "doc_sha256": "c157a08a549a1edd9681647cd609226dc78483ace3f50fb305af7c51c1c5c794",
+    "end": 116,
+    "header_sha256": "1cb8e65fab050a848c323ee75b9ed47ef7d3d7ccdbe87ad3aef47c507a2d17d8",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 64
+  },
+  "ValuationRing.denominator_dvd_of_not_mem_radical": {
+    "display_kind": "theorem",
+    "doc_sha256": "0aca8e3fc0a1e27c5a6afd261020f58dfc75f744d738c667b16d5354d15771a6",
+    "end": 44,
+    "header_sha256": "10d2436907e3a6c9425012482aa756220bb57910f28330c686a36862290f3686",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 37
+  },
+  "ValuationRing.denseRange_algebraMap_completionIntegers": {
+    "display_kind": "theorem",
+    "doc_sha256": "57c9d58a0a04a105cbd2a885a1c5faa789ba1207edbc48ddb577bd0f371502d3",
+    "end": 88,
+    "header_sha256": "1cc9dccd4e6fed721706aba18f520ab69022672df9ce162cbc6cb1dd9e68bddc",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 73
+  },
+  "ValuationRing.exists_pow_valuation_lt_of_isHausdorff": {
+    "display_kind": "theorem",
+    "doc_sha256": "99f1c68ad617f243cec242d11250d7b2b3a8d19cb433236015fc5346f7b66389",
+    "end": 119,
+    "header_sha256": "aba69c1a818c98f156ae48c9d800633d3e39f7ac7e9b7c8d17892344916ca42b",
+    "kind": "theorem",
+    "module": "AdicModules.ValuationTopology",
+    "start": 106
+  },
+  "ValuationRing.hasBasis_nhds_zero_adic_localizedPowerImage": {
+    "display_kind": "theorem",
+    "doc_sha256": "eb952b8b52f1010c67af5a38a4214f2a06f2fbd91eb5b5bc5a1024d1f162b934",
+    "end": 111,
+    "header_sha256": "ffedcb1f01dff4a153e47220f5ef813fde0012be46e816a68e2cdeb8497fba14",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 94
+  },
+  "ValuationRing.isAdic_valuationTopology_span_singleton": {
+    "display_kind": "theorem",
+    "doc_sha256": "54ddd20f2fd6e88dd2e917aa0278dcd95b62a33324b0e58f1fd3fcd1c55a3f42",
+    "end": 157,
+    "header_sha256": "b837e8aae7c8dc82f5228009885363af5ef14330697a871d5273280417e76b7f",
+    "kind": "theorem",
+    "module": "AdicModules.ValuationTopology",
+    "start": 121
+  },
+  "ValuationRing.isHausdorff_localizationAtNonzeroPrime_span_singleton": {
+    "display_kind": "theorem",
+    "doc_sha256": "bf102928af03fe3c02e63a55c1cfc2c6e63f8b7c2fd92b7ccbaf0bb82695f715",
+    "end": 162,
+    "header_sha256": "e7ec55a213d7c363a89be0e0bc29e2bc8267dfd168055736a7cadfae254a544d",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 153
+  },
+  "ValuationRing.isHausdorff_localizationAtPrime_span_singleton": {
+    "display_kind": "theorem",
+    "doc_sha256": "d1cb3659d3f42054632a1cd6f4543521859a8d10af920c1dab6ace2d1f1ffa12",
+    "end": 151,
+    "header_sha256": "2ceeffacbe1c0ac0d8d0fc5733b64e63ab135850815b858c805e9c540e08aa11",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 141
+  },
+  "ValuationRing.isHausdorff_localization_span_singleton": {
+    "display_kind": "theorem",
+    "doc_sha256": "943158d7fb2167f0f8acf660480462ed9cff00d724d6c2f2582ee80b1281b5a4",
+    "end": 139,
+    "header_sha256": "be6d912c677b540b29aae491ca47e266022c53d0f29b094a60e84fc1a765e2b0",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 113
+  },
+  "ValuationRing.isUniformInducing_algebraMap_fractionRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "8b8dc1a4b62b59f4acbf37f042800fcedede5ac776aeb2d6c57f4f1945be22df",
+    "end": 158,
+    "header_sha256": "d83eae6da23ee8d813cf41ca4967be92149d3c9fee6f6c1061db4275ad9dad6a",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 90
+  },
+  "ValuationRing.isUniformInducing_mapToFractionRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "89bad3e497cd8d4a229be5f511a7e1a4da1a617615791e988252d256a32fd6cf",
+    "end": 168,
+    "header_sha256": "ee8daafafaf70ec3fd65978afce15974b47163ba0e1b620d39f62f6417953e5b",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 117
+  },
+  "ValuationRing.ker_completionIntegersCompositeResidue": {
+    "display_kind": "theorem",
+    "doc_sha256": "b4a75d957159d0a0d44a92fa08771ef95cee472a1eb4e88401b3d56eea28b450",
+    "end": 492,
+    "header_sha256": "13186222a3cfef1a12485d1a8c2697652491e193c4b91eac4f3e52bc4cd47160",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedValuationComposite",
+    "start": 462
+  },
+  "ValuationRing.localization_isValuationRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "12374876db4ba7eeb35a985c710e9a926df1a16475e2cea6a3e0f471230157d1",
+    "end": 57,
+    "header_sha256": "153e1ee5949841c38b2b2b52bc3e8179a57287118e7a6f4848e2df02e35b3df4",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedValuationSubring",
+    "start": 30
+  },
+  "ValuationRing.localizedAdicCompletionFractionFieldAlgebra": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "cd11df615b6fa10d70c3b021ef236324508c05ef0e726e1672919a15a8ae30a6",
+    "end": 345,
+    "header_sha256": "e46eca1c9672ed9e451ad220bc7ffceeacb6cddd1e04ed7b3cd1a56478fdc8c1",
+    "kind": "def",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 333
+  },
+  "ValuationRing.localizedAdicCompletionResidueFieldEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "b109e896915624bd492ca36e47861ab5e27479f53219e50ebe3b11e2b5c4f538",
+    "end": 85,
+    "header_sha256": "65d37bb16aadc5c49d3be622e129bcff2d1a6069fdc645d23ed9f8ddf91df455",
+    "kind": "def",
+    "module": "AdicModules.LocalizedResidueField",
+    "start": 34
+  },
+  "ValuationRing.localizedAdicCompletionResidueFieldEquiv_residue": {
+    "display_kind": "theorem",
+    "doc_sha256": "bf63ef0b6b9db140607348afb18f2ab95c4948632734e265087968fe395bd61d",
+    "end": 140,
+    "header_sha256": "633ae330349cf5a5a920f8804fe799a7eb293862f6012cc79a1af8ec2b10347b",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedResidueField",
+    "start": 87
+  },
+  "ValuationRing.localizedAdicCompletionToFractionFieldCompletion": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "3cf588da3f26ecb87c216dcc6a3cd980e5a2ba106ec19e8cadc265cb985d80e3",
+    "end": 197,
+    "header_sha256": "29afcd33568413003468e7047008a0b7bafa339b4ea3287b5911d9433ec38fd0",
+    "kind": "def",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 170
+  },
+  "ValuationRing.localizedAdicCompletionToFractionFieldCompletion_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "5faeb376e0f1ed5256c6c7b74ad93815adfe26eafdceb3e5fb9e944f9b1290d6",
+    "end": 232,
+    "header_sha256": "537e3d2610a0d164fc03cb0dd5b5b14fff933184fad9f6b46bb8bea06a85d557",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 199
+  },
+  "ValuationRing.localizedAdicCompletionToFractionFieldCompletion_algebraMap_base": {
+    "display_kind": "theorem",
+    "doc_sha256": "c455695728399c027a16a8c74a96676910152ce86cf2a658d5e4209d40564ae0",
+    "end": 247,
+    "header_sha256": "b4a4fb8ef199cd9b089b965578fd2f37647678a061fea249ffcf78c1b0b7b311",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 234
+  },
+  "ValuationRing.localizedAdicCompletionToFractionFieldCompletion_injective": {
+    "display_kind": "theorem",
+    "doc_sha256": "d99ed7f93153bcace21d176d67a7363e16638545fe7f961f67d3d233d8145996",
+    "end": 284,
+    "header_sha256": "25dee09f991a24d64858512c93caea15ef191b73f998fb4b0daf4adcc6e143fc",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 249
+  },
+  "ValuationRing.localizedAdicCompletionValuationSubring": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "2f0549ca92f7312df6679a15149cf67327bb348e51a42e7b531d29b1e3ea58c9",
+    "end": 96,
+    "header_sha256": "ac47dac2c99d9800b36d48913371fee7b977c5ae4aafe3dc3dc00a851c90d4f1",
+    "kind": "def",
+    "module": "AdicModules.LocalizedValuationSubring",
+    "start": 64
+  },
+  "ValuationRing.localizedAdicCompletionValuationSubringEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "59083648ee9240b356e488c27b1690ea9147ed8f1e7a1cb84ef486d31432614e",
+    "end": 131,
+    "header_sha256": "90c1333725255b9609a447b23e6caae2a882b15ecc93c08a759fd6ceca8bbdae",
+    "kind": "def",
+    "module": "AdicModules.LocalizedValuationSubring",
+    "start": 98
+  },
+  "ValuationRing.localizedAdicCompletion_isFractionRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "4a2bec57e322824ebd5c978741545881b41c76ee11423a59f7ac378b3e7cc393",
+    "end": 387,
+    "header_sha256": "15f2ddd4cdd2c2042f80cf795d2cd8f3eaceab1ed9022ca7312c89d4899db11c",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedCompletion",
+    "start": 347
+  },
+  "ValuationRing.localizedAtPrimeQuotientValuationSubring": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "36a0113179301b40e5963ff10e35bc8b1d8482881b2f806d60214a6b4ed1fc46",
+    "end": 72,
+    "header_sha256": "5a625b49174d3c4c159298b23dc58930411f9f0013ad41d2111448bd228bb0d9",
+    "kind": "def",
+    "module": "AdicModules.LocalizedQuotientValuationSubring",
+    "start": 45
+  },
+  "ValuationRing.localizedAtPrimeQuotientValuationSubring_algebraMap_mem": {
+    "display_kind": "theorem",
+    "doc_sha256": "51332b7a442285ce9b60c3104ab67408ff0b9d39a22a1bfc0491882a69cbd0fc",
+    "end": 144,
+    "header_sha256": "dbb4c51b7a19844e480c6788b73e2033748e0259ccae6f2a1dbcc61c5ac3a8e6",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedQuotientValuationSubring",
+    "start": 114
+  },
+  "ValuationRing.localizedPowerImage": {
+    "display_kind": "def",
+    "doc_sha256": "5d450ad4f8f6ee4bc80819972327e8d02d2613192e4e3201cbafec7f303cd2cb",
+    "end": 35,
+    "header_sha256": "1c3aaf86210ee6c87e1ba3c362538d0513f6a373ac254758bd466cb5bdab2db2",
+    "kind": "def",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 32
+  },
+  "ValuationRing.localizedPowerImage_sandwich": {
+    "display_kind": "theorem",
+    "doc_sha256": "f01876dfbabb939eaed0fa7366bdc5bba0a158d0f09030eda0e6820d050daa84",
+    "end": 92,
+    "header_sha256": "c434732907c542fb3976af2e01b2bd9807daacdd43394af095e87207cc25cbac",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 72
+  },
+  "ValuationRing.mem_localizedAtPrimeQuotientValuationSubring": {
+    "display_kind": "theorem",
+    "doc_sha256": "61220cc6d2a3791556c9125196e83de6df011e56314fb9eb67cd97f72e39f5f0",
+    "end": 112,
+    "header_sha256": "39640c51483c007f4244b6bd7fdabef47ac83b64c10b252d4dd7b7f6b6bd1657",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedQuotientValuationSubring",
+    "start": 74
+  },
+  "ValuationRing.pow_succ_mul_mem_localizedPowerImage": {
+    "display_kind": "theorem",
+    "doc_sha256": "76aecb8b71543ad889856c6b5c572ee4d80c902cfbff7fdc58e6377fb4cfd932",
+    "end": 70,
+    "header_sha256": "effa0023efbe00845c0065a0786f68eb620492bc439f3a06f16e6c70ef30aa6f",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedFiltration",
+    "start": 46
+  },
+  "ValuationRing.primeCompl_disjoint_radical_span_singleton_of_isHausdorff": {
+    "display_kind": "theorem",
+    "doc_sha256": "47671ffa5146511a78eae34a72cb889ac77ab7f353262dd282dfde28e94bf318",
+    "end": 43,
+    "header_sha256": "61718d3efd73d7d9e73bf44c0509ba8524e8e9daba84e34a640b04a3a3638de7",
+    "kind": "theorem",
+    "module": "AdicModules.LocalizedQuotientValuationSubring",
+    "start": 34
+  },
+  "ValuationRing.principalAdicCompletionEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "e79680c49485897111b66e87af2141d414d5aa3b4fcd7d80dbdff05e975a931e",
+    "end": 289,
+    "header_sha256": "3d262976fa4edd598475850b749ee8543113f3906f85d533161427e747aa5948",
+    "kind": "def",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 283
+  },
+  "ValuationRing.principalAdicCompletionEquiv_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "1c5852ccd8d79a9881a20c2100c8dfdcd608b6202c0f38f0801a59da4dfff005",
+    "end": 297,
+    "header_sha256": "0988f627ea2382f7b1ce6a00121ef06e08285b1979996b26b2d821a72057df98",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 291
+  },
+  "ValuationRing.principalAdicCompletionFractionFieldAlgebra": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "7a86a195f4bc8418afa72e56119a924c92251f3c31c2fd9196df2a357156d2e5",
+    "end": 69,
+    "header_sha256": "c96b1673b1b7d3834de9aa143f6f16bb49c93dc1b2b804195f8e0e1e4413ea7b",
+    "kind": "def",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 60
+  },
+  "ValuationRing.principalAdicCompletionFractionFieldAlgebra_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "cd29cee2f7da68c02e38b82887301c3ee9e87bc15ce27f659363a8673ba97f17",
+    "end": 83,
+    "header_sha256": "9ae053e0cb08f776dbbf3ee069a21b6278c7e3b096a521c662e2001231616221",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 71
+  },
+  "ValuationRing.principalAdicCompletionFractionFieldAlgebra_algebraMap_base": {
+    "display_kind": "theorem",
+    "doc_sha256": "24f6564e215c154091b447ddaaa01622448de7fd7f083bdd49879a04a69e640b",
+    "end": 100,
+    "header_sha256": "45bc8b9efb49ee89d6af469ba88ce66bdcbde02c3d4c87fcee4c39b38ee5515a",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 85
+  },
+  "ValuationRing.principalAdicCompletionPrimeSpectrumOrderIso": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "d62a60c89150aabb8506e7b2e52ab9525c27ea521c481237790674f59fef7967",
+    "end": 218,
+    "header_sha256": "843ef382a915e53662ff67644b946abdd13f20a9370c009f67c096088cf778f7",
+    "kind": "def",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 183
+  },
+  "ValuationRing.principalAdicCompletionRingEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "7b393538fb783c39da617704e210638f554eece6cd0432de1910ff2f4ab55425",
+    "end": 265,
+    "header_sha256": "bc89364a209842a376950ce665e023e81afd3dd0a43fc7565df599e9e27b66ee",
+    "kind": "def",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 191
+  },
+  "ValuationRing.principalAdicCompletionRingEquiv_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "289c632e16d7aa2a3d707da2aa67f1e8e1484dcae6a0b8ea8e2be9956e5237c6",
+    "end": 281,
+    "header_sha256": "818e94804292b2a2e71a0dd5c121494dfe4483497a9f26606aecdbecc4636351",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedIntegers",
+    "start": 267
+  },
+  "ValuationRing.principalAdicCompletion_algebraMap_isLocalHom": {
+    "display_kind": "theorem",
+    "doc_sha256": "516211d29adc65ff84111f97f4a261a5adca6ebd11d6e26da5d654a7a8fa2d59",
+    "end": 194,
+    "header_sha256": "e7fd61d734ba3cf94719a83b07eec284e8b6ed15c8ea41b80ca7711eb90631bd",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 178
+  },
+  "ValuationRing.principalAdicCompletion_exists_associated_algebraMap": {
+    "display_kind": "theorem",
+    "doc_sha256": "9e3370895217cd24d5f7000a2797ea1e60d5d4f8a39fe18949f417cbc482e02b",
+    "end": 96,
+    "header_sha256": "e348a957724afe877c28ef57863336401c4cd8b3ac9fe63784f7c8c76c9ad774",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 78
+  },
+  "ValuationRing.principalAdicCompletion_extensionValuation_isEquiv": {
+    "display_kind": "theorem",
+    "doc_sha256": "8ce8863eb69ccb981f400e175aba9b9e6371655f5b6cb684f968465aa756754e",
+    "end": 181,
+    "header_sha256": "72239b6afd4b8424ea0aa4883b0cea0cecdd31d013e6373d8e23db7bdb05cb8d",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 139
+  },
+  "ValuationRing.principalAdicCompletion_faithfullyFlat": {
+    "display_kind": "theorem",
+    "doc_sha256": "b4a6db8138705c65a1a5a44e8ed0df0cef3843734343fe900471fe5db4c6f016",
+    "end": 137,
+    "header_sha256": "ca0e92798f024673e5272b14ee3f10b35d778b695f4cf9d36ee43219b6494860",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 113
+  },
+  "ValuationRing.principalAdicCompletion_isDomain": {
+    "display_kind": "theorem",
+    "doc_sha256": "c9dca9c6d629754e8d513c56e818df072acb439b3245e223499c4a027dbae12a",
+    "end": 41,
+    "header_sha256": "49c39e2a48ad44d5547cc411832df60c4b6f4544299ec52e449b2850536ae342",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 35
+  },
+  "ValuationRing.principalAdicCompletion_isFractionRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "e8088a6b80171ec471ae4ff53eabda0dbf76f69772977e6e1558d9fd4ec87292",
+    "end": 117,
+    "header_sha256": "9bb272d3adc79f69502fc7cc099895ad55a3f04b52c70fa4360636d4dbe93a12",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 102
+  },
+  "ValuationRing.principalAdicCompletion_isValuationRing": {
+    "display_kind": "theorem",
+    "doc_sha256": "1679d26358cee5b5300019f4933c5af44eb21160cddfe20455d348c9169cb0f4",
+    "end": 58,
+    "header_sha256": "ad3cddc45f9765a2afe0f32d6204a2d199ea4d0d344d7557329348a6acb9f530",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 43
+  },
+  "ValuationRing.principalAdicCompletion_map_comap_eq": {
+    "display_kind": "theorem",
+    "doc_sha256": "bba5f156f46626ac3317e069e13ca682e4c90c78552b37a5683ff6b0bd74cd8d",
+    "end": 111,
+    "header_sha256": "03c2447872d5a651979ea279b8bb29fdeb4fe116bc85b000d8172ac328fc3b9d",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 98
+  },
+  "ValuationRing.principalAdicCompletion_maximalIdeal_eq_map": {
+    "display_kind": "theorem",
+    "doc_sha256": "05bf46358d0f69ac826fe5bb3c241270d5cdede48c6668730ffea88d38c0abdc",
+    "end": 139,
+    "header_sha256": "a9507c973d107a38ef461cb70dd46ae84982723fad64c3c6a87c0a410098512b",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 119
+  },
+  "ValuationRing.principalAdicCompletion_not_isField": {
+    "display_kind": "theorem",
+    "doc_sha256": "f96675184e041ae593e6d7a4a68661fd3ea823bf3a05253c06e0495e14ec76b6",
+    "end": 176,
+    "header_sha256": "2fe4e815b0c005faee44fa8b1505c13d54f179b633c47adcaa1ad8307e88e736",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 141
+  },
+  "ValuationRing.principalAdicCompletion_primeHeight_comap": {
+    "display_kind": "theorem",
+    "doc_sha256": "2c56d30bc1b42d94c4dc2371ef641ae92c7111fce8fb444aef70a68f5745d1fe",
+    "end": 232,
+    "header_sha256": "561964025b6e884645f86b180f872fb64f661b588da28cebe704c2f2e19ce925",
+    "kind": "theorem",
+    "module": "AdicModules.PrincipalAdicSpectrum",
+    "start": 220
+  },
+  "ValuationRing.principalAdicCompletion_residueFieldMap_bijective": {
+    "display_kind": "theorem",
+    "doc_sha256": "bf3af767554871155a680e5e1293aad46dd8b290f0fc0794d72002f28e72c088",
+    "end": 231,
+    "header_sha256": "8dc29754937aa5c6eb99b408797861cc2496a3110f0ad04dee3e0b6cd4939186",
+    "kind": "theorem",
+    "module": "AdicModules.CompletedLocalStructure",
+    "start": 196
+  },
+  "ValuationRing.radical_span_singleton_le_prime_of_isHausdorff": {
+    "display_kind": "theorem",
+    "doc_sha256": "10e9daa3f17ce729e81349c3c51ea4fb3269873c40b9b50f554e11e70d63784d",
+    "end": 104,
+    "header_sha256": "8256a52d96c8f94e2ab8744ac043489355b8347b726569e400b5470ca205804d",
+    "kind": "theorem",
+    "module": "AdicModules.ValuationTopology",
+    "start": 79
+  },
+  "ValuationSubring.composite": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "9f6a2bc0f43fb7f1bb4a2e1a1d713eb3eb39a6ccc06feac44bbddc8d80334636",
+    "end": 103,
+    "header_sha256": "1c3948e7a3a9c6e2ceb25706e4512ff64e31e3ae0dbb4aadc6d5b6fafb51eb79",
+    "kind": "def",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 26
+  },
+  "ValuationSubring.compositeAlgebra": {
+    "display_kind": "noncomputable instance",
+    "doc_sha256": "a0bb00d887e4a89daddef26efc9b7a58735655b84756342d8a6057b489c7af4c",
+    "end": 118,
+    "header_sha256": "3e96050de14aa291cf05fdf6d7ec7a667262af4ce3df09bcff828baf68f7fc31",
+    "kind": "instance",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 114
+  },
+  "ValuationSubring.compositeIdeal": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "12c529bc9fc90b2d4bcb086070190a683a6663261370f89a35f9eee40eac5358",
+    "end": 156,
+    "header_sha256": "ac01adf02177acddc756654fda99fd8ef2da9e1cdb0360b2088d7a2e5f4c3cd5",
+    "kind": "def",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 151
+  },
+  "ValuationSubring.compositeIdeal_isPrime": {
+    "display_kind": "instance",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 160,
+    "header_sha256": "9726e33656d20997ef4f0b465dc87188d5d56461ba8614a0c038fdc2f281b6aa",
+    "kind": "instance",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 158
+  },
+  "ValuationSubring.compositeResidue": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "9ac1b2732887f4827704456aab7aba539ca1381464beaf3aebd431b7d004db0b",
+    "end": 131,
+    "header_sha256": "8991d32ce3ef9b5b2bb2e93c411e4608d1f49c44ed51320cb89a082a70816944",
+    "kind": "def",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 126
+  },
+  "ValuationSubring.compositeResidue_apply": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 137,
+    "header_sha256": "d11d1c1a9e1c5388d0624d7aa339890dcd679785a43dc191ac220f70c4675a51",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 133
+  },
+  "ValuationSubring.compositeResidue_surjective": {
+    "display_kind": "theorem",
+    "doc_sha256": "02973a072d12a0e173fa94676a1dd51322063875af3294a91876ae655d3657e3",
+    "end": 149,
+    "header_sha256": "3eb53f586830898a8f19aab4d013f9f0daf7e9f0c07824b6fda7140cba41b33d",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 139
+  },
+  "ValuationSubring.composite_isLocalizationAtPrime": {
+    "display_kind": "instance",
+    "doc_sha256": "789822e41e7f7987fbd4eac986f7d2509a76e88eb60b115acdb7c51c5f24c16f",
+    "end": 184,
+    "header_sha256": "d089c4024113115c649b326738dfd373eb2054b208b190f2493640794f6c554a",
+    "kind": "instance",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 179
+  },
+  "ValuationSubring.composite_le": {
+    "display_kind": "theorem",
+    "doc_sha256": "f2450210c9333806f5dce236a9d4fad553fc634c669797d90bcc4726e10da625",
+    "end": 112,
+    "header_sha256": "ffc2774c64dceee2111106b71003141a179f49a072c790d329c919bc476a0490",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 110
+  },
+  "ValuationSubring.composite_top": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 124,
+    "header_sha256": "59617cf84f9149fd8e3fe84bd7b0094f921651c4c262513385f6345a8182f0fb",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 120
+  },
+  "ValuationSubring.eq_of_le_of_isLocalHom": {
+    "display_kind": "theorem",
+    "doc_sha256": "a8ab807d3c74690c828f7722cfd70ba134dffad12c748f226b6a1ffc35b9bc44",
+    "end": 227,
+    "header_sha256": "6dccaab93744290f9c944d4aa2a2739fe41b3004716555d8865625ade0d77c68",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 220
+  },
+  "ValuationSubring.ker_compositeResidue": {
+    "display_kind": "theorem",
+    "doc_sha256": "27a87c63eab4a5a101b60321754ec7a63f192bb9dcd9381f8e7def9b87c386c8",
+    "end": 195,
+    "header_sha256": "e69933b063b402cd5a6e8dd0350340cd83e675f256a130e6e41fdaa0cfe4f6e5",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 186
+  },
+  "ValuationSubring.mem_composite": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 108,
+    "header_sha256": "de927db2577bc4d2e7e7027a9dd629fb7235536f5fb3eca375028b9f0db4b8ef",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 105
+  },
+  "ValuationSubring.mem_compositeIdeal": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 203,
+    "header_sha256": "269897c841b99e68788cab5c92c4b19a674fae7365d038dd292685648ebb55dc",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 197
+  },
+  "ValuationSubring.ofPrimeCompositeIdealAlgEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "80821ed68127730056bd6125bc890d82fb829ff29bcd38185acbd7044d1f1d6d",
+    "end": 177,
+    "header_sha256": "520c2f71959ba65ad0d867a28973ecbec5f9dff1693b0eec84679b38c1957c6c",
+    "kind": "def",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 170
+  },
+  "ValuationSubring.ofPrime_compositeIdeal": {
+    "display_kind": "theorem",
+    "doc_sha256": "897a634b0dc1113494e3b5545695bd21260f5be2e106000091b2de5903c74895",
+    "end": 168,
+    "header_sha256": "bc27d8cbdefcd3e8d3c99d696ea25c318a733fea86412ce62761cabf6afff8f0",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 162
+  },
+  "ValuationSubring.quotientCompositeIdealEquiv": {
+    "display_kind": "noncomputable def",
+    "doc_sha256": "6c3156708e27188fa0a0ea9a2e81ff816c026a1e3ac7bd172d13737772c9c483",
+    "end": 211,
+    "header_sha256": "a19d3c6902fa4e05b9fbf0d08ad13d117b16d67de3c560e2bac20e4e3259750c",
+    "kind": "def",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 205
+  },
+  "ValuationSubring.quotientCompositeIdealEquiv_mk": {
+    "display_kind": "theorem",
+    "doc_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "end": 218,
+    "header_sha256": "790859f741bbb691ea30b088055cc576a1e5a91c77111decb0848ff440a1b48b",
+    "kind": "theorem",
+    "module": "AdicModules.CompositeValuationSubring",
+    "start": 213
+  }
+}

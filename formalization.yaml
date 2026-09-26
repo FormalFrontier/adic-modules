@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/99c678e569c7c4c0772db297c5ddd5e4c9b6322e/schema/v0.4.schema.json
+version: "v0.4"
+
+project:
+  name: "adic-modules"
+  description: >-
+    Bounded ideal-power torsion, abstract adic completions, valuation-ring
+    principal-adic completions, completed valuation integers, localization,
+    residue fields and composite valuation subrings in Lean.
+  authors:
+    - "Formal Frontier Agents"
+  responsible_maintainers:
+    - "Formal Frontier source-maintainer team"
+  license: "Apache-2.0"
+
+sources:
+  - title: "Adic modules and completions of valuation rings"
+    type: "folklore"
+    relationship: "independently-proves"
+    note: >-
+      Reusable mathematical constructions on native mathlib modules, ideals,
+      inverse limits, valuations, uniform completions and localization.
+      No mathematical novelty or source-author endorsement is claimed.
+  - title: "Foundations of Rigid Geometry I"
+    authors:
+      - "Kazuhiro Fujiwara"
+      - "Fumiharu Kato"
+    id: "https://arxiv.org/abs/1308.4734v5"
+    type: "book"
+    relationship: "background"
+    note: >-
+      Motivating mathematics, including bounded torsion and separated
+      principal-adic valuation-ring completions. Detailed passage correspondence
+      and remaining gaps are recorded separately; no whole-source coverage or
+      completion claim is made by this library or metadata.
+
+related_formalizations:
+  - id: "https://github.com/leanprover-community/mathlib4"
+    relationship: "builds-on"
+    note: >-
+      Native mathematical infrastructure at revision
+      e37d88a26f3791ed5a93daa1f949af1021b8d103 with Lean v4.34.0-rc2 and
+      the complete pinned Lake dependency graph.
+
+automation:
+  methods:
+    - method: "agent"
+      tool_setup: >-
+        Formal Frontier AI agents using Lean, Lake, Git and Hive for original
+        development, independent agent review, assembly and maintenance.
+  notes: >-
+    Original project expression and earlier source-repository adaptations are
+    credited in docs/CREDITS.md. Historical development review does not approve
+    later modifications. Unverified model identities and costs are omitted.
+
+status:
+  scope: >-
+    Uniform ideal-power torsion and valuation-free abstract completions for
+    finitely generated ideals; separated nonzero principal-adic valuation-ring
+    completions of arbitrary valuation rank, with independent ring and field
+    universes. Local, residue, spectrum and localization results keep their
+    actual maximal-ideal, radical-disjointness and nonzero-prime hypotheses.
+    General nonseparated reduction, height/rational-rank additivity, isolated
+    subgroups, value-group exact sequences and source completion are not claimed.
+
+review:
+  status: "other: historical development reviews; exact-artifact release review recorded separately"
+  notes: >-
+    Accepted development main d8ceb6a5db0b1080c0c166be4dc1c71a632bc788
+    contains the bounded units integrated through PRs 2, 4, 6, 8, 10, 12,
+    14, 16, 17, 19, 21, 22, 23, 24 and 25. The normal successor ending at
+    a590809e4012f98f443edff7a40574aad1108799 introduces public module
+    boundaries, stable private clients, the complete default test target,
+    a proof-local exposure repair and a small simp-normalization repair.
+    At the start of this assembly, those readiness changes had not received
+    independent acceptance. A later release decision must bind the exact final
+    artifact and complete semantic, proof, rights, documentation and resource
+    evidence. Historical review does not approve subsequent changes, and no
+    official release or publication decision is self-certified by this file.
+
+acknowledgements: >-
+  Lean and mathlib authors for the proof assistant and mathematical infrastructure;
+  Anchor for the attributed project development and assembly, and independent
+  Formal Frontier agent reviewers. Collective credit does not identify a legal
+  copyright holder or clear incorporated third-party material.
