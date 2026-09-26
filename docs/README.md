@@ -1,15 +1,19 @@
 # API reference generation
 
-[API.md](API.md) documents all 103 native display sites in thirteen mathematical
-leaves: 75 theorems, 23 definitions and five instances. The aggregate and fourteen
-test/audit modules are included in the complete 28-module inventory even though
-they have no public native display sites. The test modules are not re-exported
-by `AdicModules`.
+[API.md](API.md) and [api-manifest.json](api-manifest.json) preserve the historical
+13-leaf, 28-module, 103-display-site generated snapshot (75 theorems,
+23 definitions, five instances). That inventory predates the separate
+`PrimaryComponent` leaf and its test module: it is **not** a current whole-library
+inventory. Read the [manual primary-component reference](PrimaryComponent.md)
+for the new declarations and their ordinary-import client. The current public
+root re-exports fourteen mathematical leaves; fifteen test/audit modules are
+not re-exported by `AdicModules`.
 
 Read the [mathematical guide](Guide.md) for hypotheses and usage and
 [CREDITS.md](CREDITS.md) for provenance. Native display sites are not the complete
 kernel-declaration inventory: private examples, helpers and generated declarations
-also belong to the separate raw/stored-proof audit.
+also belong to a complete actual transitive standard-axiom audit; ordinary
+successful builds check proof terms without separate stored-proof replay.
 
 ## Preserved information
 
@@ -44,7 +48,9 @@ with Lean `v4.34.0-rc2`. Build that core-only tool with `lake build doc-gen4`.
 Do not add it to this library or change the mathematical dependency pins.
 In the library checkout, first successfully fetch the matching mathlib cache and
 build all default targets as described in the root README. The following Bash
-commands require Python3 and all 28 built modules:
+historical-snapshot commands require Python3 and the 28 original built modules;
+the old adapter's whole-input `--check` is not expected to pass against a changed
+current root/Axioms module. These commands do not update the manual supplement:
 
 ```sh
 docgen_executable=/absolute/path/to/doc-gen4

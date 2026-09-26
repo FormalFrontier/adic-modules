@@ -4,7 +4,8 @@ Reusable Lean theory for adic modules and ideal-power torsion.
 
 Authors: Formal Frontier Agents. Licensed under [Apache-2.0](LICENSE).
 See the [mathematical guide](docs/Guide.md) for entry points and hypotheses,
-the [complete native API reference](docs/API.md) for declaration signatures,
+the [historical generated API reference](docs/API.md) and
+[manual primary-component reference](docs/PrimaryComponent.md) for declaration signatures,
 and [credits and provenance](docs/CREDITS.md) for original contributions,
 earlier project adaptations and upstream acknowledgments. The
 [documentation recipe](docs/README.md) records exact input binding, reproduction
@@ -17,8 +18,12 @@ source-independent predicate that a power of an ideal annihilates a module and
 develops its basic closure API: exponent and ideal monotonicity, submodules,
 surjective linear images, quotients, and extensions. For finite modules, it
 also identifies uniform ideal-power torsion with the condition that the
-elementwise `Ideal.primaryComponent` is the whole module. It also packages the
-inverse-limit completion of a finitely generated ideal as an
+elementwise `Ideal.primaryComponent` is the whole module. A separate module
+proves height-one primary-component exactness for a Dedekind-domain exact pair
+with a torsion source, and transports this to restricted maps of ordinary
+abelian-group primary subgroups. It assumes neither a uniform exponent nor
+torsion of the middle or target. The library also packages the inverse-limit
+completion of a finitely generated ideal as an
 `AbstractCompletion` of any ring carrying the corresponding adic uniform
 topology. For a valuation ring, it proves that separation for the powers of a
 nonzero principal ideal makes those powers cofinal in the induced valuation
@@ -90,11 +95,12 @@ lake exe cache get
 lake --wfail build
 ```
 
-The default target includes the public library and all fourteen ordinary-import
-test/audit modules. Individual clients can also be replayed with:
+The default target includes the public library and all fifteen ordinary-import
+test/audit modules. Individual clients can also be checked with:
 
 ```text
 lake env lean -DwarningAsError=true AdicModulesTest/BoundedIdealPowerTorsion.lean
+lake env lean -DwarningAsError=true AdicModulesTest/PrimaryComponent.lean
 lake env lean -DwarningAsError=true AdicModulesTest/AdicCompletion.lean
 lake env lean -DwarningAsError=true AdicModulesTest/ValuationTopology.lean
 lake env lean -DwarningAsError=true AdicModulesTest/CompletedIntegers.lean
@@ -110,10 +116,12 @@ lake env lean -DwarningAsError=true AdicModulesTest/CompletedValuationComposite.
 lake env lean -DwarningAsError=true AdicModulesTest/Axioms.lean
 ```
 
-The explicit `#print axioms` client is a useful selected audit, not a complete
-private/generated-declaration census or an independent stored-proof checker.
-Those are separate, exact-artifact release checks. A successful build, import,
-documentation render or historical reviewer verdict does not replace them.
+The explicit `#print axioms` client is a selected audit, not a complete
+private/generated-declaration census. Release computation requires an ordinary
+successful build and a complete actual transitive standard-axiom audit of all
+repository declarations, including private helpers and test declarations;
+there is no separate stored-proof replay requirement. Documentation rendering
+or historical review does not replace mathematical and artifact-specific review.
 
 For measured cache/build cost and resource cautions, see
 [reproduction and resources](docs/Guide.md#reproduction-and-resources).

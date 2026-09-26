@@ -4,7 +4,8 @@ version: "v0.4"
 project:
   name: "adic-modules"
   description: >-
-    Bounded ideal-power torsion, abstract adic completions, valuation-ring
+    Bounded ideal-power torsion, primary-component exactness, abstract adic
+    completions, valuation-ring
     principal-adic completions, completed valuation integers, localization,
     residue fields and composite valuation subrings in Lean.
   authors:
@@ -55,8 +56,10 @@ automation:
 
 status:
   scope: >-
-    Uniform ideal-power torsion and valuation-free abstract completions for
-    finitely generated ideals; separated nonzero principal-adic valuation-ring
+    Uniform ideal-power torsion, height-one Dedekind primary-component exactness
+    for torsion-source pairs, ordinary integer-prime subgroup restrictions and
+    valuation-free abstract completions for finitely generated ideals; separated
+    nonzero principal-adic valuation-ring
     completions of arbitrary valuation rank, with independent ring and field
     universes. Local, residue, spectrum and localization results keep their
     actual maximal-ideal, radical-disjointness and nonzero-prime hypotheses.
@@ -77,9 +80,14 @@ review:
     artifact and complete semantic, proof, rights, documentation and resource
     evidence. Historical review does not approve subsequent changes, and no
     official release or publication decision is self-certified by this file.
+    The primary-component contribution received independent mathematical/API
+    review on 2026-09-26; that review does not certify a later release artifact
+    or its publication.
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;
-  Anchor for the attributed project development and assembly, and independent
-  Formal Frontier agent reviewers. Collective credit does not identify a legal
+  Anchor for the attributed earlier project development and assembly, the
+  original primary-component research contributor and the current port author
+  as distinguished in docs/CREDITS.md, and independent Formal Frontier agent
+  reviewers of earlier work. Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

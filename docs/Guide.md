@@ -21,6 +21,16 @@ extension lemma uses exponent `n + m`. The
 [ordinary-import client](../AdicModulesTest/BoundedIdealPowerTorsion.lean)
 shows both the specified-exponent and existential-bounded interfaces.
 
+The [primary-component module](../AdicModules/PrimaryComponent.lean) instead
+works with element-dependent ideal powers. For an exact pair of modules over a
+Dedekind domain, its height-one component maps are exact if the **source** is
+torsion; no other torsion, finiteness or uniform exponent premise is present.
+For abelian groups, the integer prime `(p)` has the ordinary `p`-primary
+subgroup as its component, and maps restricted to these ordinary subgroups
+are exact when the source group is torsion. Read the
+[manual reference](PrimaryComponent.md) and its
+[ordinary-import client](../AdicModulesTest/PrimaryComponent.lean) for signatures.
+
 ## Completion and valuation hypotheses
 
 [`AdicCompletion.abstractCompletion`](../AdicModules/AdicCompletion.lean)
@@ -53,6 +63,7 @@ All module names below have prefix `AdicModules.`.
 | Module | Main role |
 | --- | --- |
 | [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | Uniform torsion and finite-module bridge |
+| [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
@@ -106,7 +117,8 @@ recorded in that bounded run. Source-comment changes and documentation generatio
 are separate subsequent work and are not benchmarked by those earlier numbers.
 
 Allow more time and memory on a cold or different machine. Build success and
-selected axiom output are distinct from exhaustive private/generated axiom
-enumeration and independent stored-term checking. Native API documentation has
+selected axiom output are distinct from the required complete transitive
+standard-axiom audit, including private/generated and test declarations.
+Native API documentation has
 its own source/pin binding and reproduction requirements; no documentation output
 should be used as proof-integrity or source-coverage evidence.

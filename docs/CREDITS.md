@@ -51,6 +51,23 @@ clients, proof-local export compatibility, the default test target and the
 completed-integer simp-normalization repair. Earlier development reviews do not
 automatically approve these changes or this release assembly.
 
+The new `PrimaryComponent.lean` has an expression predecessor in
+`source-nsw`, accepted research revision
+`3c76ffd1abb20b0927bbd72ff8ba3dffb2ca8fef`, files
+`NSWResearch/Chapter10/PrimaryTorsionExactness.lean` and
+`research/chapter-x-primary-torsion-exactness-reuse.md` (original author
+expression `b5181f78b7274b9e4fa63de74a85cbc0f86c4f43`). The original
+source-research author was Formal Frontier worker-b Task
+`hive-request-cc72e29df4ce7c3051bfb029c85e59fec5d3853a`, UID
+`8f42012f-5421-46e1-88fa-068ce8e60628`; its fresh worker-a review
+approved bounded research, **not** this different library contribution.
+The Adic port adds an ordinary-subgroup restricted map and its exactness
+transport, and is authored by a distinct Formal Frontier worker-b Task
+`hive-request-6f4d01cb68a0c44b2782b550e0c501fe69398e16`, UID
+`bf9d73f7-a8e7-4d94-941d-119acd8ca43b`. Exact candidate attribution,
+checks and its later independent disposition are recorded by the maintainer;
+this credit does not assert review or acceptance of the new work.
+
 Independent Formal Frontier agents reviewed earlier mathematical units; their
 exact candidate-specific verdicts remain in the development records. Review is
 distinct from code authorship. Historical objects need not belong to a public
@@ -67,6 +84,12 @@ correspondence. No source PDF, scan, figure or substantial source excerpt is bun
 The library uses native Lean/mathlib objects and proof infrastructure at the exact
 pinned revisions. It does not vendor those dependencies. Their licenses and author
 notices remain in their upstream repositories. The source design consulted
+`Mathlib/Algebra/Module/Torsion/PrimaryComponent.lean`,
+`Mathlib/GroupTheory/Torsion.lean` and `Mathlib/RingTheory/Ideal/Int.lean` at
+mathlib `e37d88a26f3791ed5a93daa1f949af1021b8d103`; the new leaf reuses
+their primary-component, Dedekind surjectivity, abelian torsion and integer-ideal
+objects rather than copying or replacing upstream implementations. The earlier
+design also consulted
 mathlib's `Mathlib/RingTheory/LaurentSeries.lean` completion-comparison pattern at
 `e37d88a26f3791ed5a93daa1f949af1021b8d103`. That file credits Aaron Anderson,
 María Inés de Frutos-Fernández and Filippo A. E. Nuccio, under Apache-2.0, with

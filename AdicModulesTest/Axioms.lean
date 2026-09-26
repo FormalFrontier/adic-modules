@@ -16,6 +16,14 @@ import AdicModules
 #print axioms Module.IsKilledByIdealPower.quotient
 #print axioms Module.isTorsionBySet_ideal_pow_extension
 #print axioms Module.IsKilledByIdealPower.extension
+#print axioms Ideal.primaryComponent.exact
+#print axioms AddCommGroup.integerPrime
+#print axioms AddCommGroup.mem_integerPrime_iff
+#print axioms AddCommGroup.integerPrime_subgroup
+#print axioms AddCommGroup.primaryComponent.map
+#print axioms AddCommGroup.primaryComponent.map_apply
+#print axioms AddCommGroup.integerPrime_map_agrees
+#print axioms AddCommGroup.primaryComponent.exact
 #print axioms AdicCompletion.abstractCompletion
 #print axioms AdicCompletion.abstractCompletion_coe
 #print axioms Valuation.exists_pow_restrict_lt_of_isHausdorff
