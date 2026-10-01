@@ -31,6 +31,61 @@ are exact when the source group is torsion. Read the
 [manual reference](PrimaryComponent.md) and its
 [ordinary-import client](../AdicModulesTest/PrimaryComponent.lean) for signatures.
 
+## Restricting scalars in adic completions
+
+Import [`AdicModules.AdicCompletion.RestrictScalars`](../AdicModules/AdicCompletion/RestrictScalars.lean)
+alone or the `AdicModules` public root. For commutative rings `R` and `S`, an
+`Algebra R S`, an additive commutative group `M` carrying compatible `R`- and
+`S`-module structures with `IsScalarTower R S M`, and any `I : Ideal R`, the
+native inverse-limit completions are equivalent as `R`-modules:
+
+```lean
+AdicCompletion.restrictScalarsEquiv I M :
+  AdicCompletion (I.map (algebraMap R S)) M ≃ₗ[R] AdicCompletion I M
+```
+
+The forward direction goes **from the extended ideal over `S` to the original
+ideal over `R`**; `.symm` reverses it. The `R`-module structure on the source
+completion is the restriction of its `S`-module structure. This comparison
+requires no finite generation, Noetherianity, flatness, separatedness,
+completeness, nontriviality or injectivity/surjectivity of `algebraMap R S`.
+It is neither a module base-change equivalence nor a claim that an arbitrary
+adic completion satisfies a separate completeness predicate.
+
+At level `n`, `map_pow_smul_top_restrictScalars I n` identifies the extended
+ideal's power-filtration submodule after restriction of scalars with
+`I ^ n • ⊤`. The `R`-linear `restrictScalarsLevelEquiv I M n` compares the
+quotients in the same orientation as the completion equivalence.
+`restrictScalarsLevelEquiv_mk` and `restrictScalarsLevelEquiv_symm_mk` preserve
+representatives in both directions;
+`restrictScalarsLevelEquiv_transitionMap` and
+`restrictScalarsLevelEquiv_symm_transitionMap` commute with the native
+`AdicCompletion.transitionMap` for every `m ≤ n`. Pointwise level comparison
+therefore yields the forward and inverse maps on compatible families, and
+their inverse laws follow at every level. The `@[simp]` laws
+`restrictScalarsEquiv_eval` and `restrictScalarsEquiv_symm_eval` give both
+evaluation formulas; `restrictScalarsEquiv_of` and
+`restrictScalarsEquiv_symm_of` transport the two native `AdicCompletion.of`
+maps.
+
+Level zero works without a special assumption: `I ^ 0 = ⊤`, so its quotient
+is trivial. The same equivalence covers the identity algebra and both `⊥`
+and `⊤` ideals: for `⊥` positive-degree filtration terms vanish, and for
+`⊤` all quotients and completions are trivial, even if `M` is not. For a
+nonidentity algebra, import `Mathlib.RingTheory.Polynomial.Basic` and use:
+
+```lean
+example (I : Ideal ℤ) :
+    AdicCompletion (I.map (algebraMap ℤ (Polynomial ℤ))) (Polynomial ℤ) ≃ₗ[ℤ]
+      AdicCompletion I (Polynomial ℤ) :=
+  AdicCompletion.restrictScalarsEquiv I (Polynomial ℤ)
+```
+
+The [ordinary-import client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean)
+exercises these directions and boundary cases. The 103-display-site native
+`docs/API.md` snapshot predates this module and remains historical; this guide
+and the Lean source describe the current scalar-restriction API.
+
 ## Completion and valuation hypotheses
 
 [`AdicCompletion.abstractCompletion`](../AdicModules/AdicCompletion.lean)
@@ -65,6 +120,7 @@ All module names below have prefix `AdicModules.`.
 | [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | Uniform torsion and finite-module bridge |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
+| [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
 | [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | Domain, valuation-ring, fraction-field, local and residue properties |
@@ -100,13 +156,34 @@ decisions, not consequences of these APIs or this guide.
 Use the checked-in Lean v4.34.0-rc2 and mathlib revision
 `e37d88a26f3791ed5a93daa1f949af1021b8d103`, including all transitive manifest
 pins. Fetch `lake exe cache get` successfully before a build; an absent cache is
-not permission to silently rebuild all of mathlib. With limited memory, set
-`LEAN_NUM_THREADS=2` for the cache/build commands and avoid concurrent large Lean
-jobs. Leave space for several gigabytes of dependency sources and artifacts.
+not permission to silently rebuild all of mathlib. On smaller machines, avoid
+other concurrent builds. `LEAN_NUM_THREADS=2` sets each Lean runtime's worker
+count; it does not cap the number of concurrent Lake jobs or processes, or total
+build memory. No verified whole-build process or RAM cap is supplied here.
+Leave space for several gigabytes of dependency sources and artifacts.
+
+### 2026-09-30 scalar-restriction build sample
+
+A configured CI run for the scalar-restriction contribution succeeded on
+2026-09-30. It covered
+both `AdicModules` and `AdicModulesTest`: fifteen public mathematical leaves,
+sixteen ordinary test/audit modules, and the public root (32 modules total).
+With the exact pins above, the matching mathlib cache fetch took about 42.509s
+and decompressed 8892 entries. Cache verification then took about 6.137s and
+reported 8907 up-to-date jobs. The both-target build took about 41.119s and
+reported 2737 jobs; these are Lake job counts, not counts of fresh compilations
+or concurrent processes. The workflow elapsed about 378s including all its
+input collection and complete private-inclusive axiom checks, not just building.
+
+These are observations from that measured configuration, not clean-machine
+guarantees. No peak-memory measurement was established for this 32-module run.
+The older memory observation below is historical, not a current 32-module estimate.
+
+### Earlier module-readiness measurements
 
 These are **historical author measurements**, not clean-machine guarantees:
 on the module-readiness sequence, the matching cache fetch took about 98 seconds.
-After the small `a590809e4012f98f443edff7a40574aad1108799` normalization repair,
+After a small normalization repair,
 the affected default build took 34.020 seconds and Lake reported 2711 jobs,
 mostly dependency/cache reuse rather than 2711 fresh compilations. That build
 used an already populated dependency cache and prior project artifacts. The

@@ -3,11 +3,16 @@
 [API.md](API.md) and [api-manifest.json](api-manifest.json) preserve the historical
 13-leaf, 28-module, 103-display-site generated snapshot (75 theorems,
 23 definitions, five instances). That inventory predates the separate
-`PrimaryComponent` leaf and its test module: it is **not** a current whole-library
-inventory. Read the [manual primary-component reference](PrimaryComponent.md)
-for the new declarations and their ordinary-import client. The current public
-root re-exports fourteen mathematical leaves; fifteen test/audit modules are
-not re-exported by `AdicModules`.
+`PrimaryComponent` and `AdicCompletion.RestrictScalars` leaves and their test
+modules: it is **not** a current whole-library inventory. Read the
+[manual primary-component reference](PrimaryComponent.md) and the
+[scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
+for those declarations and their ordinary-import clients. The current public
+root re-exports fifteen mathematical leaves; sixteen test/audit modules are
+not re-exported by `AdicModules`. The scalar-restriction
+[producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
+[client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
+source references, not regenerated entries in the historical snapshot.
 
 Read the [mathematical guide](Guide.md) for hypotheses and usage and
 [CREDITS.md](CREDITS.md) for provenance. Native display sites are not the complete

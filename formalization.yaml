@@ -5,7 +5,7 @@ project:
   name: "adic-modules"
   description: >-
     Bounded ideal-power torsion, primary-component exactness, abstract adic
-    completions, valuation-ring
+    completions, restriction of scalars for native adic completions, valuation-ring
     principal-adic completions, completed valuation integers, localization,
     residue fields and composite valuation subrings in Lean.
   authors:
@@ -58,7 +58,10 @@ status:
   scope: >-
     Uniform ideal-power torsion, height-one Dedekind primary-component exactness
     for torsion-source pairs, ordinary integer-prime subgroup restrictions and
-    valuation-free abstract completions for finitely generated ideals; separated
+    valuation-free abstract completions for finitely generated ideals; native
+    adic completion under restriction of scalars along arbitrary commutative
+    algebras, with compatible module actions and ideal extension, without finite
+    generation, flatness or separatedness; separated
     nonzero principal-adic valuation-ring
     completions of arbitrary valuation rank, with independent ring and field
     universes. Local, residue, spectrum and localization results keep their
@@ -67,27 +70,28 @@ status:
     subgroups, value-group exact sequences and source completion are not claimed.
 
 review:
-  status: "other: historical development reviews; exact-artifact release review recorded separately"
+  status: "other: revision-specific independent AI-agent review"
   notes: >-
-    Accepted development main d8ceb6a5db0b1080c0c166be4dc1c71a632bc788
-    contains the bounded units integrated through PRs 2, 4, 6, 8, 10, 12,
-    14, 16, 17, 19, 21, 22, 23, 24 and 25. The normal successor ending at
-    a590809e4012f98f443edff7a40574aad1108799 introduces public module
-    boundaries, stable private clients, the complete default test target,
-    a proof-local exposure repair and a small simp-normalization repair.
-    At the start of this assembly, those readiness changes had not received
-    independent acceptance. A later release decision must bind the exact final
-    artifact and complete semantic, proof, rights, documentation and resource
-    evidence. Historical review does not approve subsequent changes, and no
-    official release or publication decision is self-certified by this file.
-    The primary-component contribution received independent mathematical/API
-    review on 2026-09-26; that review does not certify a later release artifact
-    or its publication.
+    Earlier bounded and primary-component contributions and module-readiness work
+    received development review. The scalar-restriction proof and client were
+    originally developed in the incubator; their destination transfer received
+    its own independent review and configured build and private-inclusive
+    standard-axiom checks before acceptance into development main on 2026-09-30.
+    The donor's review and checks alone did not verify the destination graph.
+    Documentation was also integrated into development main on 2026-09-30.
+    Independent AI-agent review, proof-checking results, rights assessment and
+    maintainer acceptance are recorded for exact revisions in the maintained
+    project records. This metadata is not itself an approval of an arbitrary
+    checkout or later modification. Development acceptance, official release,
+    mirrored publication and source coverage are separate decisions; historical
+    review does not certify later changes or whole-source coverage.
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;
   Anchor for the attributed earlier project development and assembly, the
-  original primary-component research contributor and the current port author
-  as distinguished in docs/CREDITS.md, and independent Formal Frontier agent
+  original primary-component research contributor and its current port author,
+  the original incubator scalar-restriction proof/client contributor and the
+  distinct destination transfer author as distinguished in docs/CREDITS.md,
+  and independent Formal Frontier agent
   reviewers of earlier work. Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

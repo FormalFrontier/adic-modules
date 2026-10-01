@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "mode": "strict",
+  "projects": [
+    {
+      "path": ".",
+      "targets": [
+        "AdicModules",
+        "AdicModulesTest"
+      ]
+    }
+  ],
+  "docs_only_paths": []
+}
