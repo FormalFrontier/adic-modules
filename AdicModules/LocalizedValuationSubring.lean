@@ -130,8 +130,8 @@ noncomputable def localizedAdicCompletionValuationSubringEquiv
     localizedAdicCompletion_isFractionRing (K := K) S ha0 hSrad
   exact ValuationRing.equivInteger (AdicCompletion I Vₛ) (UniformSpace.Completion K)
 
-/-- The canonical equivalence onto the localized-completion valuation subring
-is the accepted embedding into the common completed fraction field. -/
+/-- Coercing the canonical equivalence agrees with
+`localizedAdicCompletionToFractionFieldCompletion`. -/
 @[simp]
 theorem coe_localizedAdicCompletionValuationSubringEquiv_apply
     {a : V} (ha0 : a ≠ 0)

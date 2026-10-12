@@ -35,7 +35,11 @@ INPUTS = tuple(MODULE_PATHS.values()) + (
     "lean-toolchain", "lakefile.toml", "lake-manifest.json")
 HERE = Path(__file__).resolve().parent
 EXPECTED = json.loads((HERE / "api_inventory.json").read_bytes())
-NOTES = json.loads((HERE / "api_notes.json").read_bytes())
+NOTE_INPUT = json.loads((HERE / "api_notes.json").read_bytes())
+NOTES = NOTE_INPUT["missing_docstrings"]
+EDITORIAL_NOTES = NOTE_INPUT["editorial_docstrings"]
+EDITORIAL_DECLARATION = "ValuationRing.coe_localizedAdicCompletionValuationSubringEquiv_apply"
+ORIGINAL_API_SHA256 = "d60949e7068b5c0e660544e4a1eb86b10369957f041f7cd0bade4125bf423ca9"
 GITHUB_SOURCE = "https://github.com/FormalFrontier/adic-modules/blob/"
 
 
@@ -136,6 +140,63 @@ class Header(HTMLParser):
         return " ".join("".join(self.text).split())
 
 
+def editorial_presentation(original):
+    """Present one authored note on the exact complete historical Markdown bytes.
+
+    This post-render stage does not read or fabricate native records. The full
+    renderer must validate native signatures/docstrings first, unchanged below.
+    """
+    require(digest(original) == ORIGINAL_API_SHA256, "original API snapshot differs")
+    require(set(NOTE_INPUT) == {"missing_docstrings", "editorial_docstrings"}
+            and set(EDITORIAL_NOTES) == {EDITORIAL_DECLARATION}
+            and EDITORIAL_DECLARATION in EXPECTED and EDITORIAL_DECLARATION not in NOTES,
+            "single editorial presentation differs")
+    note = EDITORIAL_NOTES[EDITORIAL_DECLARATION]
+    require(isinstance(note, str) and bool(note.strip()) and "```" not in note,
+            "invalid authored editorial API note")
+    text = original.decode()
+    marker = "\n### " + EDITORIAL_DECLARATION + "\n\n"
+    require(text.count(marker) == 1, "editorial declaration site differs")
+    before, entry = text.split(marker)
+    signature, body = entry.split("\n```\n\n", 1)
+    _, after = body.split("\n\n[Source]", 1)
+    text = (before + marker + signature + "\n```\n\n"
+            + "**Authored editorial API note (not a native source docstring):** "
+            + note + "\n\n[Source]" + after)
+    text = text.replace("# Generated API reference\n", "# Historical API reference\n", 1)
+    text = text.replace(
+        "This reference contains all 103 native library display sites: 75 theorems,\n",
+        "This reference presents the historical 13-leaf, 28-module snapshot, not a\n"
+        "current whole-library inventory. Its 103 native display sites are 75 theorems,\n", 1)
+    text = text.replace(
+        "Where no source docstring exists, a separately authored **API note** is labeled explicitly.\n",
+        "Where no source docstring exists, a separately authored **API note** is labeled explicitly.\n"
+        "The frozen records contain 93 native source docstrings; 92 are rendered verbatim.\n"
+        "One is presented instead as an **authored editorial API note**, not a native\n"
+        "source docstring. Its original native hash is still checked by the full renderer.\n"
+        "There are eleven authored notes: ten missing-docstring notes and one editorial\n"
+        "note. This post-render presentation is not a new native run.\n", 1)
+    return text.encode()
+
+
+def editorial_manifest(native_manifest, original):
+    """Retain historical bindings; hash the guarded presentation separately."""
+    presented = editorial_presentation(original)
+    require(native_manifest.get("api_sha256") == ORIGINAL_API_SHA256
+            and native_manifest.get("analyzed_source_revision") == SOURCE
+            and native_manifest.get("docgen_revision") == TOOL,
+            "original API manifest identity differs")
+    manifest = dict(native_manifest, original_api_sha256=ORIGINAL_API_SHA256,
+                    editorial_declarations=[EDITORIAL_DECLARATION],
+                    documentation_counts=dict(original_native_source_docstrings=93,
+                        rendered_native_source_docstrings=92,
+                        authored_missing_docstring_notes=10, authored_editorial_notes=1),
+                    documentation_inputs={str(p.relative_to(HERE.parent)): digest(p.read_bytes())
+                        for p in (HERE / "generate_api.py", HERE / "api_inventory.json", HERE / "api_notes.json")},
+                    api_sha256=digest(presented))
+    return (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
+
+
 def render(records, revision, sources):
     require(revision == SOURCE, "wrong frozen source revision")
     require(set(records) == set(MODULES), "shipped module records differ")
@@ -229,7 +290,8 @@ def render(records, revision, sources):
                                           for m in MODULES},
                     api_sha256=digest(markdown), proof_certification=False,
                     release_acceptance=False)
-    return markdown, (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
+    presented = editorial_presentation(markdown)
+    return presented, editorial_manifest(manifest, markdown)
 
 
 def main():

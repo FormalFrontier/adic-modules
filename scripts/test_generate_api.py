@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Authors: Formal Frontier Agents
-"""Data-only controls on supplied native records; no Lean or doc-gen4 rerun.
+"""Data-only native-record or historical-presentation controls; no native rerun.
 
-The caller must authenticate the input directory separately. These tests exercise
-the bounded adapter, not the native provenance of arbitrary supplied JSON.
+The caller must authenticate supplied inputs separately. Presentation-only tests
+use the complete original public Markdown/manifest, never constructed native JSON.
+Neither mode authenticates native provenance or certifies Lean proofs.
 """
 import argparse
 import copy
@@ -14,11 +15,14 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import generate_api as api
 
 ROOT = Path(__file__).resolve().parent.parent
 RECORDS = {}
+ORIGINAL_API = b""
+ORIGINAL_MANIFEST = {}
 SOURCES = {p: (ROOT / p).read_bytes() for p in api.INPUTS}
 
 
@@ -39,6 +43,12 @@ class Controls(unittest.TestCase):
         facts = json.loads(manifest)
         self.assertEqual(raw.count(b"\n### "), 103)
         self.assertEqual(raw.count(b"**API note (not a source docstring):**"), 10)
+        self.assertEqual(raw.count(b"**Authored editorial API note (not a native source docstring):**"), 1)
+        self.assertEqual(facts["original_api_sha256"], api.ORIGINAL_API_SHA256)
+        self.assertEqual(facts["editorial_declarations"], [api.EDITORIAL_DECLARATION])
+        self.assertEqual(facts["documentation_counts"], dict(original_native_source_docstrings=93,
+            rendered_native_source_docstrings=92, authored_missing_docstring_notes=10,
+            authored_editorial_notes=1))
         self.assertEqual(facts["library_display_sites"], 103)
         self.assertEqual(facts["boundary_client_display_sites"], 0)
         self.assertEqual(len(facts["inputs"]), 31)
@@ -129,6 +139,29 @@ class Controls(unittest.TestCase):
             row["info"]["doc"] = "fabricated" if missing else row["info"]["doc"] + "changed"
             with self.subTest(missing=missing), self.assertRaises(ValueError):
                 api.render(records, api.SOURCE, sources)
+
+    def test_editorial_note_still_requires_original_native_docstring(self):
+        records, sources = fixture()
+        row = next(row for record in records.values() for row in record["declarations"]
+                   if row["info"]["name"] == api.EDITORIAL_DECLARATION)
+        original = row["info"]["doc"]
+        raw, _ = api.render(records, api.SOURCE, sources)
+        self.assertNotIn(original.strip().encode(), raw)
+        self.assertIn(api.EDITORIAL_NOTES[api.EDITORIAL_DECLARATION].encode(), raw)
+        self.assertEqual(api.digest(original.encode()), api.EXPECTED[api.EDITORIAL_DECLARATION]["doc_sha256"])
+        for replacement in ("", original + "changed", api.EDITORIAL_NOTES[api.EDITORIAL_DECLARATION]):
+            row["info"]["doc"] = replacement
+            with self.subTest(replacement=replacement), self.assertRaises(ValueError):
+                api.render(records, api.SOURCE, sources)
+
+    def test_editorial_mapping_is_exactly_one_bounded_note(self):
+        records, sources = fixture()
+        for notes in ({}, {api.EDITORIAL_DECLARATION: "valid", "Other": "extra"},
+                      {"Other": "wrong declaration"}, {api.EDITORIAL_DECLARATION: ""},
+                      {api.EDITORIAL_DECLARATION: "```"}, {api.EDITORIAL_DECLARATION: 42}):
+            with self.subTest(notes=notes), patch.dict(api.EDITORIAL_NOTES, notes, clear=True):
+                with self.assertRaises(ValueError):
+                    api.render(records, api.SOURCE, sources)
 
     def test_source_url_and_exact_range_refusals(self):
         records, sources = fixture()
@@ -222,12 +255,71 @@ class Controls(unittest.TestCase):
             run(False, "native module file inventory differs")
 
 
+class PresentationControls(unittest.TestCase):
+    def test_guarded_complete_public_snapshot_presentation(self):
+        raw = api.editorial_presentation(ORIGINAL_API)
+        self.assertEqual(raw, (ROOT / "docs/API.md").read_bytes())
+        self.assertEqual(raw.count(b"\n### "), 103)
+        self.assertEqual(raw.count(b"**API note (not a source docstring):**"), 10)
+        self.assertEqual(raw.count(b"**Authored editorial API note (not a native source docstring):**"), 1)
+        self.assertIn(api.EDITORIAL_NOTES[api.EDITORIAL_DECLARATION].encode(), raw)
+        self.assertEqual(api.editorial_presentation(ORIGINAL_API), raw)
+
+    def test_presentation_manifest_preserves_original_bindings(self):
+        raw = api.editorial_manifest(ORIGINAL_MANIFEST, ORIGINAL_API)
+        self.assertEqual(raw, (ROOT / "docs/api-manifest.json").read_bytes())
+        manifest = json.loads(raw)
+        for key, value in ORIGINAL_MANIFEST.items():
+            if key not in {"documentation_inputs", "api_sha256"}:
+                self.assertEqual(manifest[key], value, key)
+        self.assertEqual(manifest["original_api_sha256"], api.digest(ORIGINAL_API))
+        self.assertEqual(manifest["api_sha256"], api.digest(api.editorial_presentation(ORIGINAL_API)))
+        self.assertEqual(manifest["documentation_counts"], dict(original_native_source_docstrings=93,
+            rendered_native_source_docstrings=92, authored_missing_docstring_notes=10,
+            authored_editorial_notes=1))
+        self.assertEqual(manifest["editorial_declarations"], [api.EDITORIAL_DECLARATION])
+        self.assertEqual(len(manifest["inputs"]), 31)
+        self.assertEqual(len(manifest["native_record_sha256"]), 28)
+
+    def test_changed_or_already_presented_snapshot_refused(self):
+        for raw in (ORIGINAL_API + b"\n", ORIGINAL_API[:-1], b"invented small test input",
+                    api.editorial_presentation(ORIGINAL_API)):
+            with self.subTest(raw_hash=api.digest(raw)), self.assertRaises(ValueError):
+                api.editorial_presentation(raw)
+
+    def test_changed_manifest_identity_refused(self):
+        for key in ("api_sha256", "analyzed_source_revision", "docgen_revision"):
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                api.editorial_manifest(dict(ORIGINAL_MANIFEST, **{key: "changed"}), ORIGINAL_API)
+
+    def test_single_editorial_mapping_refusals(self):
+        for notes in ({}, {api.EDITORIAL_DECLARATION: "valid", "Other": "extra"},
+                      {"Other": "wrong declaration"}, {api.EDITORIAL_DECLARATION: ""},
+                      {api.EDITORIAL_DECLARATION: "```"}, {api.EDITORIAL_DECLARATION: 42}):
+            with self.subTest(notes=notes), patch.dict(api.EDITORIAL_NOTES, notes, clear=True):
+                with self.assertRaises(ValueError):
+                    api.editorial_presentation(ORIGINAL_API)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--native-data", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--native-data", type=Path)
+    mode.add_argument("--original-api", type=Path,
+                      help="complete original historical public Markdown, not native records")
+    parser.add_argument("--original-manifest", type=Path,
+                        help="original public manifest for presentation-only controls")
     args = parser.parse_args()
-    api.require({p.name for p in args.native_data.glob("declaration-data-*.bmp")} ==
-                {"declaration-data-" + m + ".bmp" for m in api.MODULES}, "native file inventory differs")
-    RECORDS.update({m: json.loads((args.native_data / ("declaration-data-" + m + ".bmp")).read_bytes())
-                    for m in api.MODULES})
-    unittest.main(argv=[sys.argv[0]], verbosity=2)
+    if args.native_data is not None:
+        api.require(args.original_manifest is None, "native and presentation input modes differ")
+        api.require({p.name for p in args.native_data.glob("declaration-data-*.bmp")} ==
+                    {"declaration-data-" + m + ".bmp" for m in api.MODULES}, "native file inventory differs")
+        RECORDS.update({m: json.loads((args.native_data / ("declaration-data-" + m + ".bmp")).read_bytes())
+                        for m in api.MODULES})
+        suite = "Controls"
+    else:
+        api.require(args.original_manifest is not None, "original public manifest required")
+        ORIGINAL_API = args.original_api.read_bytes()
+        ORIGINAL_MANIFEST = json.loads(args.original_manifest.read_bytes())
+        suite = "PresentationControls"
+    unittest.main(argv=[sys.argv[0]], defaultTest=suite, verbosity=2)

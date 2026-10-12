@@ -1,13 +1,22 @@
 {
   "analyzed_source_revision": "2de7cf7ce503c2243cb5c3b93b7a2d78ec700b3f",
-  "api_sha256": "d60949e7068b5c0e660544e4a1eb86b10369957f041f7cd0bade4125bf423ca9",
+  "api_sha256": "1f257d0009131d50724d9ba8085aba58ee6bfdec8827b34257d49b295ee85762",
   "boundary_client_display_sites": 0,
   "docgen_revision": "97d4ecdfc8e09e7f511724c25e303d448de6a3db",
+  "documentation_counts": {
+    "authored_editorial_notes": 1,
+    "authored_missing_docstring_notes": 10,
+    "original_native_source_docstrings": 93,
+    "rendered_native_source_docstrings": 92
+  },
   "documentation_inputs": {
     "scripts/api_inventory.json": "6a7878f53e58e901a4a05a1b93c1a3364560748e673ce4d3f4fc123997b040eb",
-    "scripts/api_notes.json": "e94c97beb9840802955f0a30415feec95fdecbd2861133f4fae210a30797c60f",
-    "scripts/generate_api.py": "eb9b7d16423c17c3523eb94a50c4311f9e735a4f65ced189e18df4ec9f437fd1"
+    "scripts/api_notes.json": "9bec78325c25f1f5c7ec54192950aef1c8f08c2557217d064fb192d34fd71c43",
+    "scripts/generate_api.py": "23cd45474b647de648268c801d264fb68096b998e5c5bfef17654951514fcbb2"
   },
+  "editorial_declarations": [
+    "ValuationRing.coe_localizedAdicCompletionValuationSubringEquiv_apply"
+  ],
   "format": 1,
   "generator": "scripts/generate_api.py",
   "inputs": {
@@ -134,6 +143,7 @@
     "AdicModulesTest.PrincipalAdicSpectrum": "035c11ca6b71240bc029d09945fa91b1eb15362742cd73f20759059c27868e9b",
     "AdicModulesTest.ValuationTopology": "1932a460325a7d8536b0d97867f6aea5dc0045eaff3e43b5cf53a252920befd4"
   },
+  "original_api_sha256": "d60949e7068b5c0e660544e4a1eb86b10369957f041f7cd0bade4125bf423ca9",
   "proof_certification": false,
   "public_declarations": [
     "AdicCompletion.abstractCompletion",

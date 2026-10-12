@@ -40,7 +40,7 @@ related_formalizations:
     relationship: "builds-on"
     note: >-
       Native mathematical infrastructure at revision
-      e37d88a26f3791ed5a93daa1f949af1021b8d103 with Lean v4.34.0-rc2 and
+      83abb3e776bdefcbc447a1e44d0debe4010039e5 with Lean v4.34.0-rc2 and
       the complete pinned Lake dependency graph.
 
 automation:
@@ -51,8 +51,7 @@ automation:
         development, independent agent review, assembly and maintenance.
   notes: >-
     Original project expression and earlier source-repository adaptations are
-    credited in docs/CREDITS.md. Historical development review does not approve
-    later modifications. Unverified model identities and costs are omitted.
+    credited in docs/CREDITS.md. Unverified model identities and costs are omitted.
 
 status:
   scope: >-
@@ -72,26 +71,18 @@ status:
 review:
   status: "other: revision-specific independent AI-agent review"
   notes: >-
-    Earlier bounded and primary-component contributions and module-readiness work
-    received development review. The scalar-restriction proof and client were
-    originally developed in the incubator; their destination transfer received
-    its own independent review and configured build and private-inclusive
-    standard-axiom checks before acceptance into development main on 2026-09-30.
-    The donor's review and checks alone did not verify the destination graph.
-    Documentation was also integrated into development main on 2026-09-30.
-    Independent AI-agent review, proof-checking results, rights assessment and
-    maintainer acceptance are recorded for exact revisions in the maintained
-    project records. This metadata is not itself an approval of an arbitrary
-    checkout or later modification. Development acceptance, official release,
-    mirrored publication and source coverage are separate decisions; historical
-    review does not certify later changes or whole-source coverage.
+    Independent AI-agent review of bounded ideal-power torsion, primary-component
+    exactness, module interfaces and the scalar-restriction proof and client is
+    revision-specific. Review and proof-checking results do not certify arbitrary
+    checkouts or later modifications. No human peer review or whole-source
+    coverage is claimed.
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;
   Anchor for the attributed earlier project development and assembly, the
   original primary-component research contributor and its current port author,
-  the original incubator scalar-restriction proof/client contributor and the
-  distinct destination transfer author as distinguished in docs/CREDITS.md,
+  the original scalar-restriction proof/client contributor and the distinct
+  library adaptation author as distinguished in docs/CREDITS.md,
   and independent Formal Frontier agent
   reviewers of earlier work. Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

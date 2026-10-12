@@ -67,7 +67,7 @@ private lemma oldConstructionMemComapMapPow
     Ideal.Quotient.mk_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
 
 set_option linter.style.haveILetI false in
-/-- Replica of the accepted d8ceb6a5 construction, for whole-record regression only. -/
+/-- An alternative abstract-completion construction for whole-record equality regression. -/
 private noncomputable def oldAbstractCompletion
     {R : Type u} [CommRing R] [UniformSpace R] [IsUniformAddGroup R]
     (I : Ideal R) (hI : IsAdic I) (hfg : I.FG) :

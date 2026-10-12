@@ -21,23 +21,16 @@ public module boundaries, added ordinary-import clients and the default test
 target, and repaired proof-local export and simp-normalization issues.
 
 The primary-component exactness contribution has an expression predecessor in
-Formal Frontier's NSW source research by a different agent contributor. Its
-original research review covered that bounded research, not the Adic library
-port. A separate Formal Frontier agent authored the port, which adds restricted
-maps on ordinary integer-prime subgroups and transports exactness. These two
+Formal Frontier's NSW source research by a different agent contributor. A separate
+Formal Frontier agent authored the library adaptation, which adds restricted maps
+on ordinary integer-prime subgroups and transports exactness. These two
 contributions and their authorship are distinct.
 
-The restriction-of-scalars equivalence and its ordinary-import client were
-originally proved in Formal Frontier's shared incubator by one agent contributor.
-A different agent authored their transfer into this library, changing only the
-client import and test namespace. The incubator review and checks alone did not
-verify the new destination dependency graph. The destination contribution
-received separate independent review and configured build and complete
-private-inclusive standard-axiom checks before acceptance into development main
-on 2026-09-30; its documentation was subsequently accepted into development main.
-Neither acceptance is an official successor release or a source-coverage decision.
-Review and release decisions are bound to exact artifacts, not automatically
-inherited by later documentation changes.
+The restriction-of-scalars equivalence and its ordinary-import client have an
+earlier Formal Frontier implementation as their expression predecessor, proved
+by one agent contributor. A different agent authored the library adaptation,
+changing only the client import and test namespace. The original proof/client
+and the library adaptation have distinct authorship.
 
 ## Mathematical and upstream references
 
@@ -61,31 +54,33 @@ completed-integer comparison instead uses a two-variable density argument via
 The scalar-restriction leaf uses mathlib's native ideal-map/power identity,
 `Submodule.Quotient.restrictScalarsEquiv`, `Submodule.quotEquivOfEq` and
 `AdicCompletion` inverse-limit interfaces rather than copying their proofs.
-The incubator guide credits mathlib contributors Kenny Lau, Judith Ludwig,
-Christian Merten, Jiedong Jiang and Nailin Guan for relevant infrastructure;
-their upstream Apache-2.0 author and license notices remain in mathlib. This
-library asserts no authorship of that upstream expression.
+The original scalar-restriction guide credits mathlib contributors Kenny Lau,
+Judith Ludwig, Christian Merten, Jiedong Jiang and Nailin Guan for relevant
+infrastructure; their upstream Apache-2.0 author and license notices remain in
+mathlib. This library asserts no authorship of that upstream expression.
 
 ## Documentation adapter expression
 
 The bounded Markdown API generator and its data tests adapt Anchor's earlier
 Apache-2.0 project implementation in `coherent-modules`. The module/site
-inventory, notes, literal-kind controls and recipe are specialized here; the
-earlier project's review does not approve this adaptation. Display headers and
-docstrings in the historical API are from this library's pinned native doc-gen
-run. The ten missing-docstring explanations are newly authored API notes, not
-source docstrings. The tool is used as a dependency of reproduction, not vendored.
+inventory, notes, literal-kind controls and recipe are specialized here. Display
+headers and 92 rendered source docstrings in the historical API are from this
+library's pinned native doc-gen run. One further original native docstring is
+verified but presented as a separately authored, labeled editorial API note.
+The ten missing-docstring explanations are also authored API notes, not source
+docstrings. The editorial presentation does not claim a new native run. The tool
+is used as a dependency of reproduction, not vendored.
 
 ## Authorization and review limits
 
-Formal Frontier's 2026-09-25 standing Apache-2.0 authorization covers verified
+Formal Frontier's standing Apache-2.0 authorization covers verified
 original project contributions, including the earlier project research adapted
 above. A historical missing license file is not itself a license grant. Project
 SPDX/author headers do not name an unverified copyright holder; no third-party
 notice is removed.
 
-Independent rights/provenance review covers the exact file inventory and public
-history considered for a release. A project label, AI generation, Git author field or
-mathematical citation alone does not settle a concrete ownership, copying or
-redistribution concern. Rights review, semantics, complete proof checking,
-source coverage and release publication remain separate decisions.
+Independent rights/provenance assessments are specific to the files and public
+history examined. A project label, AI generation, Git author field or mathematical
+citation alone does not settle a concrete ownership, copying or redistribution
+concern. Rights/provenance, mathematical correctness, complete proof checking
+and source coverage are distinct matters.

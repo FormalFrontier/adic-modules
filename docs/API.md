@@ -1,6 +1,7 @@
-# Generated API reference
+# Historical API reference
 
-This reference contains all 103 native library display sites: 75 theorems,
+This reference presents the historical 13-leaf, 28-module snapshot, not a
+current whole-library inventory. Its 103 native display sites are 75 theorems,
 23 definitions and five instances. The root and fourteen test/audit modules
 have no public display sites.
 Import `AdicModules` for the library; the test-target modules are separate.
@@ -18,6 +19,11 @@ Source links are relative to this same checkout.
 The source/pin hashes and generation provenance are in [api-manifest.json](api-manifest.json).
 See [generation instructions](README.md) and the [mathematical guide](Guide.md).
 Where no source docstring exists, a separately authored **API note** is labeled explicitly.
+The frozen records contain 93 native source docstrings; 92 are rendered verbatim.
+One is presented instead as an **authored editorial API note**, not a native
+source docstring. Its original native hash is still checked by the full renderer.
+There are eleven authored notes: ten missing-docstring notes and one editorial
+note. This post-render presentation is not a new native run.
 
 ## Complete module inventory
 
@@ -1279,8 +1285,7 @@ realization as a valuation subring of the common completed fraction field.
 theorem ValuationRing.coe_localizedAdicCompletionValuationSubringEquiv_apply {V : Type u} {Vₛ : Type v} {K : Type w} [CommRing V] [IsDomain V] [ValuationRing V] [CommRing Vₛ] [Field K] [Algebra V Vₛ] [Algebra V K] (S : Submonoid V) [IsLocalization S Vₛ] [IsFractionRing V K] {a : V} (ha0 : a ≠ 0) (hSrad : Disjoint ↑S ↑(Ideal.span {a}).radical) [IsHausdorff (Ideal.span {a}) V] (x : AdicCompletion (Ideal.span {(algebraMap V Vₛ) a}) Vₛ) : ↑((localizedAdicCompletionValuationSubringEquiv S ha0 hSrad) x) = (localizedAdicCompletionToFractionFieldCompletion S ha0 hSrad) x
 ```
 
-The canonical equivalence onto the localized-completion valuation subring
-is the accepted embedding into the common completed fraction field.
+**Authored editorial API note (not a native source docstring):** Coercing the canonical equivalence agrees with `localizedAdicCompletionToFractionFieldCompletion`.
 
 [Source](../AdicModules/LocalizedValuationSubring.lean#L133-L148) (native source range).
 

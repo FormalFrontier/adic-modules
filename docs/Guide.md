@@ -154,7 +154,7 @@ decisions, not consequences of these APIs or this guide.
 ## Reproduction and resources
 
 Use the checked-in Lean v4.34.0-rc2 and mathlib revision
-`e37d88a26f3791ed5a93daa1f949af1021b8d103`, including all transitive manifest
+`83abb3e776bdefcbc447a1e44d0debe4010039e5`, including all transitive manifest
 pins. Fetch `lake exe cache get` successfully before a build; an absent cache is
 not permission to silently rebuild all of mathlib. On smaller machines, avoid
 other concurrent builds. `LEAN_NUM_THREADS=2` sets each Lean runtime's worker
@@ -162,22 +162,25 @@ count; it does not cap the number of concurrent Lake jobs or processes, or total
 build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
-### 2026-09-30 scalar-restriction build sample
+### Scalar-restriction resource sample
 
-A configured CI run for the scalar-restriction contribution succeeded on
-2026-09-30. It covered
-both `AdicModules` and `AdicModulesTest`: fifteen public mathematical leaves,
-sixteen ordinary test/audit modules, and the public root (32 modules total).
-With the exact pins above, the matching mathlib cache fetch took about 42.509s
-and decompressed 8892 entries. Cache verification then took about 6.137s and
-reported 8907 up-to-date jobs. The both-target build took about 41.119s and
-reported 2737 jobs; these are Lake job counts, not counts of fresh compilations
-or concurrent processes. The workflow elapsed about 378s including all its
-input collection and complete private-inclusive axiom checks, not just building.
+This historical configured run for the scalar-restriction proof and client used
+Lean v4.34.0-rc2, mathlib revision
+`e37d88a26f3791ed5a93daa1f949af1021b8d103` and the matching complete Lake
+dependency graph. It succeeded for both `AdicModules` and `AdicModulesTest`:
+fifteen public mathematical leaves, sixteen ordinary test/audit modules, and
+the public root (32 modules total). With those historical pins, the matching
+mathlib cache fetch took about 42.509s and decompressed 8892 entries. Cache
+verification then took about 6.137s and reported 8907 up-to-date jobs. The
+both-target build took about 41.119s and reported 2737 jobs; these are Lake job
+counts, not counts of fresh compilations or concurrent processes. The workflow
+elapsed about 378s including all its input collection and complete
+private-inclusive axiom checks, not just building.
 
-These are observations from that measured configuration, not clean-machine
-guarantees. No peak-memory measurement was established for this 32-module run.
-The older memory observation below is historical, not a current 32-module estimate.
+These are historical observations from that measured configuration, not
+measurements of the current dependency pins or clean-machine guarantees. No
+peak-memory measurement was established for this 32-module run. The older memory
+observation below is historical, not a current 32-module estimate.
 
 ### Earlier module-readiness measurements
 
