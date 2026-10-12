@@ -2,9 +2,9 @@
 
 Authors: Formal Frontier Agents
 
-Lean results on ideal-power torsion, inverse-limit adic completions and valuation
-rings. Import `AdicModules` for the public library or an individual module for
-a narrower dependency. The library builds on Lean, mathlib's native ideals and
+Lean results on ideal-power torsion, inverse-limit adic completions, submodule
+closure from neighborhood bases and valuation rings. Import `AdicModules` for
+the public library or an individual module for a narrower dependency. The library builds on Lean, mathlib's native ideals and
 adic completion, and the pinned dependencies in this repository; it does not
 require source-research records to use its mathematical API.
 
@@ -54,6 +54,20 @@ require source-research records to use its mathematical API.
   generation, flatness, separatedness or completeness-predicate hypothesis is
   needed for this comparison; these are not assertions about the distinct
   `AbstractCompletion` construction.
+
+- **Submodule closure from a neighborhood basis.**
+  [`Submodule.topologicalClosure_eq_iInf_sup`](AdicModules/Topology/Algebra/Submodule.lean)
+  identifies `N.topologicalClosure` with `⨅ i, ⨅ (_ : p i), N ⊔ U i` when
+  the active submodules `U i` form a basis of neighborhoods of zero. It applies
+  over a semiring `R` to an additive commutative group `M` with an `R`-module
+  structure, a **given compatible topological additive-group structure**, and
+  continuous multiplication by each fixed scalar. Scalar, module and
+  `Sort`-valued index universes are independent. No scalar topology, joint
+  scalar continuity, Hausdorffness, countability or closedness assumption is
+  needed; this does **not** construct a topology from arbitrary semiring
+  submodule filtrations. The [clients](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean)
+  compute discrete and indiscrete closures and specialize to canonical
+  `(2)`-adic powers, including proposition indices and an active `Bool` predicate.
 
 - **Valuation topology, completed integers and spectra.** For a valuation
   domain `V` with fraction field `K`, nonzero `a : V` and separated
@@ -110,14 +124,17 @@ are **not** claimed here.
 ## Imports and checks
 
 Import `AdicModules` or, for example, the narrower
-`AdicModules.AdicCompletion.RestrictScalars`. The 15 mathematical leaves above
-are re-exported by the public root. The separate 16 ordinary-import test/audit
-modules illustrate actual downstream use and check selected statements:
+`AdicModules.AdicCompletion.RestrictScalars` or
+`AdicModules.Topology.Algebra.Submodule`. The 16 mathematical leaves above
+are re-exported by the public root. The separate 17 ordinary-import test/audit
+modules illustrate actual downstream use and check selected statements
+(34 maintained modules in total, including the public root):
 
 | Area | Ordinary-import clients |
 | --- | --- |
 | Torsion and primary components | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean), [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | Adic inverse limits and scalar restriction | [AdicCompletion](AdicModulesTest/AdicCompletion.lean), [RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| Submodule closure | [SubmoduleClosure](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
 | Valuation completion and spectra | [ValuationTopology](AdicModulesTest/ValuationTopology.lean), [CompletedIntegers](AdicModulesTest/CompletedIntegers.lean), [CompletedLocalStructure](AdicModulesTest/CompletedLocalStructure.lean), [PrincipalAdicSpectrum](AdicModulesTest/PrincipalAdicSpectrum.lean) |
 | Localization and residue | [LocalizedFiltration](AdicModulesTest/LocalizedFiltration.lean), [LocalizedCompletion](AdicModulesTest/LocalizedCompletion.lean), [LocalizedValuationSubring](AdicModulesTest/LocalizedValuationSubring.lean), [LocalizedResidueField](AdicModulesTest/LocalizedResidueField.lean), [LocalizedQuotientValuationSubring](AdicModulesTest/LocalizedQuotientValuationSubring.lean) |
 | Composites and selected axioms | [CompositeValuationSubring](AdicModulesTest/CompositeValuationSubring.lean), [CompletedValuationComposite](AdicModulesTest/CompletedValuationComposite.lean), [Axioms](AdicModulesTest/Axioms.lean) |
@@ -138,7 +155,7 @@ lake exe cache get
 lake --wfail build
 ```
 
-The default build targets both the public library and all 16 test/audit
+The default build targets both the public library and all 17 test/audit
 modules. To check one client with warnings fatal, run, for example,
 `lake env lean -DwarningAsError=true AdicModulesTest/AdicCompletion/RestrictScalars.lean`
 after the cache fetch. Do not silently rebuild mathlib from source when the
@@ -154,10 +171,11 @@ is required.
 The [historical generated API](docs/API.md) and
 [generation notes](docs/README.md) cover 13 mathematical leaves, 28 modules
 and 103 display sites at their recorded source revision. They predate the
-primary-component and scalar-restriction leaves and are **not** a current
-whole-library or complete kernel-declaration inventory. Use the
-[primary-component supplement](docs/PrimaryComponent.md),
-[scalar-restriction guide](docs/Guide.md#restricting-scalars-in-adic-completions)
+primary-component, scalar-restriction and submodule-closure leaves and are
+**not** a current whole-library or complete kernel-declaration inventory. Use
+the [primary-component supplement](docs/PrimaryComponent.md),
+[scalar-restriction guide](docs/Guide.md#restricting-scalars-in-adic-completions),
+[submodule-closure module](AdicModules/Topology/Algebra/Submodule.lean)
 and current Lean files for their signatures.
 
 The [reproduction and resources guide](docs/Guide.md#reproduction-and-resources)

@@ -32,6 +32,12 @@ by one agent contributor. A different agent authored the library adaptation,
 changing only the client import and test namespace. The original proof/client
 and the library adaptation have distinct authorship.
 
+Rudder authored the bundled submodule-closure theorem and its five applications
+in discrete, indiscrete and adic integer topologies. The proof packages
+mathlib's existing set-level closure formula through canonical submodule
+carriers and reindexes the neighborhood basis along `PLift.down`; it does not
+reprove that set-level result or introduce a competing closure construction.
+
 ## Mathematical and upstream references
 
 The mathematical background includes Fujiwara and Kato, *Foundations of Rigid
@@ -40,6 +46,13 @@ classical module, completion, valuation and localization theory. These are
 mathematical references, not permission to copy protected expression or claims
 of complete source correspondence. No source PDF, scan, figure or substantial
 source excerpt is bundled.
+
+The submodule-closure theorem is motivated by Fujiwara and Kato,
+*Foundations of Rigid Geometry I* (2017), Proposition 7.1.6 and Exercise 0.7.1.
+It generalizes the filtered ring-module setting to any submodule neighborhood
+basis in a given topological additive group over a semiring with continuous
+fixed-scalar actions, without claiming a topology construction from arbitrary
+semiring filtrations.
 
 The library uses native Lean and mathlib objects and proof infrastructure at
 the pinned revisions and does not vendor those dependencies. Upstream licenses
@@ -58,6 +71,21 @@ The original scalar-restriction guide credits mathlib contributors Kenny Lau,
 Judith Ludwig, Christian Merten, Jiedong Jiang and Nailin Guan for relevant
 infrastructure; their upstream Apache-2.0 author and license notices remain in
 mathlib. This library asserts no authorship of that upstream expression.
+
+The closure proof uses `Filter.HasBasis.iInter_add_right_eq_closure`,
+`Submodule.topologicalClosure_coe`, `Submodule.coe_sup`, `Submodule.coe_iInf`,
+`Filter.HasBasis.comp_surjective` and `Set.iInter_plift_down`. The relevant
+mathlib files credit Johannes Hölzl, Mario Carneiro, Patrick Massot,
+Jan-David Salchow, Sébastien Gouëzel, Jean Lo, Yury Kudryashov,
+Frédéric Dupuis, Heather Macbeth, Nathaniel Thomas, Jeremy Avigad,
+Kevin Buzzard and Leonardo de Moura. The clients also reuse mathlib's
+nonnegative submonoid, integer scalar continuity, linear-topology and adic
+filter-basis interfaces; the corresponding files additionally credit
+Damiano Testa, Antoine Chambert-Loir, María Inés de Frutos-Fernández and
+Anatole Dedecker. In particular, integer fixed-scalar continuity comes from
+`AddGroup.continuousConstSMul_int`, not a new scalar-continuity API.
+These upstream files are Apache-2.0; their licenses, copyright and author
+notices remain upstream, and no upstream proof bodies are copied here.
 
 ## Documentation adapter expression
 

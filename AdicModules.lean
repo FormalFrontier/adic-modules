@@ -8,6 +8,7 @@ public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.ValuationTopology
 public import AdicModules.CompletedIntegers
 public import AdicModules.CompletedLocalStructure
@@ -26,7 +27,8 @@ public import AdicModules.CompletedValuationComposite
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
-compares native adic completions under restriction of scalars.
+compares native adic completions under restriction of scalars and describes submodule closure
+using a basis of submodule neighborhoods of zero in a given topological additive group.
 Test and audit modules are separate.
 Theorems retain their stated separation, nonzero-generator and localization hypotheses.
 -/

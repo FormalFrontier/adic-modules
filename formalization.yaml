@@ -5,8 +5,9 @@ project:
   name: "adic-modules"
   description: >-
     Bounded ideal-power torsion, primary-component exactness, abstract adic
-    completions, restriction of scalars for native adic completions, valuation-ring
-    principal-adic completions, completed valuation integers, localization,
+    completions, restriction of scalars for native adic completions, submodule
+    closure from neighborhood bases, valuation-ring principal-adic completions,
+    completed valuation integers, localization,
     residue fields and composite valuation subrings in Lean.
   authors:
     - "Formal Frontier Agents"
@@ -30,8 +31,12 @@ sources:
     type: "book"
     relationship: "background"
     note: >-
-      Motivating mathematics, including bounded torsion and separated
-      principal-adic valuation-ring completions. Detailed passage correspondence
+      Motivating mathematics, including bounded torsion, separated principal-adic
+      valuation-ring completions and the closure-as-intersection-of-sums formula
+      in the 2017 book, Proposition 7.1.6 and Exercise 0.7.1. The bundled closure
+      theorem uses a given compatible topological additive group over a semiring
+      with fixed-scalar continuity, not a topology construction from arbitrary
+      semiring filtrations. Detailed passage correspondence
       and remaining gaps are recorded separately; no whole-source coverage or
       completion claim is made by this library or metadata.
 
@@ -41,7 +46,9 @@ related_formalizations:
     note: >-
       Native mathematical infrastructure at revision
       83abb3e776bdefcbc447a1e44d0debe4010039e5 with Lean v4.34.0-rc2 and
-      the complete pinned Lake dependency graph.
+      the complete pinned Lake dependency graph. The submodule-closure formula
+      reuses Filter.HasBasis.iInter_add_right_eq_closure, canonical submodule
+      carriers and PLift basis reindexing for Sort-valued indices.
 
 automation:
   methods:
@@ -60,7 +67,12 @@ status:
     valuation-free abstract completions for finitely generated ideals; native
     adic completion under restriction of scalars along arbitrary commutative
     algebras, with compatible module actions and ideal extension, without finite
-    generation, flatness or separatedness; separated
+    generation, flatness or separatedness; submodule closure as the infimum of
+    sums with active submodule neighborhoods of zero over a semiring, with
+    independent scalar, module and Sort-valued index universes, a compatible
+    group topology and fixed-scalar continuity. This requires no scalar topology,
+    Hausdorffness, countability or closedness, and does not construct a topology
+    from arbitrary semiring filtrations; separated
     nonzero principal-adic valuation-ring
     completions of arbitrary valuation rank, with independent ring and field
     universes. Local, residue, spectrum and localization results keep their
@@ -82,7 +94,8 @@ acknowledgements: >-
   Anchor for the attributed earlier project development and assembly, the
   original primary-component research contributor and its current port author,
   the original scalar-restriction proof/client contributor and the distinct
-  library adaptation author as distinguished in docs/CREDITS.md,
+  library adaptation author as distinguished in docs/CREDITS.md, Rudder for
+  the bundled submodule-closure proof and its applications,
   and independent Formal Frontier agent
   reviewers of earlier work. Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

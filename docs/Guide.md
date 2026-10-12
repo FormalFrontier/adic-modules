@@ -121,6 +121,7 @@ All module names below have prefix `AdicModules.`.
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
+| [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
 | [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | Domain, valuation-ring, fraction-field, local and residue properties |
@@ -180,7 +181,7 @@ private-inclusive axiom checks, not just building.
 These are historical observations from that measured configuration, not
 measurements of the current dependency pins or clean-machine guarantees. No
 peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not a current 32-module estimate.
+observation below is historical, not a current 34-module estimate.
 
 ### Earlier module-readiness measurements
 

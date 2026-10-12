@@ -7,13 +7,17 @@ The original source/tool/native-record bindings remain unchanged; the manifest's
 `original_api_sha256` identifies the original presentation retained in Git history,
 while `api_sha256` binds the Markdown with the editorial note. That inventory
 predates the separate
-`PrimaryComponent` and `AdicCompletion.RestrictScalars` leaves and their test
-modules: it is **not** a current whole-library inventory. Read the
+`PrimaryComponent`, `AdicCompletion.RestrictScalars` and
+`Topology.Algebra.Submodule` leaves and their test modules: it is **not** a
+current whole-library inventory. Read the
 [manual primary-component reference](PrimaryComponent.md) and the
 [scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
-for those declarations and their ordinary-import clients. The current public
-root re-exports fifteen mathematical leaves; sixteen test/audit modules are
-not re-exported by `AdicModules`. The scalar-restriction
+for those declarations and their ordinary-import clients, and the
+[submodule-closure module](../AdicModules/Topology/Algebra/Submodule.lean) for
+its neighborhood-basis formula and
+[applications](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean).
+The current public root re-exports sixteen mathematical leaves; seventeen
+test/audit modules are not re-exported by `AdicModules`. The scalar-restriction
 [producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
 [client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
 source references, not regenerated entries in the historical snapshot.
