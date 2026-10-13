@@ -38,6 +38,13 @@ mathlib's existing set-level closure formula through canonical submodule
 carriers and reindexes the neighborhood basis along `PLift.down`; it does not
 reprove that set-level result or introduce a competing closure construction.
 
+Rudder also authored the unital cyclic-ring integer-cast bridge, its singleton-span
+consequences and integer, cyclic-quotient and matrix clients. The proof evaluates
+mathlib's existing cyclic additive-endomorphism theorem on right multiplication
+at `1`, then uses the existing singleton-span eliminator and contraposition.
+It does not copy or reimplement the cyclic-endomorphism proof, introduce a new
+integer action or assert that this bridge is a theorem from the source book.
+
 Rudder also authored the integer-span density result and the p-adic basis,
 linearity, properness and density chapter, adapting earlier Formal Frontier
 p-adic proof developments. The formulations and proofs retain Mathlib's norm
@@ -94,6 +101,29 @@ Anatole Dedecker. In particular, integer fixed-scalar continuity comes from
 `AddGroup.continuousConstSMul_int`, not a new scalar-continuity API.
 These upstream files are Apache-2.0; their licenses, copyright and author
 notices remain upstream, and no upstream proof bodies are copied here.
+
+The integer-span proofs reuse `AddMonoidHom.map_addCyclic`, generated additively
+from `MonoidHom.map_cyclic`, `AddMonoidHom.mulRight`, `Int.smul_one_eq_cast`,
+`AddCommGroup.toIntModule` and `Submodule.span_singleton_eq_top_iff`.
+The relevant cyclic-group files credit Johannes Hölzl; the ring file credits
+Jeremy Avigad, Leonardo de Moura, Floris van Doorn, Yury Kudryashov and
+Neil Strickland. The integer-module file credits Nathaniel Thomas, Jeremy
+Avigad, Johannes Hölzl and Mario Carneiro. The singleton-span file credits
+Johannes Hölzl, Mario Carneiro, Kevin Buzzard, Yury Kudryashov, Frédéric Dupuis
+and Heather Macbeth. The cyclic-class definitions
+credit Jeremy Avigad, Leonardo de Moura, Simon Hudon and Mario Carneiro, and the
+integer-cast interfaces credit Mario Carneiro and Gabriel Ebner.
+
+The integer-span clients reuse `ZMod.intCast_surjective`, maintained cyclic
+instances, integer-unit lemmas and matrix-unit, diagonal-cast and multiplication
+interfaces. The corresponding ZMod file credits Chris Hughes, and the
+integer-unit file credits Jeremy Avigad. The matrix-unit file credits
+Jalex Stark, Kim Morrison, Eric Wieser, Oliver Nash and Wen Yang; the diagonal
+and multiplication files credit Ellen Arlt, Blair Shi, Sean Leather,
+Mario Carneiro, Johan Commelin and Lu-Ming Zhang. These mathlib files are
+Apache-2.0, with their original licenses, copyright and author notices retained
+upstream. This library reuses their interfaces and formalization approach,
+without copying upstream proof bodies or claiming authorship of them.
 
 The p-adic chapter follows Mathlib's p-adic norm and approximation theory by
 Robert Y. Lewis, Mario Carneiro and Johan Commelin. Its basis proof combines

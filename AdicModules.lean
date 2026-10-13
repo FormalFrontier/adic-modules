@@ -8,6 +8,7 @@ public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.Algebra.Module.Int
 public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.PadicInt
 public import AdicModules.ValuationTopology
@@ -30,6 +31,8 @@ abstract adic completions, principal-adic valuation topology, completed valuatio
 and their local, spectral, localization and composite-valuation interfaces. It also
 compares native adic completions under restriction of scalars and describes submodule closure
 using a basis of submodule neighborhoods of zero in a given topological additive group.
+For unital rings, additive cyclicity implies surjective integer casts; nonsurjective
+integer casts force every singleton span under the canonical integer action to be proper.
 For the p-adic integers it gives ideal-power neighborhood bases and proper dense
 integer spans, using their usual norm topology. Test and audit modules are separate.
 Theorems retain their stated separation, nonzero-generator and localization hypotheses.

@@ -89,6 +89,46 @@ exercises these directions and boundary cases. The 103-display-site native
 `docs/API.md` snapshot predates this module and remains historical; this guide
 and the Lean source describe the current scalar-restriction API.
 
+## Integer singleton spans in unital rings
+
+Import [`AdicModules.Algebra.Module.Int`](../AdicModules/Algebra/Module/Int.lean)
+alone or the `AdicModules` public root. For `R : Type u` with `NonAssocRing R`,
+the integer action is the canonical `AddCommGroup.toIntModule` action induced
+by the additive group. No separately chosen `Module ℤ R` structure is needed.
+The span `Submodule.span ℤ ({x} : Set R)` consists of the integer multiples
+of `x`; it is not a span for a separately chosen self-scalar action of `R`.
+
+`IsAddCyclic.intCast_surjective` says that the integer cast `ℤ → R` is
+surjective when the additive group of `R` is cyclic.
+`Submodule.intCast_surjective_of_span_singleton_eq_top` gives the same
+conclusion if one element has top integer span. Its contrapositive,
+`Submodule.int_span_singleton_ne_top_of_not_surjective_intCast`, makes
+**every** singleton integer span proper when integer casts are not surjective.
+Multiplication need not be associative or commutative. No `CharZero`,
+`Nontrivial`, topology or special-generator hypothesis is added.
+
+The proof uses mathlib's `AddMonoidHom.map_addCyclic`: every additive endomorphism
+of a cyclic additive group is an integer scalar map. Apply this to the existing
+right-multiplication homomorphism `AddMonoidHom.mulRight a`, and evaluate at
+`1`. The identities `1 * a = a` and `m • 1 = (m : R)` put each `a` in the
+integer-cast image. This uses no reassociation of ring multiplication or self
+`Module R R` structure. Mathlib's `Submodule.span_singleton_eq_top_iff`
+provides the cyclic additive-group witness from the top-span premise.
+
+The [ordinary-import clients](../AdicModulesTest/Algebra/Module/Int.lean) show
+that `1` generates `ℤ` and every `ZMod n` as an integer module. This includes
+`ZMod 0` and the zero ring `ZMod 1`. In a subsingleton ring, every singleton
+span is both top and bottom and integer casts are onto. Nonsurjectivity is not
+necessary for one particular span to be proper: `ℤ` has surjective casts, yet
+its integer span of `2` does not contain `1`.
+
+For `Matrix (Fin 2) (Fin 2) ℤ`, every integer cast is a scalar diagonal matrix.
+The matrix unit `E₀₁ = Matrix.single 0 1 1` is not a cast, because its `(0,1)`
+entry is `1` rather than `0`. Hence every singleton integer span in this ring
+is proper. The span of `E₀₁` contains `E₀₁` itself but not the identity matrix.
+The identities `E₀₁ * E₁₀ = E₀₀` and `E₁₀ * E₀₁ = E₁₁` exhibit genuine
+noncommutativity, so a commutative-ring restriction would omit this client.
+
 ## P-adic neighborhood bases and integer spans
 
 Import [`AdicModules.Topology.Algebra.PadicInt`](../AdicModules/Topology/Algebra/PadicInt.lean)
@@ -193,8 +233,9 @@ local typeclass installations rather than silently adding global instances.
 ## Module map
 
 All module names below have prefix `AdicModules.`. The public root re-exports
-17 mathematical leaves; 18 separate test/audit modules give 36 maintained
-modules in total when the public root is included.
+18 mathematical leaves; 19 separate test/audit source modules give 38 maintained
+source modules in total when the public root is included. These are source-file
+counts, not a compiled-declaration or axiom-audit inventory.
 
 | Module | Main role |
 | --- | --- |
@@ -202,6 +243,7 @@ modules in total when the public root is included.
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
+| [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
 | [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | P-adic ideal-power bases, linear topology, proper dense integer spans and top neighborhood suprema |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
@@ -263,7 +305,7 @@ private-inclusive axiom checks, not just building.
 These are historical observations from that measured configuration, not
 measurements of the current dependency pins or clean-machine guarantees. No
 peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not a current 36-module estimate.
+observation below is historical, not a current whole-library estimate.
 
 ### Earlier module-readiness measurements
 
