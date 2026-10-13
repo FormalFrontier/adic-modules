@@ -4,8 +4,16 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.AdicCompletion.RestrictScalars
 import Mathlib.RingTheory.Polynomial.Basic
+
+/-!
+# Scalar restriction on quotient and completion elements
+
+The quotient and completion comparisons preserve representatives, transition maps and inverse
+identities. Integer and polynomial algebras give models, including the bottom and top ideals
+and the level-zero quotient.
+-/
 
 set_option warningAsError true
 
@@ -119,3 +127,24 @@ private noncomputable def polynomial_algebra (I : Ideal ℤ) :
   AdicCompletion.restrictScalarsEquiv I (Polynomial ℤ)
 
 end AdicModulesTest.AdicCompletion.RestrictScalars
+
+namespace Polynomial
+
+/-- Restricting scalars from integer polynomials to integers distinguishes the completed images
+of `X` and `1` in the bottom-adic model. -/
+public theorem adicCompletion_restrictScalars_bot_of_X_ne_of_one :
+    AdicCompletion.restrictScalarsEquiv (⊥ : Ideal ℤ) (Polynomial ℤ)
+        (AdicCompletion.of ((⊥ : Ideal ℤ).map (algebraMap ℤ (Polynomial ℤ)))
+          (Polynomial ℤ) X) ≠
+      AdicCompletion.restrictScalarsEquiv (⊥ : Ideal ℤ) (Polynomial ℤ)
+        (AdicCompletion.of ((⊥ : Ideal ℤ).map (algebraMap ℤ (Polynomial ℤ)))
+          (Polynomial ℤ) 1) := by
+  rw [AdicModulesTest.AdicCompletion.RestrictScalars.forward_of,
+    AdicModulesTest.AdicCompletion.RestrictScalars.forward_of]
+  intro h
+  have hpoly : (X : Polynomial ℤ) = 1 :=
+    (AdicCompletion.of_injective (⊥ : Ideal ℤ) (Polynomial ℤ)) h
+  have hconstant := congrArg (fun p : Polynomial ℤ ↦ p.coeff 0) hpoly
+  simp at hconstant
+
+end Polynomial

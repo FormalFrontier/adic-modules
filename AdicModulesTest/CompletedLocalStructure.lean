@@ -4,7 +4,27 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules
+public import AdicModules
+public import Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.RingTheory.PowerSeries.Inverse
+
+/-!
+# Local algebra of separated principal-adic completions
+
+The principal-adic comparison supplies domain, valuation-ring and fraction-field structures.
+For a nonzero generator in the maximal ideal, the completion is not a field and the canonical
+local map induces a bijection on residue fields.
+
+The `X`-adic completion of rational power series contains a nonzero nonunit. Its generator and
+separatedness hypotheses follow from the discrete valuation ring of power series and the equality
+of its maximal ideal with `(X)`.
+
+## References
+
+The power-series discrete valuation ring, fraction ring and separated powers of the maximal ideal
+are supplied by Mathlib. The nonzero nonunit criterion is supplied by
+`AdicModules.CompletedLocalStructure`.
+-/
 
 set_option warningAsError true
 set_option linter.style.haveILetI false
@@ -14,16 +34,6 @@ noncomputable section
 open scoped Topology
 
 universe u v
-
-#check ValuationRing.principalAdicCompletion_isDomain
-#check ValuationRing.principalAdicCompletion_isValuationRing
-#check ValuationRing.principalAdicCompletionFractionFieldAlgebra
-#check ValuationRing.principalAdicCompletionFractionFieldAlgebra_algebraMap_base
-#check ValuationRing.principalAdicCompletion_isFractionRing
-#check ValuationRing.principalAdicCompletion_maximalIdeal_eq_map
-#check ValuationRing.principalAdicCompletion_not_isField
-#check ValuationRing.principalAdicCompletion_algebraMap_isLocalHom
-#check ValuationRing.principalAdicCompletion_residueFieldMap_bijective
 
 section
 
@@ -112,4 +122,23 @@ private theorem baseMapSimpClient (x : V) :
       algebraMap K (UniformSpace.Completion K) (algebraMap V K x) := by
   simp
 
+
 end
+
+/-- The `X`-adic completion of rational power series contains a nonzero nonunit. -/
+public theorem PowerSeries.exists_ne_zero_not_isUnit_adicCompletion :
+    ∃ z : AdicCompletion (R := PowerSeries ℚ) (Ideal.span {PowerSeries.X}) (PowerSeries ℚ),
+      z ≠ 0 ∧ ¬ IsUnit z := by
+  let hSep : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) :=
+    Eq.mp
+      (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ IsHausdorff I (PowerSeries ℚ))
+        (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+      (inferInstance :
+        IsHausdorff (IsLocalRing.maximalIdeal (PowerSeries ℚ)) (PowerSeries ℚ))
+  have hXmax : (PowerSeries.X : PowerSeries ℚ) ∈
+      IsLocalRing.maximalIdeal (PowerSeries ℚ) := by
+    rw [PowerSeries.maximalIdeal_eq_span_X (k := ℚ)]
+    exact Ideal.subset_span (Set.mem_singleton PowerSeries.X)
+  exact @ValuationRing.exists_ne_zero_not_isUnit_principalAdicCompletion
+    (PowerSeries ℚ) (FractionRing (PowerSeries ℚ)) _ _ _ _ _ _
+    PowerSeries.X PowerSeries.X_ne_zero hXmax hSep

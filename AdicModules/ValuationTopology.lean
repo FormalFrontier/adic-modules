@@ -157,3 +157,28 @@ theorem isAdic_valuationTopology_span_singleton
     exact (hmem n b).mp hb |>.trans_lt (by simpa only [map_pow] using hn)
 
 end ValuationRing
+
+@[expose] public section
+
+open scoped Topology
+
+variable {V : Type u} {K : Type v} [CommRing V] [IsDomain V]
+  [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+
+/-- A zero-neighborhood for the fraction-field valuation topology contains a power of
+any nonzero principal ideal with separated power filtration, and conversely. This combines
+`ValuationRing.isAdic_valuationTopology_span_singleton` with Mathlib's
+`IsAdic.hasBasis_nhds_zero`. -/
+theorem ValuationRing.principalAdicTopology_mem_nhds_zero_iff
+    {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V] (U : Set V) :
+    U ∈ @nhds V
+        (Valued.mk' ((ValuationRing.valuation V K).comap
+          (algebraMap V K))).toUniformSpace.toTopologicalSpace (0 : V) ↔
+      ∃ n : ℕ, (↑((Ideal.span {a}) ^ n) : Set V) ⊆ U := by
+  let _ : Valued V (ValueGroup V K) :=
+    Valued.mk' ((ValuationRing.valuation V K).comap (algebraMap V K))
+  simpa only [true_and] using
+    (ValuationRing.isAdic_valuationTopology_span_singleton
+      (K := K) ha0).hasBasis_nhds_zero.mem_iff (t := U)
+
+end

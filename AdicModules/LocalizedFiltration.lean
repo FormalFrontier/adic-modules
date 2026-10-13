@@ -162,3 +162,25 @@ theorem isHausdorff_localizationAtNonzeroPrime_span_singleton
   exact radical_span_singleton_le_prime_of_isHausdorff p hp
 
 end ValuationRing
+
+namespace ValuationRing
+
+variable {V : Type u} [CommRing V] [IsDomain V] [ValuationRing V]
+  (S : Submonoid V) (Vₛ : Type v) [CommRing Vₛ] [Algebra V Vₛ] [IsLocalization S Vₛ]
+  {a : V} (hS : Disjoint (S : Set V) ((Ideal.span {a}).radical : Set V))
+
+include hS in
+/-- In the zero-power boundary of the localized filtration, multiplication by the generator
+clears the denominator of every localized element, giving a representative in the base ring. -/
+public theorem exists_algebraMap_eq_mul (x : Vₛ) :
+    ∃ y : V, algebraMap V Vₛ y = algebraMap V Vₛ a * x := by
+  have hmem : algebraMap V Vₛ a * x ∈
+      ((Ideal.span {algebraMap V Vₛ a}) ^ (0 + 1)).restrictScalars V := by
+    change algebraMap V Vₛ a * x ∈ (Ideal.span {algebraMap V Vₛ a}) ^ (0 + 1)
+    rw [zero_add, pow_one, Ideal.mem_span_singleton]
+    exact ⟨x, rfl⟩
+  rcases Submodule.mem_map.mp ((localizedPowerImage_sandwich S Vₛ hS 0).1 hmem) with
+    ⟨y, _, hxy⟩
+  exact ⟨y, hxy⟩
+
+end ValuationRing

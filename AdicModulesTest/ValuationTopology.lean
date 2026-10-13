@@ -4,20 +4,34 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules
+public import AdicModules
+public import Mathlib.RingTheory.PowerSeries.Inverse
+public import Mathlib.RingTheory.Localization.FractionRing
+
+/-!
+# Principal-adic valuation topology
+
+A valuation domain separated for powers of a nonzero principal ideal carries the corresponding
+adic topology under its fraction-field valuation. This module also retains the cofinality and
+prime-radical consequences of separatedness, without rank or Noetherian hypotheses. The
+zero-neighborhood criterion combines this comparison with the `IsAdic` neighborhood-basis API.
+
+For `ℚ[[X]]`, `(X)` is a zero-neighborhood for the topology induced by the canonical
+fraction-field valuation. This is the topology selected by the comparison theorem, not a
+separately chosen power-series topology. The empty set contains no ideal power, since each
+contains zero.
+
+The proofs use the valuation topology APIs of AdicModules and Mathlib.
+-/
 
 set_option warningAsError true
 
 open MonoidWithZeroHom MonoidWithZeroHom.ValueGroup₀
+open scoped Topology
 
 noncomputable section
 
 universe u v w
-
-#check Valuation.exists_pow_restrict_lt_of_isHausdorff
-#check ValuationRing.radical_span_singleton_le_prime_of_isHausdorff
-#check ValuationRing.exists_pow_valuation_lt_of_isHausdorff
-#check ValuationRing.isAdic_valuationTopology_span_singleton
 
 section Generic
 
@@ -58,3 +72,39 @@ private theorem adicTopologyClient {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.s
   ValuationRing.isAdic_valuationTopology_span_singleton ha0
 
 end ValuationRing
+
+/-- For rational power series, `(X)` is a zero-neighborhood in the topology induced by the
+canonical fraction-field valuation, whereas the empty set is not a zero-neighborhood. -/
+public theorem ValuationRing.powerSeries_span_X_mem_nhds_zero_and_empty_not_mem :
+    ((Ideal.span {PowerSeries.X} : Ideal (PowerSeries ℚ)) : Set (PowerSeries ℚ)) ∈
+        @nhds (PowerSeries ℚ)
+          (Valued.mk' ((ValuationRing.valuation (PowerSeries ℚ)
+            (FractionRing (PowerSeries ℚ))).comap
+              (algebraMap (PowerSeries ℚ)
+                (FractionRing (PowerSeries ℚ))))).toUniformSpace.toTopologicalSpace 0 ∧
+      (∅ : Set (PowerSeries ℚ)) ∉
+        @nhds (PowerSeries ℚ)
+          (Valued.mk' ((ValuationRing.valuation (PowerSeries ℚ)
+            (FractionRing (PowerSeries ℚ))).comap
+              (algebraMap (PowerSeries ℚ)
+                (FractionRing (PowerSeries ℚ))))).toUniformSpace.toTopologicalSpace 0 := by
+  let hSep : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) :=
+    Eq.mp
+      (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ IsHausdorff I (PowerSeries ℚ))
+        (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+      (inferInstance :
+        IsHausdorff (IsLocalRing.maximalIdeal (PowerSeries ℚ)) (PowerSeries ℚ))
+  constructor
+  · apply (@ValuationRing.principalAdicTopology_mem_nhds_zero_iff
+      (PowerSeries ℚ) (FractionRing (PowerSeries ℚ)) _ _ _ _ _ _
+      PowerSeries.X PowerSeries.X_ne_zero hSep _).mpr
+    refine ⟨1, ?_⟩
+    simpa only [pow_one] using
+      (Set.Subset.rfl :
+        ((Ideal.span {PowerSeries.X} : Ideal (PowerSeries ℚ)) : Set (PowerSeries ℚ)) ⊆
+          ((Ideal.span {PowerSeries.X} : Ideal (PowerSeries ℚ)) : Set (PowerSeries ℚ)))
+  · intro hEmpty
+    obtain ⟨n, hn⟩ := (@ValuationRing.principalAdicTopology_mem_nhds_zero_iff
+      (PowerSeries ℚ) (FractionRing (PowerSeries ℚ)) _ _ _ _ _ _
+      PowerSeries.X PowerSeries.X_ne_zero hSep (∅ : Set (PowerSeries ℚ))).mp hEmpty
+    exact hn (Ideal.zero_mem ((Ideal.span {PowerSeries.X} : Ideal (PowerSeries ℚ)) ^ n))

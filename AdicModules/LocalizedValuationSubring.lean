@@ -148,3 +148,41 @@ theorem coe_localizedAdicCompletionValuationSubringEquiv_apply
   rfl
 
 end ValuationRing
+
+@[expose] public section
+
+namespace ValuationRing
+
+variable {V : Type u} {Vₛ : Type v} {K : Type w}
+  [CommRing V] [IsDomain V] [ValuationRing V]
+  [CommRing Vₛ] [Field K] [Algebra V Vₛ] [Algebra V K]
+  (S : Submonoid V) [IsLocalization S Vₛ] [IsFractionRing V K]
+  {a : V} (ha0 : a ≠ 0)
+  (hS : Disjoint (S : Set V) ((Ideal.span {a}).radical : Set V))
+  [IsHausdorff (Ideal.span {a}) V]
+
+/-- Equality of the completed-field realizations of two localized-completion elements
+can be tested in the original completion. The canonical ring equivalence and the subtype
+coercion together reflect equality, using Mathlib's ring-equivalence injectivity and
+subtype extensionality. -/
+theorem localizedAdicCompletion_equiv_coe_eq_iff
+    (x y : AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ) :
+    (localizedAdicCompletionValuationSubringEquiv (Vₛ := Vₛ) (K := K)
+        S ha0 hS x).val =
+      (localizedAdicCompletionValuationSubringEquiv (Vₛ := Vₛ) (K := K)
+        S ha0 hS y).val ↔ x = y := by
+  let _ : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  constructor
+  · intro h
+    exact (localizedAdicCompletionValuationSubringEquiv
+      (Vₛ := Vₛ) (K := K) S ha0 hS).injective (Subtype.ext h)
+  · intro h
+    exact congrArg (fun z ↦
+      ((localizedAdicCompletionValuationSubringEquiv (Vₛ := Vₛ) (K := K)
+          S ha0 hS z :
+        localizedAdicCompletionValuationSubring (Vₛ := Vₛ) (K := K) S ha0 hS) :
+          UniformSpace.Completion K)) h
+
+end ValuationRing
+
+end

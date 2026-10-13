@@ -297,3 +297,22 @@ theorem principalAdicCompletionEquiv_algebraMap
   principalAdicCompletionRingEquiv_algebraMap (V := V) (K := K) a ha0 x
 
 end ValuationRing
+
+section
+
+variable {V : Type u} {K : Type v} [CommRing V] [IsDomain V]
+  [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  (a : V) (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V]
+
+/-- An inverse comparison equals a canonical principal-adic element exactly when the completed
+valuation integer was the corresponding base-ring image. This permits equality tests on either
+side of the comparison without unfolding it. -/
+public theorem ValuationRing.principalAdicCompletionEquiv_symm_eq_algebraMap_iff
+    (z : ValuationRing.CompletionIntegers V K) (x : V) :
+    (ValuationRing.principalAdicCompletionEquiv (K := K) a ha0).symm z =
+        algebraMap V (AdicCompletion (Ideal.span {a}) V) x ↔
+      z = algebraMap V (ValuationRing.CompletionIntegers V K) x := by
+  rw [(ValuationRing.principalAdicCompletionEquiv (K := K) a ha0).symm_apply_eq,
+    ValuationRing.principalAdicCompletionEquiv_algebraMap (K := K) a ha0 x]
+
+end

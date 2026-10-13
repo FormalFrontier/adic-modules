@@ -523,3 +523,31 @@ theorem completionIntegersQuotientEquiv_mk
   rfl
 
 end ValuationRing
+
+@[expose] public section
+
+namespace ValuationRing
+
+variable {V : Type u} {K : Type v}
+  [CommRing V] [IsDomain V] [ValuationRing V]
+  [Field K] [Algebra V K] [IsFractionRing V K]
+
+/-- The inverse quotient equivalence sends the residue of a completed valuation integer
+back to its canonical quotient class. This makes the transported quotient factor usable
+without unfolding either the residue map or the equivalence, through
+`ValuationRing.completionIntegersQuotientEquiv_mk` and Mathlib's
+`RingEquiv.symm_apply_apply`. -/
+theorem completionIntegersQuotientEquiv_symm_residue
+    (p : Ideal V) [p.IsPrime] (hp : p ≠ ⊥)
+    {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V]
+    (x : CompletionIntegers V K) :
+    (completionIntegersQuotientEquiv (K := K) p hp ha0).symm
+        (completionIntegersCompositeResidue (K := K) p hp ha0 x) =
+      Ideal.Quotient.mk (completionIntegersLocalizedPrime (K := K) p hp ha0) x := by
+  let _ : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  rw [← completionIntegersQuotientEquiv_mk (K := K) p hp ha0 x]
+  exact (completionIntegersQuotientEquiv (K := K) p hp ha0).symm_apply_apply _
+
+end ValuationRing
+
+end

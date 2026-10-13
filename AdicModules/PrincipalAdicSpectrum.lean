@@ -232,3 +232,24 @@ theorem principalAdicCompletion_primeHeight_comap
     (principalAdicCompletionPrimeSpectrumOrderIso K a ha0 ha) P
 
 end ValuationRing
+
+@[expose] public section
+
+namespace ValuationRing
+
+variable {V : Type u} [CommRing V] [IsDomain V] [ValuationRing V]
+  (K : Type v) [Field K] [Algebra V K] [IsFractionRing V K]
+  (a : V) (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V)
+  [IsHausdorff (Ideal.span {a}) V]
+
+/-- The prime of the completion selected by the inverse spectrum order isomorphism
+contracts to the original prime. This combines the contraction formula with the inverse
+law `OrderIso.apply_symm_apply` from Mathlib for the canonical contraction order isomorphism. -/
+theorem principalAdicCompletion_comap_orderIso_symm (P : PrimeSpectrum V) :
+    PrimeSpectrum.comap (algebraMap V (AdicCompletion (Ideal.span {a}) V))
+        ((principalAdicCompletionPrimeSpectrumOrderIso K a ha0 ha).symm P) = P := by
+  exact (principalAdicCompletionPrimeSpectrumOrderIso K a ha0 ha).apply_symm_apply P
+
+end ValuationRing
+
+end

@@ -144,3 +144,41 @@ theorem localizedAtPrimeQuotientValuationSubring_algebraMap_mem
   exact (ValuationRing.integers (V ⧸ p) p.ResidueField).map_le_one x
 
 end ValuationRing
+
+@[expose] public section
+
+namespace ValuationRing
+
+variable {V : Type u} {K : Type v}
+  [CommRing V] [IsDomain V] [ValuationRing V]
+  [Field K] [Algebra V K] [IsFractionRing V K]
+
+/-- Lift a quotient-ring element into the transported quotient valuation subring using
+its algebra-map image. Applying the inverse residue-field equivalence to the underlying
+residue-field element recovers that image in the original residue field. The subtype lift uses
+`ValuationRing.localizedAtPrimeQuotientValuationSubring_algebraMap_mem`, and the inverse law is
+Mathlib's `RingEquiv.symm_apply_apply`. -/
+theorem localizedAtPrimeQuotientValuationSubring_symm_coe_algebraMap
+    (p : Ideal V) [p.IsPrime] (hp : p ≠ ⊥)
+    {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V] (x : V ⧸ p) :
+    let hDisj :=
+      primeCompl_disjoint_radical_span_singleton_of_isHausdorff (a := a) p hp
+    let e := localizedAdicCompletionResidueFieldEquiv
+      (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
+    e.symm
+        (⟨e (algebraMap (V ⧸ p) p.ResidueField x),
+          localizedAtPrimeQuotientValuationSubring_algebraMap_mem (K := K) p hp ha0 x⟩ :
+            localizedAtPrimeQuotientValuationSubring (K := K) p hp ha0).val =
+      algebraMap (V ⧸ p) p.ResidueField x := by
+  let _ : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let hDisj := primeCompl_disjoint_radical_span_singleton_of_isHausdorff (a := a) p hp
+  let A := localizedAdicCompletionValuationSubring
+    (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
+  let e : p.ResidueField ≃+* IsLocalRing.ResidueField A :=
+    localizedAdicCompletionResidueFieldEquiv
+      (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
+  exact e.symm_apply_apply _
+
+end ValuationRing
+
+end

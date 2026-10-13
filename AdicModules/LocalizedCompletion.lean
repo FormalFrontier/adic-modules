@@ -387,3 +387,33 @@ theorem localizedAdicCompletion_isFractionRing
   exact hxy.symm
 
 end ValuationRing
+
+namespace ValuationRing
+
+variable {V : Type u} {Vₛ : Type v} {K : Type w}
+  [CommRing V] [IsDomain V] [ValuationRing V]
+  [CommRing Vₛ] [Field K] [Algebra V Vₛ] [Algebra V K]
+  (S : Submonoid V) [IsLocalization S Vₛ] [IsFractionRing V K]
+  {a : V} (ha0 : a ≠ 0)
+  (hS : Disjoint (S : Set V) ((Ideal.span {a}).radical : Set V))
+  [IsHausdorff (Ideal.span {a}) V]
+
+/-- The image of a localized-completion element is the completed valuation integer coming
+from `x` precisely when the element is the canonical image of `x` through the localization.
+Thus the common completed fraction field detects this base-ring representative uniquely. -/
+public theorem localizedAdicCompletionToFractionFieldCompletion_eq_completionIntegers_iff
+    (z : AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ) (x : V) :
+    localizedAdicCompletionToFractionFieldCompletion (K := K) S ha0 hS z =
+        (algebraMap V (CompletionIntegers V K) x).val ↔
+      z = algebraMap Vₛ (AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ)
+        (algebraMap V Vₛ x) := by
+  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  rw [show (algebraMap V (CompletionIntegers V K) x).val =
+    algebraMap K (UniformSpace.Completion K) (algebraMap V K x) from
+      coe_algebraMap_completionIntegers (V := V) (K := K) x,
+    ← localizedAdicCompletionToFractionFieldCompletion_algebraMap_base
+      (V := V) (Vₛ := Vₛ) (K := K) S ha0 hS x]
+  exact (localizedAdicCompletionToFractionFieldCompletion_injective
+    (V := V) (Vₛ := Vₛ) (K := K) S ha0 hS).eq_iff
+
+end ValuationRing

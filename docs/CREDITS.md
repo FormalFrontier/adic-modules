@@ -38,6 +38,14 @@ mathlib's existing set-level closure formula through canonical submodule
 carriers and reindexes the neighborhood basis along `PLift.down`; it does not
 reprove that set-level result or introduce a competing closure construction.
 
+Rudder also authored the integer-span density result and the p-adic basis,
+linearity, properness and density chapter, adapting earlier Formal Frontier
+p-adic proof developments. The formulations and proofs retain Mathlib's norm
+topology, integer module and restricted ideal carriers rather than constructing
+new versions of these objects. The top-supremum result and its positive-degree
+membership client use the library's generic submodule-closure formula rather
+than copying its proof or substituting an arithmetic argument.
+
 ## Mathematical and upstream references
 
 The mathematical background includes Fujiwara and Kato, *Foundations of Rigid
@@ -86,6 +94,25 @@ Anatole Dedecker. In particular, integer fixed-scalar continuity comes from
 `AddGroup.continuousConstSMul_int`, not a new scalar-continuity API.
 These upstream files are Apache-2.0; their licenses, copyright and author
 notices remain upstream, and no upstream proof bodies are copied here.
+
+The p-adic chapter follows Mathlib's p-adic norm and approximation theory by
+Robert Y. Lewis, Mario Carneiro and Johan Commelin. Its basis proof combines
+`Metric.nhds_basis_closedBall_pow` with
+`PadicInt.norm_le_pow_iff_mem_span_pow`; scalar restriction preserves the carrier
+through `Submodule.coe_restrictScalars`, and linearity uses
+`IsLinearTopology.mk_of_hasBasis`. The ring-level density argument uses
+`IsUnit.isHomeomorph_smul`, dense-range composition,
+`Submodule.span_singleton_eq_range` and central integer casts. Its p-adic
+specialization reuses `PadicInt.denseRange_intCast`, not a copied approximation
+proof. Properness follows the existing `PadicInt.inv`, norm-one inverse identity
+and faithful integer casts, reducing the obstruction to
+`Int.eq_one_or_neg_one_of_mul_eq_one`. The underlying norm, metric, span,
+scalar-restriction and continuous-action files additionally credit
+Alex Kontorovich, Oliver Nash, Andrew Yang, Robert Y. Lewis and Johan Commelin,
+alongside the contributors above. These Mathlib APIs and proof ideas are reused
+under their upstream Apache-2.0 notices, which remain upstream. The supremum
+consumer also uses `Submodule.dense_iff_topologicalClosure_eq_top`, `iInf_const`
+and `iInf_le` to pass from dense closure to the individual neighborhood sums.
 
 ## Documentation adapter expression
 

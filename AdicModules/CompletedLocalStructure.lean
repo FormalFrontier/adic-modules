@@ -231,3 +231,23 @@ theorem principalAdicCompletion_residueFieldMap_bijective
     (Ideal.span_singleton_le_iff_mem (IsLocalRing.maximalIdeal V)).mpr ha)) hI
 
 end ValuationRing
+
+section
+
+variable {V : Type u} {K : Type v} [CommRing V] [IsDomain V]
+  [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  (a : V) (ha0 : a ≠ 0) (ha : a ∈ IsLocalRing.maximalIdeal V)
+  [IsHausdorff (Ideal.span {a}) V]
+
+include K ha0 ha in
+/-- A separated principal-adic completion with a nonzero generator in the maximal ideal
+contains a nonzero nonunit, so its domain structure does not make it a field. -/
+public theorem ValuationRing.exists_ne_zero_not_isUnit_principalAdicCompletion :
+    ∃ x : AdicCompletion (Ideal.span {a}) V, x ≠ 0 ∧ ¬ IsUnit x := by
+  letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
+    ValuationRing.principalAdicCompletion_isDomain K a ha0
+  obtain ⟨x, hx0, hxu⟩ := Ring.exists_not_isUnit_of_not_isField
+    (ValuationRing.principalAdicCompletion_not_isField K a ha0 ha)
+  exact ⟨x, ⟨hx0, hxu⟩⟩
+
+end

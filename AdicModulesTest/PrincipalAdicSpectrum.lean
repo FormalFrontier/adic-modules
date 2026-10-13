@@ -4,7 +4,22 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules
+public import AdicModules
+public import Mathlib.RingTheory.PowerSeries.Inverse
+public import Mathlib.RingTheory.Localization.FractionRing
+
+/-!
+# Contraction in the prime spectrum of a principal-adic completion
+
+The prime-spectrum order isomorphism of a separated principal-adic valuation-ring completion
+acts by contraction along the algebra map. Contracting the prime selected by its inverse
+recovers the original prime without unfolding the order-isomorphism construction.
+For `ℚ[[X]]`, the bottom prime and the maximal prime `(X)` have distinct inverse lifts to
+the `X`-adic completion. Contracting either lift recovers its original prime. The
+associated-element, faithful-flatness, height and value-group applications are retained as well.
+
+The proofs use the completion, spectrum and valuation APIs of AdicModules and Mathlib.
+-/
 
 set_option warningAsError true
 
@@ -13,14 +28,6 @@ noncomputable section
 open scoped Topology
 
 universe u v
-
-#check ValuationRing.completionIntegers_exists_associated_algebraMap
-#check ValuationRing.principalAdicCompletion_exists_associated_algebraMap
-#check ValuationRing.principalAdicCompletion_map_comap_eq
-#check ValuationRing.principalAdicCompletion_faithfullyFlat
-#check ValuationRing.principalAdicCompletion_extensionValuation_isEquiv
-#check ValuationRing.principalAdicCompletionPrimeSpectrumOrderIso
-#check ValuationRing.principalAdicCompletion_primeHeight_comap
 
 namespace ValuationRing
 
@@ -91,5 +98,77 @@ private noncomputable def valueGroupEquivalenceClient :
   letI : IsFractionRing A (UniformSpace.Completion K) :=
     principalAdicCompletion_isFractionRing a ha0
   exact (principalAdicCompletion_extensionValuation_isEquiv K a ha0).orderMonoidIso
+
+end ValuationRing
+
+namespace ValuationRing
+
+/-- The bottom and maximal primes of rational power series have distinct lifts to the
+`X`-adic completion, and both lifts contract to their respective original primes. -/
+public theorem powerSeries_principalAdicCompletion_two_primes :
+    let p := IsLocalRing.maximalIdeal (PowerSeries ℚ)
+    let hSep : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) :=
+      Eq.mp
+        (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ IsHausdorff I (PowerSeries ℚ))
+          (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+        (inferInstance :
+          IsHausdorff (IsLocalRing.maximalIdeal (PowerSeries ℚ)) (PowerSeries ℚ))
+    let hXmax : (PowerSeries.X : PowerSeries ℚ) ∈ p :=
+      Eq.mpr
+        (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ (PowerSeries.X : PowerSeries ℚ) ∈ I)
+          (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+        (Ideal.subset_span (Set.mem_singleton PowerSeries.X))
+    let P₀ : PrimeSpectrum (PowerSeries ℚ) := ⟨⊥, inferInstance⟩
+    let Pₘ : PrimeSpectrum (PowerSeries ℚ) := ⟨p, inferInstance⟩
+    let e := @principalAdicCompletionPrimeSpectrumOrderIso
+      (PowerSeries ℚ) _ _ _ (FractionRing (PowerSeries ℚ)) _ _ _
+      PowerSeries.X PowerSeries.X_ne_zero hXmax hSep
+    e.symm P₀ ≠ e.symm Pₘ ∧
+      PrimeSpectrum.comap
+          (algebraMap (PowerSeries ℚ)
+            (AdicCompletion (Ideal.span {PowerSeries.X}) (PowerSeries ℚ)))
+          (e.symm P₀) = P₀ ∧
+      PrimeSpectrum.comap
+          (algebraMap (PowerSeries ℚ)
+            (AdicCompletion (Ideal.span {PowerSeries.X}) (PowerSeries ℚ)))
+          (e.symm Pₘ) = Pₘ := by
+  let p := IsLocalRing.maximalIdeal (PowerSeries ℚ)
+  let hSep : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) :=
+    Eq.mp
+      (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ IsHausdorff I (PowerSeries ℚ))
+        (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+      (inferInstance :
+        IsHausdorff (IsLocalRing.maximalIdeal (PowerSeries ℚ)) (PowerSeries ℚ))
+  have hXmax : (PowerSeries.X : PowerSeries ℚ) ∈ p :=
+    Eq.mpr
+      (congrArg (fun I : Ideal (PowerSeries ℚ) ↦ (PowerSeries.X : PowerSeries ℚ) ∈ I)
+        (PowerSeries.maximalIdeal_eq_span_X (k := ℚ)))
+      (Ideal.subset_span (Set.mem_singleton PowerSeries.X))
+  let P₀ : PrimeSpectrum (PowerSeries ℚ) := ⟨⊥, inferInstance⟩
+  let Pₘ : PrimeSpectrum (PowerSeries ℚ) := ⟨p, inferInstance⟩
+  let e := @principalAdicCompletionPrimeSpectrumOrderIso
+    (PowerSeries ℚ) _ _ _ (FractionRing (PowerSeries ℚ)) _ _ _
+    PowerSeries.X PowerSeries.X_ne_zero hXmax hSep
+  change e.symm P₀ ≠ e.symm Pₘ ∧
+    PrimeSpectrum.comap
+        (algebraMap (PowerSeries ℚ)
+          (AdicCompletion (Ideal.span {PowerSeries.X}) (PowerSeries ℚ)))
+        (e.symm P₀) = P₀ ∧
+    PrimeSpectrum.comap
+        (algebraMap (PowerSeries ℚ)
+          (AdicCompletion (Ideal.span {PowerSeries.X}) (PowerSeries ℚ)))
+        (e.symm Pₘ) = Pₘ
+  have hPrimes : P₀ ≠ Pₘ := by
+    intro h
+    have hIdeals : (⊥ : Ideal (PowerSeries ℚ)) = p :=
+      congrArg PrimeSpectrum.asIdeal h
+    exact (IsDiscreteValuationRing.not_a_field (PowerSeries ℚ)) hIdeals.symm
+  refine ⟨fun h ↦ hPrimes (e.symm.injective h), ?_, ?_⟩
+  · exact @principalAdicCompletion_comap_orderIso_symm
+      (PowerSeries ℚ) _ _ _ (FractionRing (PowerSeries ℚ)) _ _ _
+      PowerSeries.X PowerSeries.X_ne_zero hXmax hSep P₀
+  · exact @principalAdicCompletion_comap_orderIso_symm
+      (PowerSeries ℚ) _ _ _ (FractionRing (PowerSeries ℚ)) _ _ _
+      PowerSeries.X PowerSeries.X_ne_zero hXmax hSep Pₘ
 
 end ValuationRing

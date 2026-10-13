@@ -4,22 +4,31 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules
+public import AdicModules
+public import Mathlib.Algebra.Field.Rat
+public import Mathlib.RingTheory.PowerSeries.Inverse
+public import Mathlib.RingTheory.Localization.FractionRing
+public import Mathlib.Tactic.NormNum
+
+/-!
+# Power images and separatedness in localizations
+
+The images of base-ring powers lie between consecutive powers of the extended principal ideal
+and form an adic neighborhood basis. Separatedness passes to localizations away from the
+principal radical, including localizations at nonzero primes.
+
+For `PowerSeries ℚ`, localization at all units is the identity localization. The public
+representative theorem gives a nonzero representative of `X * C 3` in this model.
+
+The proofs reuse Mathlib's power-series domain and prime-ideal results and the localized
+filtration API of AdicModules.
+-/
 
 set_option warningAsError true
 
 noncomputable section
 
 universe u v
-
-#check ValuationRing.localizedPowerImage
-#check ValuationRing.denominator_dvd_of_not_mem_radical
-#check ValuationRing.pow_succ_mul_mem_localizedPowerImage
-#check ValuationRing.localizedPowerImage_sandwich
-#check ValuationRing.hasBasis_nhds_zero_adic_localizedPowerImage
-#check ValuationRing.isHausdorff_localization_span_singleton
-#check ValuationRing.isHausdorff_localizationAtPrime_span_singleton
-#check ValuationRing.isHausdorff_localizationAtNonzeroPrime_span_singleton
 
 namespace ValuationRing
 
@@ -48,7 +57,8 @@ private theorem separatedLocalizationClient [IsHausdorff (Ideal.span {a}) V] :
     IsHausdorff (Ideal.span {algebraMap V Vₛ a}) Vₛ :=
   isHausdorff_localization_span_singleton S Vₛ hS
 
-private theorem separatedPrimeLocalizationClient (p : Ideal V) [p.IsPrime] (Vₚ : Type v) [CommRing Vₚ] [Algebra V Vₚ]
+private theorem separatedPrimeLocalizationClient (p : Ideal V) [p.IsPrime]
+    (Vₚ : Type v) [CommRing Vₚ] [Algebra V Vₚ]
     [IsLocalization p.primeCompl Vₚ] (ha : (Ideal.span {a}).radical ≤ p)
     [IsHausdorff (Ideal.span {a}) V] :
     IsHausdorff (Ideal.span {algebraMap V Vₚ a}) Vₚ :=
@@ -59,5 +69,54 @@ private theorem separatedNonzeroPrimeLocalizationClient (p : Ideal V) [p.IsPrime
     [IsHausdorff (Ideal.span {a}) V] :
     IsHausdorff (Ideal.span {algebraMap V Vₚ a}) Vₚ :=
   isHausdorff_localizationAtNonzeroPrime_span_singleton p hp Vₚ
+
+/-- Localization at all units gives the identity-localization model for a generator in the
+maximal ideal; the denominator-disjointness premise is satisfied. -/
+private theorem unitsLocalizationClient (ha : a ∈ IsLocalRing.maximalIdeal V) (x : V) :
+    ∃ y : V, algebraMap V V y = algebraMap V V a * x := by
+  have hle : (Ideal.span {a}).radical ≤ IsLocalRing.maximalIdeal V :=
+    (Ideal.IsPrime.radical_le_iff
+      (inferInstance : (IsLocalRing.maximalIdeal V).IsPrime)).2
+      ((Ideal.span_singleton_le_iff_mem _).2 ha)
+  have hUnits : Disjoint (IsUnit.submonoid V : Set V)
+      ((Ideal.span {a}).radical : Set V) := by
+    rw [Set.disjoint_left]
+    intro s hs hr
+    have hnot : ¬ IsUnit s := by
+      simpa only [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] using hle hr
+    exact hnot hs
+  exact exists_algebraMap_eq_mul (IsUnit.submonoid V) V hUnits x
+
+end ValuationRing
+
+namespace ValuationRing
+
+/-- In the units localization of `PowerSeries ℚ`, the localized-filtration representative of
+`X * C 3` is nonzero. -/
+public theorem powerSeries_unitsLocalization_exists_ne_zero_X_mul_three :
+    ∃ y : PowerSeries ℚ, y ≠ 0 ∧
+      algebraMap (PowerSeries ℚ) (PowerSeries ℚ) y =
+        algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X *
+          algebraMap (PowerSeries ℚ) (PowerSeries ℚ) (PowerSeries.C (3 : ℚ)) := by
+  have hUnits : Disjoint (IsUnit.submonoid (PowerSeries ℚ) : Set (PowerSeries ℚ))
+      ((Ideal.span {(PowerSeries.X : PowerSeries ℚ)}).radical : Set (PowerSeries ℚ)) := by
+    rw [Set.disjoint_left]
+    intro s hs hr
+    have hnot : ¬ IsUnit s := by
+      simpa only [← PowerSeries.maximalIdeal_eq_span_X (k := ℚ),
+        IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] using
+        (PowerSeries.span_X_isPrime (R := ℚ)).isRadical hr
+    exact hnot hs
+  obtain ⟨y, hy⟩ := exists_algebraMap_eq_mul (a := PowerSeries.X)
+    (IsUnit.submonoid (PowerSeries ℚ)) (PowerSeries ℚ) hUnits
+    (algebraMap (PowerSeries ℚ) (PowerSeries ℚ) (PowerSeries.C (3 : ℚ)))
+  have hC : PowerSeries.C (3 : ℚ) ≠ (0 : PowerSeries ℚ) := by
+    simpa only [map_zero] using
+      (PowerSeries.C_injective (R := ℚ)).ne (by norm_num : (3 : ℚ) ≠ 0)
+  refine ⟨y, ?_, hy⟩
+  intro hy0
+  have hprod : (PowerSeries.X : PowerSeries ℚ) * PowerSeries.C (3 : ℚ) = 0 := by
+    simpa only [Algebra.algebraMap_self, RingHom.id_apply, hy0] using hy.symm
+  exact (mul_ne_zero (PowerSeries.X_ne_zero (R := ℚ)) hC) hprod
 
 end ValuationRing

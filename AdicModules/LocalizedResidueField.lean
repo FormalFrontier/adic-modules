@@ -140,3 +140,47 @@ theorem localizedAdicCompletionResidueFieldEquiv_residue
   rfl
 
 end ValuationRing
+
+namespace ValuationRing
+
+variable {V : Type u} {Vₛ : Type v} {K : Type w}
+  [CommRing V] [IsDomain V] [ValuationRing V]
+  [CommRing Vₛ] [Field K] [Algebra V Vₛ] [Algebra V K]
+  (S : Submonoid V) [IsLocalization S Vₛ] [IsFractionRing V K]
+  {a : V} (ha0 : a ≠ 0)
+  (hSrad : Disjoint (S : Set V) ((Ideal.span {a}).radical : Set V))
+  [IsHausdorff (Ideal.span {a}) V]
+
+/-- The completed-localization residue comparison detects congruence modulo the maximal ideal
+of the localization. Its local-ring structure is supplied by the canonical localization
+valuation ring, without a separate choice of instance. -/
+public theorem localizedAdicCompletionResidueFieldEquiv_eq_iff (x y : Vₛ) :
+    let hS0 : (0 : V) ∉ S := fun h0 ↦
+      Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
+    let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
+    let hDomain := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
+    let hValuation : @ValuationRing Vₛ _ hDomain :=
+      localization_isValuationRing (Vₛ := Vₛ) S hSnzd
+    let hLocal := @ValuationRing.isLocalRing Vₛ _
+      hDomain.toNontrivial hValuation.toPreValuationRing
+    localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
+        (@IsLocalRing.residue Vₛ _ hLocal x) =
+      localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
+        (@IsLocalRing.residue Vₛ _ hLocal y) ↔
+      x - y ∈ @IsLocalRing.maximalIdeal Vₛ _ hLocal := by
+  have hS0 : (0 : V) ∉ S := fun h0 ↦
+    Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
+  let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
+  letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
+  letI : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
+  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  change localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
+      (IsLocalRing.residue Vₛ x) =
+    localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
+      (IsLocalRing.residue Vₛ y) ↔ x - y ∈ IsLocalRing.maximalIdeal Vₛ
+  rw [(localizedAdicCompletionResidueFieldEquiv
+    (Vₛ := Vₛ) (K := K) S ha0 hSrad).injective.eq_iff,
+    IsLocalRing.residue_def, IsLocalRing.residue_def]
+  exact Ideal.Quotient.mk_eq_mk_iff_sub_mem x y
+
+end ValuationRing

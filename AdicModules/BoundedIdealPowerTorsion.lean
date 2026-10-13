@@ -153,3 +153,22 @@ theorem IsKilledByIdealPower.extension (I : Ideal R) (N : Submodule R M)
 end AddCommGroup
 
 end Module
+
+@[expose] public section
+
+open Module
+
+variable (R : Type u) (M : Type v) [CommRing R] [AddCommMonoid M] [Module R M]
+  [Module.Finite R M]
+
+/-- Every submodule of a finite module equal to its ideal-primary component is
+annihilated by one ideal power. Uniformity is obtained on the ambient finite module first;
+the submodule itself need not be assumed finite. This uses
+`Module.isKilledByIdealPower_iff_primaryComponent_eq_top` and
+`Module.IsKilledByIdealPower.submodule`. -/
+theorem Module.isKilledByIdealPower_submodule_of_primaryComponent_eq_top
+    (I : Ideal R) (h : Ideal.primaryComponent M I = ⊤) (N : Submodule R M) :
+    IsKilledByIdealPower R N I :=
+  (Module.isKilledByIdealPower_iff_primaryComponent_eq_top R M I).mpr h |>.submodule N
+
+end

@@ -7,17 +7,23 @@ The original source/tool/native-record bindings remain unchanged; the manifest's
 `original_api_sha256` identifies the original presentation retained in Git history,
 while `api_sha256` binds the Markdown with the editorial note. That inventory
 predates the separate
-`PrimaryComponent`, `AdicCompletion.RestrictScalars` and
-`Topology.Algebra.Submodule` leaves and their test modules: it is **not** a
-current whole-library inventory. Read the
+`PrimaryComponent`, `AdicCompletion.RestrictScalars`,
+`Topology.Algebra.Submodule` and `Topology.Algebra.PadicInt` leaves and their
+test modules: it is **not** a current whole-library inventory. Read the
 [manual primary-component reference](PrimaryComponent.md) and the
 [scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
 for those declarations and their ordinary-import clients, and the
 [submodule-closure module](../AdicModules/Topology/Algebra/Submodule.lean) for
 its neighborhood-basis formula and
 [applications](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean).
-The current public root re-exports sixteen mathematical leaves; seventeen
-test/audit modules are not re-exported by `AdicModules`. The scalar-restriction
+The [p-adic guide](Guide.md#p-adic-neighborhood-bases-and-integer-spans) describes
+the twelve-result integer-span API: ideal-power bases, linear topology, density,
+properness and top suprema with restricted ideal neighborhoods. Its
+[clients](../AdicModulesTest/Topology/Algebra/PadicInt.lean) gain membership of
+excluded elements after adding positive-degree neighborhoods.
+The current public root re-exports seventeen mathematical leaves; eighteen
+test/audit modules are not re-exported by `AdicModules` (36 maintained modules
+including the public root). The scalar-restriction
 [producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
 [client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
 source references, not regenerated entries in the historical snapshot.

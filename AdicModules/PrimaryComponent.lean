@@ -168,3 +168,30 @@ theorem primaryComponent.exact (hG : IsAddTorsion G) (p : ℕ) [Fact p.Prime]
     exact (hfg (f (x : G))).2 ⟨x, rfl⟩
 
 end AddCommGroup
+
+@[expose] public section
+
+/-- A `p`-primary element is in the kernel of the integer-ideal restricted map exactly
+when its underlying element is in the kernel of the original additive homomorphism.
+The criterion uses the canonical integer action, with no torsion hypothesis on either group,
+and the characteristic formulas `AddCommGroup.integerPrime_map_agrees` and
+`AddCommGroup.primaryComponent.map_apply`. -/
+theorem AddCommGroup.integerPrime_map_eq_zero_iff
+    {G H : Type*} [AddCommGroup G] [AddCommGroup H]
+    (p : ℕ) [Fact p.Prime] (f : G →+ H) (x : AddCommGroup.primaryComponent G p) :
+    Ideal.primaryComponent.map (AddCommGroup.integerPrime p).asIdeal f.toIntLinearMap
+        (⟨x, (AddCommGroup.mem_integerPrime_iff p (x : G)).2 x.property⟩ :
+          Ideal.primaryComponent G (AddCommGroup.integerPrime p).asIdeal) = 0 ↔
+      f (x : G) = 0 := by
+  have hmap := AddCommGroup.integerPrime_map_agrees p f x
+  rw [AddCommGroup.primaryComponent.map_apply] at hmap
+  constructor
+  · intro h
+    have h' := congrArg
+      (fun y : Ideal.primaryComponent H (AddCommGroup.integerPrime p).asIdeal ↦ (y : H)) h
+    exact hmap.symm.trans h'
+  · intro h
+    apply Subtype.ext
+    exact hmap.trans h
+
+end
