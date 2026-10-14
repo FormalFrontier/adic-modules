@@ -200,6 +200,37 @@ Apache-2.0 copyright, author and license notices remain upstream. Mathematical
 credit is distinct from the redistribution basis for original project expression;
 no additional third-party source text, assets or figures are bundled.
 
+## Comaximal powers and finite Chinese remainders
+
+The comaximal-powers development uses Mathlib's left-ideal and power APIs in
+`Mathlib.RingTheory.Ideal.Operations`, credited to Kenny Lau, and Neil
+Strickland's geometric-sum formalization in `Mathlib.Algebra.Ring.GeomSum`.
+Its subtraction-free recurrence works for arbitrary semiring left ideals;
+the independent-power pairwise guard applies it twice. The two private
+specializations retain the respective two-sided hypotheses of Mathlib's
+`Ideal.sup_pow_eq_top` and `Ideal.sup_pow_eq_top'`.
+
+The finite-selector proof adapts Mathlib's
+`Ideal.quotientInfToPiQuotient_surj` from
+`Mathlib.RingTheory.Ideal.Quotient.Operations`, using
+`Ideal.sup_iInf_eq_top` from the ideal operations module. The finite-quotient
+module retains Kenny Lau's 2018 copyright notice, the Apache-2.0 license
+notice and author credit to Kenny Lau, Patrick Massot and Formal Frontier
+Agents. It reuses Mathlib's actual `Ideal.quotientInfToPiQuotient`, quotient
+formulas and injectivity, quotient factors, `Ideal.pow_sup_pow_eq_top` and
+commutative `Ideal.quotientInfRingEquivPiQuotient`, rather than introducing
+replacement quotients or a different canonical map.
+
+The inverse and representative criteria, common-ring scalar bridge,
+linear-equivalence definition and inclusion/precision squares build on those
+same objects. The linear definition uses the ring equivalence's existing
+`toAddEquiv.toLinearEquiv` and the canonical quotient/Pi module actions.
+Their integer examples reuse Mathlib's principal-ideal, congruence and finite
+calculation APIs. See the [finite-quotient guide](FiniteQuotient.md) for the
+mathematical scope and the distinction between ring CRT and arbitrary
+left-ideal module diagonals. These reuse and adaptation credits supplement,
+not replace, the upstream and project author notices above.
+
 ## Documentation adapter expression
 
 The bounded Markdown API generator and its data tests adapt Anchor's earlier

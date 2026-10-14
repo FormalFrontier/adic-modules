@@ -29,6 +29,11 @@ identifies the uniform condition with `Ideal.primaryComponent M I = ⊤` under
 
 The [bounded-torsion module](../AdicModules/BoundedIdealPowerTorsion.lean)
 provides monotonicity, submodule, surjection, quotient and extension lemmas.
+Submodule and surjective-image results work over a commutative semiring and an
+additive commutative monoid with a module structure. Quotient and extension
+results retain their commutative-ring/additive-group hypotheses. The
+finite-module primary-component comparison is over a commutative ring;
+`Module.Finite` means finite generation, not a finite underlying set.
 For a submodule killed by `I ^ n` and quotient killed by `I ^ m`, the explicit
 extension lemma uses exponent `n + m`. The
 [ordinary-import client](../AdicModulesTest/BoundedIdealPowerTorsion.lean)
@@ -138,6 +143,32 @@ entry is `1` rather than `0`. Hence every singleton integer span in this ring
 is proper. The span of `E₀₁` contains `E₀₁` itself but not the identity matrix.
 The identities `E₀₁ * E₁₀ = E₀₀` and `E₁₀ * E₀₁ = E₁₁` exhibit genuine
 noncommutativity, so a commutative-ring restriction would omit this client.
+
+## Submodule closure from a neighborhood basis
+
+Import [`AdicModules.Topology.Algebra.Submodule`](../AdicModules/Topology/Algebra/Submodule.lean)
+or the public root. `Submodule.topologicalClosure_eq_iInf_sup` identifies
+
+```text
+N.topologicalClosure = ⨅ i, ⨅ (_ : p i), N ⊔ U i
+```
+
+when the active submodules `U i` form a basis of neighborhoods of zero. The
+scalar ring is only a semiring; the module is an additive commutative group
+with an `R`-module structure, a **given compatible topological additive-group
+structure**, and continuous multiplication by each fixed scalar. Scalar,
+module and `Sort`-valued index universes are independent. There is no scalar
+topology, joint scalar continuity, Hausdorffness, countability or closedness
+premise. This theorem does not construct a topology from arbitrary semiring
+submodule filtrations.
+
+The proof packages Mathlib's set-level neighborhood-basis closure formula
+through canonical submodule carriers; it does not replace that closure
+construction. The [examples](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean)
+compute discrete and indiscrete closures and specialize to canonical `(2)`-adic
+powers on the integers, including proposition indices and an active `Bool`
+predicate. The [p-adic application](#p-adic-neighborhood-bases-and-integer-spans)
+uses the same formula with ideals restricted to integer scalars.
 
 ## Closure of spans over a dense subsemiring
 
@@ -361,6 +392,21 @@ Mathlib's ideal operations and Neil Strickland's geometric-sum formalization
 for the underlying APIs and proof idea; the recurrence requires neither
 subtraction nor a commutation premise.
 
+The companion theorem `Ideal.pairwise_sup_eq_top_pow` has signature
+
+```lean
+{R : Type u} {ι : Type v} [Semiring R]
+(I : ι → Ideal R) (hI : Pairwise (fun i j => I i ⊔ I j = ⊤)) (n : ι → ℕ) :
+Pairwise (fun i j => I i ^ n i ⊔ I j ^ n j = ⊤)
+```
+
+It applies the preceding theorem twice, interchanging the ideals, so each
+coordinate may have its own exponent, including zero. The index type is
+arbitrary and independent of the ring universe: no finiteness or two-sidedness
+is needed. This is a pairwise comaximality statement about ideal powers, not a
+finite CRT for arbitrary left ideals; see the
+[finite-quotient boundary](FiniteQuotient.md#arbitrary-left-ideal-boundary).
+
 Mathlib's `Ideal.sup_pow_eq_top` and `Ideal.sup_pow_eq_top'` give the same
 conclusion with the unpowered or powered ideal, respectively, two-sided.
 Two private recovery lemmas apply the public theorem under those respective
@@ -506,6 +552,27 @@ comes from the topological additive group, not from an assumed continuous
 `R`-action. These boundary calculations are independent of the general
 density criterion.
 
+## Finite Chinese remainders
+
+Import [`AdicModules.RingTheory.Ideal.Quotient.Finite`](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean)
+or the public root. For a possibly noncommutative ring `R`, a finite index type
+`ι` in an independent universe, full `[∀ i, (I i).IsTwoSided]` and
+`Pairwise (fun i j => I i ⊔ I j = ⊤)`, the canonical ring map gives
+
+```lean
+Ideal.quotientInfRingEquivPiQuotientOfPairwiseSupEqTop I hI :
+  (R ⧸ ⨅ i, I i) ≃+* ((i : ι) → R ⧸ I i)
+```
+
+The [finite-quotient guide](FiniteQuotient.md) develops its canonical forward
+formulas, inverse class and complete representative coset, equality with
+Mathlib's commutative equivalence and inverse, independent powers including
+zero, common-ring scalar action, the linear equivalence and its characteristic
+API, and forward/inverse precision-reduction squares. It also gives the integer
+examples and the boundary separating two-sided ring CRT from arbitrary-left-ideal
+module diagonals. Finiteness is of the index type, not of `R`; no topology,
+completion or general module CRT is asserted.
+
 ## Completion and valuation hypotheses
 
 [`AdicCompletion.abstractCompletion`](../AdicModules/AdicCompletion.lean)
@@ -531,15 +598,59 @@ the hypothesis that `a` belongs to the maximal ideal where stated. The ordinary
 [spectrum](../AdicModulesTest/PrincipalAdicSpectrum.lean) clients show the needed
 local typeclass installations rather than silently adding global instances.
 
+## Localization and literal composites
+
+Keep the valuation domain `V`, fraction field `K` and element `a : V` above.
+For denominators disjoint from the radical of `(a)`,
+[`localizedPowerImage`](../AdicModules/LocalizedFiltration.lean) consists of the
+literal images of the base-ring powers as `V`-submodules of the localization.
+The comparison sandwiches these submodules between successive powers of the
+extended principal ideal; it is **not** an unconditional equality with those
+powers. The filtration defines the localized topology, and principal-adic
+separatedness supplies its separation.
+
+For a nonzero generator, radical-disjoint denominators and separatedness, the
+[localized-completion map](../AdicModules/LocalizedCompletion.lean) embeds into
+the same completed fraction field used for the base ring. The
+[valuation-subring equivalence](../AdicModules/LocalizedValuationSubring.lean)
+and [residue-field comparison](../AdicModules/LocalizedResidueField.lean)
+describe that completion and its residue field. At a nonzero prime,
+separatedness supplies radical-disjointness. The
+[quotient valuation subring](../AdicModules/LocalizedQuotientValuationSubring.lean)
+retains those prime-specific hypotheses; this is not arbitrary-denominator
+localization without assumptions.
+
+[`ValuationSubring.composite`](../AdicModules/CompositeValuationSubring.lean)
+is the literal residue preimage of a valuation subring of the residue field.
+Localization at its distinguished prime recovers the first factor, and
+quotient by that prime recovers the second. The
+[completed-composite equality](../AdicModules/CompletedValuationComposite.lean)
+identifies the completed valuation integers literally with the composite of
+the completed localization and its transported residue factor. It uses the
+completion and residue maps above, not a new kind of completion.
+
+### Separately importable concrete results
+
+The completion and valuation leaves expose characteristic criteria for inverse
+comparisons, residue congruence and equality in completed-field realizations.
+Their canonical maps are available from `AdicModules` or the narrower library
+leaf. Some related example modules also expose named concrete results: the
+ideal generated by `2` remains proper in its integer adic completion; the
+bottom-adic polynomial comparison distinguishes `X` from `1`; and a composite
+with the whole field as first factor localizes back to that field. Import the
+corresponding model module to use those results.
+These examples are not re-exported by `AdicModules`.
+
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The public root re-exports 21 mathematical source leaves, including the
-comaximal-powers theorem, left-ideal density criterion and dense-subsemiring
-span comparison. There are 22 library sources including that root and 28
-separate test/model/audit source modules, hence **50 tracked Lean source
-modules**. These are source-file counts, not counts of mathematical models,
-compiled modules, kernel declarations or audited axioms. All four left-ideal
+The public root re-exports 22 mathematical source leaves, including the
+comaximal-powers theorems, finite Chinese remainder equivalence, left-ideal
+density criterion and dense-subsemiring span comparison. There are 23 library
+sources including that root and 36 separate test/model/audit source modules,
+hence **59 tracked Lean source modules**. These are source-file counts, not
+counts of mathematical models, compiled modules, kernel declarations or audited
+axioms. All four left-ideal
 and all five span-model files retain independent original calculations; `Int`,
 `MatrixNat` and `Real` additionally contain private applications of their
 respective library theorems. The tables enumerate every library leaf and
@@ -555,7 +666,8 @@ imported declarations.
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
-| [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | Public all-exponent semiring left-ideal comaximal-powers theorem with a written subtraction-free proof and private two-sided specializations |
+| [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
+| [RingTheory.Ideal.Quotient.Finite](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | Finite two-sided ring CRT, inverse representatives, independent powers, common-ring linear equivalence with characteristic API and precision-reduction squares |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
 | [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
 | [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | Set-closure comparison for arbitrary generators over a dense subsemiring with generatorwise coefficient continuity |
@@ -588,6 +700,14 @@ by the public root.
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
 | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
 | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) | Integer, all `ZMod n`, subsingleton and noncommutative matrix singleton-span clients |
+| [RingTheory.Ideal.Quotient.Finite](../AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) | Integer quotient and boundary calculations |
+| [RingTheory.Ideal.Quotient.FiniteEquivalence](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) | Canonical equivalence sending `[8]` to `([0], [2])` modulo `(2)` and `(3)` |
+| [RingTheory.Ideal.Quotient.FinitePowers](../AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) | Independent powers-surjectivity example `[172]` modulo `(4)`, `(9)` and `(5)` |
+| [RingTheory.Ideal.Quotient.FiniteInverse](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteInverse.lean) | Inverse class `[8]`, uniqueness in the quotient, all representatives modulo `(6)` and commutative inverse agreement |
+| [RingTheory.Ideal.Quotient.FiniteLinear](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteLinear.lean) | Generic uses of the seven linear characteristic identities and the inverse-class bridge; canonical `ℤ`-linear equivalence, `[8]` and `2 • [8]` |
+| [RingTheory.Ideal.Quotient.FiniteReduction](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) | Forward/inverse precision `2` to `1` squares for `[8]`, including mixed zero precision |
+| [RingTheory.Ideal.Quotient.Matrix](../AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) | Two-sided matrix quotient examples |
+| [RingTheory.Ideal.Quotient.LeftIdeal](../AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) | Surjective binary left-module diagonal and nonsurjective pairwise comaximal ternary diagonal |
 | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) | Discrete, indiscrete and adic integer closures, proposition indices and active predicates |
 | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) | Proper dense integer spans, excluded elements, positive-degree neighborhood suprema and basis boundaries |
 | [Topology.Algebra.Ideal.Int](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean) | Four original private `(3)`/`(2)` calculations on integers, including proper density; additional private density-criterion application |
@@ -612,19 +732,6 @@ by the public root.
 | [CompletedValuationComposite](../AdicModulesTest/CompletedValuationComposite.lean) | Completed-composite identification client |
 | [Axioms](../AdicModulesTest/Axioms.lean) | Aggregate public-root import only; no axiom census |
 
-In `LocalizedFiltration`, `localizedPowerImage` is a submodule over the **base
-ring**, not the extended ideal. The comparison sandwiches it between successive
-powers of the extended principal ideal. The general localization results require
-denominators disjoint from the radical of the principal ideal. The nonzero-prime
-specialization obtains the required containment from principal-adic separatedness;
-it is not a statement about arbitrary localization without hypotheses.
-
-The composite of a valuation subring with a valuation subring of its residue field
-is a literal residue preimage. Its distinguished prime recovers the first factor
-by localization and the second by quotient. The completed-composite results use
-the previously constructed completion and residue maps; they do not introduce a
-new notion of completion.
-
 General nonseparated reduction, height/rational-rank additivity, isolated-subgroup
 classification and value-group exact sequences are outside the asserted scope.
 Source-level correspondence and whole-source coverage are separate research
@@ -644,8 +751,8 @@ Leave space for several gigabytes of dependency sources and artifacts.
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
 `AdicModulesTest.+` glob including every independent test/model/audit file.
 The normal reproduction command is `lake build AdicModules AdicModulesTest`
-(or `lake build` for both default targets). This covers the current 22
-main-library and 28 test source files, including the three theorem modules
+(or `lake build` for both default targets). This covers the current 23
+main-library and 36 test source files, including the three theorem modules
 for comaximal powers, ideal density and dense-subsemiring span closure, all
 with written proofs, the four left-ideal models and the five span models.
 Private verification fixtures may emit private-module advisories by design.
@@ -653,6 +760,34 @@ Complete library proof-integrity assurance is not claimed by these descriptions
 or model calculations. A complete transitive
 audit must cover private, generated, test and imported declarations and permit
 only `propext`, `Classical.choice` and `Quot.sound`.
+
+### Build options and the historical API
+
+At `⊤`, scalar-restriction completions are trivial even for nonzero `M`; the
+identity and polynomial algebra examples also include `⊥` and level zero.
+These boundaries are part of the same comparison, not extra nontriviality
+premises.
+
+The normal build recipe does not make warnings fatal. Private example modules
+may emit private-module advisories. An optional stricter individual command is
+`lake env lean -DwarningAsError=true AdicModulesTest/AdicCompletion/RestrictScalars.lean`
+after fetching the matching cache. This is a command example, not a statement
+that such a check has been performed. The import-only
+[`Axioms.lean`](../AdicModulesTest/Axioms.lean) is not an axiom census. A relevant
+build and a complete transitive standard-axiom audit are distinct requirements;
+the latter includes private, generated, test and imported declarations and
+permits only `propext`, `Classical.choice` and `Quot.sound`. Historical results,
+generated documentation and selected audits do not replace checks of the
+particular revision. No separate stored-proof replay is required.
+
+The [historical API](API.md) and [generation notes](README.md) describe 13
+mathematical leaves, 28 modules and 103 display sites at their recorded revision.
+They predate the primary-component, scalar-restriction, integer-singleton-span,
+submodule-closure, p-adic, left-ideal, finite-quotient and span-comparison leaves
+and related examples. They are not a current whole-library or complete
+kernel-declaration inventory. Use this guide, the
+[primary-component supplement](PrimaryComponent.md), the
+[finite-quotient guide](FiniteQuotient.md) and current Lean signatures instead.
 
 ### Scalar-restriction resource sample
 
@@ -672,7 +807,7 @@ private-inclusive axiom checks, not just building.
 These are historical observations from that measured configuration, not
 measurements of the current dependency pins or clean-machine guarantees. No
 peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not an estimate for the current 50 source
+observation below is historical, not an estimate for the current 59 source
 modules.
 
 ### Earlier module-readiness measurements

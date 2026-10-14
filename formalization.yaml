@@ -14,8 +14,11 @@ project:
     a written subtraction-free proof, a left-ideal density criterion with a
     written direct additive proof for supplied ring powers topologies, and a
     dense-subsemiring span-closure comparison with generatorwise coefficient
-    continuity. Four left-ideal and five real, discrete, p-adic and
-    degenerate-boundary model source files retain original independent
+    continuity. Finite Chinese remainders for fully two-sided ideal families in
+    possibly noncommutative rings give canonical ring and common-base linear
+    equivalences, inverse representative cosets, independent powers and
+    precision-reduction compatibility. Four left-ideal and five real, discrete,
+    p-adic and degenerate-boundary model source files retain original independent
     calculations, alongside additional private integer-density, natural-matrix
     comaximal-powers and real rational-axis applications.
   authors:
@@ -221,13 +224,34 @@ status:
     ring structure. The direct calculations do not invoke the general density
     criterion. The integer file additionally applies that criterion to (3) in
     the (2)-adic topology, and the natural-matrix file applies the comaximal-powers
-    theorem to its column ideals. The public root imports 21 mathematical leaf
-    modules, including the comaximal-powers theorem, density criterion and
-    dense-subsemiring span comparison; with the root these are 22 main-library
-    source modules. The 28 separate test/model/audit files include all four
-    left-ideal and all five span-model sources, giving 50 tracked Lean source
-    modules. These are source-file counts, not counts of mathematical models,
-    compiled declarations or kernel axioms.
+    theorem to its column ideals.
+    For a possibly noncommutative ring R and a finite index type in an independent
+    universe, a fully two-sided ideal family with pairwise supremum top gives
+    the canonical quotient-by-intersection ring equivalence to the product of
+    quotients. Each tuple has a unique preimage as a quotient class; its
+    simultaneous ring representatives form an additive coset of the intersection.
+    The ring equivalence and its inverse agree with Mathlib's commutative
+    constructions. Independent natural powers, including zero, need comaximality
+    only of the original family, still with full family two-sidedness. The
+    common-base R-linear equivalence uses the same additive equivalence and
+    canonical left quotient/Pi actions; its characteristic API identifies the
+    underlying type and additive equivalences, canonical forward function, components,
+    representatives, scalar preservation and the inverse quotient-class bridge.
+    Forward and inverse equivalences commute with quotient factors for pointwise
+    family inclusions, and with independent precision reduction, including zero.
+    With full two-sidedness but no finiteness or comaximality, the canonical map
+    agrees as a function with the product of linear quotient factors and
+    preserves the common left R-action. Separately, given one solution, the
+    congruence solution-coset lemma works for arbitrary ring left ideals and index
+    types; the independent-power comaximality guard needs only a semiring and
+    arbitrary left ideals. Neither is a finite CRT for arbitrary left ideals.
+    The public root imports 22 mathematical leaf modules, including the
+    comaximal-powers theorems, finite Chinese remainder equivalence, density
+    criterion and dense-subsemiring span comparison; with the root these are 23
+    main-library source modules. The 36 separate test/model/audit files include
+    the finite-quotient clients, all four left-ideal and all five span-model
+    sources, giving 59 tracked Lean source modules. These are source-file counts,
+    not counts of mathematical models, compiled declarations or kernel axioms.
     These counts and written proof descriptions do not certify complete library
     proof integrity, including transitive standard-axiom dependencies of private,
     generated, model and imported declarations.
@@ -244,7 +268,7 @@ review:
     closure, generatorwise continuous dense images and span induction. All four
     left-ideal and all five span-model files retain original independent
     calculations; Int, MatrixNat and Real also contain additional private
-    applications. The complete 21-leaf and 28-test source rosters and model maps
+    applications. The complete 22-leaf and 36-test source rosters and model maps
     are in README.md and docs/Guide.md; docs/README.md distinguishes them from
     the historical API. Mathematical proof descriptions, source counts and
     historical reviews do not establish complete transitive standard-axiom

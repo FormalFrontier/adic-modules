@@ -10,6 +10,7 @@ public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.Algebra.Module.Int
 public import AdicModules.RingTheory.Ideal.Operations
+public import AdicModules.RingTheory.Ideal.Quotient.Finite
 public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
@@ -40,6 +41,11 @@ For the p-adic integers it gives ideal-power neighborhood bases and proper dense
 integer spans, using their usual norm topology. For arbitrary left ideals of a semiring,
 comaximality with an ideal implies comaximality with every natural power of that ideal.
 Powers retain their whole ideal carriers and coefficients in the original semiring.
+For a finite pairwise comaximal family of two-sided ideals in a possibly
+noncommutative ring, the canonical map from the quotient by the intersection
+to the product of the quotients is a ring equivalence. Its inverse recovers a
+unique quotient class from prescribed residues. The canonical map is also
+surjective for independently chosen natural powers, including zeroth powers.
 For a ring with a compatible additive-group topology and a supplied ideal-power
 neighborhood basis at zero, a left ideal is dense exactly when its supremum with the
 filtration ideal is top. Neither ideal needs to be two-sided, and no multiplication

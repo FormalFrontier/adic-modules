@@ -37,6 +37,7 @@ under their respective two-sidedness hypotheses.
 @[expose] public section
 
 universe u
+universe v
 
 namespace Ideal
 
@@ -62,6 +63,19 @@ theorem sup_pow_eq_top_of_sup_eq_top {R : Type u} [Semiring R]
   obtain ⟨x, hx, hxi⟩ := hp
   exact (eq_top_iff_one _).mpr
     (Submodule.mem_sup.mpr ⟨x, hx, i ^ n, pow_mem_pow hi n, hxi⟩)
+
+/-- Independent natural powers of pairwise comaximal left ideals remain
+pairwise comaximal, including at exponent zero. No finiteness or two-sidedness
+assumption is needed. -/
+theorem pairwise_sup_eq_top_pow
+    {R : Type u} {ι : Type v} [Semiring R]
+    (I : ι → Ideal R)
+    (hI : Pairwise (fun i j => I i ⊔ I j = ⊤)) (n : ι → ℕ) :
+    Pairwise (fun i j => I i ^ n i ⊔ I j ^ n j = ⊤) := by
+  intro i j hij
+  have h : I j ^ n j ⊔ I i = ⊤ :=
+    (sup_comm _ _).trans (sup_pow_eq_top_of_sup_eq_top (n := n j) (hI hij))
+  exact (sup_comm _ _).trans (sup_pow_eq_top_of_sup_eq_top (n := n i) h)
 
 /-- The comaximal-power conclusion when the unpowered ideal is two-sided. -/
 private theorem sup_pow_eq_top_of_isTwoSided_left
