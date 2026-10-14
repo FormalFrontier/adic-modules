@@ -9,8 +9,15 @@ project:
     singleton spans in unital rings, submodule closure from neighborhood bases,
     p-adic ideal-power bases and proper dense integer spans with top neighborhood
     suprema, valuation-ring principal-adic completions, completed valuation
-    integers, localization,
-    residue fields and composite valuation subrings in Lean.
+    integers, localization, residue fields and composite valuation subrings in
+    Lean. Also includes comaximal powers of arbitrary semiring left ideals with
+    a written subtraction-free proof, a left-ideal density criterion with a
+    written direct additive proof for supplied ring powers topologies, and a
+    dense-subsemiring span-closure comparison with generatorwise coefficient
+    continuity. Four left-ideal and five real, discrete, p-adic and
+    degenerate-boundary model source files retain original independent
+    calculations, alongside additional private integer-density, natural-matrix
+    comaximal-powers and real rational-axis applications.
   authors:
     - "Formal Frontier Agents"
   responsible_maintainers:
@@ -54,12 +61,40 @@ related_formalizations:
       carriers and PLift basis reindexing for Sort-valued indices. The cyclic-ring
       integer-span results reuse cyclic additive endomorphisms and right
       multiplication evaluated at one, with the canonical integer action and
-      singleton-span interfaces. P-adic bases reuse the geometric closed-ball
-      basis and norm/ideal carrier identity; density transports integer casts
+      singleton-span interfaces. The comaximal-powers theorem reuses Mathlib's
+      semiring left-ideal membership and power APIs, authored by Kenny Lau,
+      and follows Neil Strickland's geometric-sum proof idea through a recurrence
+      without subtraction or a commutation premise. Mathlib's sup_pow_eq_top and
+      sup_pow_eq_top' have additional two-sidedness assumptions on the unpowered
+      and powered ideals, respectively; two private lemmas recover these
+      conclusions from the public theorem. The left-ideal density proof uses
+      nhds_of_zero to translate the supplied ideal-power basis and
+      mem_closure_iff_nhds_basis to test closure, together with the comaximal-powers
+      theorem, without restriction to integer scalars. P-adic bases reuse the
+      geometric closed-ball basis and norm/ideal carrier identity; density transports integer casts
       through unit multiplication, and properness uses the existing p-adic inverse
       and faithful integer casts. Top suprema with restricted ideal neighborhoods
       consume the generic submodule-closure formula, the dense-closure
-      characterization and complete-lattice APIs.
+      characterization and complete-lattice APIs. The dense-subsemiring comparison
+      uses canonical Subsemiring.module and Subsemiring.smul_def restriction,
+      AddSubmonoid.topologicalClosure for additive closure under separately
+      continuous addition, Continuous.range_subset_closure_image_dense at the
+      selected generators and Submodule.span_induction with the strengthened
+      assertion that every scalar multiple lies in that closure.
+      Submodule.span_subset_span supplies the reverse inclusion. The original
+      real and discrete-module calculations, independent of the comparison, reuse
+      singleton-span eliminators, rational cast density, continuous-image closure,
+      coordinate and product continuity, irrational sqrt two and the closed
+      integer image in the real line. The real model also includes an additional
+      private application of Submodule.closure_span_eq_of_dense_subsemiring to
+      the rational axis.
+      P-adic singleton models apply closure_image_closure, DenseRange.closure_range,
+      span_singleton_eq_range and Int.cast_smul_eq_zsmul directly on the canonical
+      self-module, with norm/ideal closedness and existing neighborhood bases.
+      Empty, zero and subsingleton calculations use stock span and closure APIs;
+      indiscrete rational self-module controls use stock indiscrete topology.
+      The independent discrete rational module uses ULift.module' and its
+      canonical algebraic transport, retaining the separate scalar topology.
 
 automation:
   methods:
@@ -101,20 +136,122 @@ status:
     completions of arbitrary valuation rank, with independent ring and field
     universes. Local, residue, spectrum and localization results keep their
     actual maximal-ideal, radical-disjointness and nonzero-prime hypotheses.
+    Submodule.closure_span_eq_of_dense_subsemiring identifies the set closures
+    of spans over a dense subsemiring and its ambient semiring acting on an
+    additive commutative monoid, with independent scalar and module universes
+    and topologies,
+    separately continuous addition and coefficient-map continuity only at the
+    selected members of an arbitrary generating set. The action is canonically
+    restricted on the same module. It assumes no additive group, joint addition,
+    global coefficient continuity, ContinuousSMul, T1, nonempty generators or
+    finiteness. Empty and zero-generator spans have closure of the zero singleton,
+    which need not be that singleton without T1. The proof uses additive-submonoid
+    topological closure, generatorwise continuous dense images and span induction
+    with the assertion that every scalar multiple lies in that closure.
+    The original span and closure calculations in all five model source files
+    Real, Discrete, PadicInt, Boundary and Indiscrete are independent of the
+    generic proof. Real also includes an additional private application of
+    Submodule.closure_span_eq_of_dense_subsemiring to the rational axis, identifying
+    its proper closure and excluding the second coordinate unit.
+    Real and Discrete retain the rational-axis, missing-density,
+    missing-coefficient-continuity and mixed-axis calculations. PadicInt uses
+    the canonical normed p-adic self-module and integer restriction: arbitrary
+    singleton closures agree by direct stock reuse; units and one give whole
+    closures, the nonzero nonunit p gives a proper closed norm sublevel ideal
+    excluding one (including p = 2), and zero gives the closed zero singleton.
+    Existing ideal-power neighborhoods, zero membership and shifted norm balls
+    are included. Boundary supplies empty, zero and arbitrary-set subsingleton
+    calculations, and a nontrivial indiscrete rational self-module where the zero
+    singleton is nonclosed, its closure is universal and T1 fails. Indiscrete uses
+    indiscrete rational scalars and independent discrete ULift rationals with the
+    canonical action: the integer-cast range subsemiring is dense and proper,
+    fixed-scalar maps are continuous, the integer and restricted-subsemiring
+    singleton spans coincide and are closed proper with transported half
+    excluded, but the rational span is whole and coefficient continuity fails.
     General nonseparated reduction, height/rational-rank additivity, isolated
     subgroups, value-group exact sequences and source completion are not claimed.
-    The public root re-exports 18 mathematical source leaves, with 19 separate
-    test/audit source modules (38 maintained source modules including the root,
-    not a compiled-declaration or axiom-audit inventory).
+    The public root also re-exports Ideal.dense_iff_sup_eq_top_of_hasBasis:
+    for every R : Type u with Ring R, TopologicalSpace R and
+    IsTopologicalAddGroup R, and arbitrary left ideals I and J, a given basis
+    (𝓝 (0 : R)).HasBasis (fun _n : ℕ ↦ True)
+    (fun n ↦ ((I ^ n : Ideal R) : Set R)) yields
+    Dense (J : Set R) iff J ⊔ I = ⊤. No two-sidedness, separation, closedness,
+    multiplication continuity or continuous ring scalar action is required.
+    Its written direct additive proof translates the powers basis to each ring
+    element and tests closure by intersection with these neighborhoods. Density
+    at 1 and degree one puts 1 in J ⊔ I; conversely, all-power comaximality
+    decomposes r = j + i and gives j - r = -i in I ^ n. The topology is the same
+    supplied topology, not one constructed from an arbitrary filtration. All
+    ideal coefficients, carriers, sums and powers are those of the original
+    ring. The proof needs no restriction to integer scalars or submodule
+    closure formula.
+    Separately, AdicModules.RingTheory.Ideal.Operations provides the public
+    Ideal.sup_pow_eq_top_of_sup_eq_top with the full universe-polymorphic statement
+    ∀ {R : Type u} [Semiring R] {J I : Ideal R} {n : ℕ}, J ⊔ I = ⊤ → J ⊔ I ^ n = ⊤.
+    Its written proof uses a subtraction-free geometric-sum recurrence and only
+    left multiplication closure. Both ideals are arbitrary left ideals, and
+    powers are whole ideal powers in the original semiring, not spans of powers
+    of chosen generators. The application API covers every natural exponent,
+    including zero, without commutativity, additive inverses, ring, domain,
+    cancellation, nontriviality or two-sidedness hypotheses. Two private
+    specializations recover Mathlib's conclusions when the unpowered or powered
+    ideal, respectively, is two-sided; they add no public entry points or
+    hypotheses to the general theorem. The density proof applies this algebraic
+    implication and uses the compatible additive-group topology directly.
+    Four model files contain direct calculations and theorem applications: the original
+    integers with (2)-adic topology and the proper dense ideal (3), all-power
+    comaximality and residue representatives; nonzero proper non-two-sided
+    column ideals in M₂(ℤ), an induced second-column powers topology with a
+    nonclosed proper dense ideal, non-Hausdorffness and discontinuous right
+    multiplication; canonical M₂(ℕ) semiring columns with membership iff
+    contracts, idempotent positive powers and both all-power suprema,
+    noncommuting elementary matrix units (not invertible units), failure of
+    multiplication cancellation and an additive-inverse obstruction for the
+    canonical addition. In that semiring E01 squared is zero but the square
+    of its generated left ideal contains nonzero E11, so generator powers
+    cannot replace ideal powers. Boundary proof terms cover zeroth versus first
+    powers, discrete integer nondensity despite comaximality and failure of the
+    (2)-power basis, the closed proper nondense (2) in the actual (2)-adic
+    integers, top/indiscrete and bottom/discrete bases, density of every ideal
+    but not the empty set in the indiscrete integers and failure of T1 there,
+    density of the top ideal with only a semiring and topology, bottom density
+    iff the defining ideal is top under the stated ring powers-basis hypothesis,
+    and subsingleton semirings and the one-element ring with all ideal powers.
+    Purely algebraic semiring models require no extra commutative, domain or
+    ring structure. The direct calculations do not invoke the general density
+    criterion. The integer file additionally applies that criterion to (3) in
+    the (2)-adic topology, and the natural-matrix file applies the comaximal-powers
+    theorem to its column ideals. The public root imports 21 mathematical leaf
+    modules, including the comaximal-powers theorem, density criterion and
+    dense-subsemiring span comparison; with the root these are 22 main-library
+    source modules. The 28 separate test/model/audit files include all four
+    left-ideal and all five span-model sources, giving 50 tracked Lean source
+    modules. These are source-file counts, not counts of mathematical models,
+    compiled declarations or kernel axioms.
+    These counts and written proof descriptions do not certify complete library
+    proof integrity, including transitive standard-axiom dependencies of private,
+    generated, model and imported declarations.
 
 review:
-  status: "other: revision-specific independent AI-agent review"
+  status: "incomplete"
   notes: >-
     Independent AI-agent review of bounded ideal-power torsion, primary-component
     exactness, module interfaces and the scalar-restriction proof and client is
     revision-specific. Review and proof-checking results do not certify arbitrary
-    checkouts or later modifications. No human peer review or whole-source
-    coverage is claimed.
+    checkouts or later modifications. The public comaximal-powers theorem has
+    a written subtraction-free proof, the density criterion has a written direct
+    additive proof, and the dense-subsemiring span comparison uses additive
+    closure, generatorwise continuous dense images and span induction. All four
+    left-ideal and all five span-model files retain original independent
+    calculations; Int, MatrixNat and Real also contain additional private
+    applications. The complete 21-leaf and 28-test source rosters and model maps
+    are in README.md and docs/Guide.md; docs/README.md distinguishes them from
+    the historical API. Mathematical proof descriptions, source counts and
+    historical reviews do not establish complete transitive standard-axiom
+    assurance. Revision-specific checks must include private, generated, test
+    and imported declarations, permitting only propext, Classical.choice and
+    Quot.sound.
+    No human peer review or whole-source coverage is claimed.
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;
@@ -124,7 +261,16 @@ acknowledgements: >-
   library adaptation author as distinguished in docs/CREDITS.md, Rudder for
   the bundled submodule-closure proof and its applications, the canonical
   cyclic-ring integer-span results and clients, integer-span density and the
-  p-adic basis, linearity, properness and neighborhood-supremum chapter, and
-  independent Formal Frontier agent
+  p-adic basis, linearity, properness and neighborhood-supremum chapter;
+  Formal Frontier Agents for the dense-subsemiring span statement, its proof and
+  all five real, discrete, p-adic and degenerate-boundary model files with
+  independent original calculations and the additional private real rational-axis
+  application;
+  Mathlib contributors, including Kenny Lau for left-ideal operations and
+  Neil Strickland for the geometric-sum proof idea, for the ideal and translated
+  neighborhood APIs;
+  Mathlib contributors for canonical ULift module transport, p-adic approximation,
+  norm and ideal interfaces, singleton spans and continuous-image closure;
+  and independent Formal Frontier agent
   reviewers of earlier work. Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

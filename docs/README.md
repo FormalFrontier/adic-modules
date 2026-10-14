@@ -8,8 +8,10 @@ The original source/tool/native-record bindings remain unchanged; the manifest's
 while `api_sha256` binds the Markdown with the editorial note. That inventory
 predates the separate
 `PrimaryComponent`, `AdicCompletion.RestrictScalars`, `Algebra.Module.Int`,
-`Topology.Algebra.Submodule` and `Topology.Algebra.PadicInt` leaves and their
-test modules: it is **not** a current whole-library inventory. Read the
+`Topology.Algebra.Submodule`, `Topology.Algebra.PadicInt`,
+`RingTheory.Ideal.Operations`, `Topology.Algebra.Ideal` and
+`Topology.Algebra.Module.Span` leaves and their test/model modules:
+it is **not** a current whole-library inventory. Read the
 [manual primary-component reference](PrimaryComponent.md) and the
 [scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
 for those declarations and their ordinary-import clients, the
@@ -23,13 +25,92 @@ the twelve-result generic-density and p-adic API: ideal-power bases, linear
 topology, density, properness and top suprema with restricted ideal neighborhoods.
 Its [clients](../AdicModulesTest/Topology/Algebra/PadicInt.lean) gain membership of
 excluded elements after adding positive-degree neighborhoods.
-The current public root re-exports eighteen mathematical source leaves;
-nineteen test/audit source modules are not re-exported by `AdicModules`.
-Including the public root gives thirty-eight maintained source modules, a
-source-file count rather than a generated API or declaration inventory.
+The [comaximal-powers guide](Guide.md#comaximal-powers-of-left-ideals)
+describes `Ideal.sup_pow_eq_top_of_sup_eq_top` and its written subtraction-free
+proof for arbitrary semiring left ideals at every natural exponent, including
+zero. Neither ideal must be two-sided; powers are formed in the original
+semiring. Two private lemmas recover Mathlib's two-sided specializations
+without adding public entry points. The
+[left-ideal density guide](Guide.md#left-ideal-density-and-integer-powers-topologies)
+describes `Ideal.dense_iff_sup_eq_top_of_hasBasis` and its written direct
+additive proof by translated neighborhoods in the supplied powers topology.
+It needs only a ring with a compatible topological additive-group structure
+and a powers basis at zero, without two-sidedness or multiplication continuity;
+no restriction to integer scalars is needed. The four left-ideal model files
+retain original direct calculations independent of the general density
+criterion. `Int` additionally applies that criterion to `(3)` in the `(2)`-adic
+integers, and `MatrixNat` additionally applies the comaximal-powers theorem
+to its column ideals. The [matrix](Guide.md#matrix-left-ideal-models) and
+[boundary](Guide.md#ideal-power-boundary-models) calculations are documented
+separately.
+The current public root re-exports **21 mathematical source leaves**;
+**28 test/model/audit source modules** are not re-exported by `AdicModules`.
+Including the public root gives **50 maintained Lean source modules**: 22
+library sources including the root and 28 test sources. These are source-file
+counts, not counts of mathematical models, compiled modules, generated API
+entries, kernel declarations or audited axioms.
+The dense-subsemiring comparison,
+`Submodule.closure_span_eq_of_dense_subsemiring`, uses additive-submonoid
+closure, continuous dense images at selected generators and span induction.
+The original span and closure calculations in the five model files (`Real`,
+`Discrete`, `PadicInt`, `Boundary`, `Indiscrete`) are independent of the generic
+proof. `Real` also includes an additional private application of
+`Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying
+its proper closure and excluding the second coordinate unit.
+Read the
+[span-comparison guide](Guide.md#closure-of-spans-over-a-dense-subsemiring)
+for the original calculations and private real application, canonical actions and
+separation and coefficient-continuity boundaries. None of these current sources is a regenerated
+entry in the historical native API snapshot. These counts, written proof
+descriptions and the generated snapshot do not certify complete transitive
+standard-axiom assurance for private, generated, model or imported declarations.
 The scalar-restriction [producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
 [client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
 source references, not regenerated entries in the historical snapshot.
+
+## Current source roster
+
+The table enumerates all 21 library leaves and all 28 test/model/audit sources;
+[`AdicModules`](../AdicModules.lean) is the additional public root. Module names
+use the prefixes `AdicModules.` and `AdicModulesTest.` respectively.
+The four left-ideal and five span model files retain original calculations
+independent of the corresponding library proofs; `Int`, `MatrixNat` and `Real`
+also include additional private applications.
+
+| Library leaf | Test/audit sources |
+| --- | --- |
+| [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](../AdicModulesTest/BoundedIdealPowerTorsion.lean) |
+| [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) |
+| [AdicCompletion](../AdicModules/AdicCompletion.lean) | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) |
+| [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) |
+| [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](../AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (original calculations and additional private comaximal-powers application) |
+| [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](../AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](../AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (original calculations and additional private density application in Int) |
+| [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
+| [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) |
+| [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](../AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](../AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) |
+| [ValuationTopology](../AdicModules/ValuationTopology.lean) | [ValuationTopology](../AdicModulesTest/ValuationTopology.lean) |
+| [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | [CompletedIntegers](../AdicModulesTest/CompletedIntegers.lean) |
+| [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | [CompletedLocalStructure](../AdicModulesTest/CompletedLocalStructure.lean) |
+| [PrincipalAdicSpectrum](../AdicModules/PrincipalAdicSpectrum.lean) | [PrincipalAdicSpectrum](../AdicModulesTest/PrincipalAdicSpectrum.lean) |
+| [LocalizedFiltration](../AdicModules/LocalizedFiltration.lean) | [LocalizedFiltration](../AdicModulesTest/LocalizedFiltration.lean) |
+| [LocalizedCompletion](../AdicModules/LocalizedCompletion.lean) | [LocalizedCompletion](../AdicModulesTest/LocalizedCompletion.lean) |
+| [LocalizedValuationSubring](../AdicModules/LocalizedValuationSubring.lean) | [LocalizedValuationSubring](../AdicModulesTest/LocalizedValuationSubring.lean) |
+| [LocalizedResidueField](../AdicModules/LocalizedResidueField.lean) | [LocalizedResidueField](../AdicModulesTest/LocalizedResidueField.lean) |
+| [LocalizedQuotientValuationSubring](../AdicModules/LocalizedQuotientValuationSubring.lean) | [LocalizedQuotientValuationSubring](../AdicModulesTest/LocalizedQuotientValuationSubring.lean) |
+| [CompositeValuationSubring](../AdicModules/CompositeValuationSubring.lean) | [CompositeValuationSubring](../AdicModulesTest/CompositeValuationSubring.lean) |
+| [CompletedValuationComposite](../AdicModules/CompletedValuationComposite.lean) | [CompletedValuationComposite](../AdicModulesTest/CompletedValuationComposite.lean) |
+| No library leaf; aggregate root import | [Axioms](../AdicModulesTest/Axioms.lean) (import-only, no axiom census) |
+
+The model-source map uses the same fixed mathematical carriers and actions:
+
+| Span model file | Span calculations and controls |
+| --- | --- |
+| [Real](../AdicModulesTest/Topology/Algebra/Module/Span/Real.lean) | Dense rational real axis with proper common closure and strict enlargement; integer real line missing density and separated by `1 / 2`. |
+| [Discrete](../AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean) | Independent discrete real module missing coefficient continuity; mixed real/discrete axis with selected but not global coefficient continuity. |
+| [PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean) | Canonical normed p-adic self-module and integer restriction; arbitrary singleton stock closure comparison, unit/one whole closures, nonzero nonunit `p` proper closed ideal (including `2`), zero and existing ideal-power/shifted norm neighborhoods. |
+| [Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean) | Empty, zero and subsingleton spans; nontrivial indiscrete rational self-module with nonclosed `{0}`, universal zero closure and nonzero `1` outside spans but in closures. |
+| [Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) | Indiscrete rational scalars and canonical independent discrete `ULift.{v} ℚ`; dense proper integer range, fixed-scalar continuity, failed selected coefficient continuity, closed proper integer/restricted spans excluding transported half, whole rational span and unequal closures. |
 
 Read the [mathematical guide](Guide.md) for hypotheses and usage and
 [CREDITS.md](CREDITS.md) for provenance. Native display sites are not the complete

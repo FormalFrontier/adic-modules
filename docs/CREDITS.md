@@ -53,6 +53,17 @@ new versions of these objects. The top-supremum result and its positive-degree
 membership client use the library's generic submodule-closure formula rather
 than copying its proof or substituting an arithmetic argument.
 
+The dense-subsemiring span-comparison statement, its proof and all five model
+source files are original Formal Frontier Agent expression: rational-axis and
+integer-line, discrete-line and mixed-axis, p-adic singleton,
+empty/zero/subsingleton and indiscrete self-module, and independent discrete
+rational-module calculations. No complete transitive standard-axiom assurance
+is claimed for these span sources. The original span and closure calculations
+are independent of the comparison theorem; the real model also includes an
+additional private application of
+`Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying
+its proper closure and excluding the second coordinate unit.
+
 ## Mathematical and upstream references
 
 The mathematical background includes Fujiwara and Kato, *Foundations of Rigid
@@ -143,6 +154,51 @@ alongside the contributors above. These Mathlib APIs and proof ideas are reused
 under their upstream Apache-2.0 notices, which remain upstream. The supremum
 consumer also uses `Submodule.dense_iff_topologicalClosure_eq_top`, `iInf_const`
 and `iInf_le` to pass from dense closure to the individual neighborhood sums.
+
+`Submodule.closure_span_eq_of_dense_subsemiring` uses Mathlib's canonical
+subsemiring restriction of scalar actions through `Subsemiring.module` and
+`Subsemiring.smul_def`. Its proof takes
+`AddSubmonoid.topologicalClosure` of the additive carrier of the restricted span,
+using `AddSubmonoid.coe_topologicalClosure` and `Submodule.coe_toAddSubmonoid`.
+`Continuous.range_subset_closure_image_dense` puts every scalar multiple of each
+selected generator in this closure. `Submodule.span_induction`, strengthened to
+assert membership for every scalar multiple, then handles the full `R`-span
+without extending the coefficient-continuity hypothesis to all module elements.
+`Submodule.span_subset_span` supplies the reverse inclusion. The comparison
+combines these existing APIs rather than copying their proofs; the span and
+closure infrastructure and its contributors are credited above.
+The real and discrete-module models reuse
+`Submodule.mem_span_singleton`, `Submodule.span_singleton_eq_range`,
+`Rat.denseRange_cast`, `Continuous.range_subset_closure_image_dense`, coordinate
+and product continuity, `irrational_sqrt_two` and
+`Int.isClosedEmbedding_coe_real`. The canonical Pi and Prod module developments
+credit Simon Hudon, Patrick Massot and Eric Wieser; rational-density development
+credits Yury Kudryashov; the irrational-real development credits Mario Carneiro,
+Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne and Yury Kudryashov; the integer
+embedding development credits Johannes Hölzl and Mario Carneiro. Singleton-span
+and closure infrastructure is credited above. These interfaces and formalization
+approaches are reused under Mathlib's upstream Apache-2.0 notices, which remain
+upstream; no upstream proof bodies are copied into the model files.
+
+The p-adic singleton models follow the stock continuous-image approach through
+`closure_image_closure`, `DenseRange.closure_range`,
+`Submodule.span_singleton_eq_range`, `Set.range_comp`, `Set.image_univ` and
+`Int.cast_smul_eq_zsmul`, with the canonical integer action and subsemiring
+restriction. Unit density and ideal-power neighborhoods use the existing p-adic
+chapter; the nonunit ideal uses Mathlib's norm/ideal carrier identity and closed
+norm sublevels. The p-adic approximation, norm and ideal formalizations by
+Robert Y. Lewis, Mario Carneiro and Johan Commelin are credited above. The
+empty/zero/subsingleton calculations and non-T1 rational self-module controls
+use Mathlib's span and indiscrete-topology APIs. The independent discrete
+rational module uses Kim Morrison's canonical `ULift.module'` action and the
+transport described by `ULift.moduleEquiv`, not a new module structure or a
+change to the scalar topology. Continuous-image closure infrastructure credits
+Johannes Hölzl, Mario Carneiro and Jeremy Avigad; singleton-span and integer-module
+contributors are credited above. These mathematical ideas, formalization
+approaches and interfaces are reused, not their upstream proof bodies. Their
+Apache-2.0 copyright, author and license notices remain upstream. Mathematical
+credit is distinct from the redistribution basis for original project expression;
+no additional third-party source text, assets or figures are bundled.
 
 ## Documentation adapter expression
 

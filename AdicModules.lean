@@ -9,7 +9,10 @@ public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.Algebra.Module.Int
+public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.Topology.Algebra.Submodule
+public import AdicModules.Topology.Algebra.Ideal
+public import AdicModules.Topology.Algebra.Module.Span
 public import AdicModules.Topology.Algebra.PadicInt
 public import AdicModules.ValuationTopology
 public import AdicModules.CompletedIntegers
@@ -29,11 +32,23 @@ public import AdicModules.CompletedValuationComposite
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
-compares native adic completions under restriction of scalars and describes submodule closure
+compares adic completions under restriction of scalars and describes submodule closure
 using a basis of submodule neighborhoods of zero in a given topological additive group.
 For unital rings, additive cyclicity implies surjective integer casts; nonsurjective
 integer casts force every singleton span under the canonical integer action to be proper.
 For the p-adic integers it gives ideal-power neighborhood bases and proper dense
-integer spans, using their usual norm topology. Test and audit modules are separate.
+integer spans, using their usual norm topology. For arbitrary left ideals of a semiring,
+comaximality with an ideal implies comaximality with every natural power of that ideal.
+Powers retain their whole ideal carriers and coefficients in the original semiring.
+For a ring with a compatible additive-group topology and a supplied ideal-power
+neighborhood basis at zero, a left ideal is dense exactly when its supremum with the
+filtration ideal is top. Neither ideal needs to be two-sided, and no multiplication
+continuity or continuous ring scalar action is required. The written density proof
+uses translated neighborhoods and all-power comaximality directly. For a dense
+subsemiring acting by canonical scalar restriction on an additive commutative monoid,
+the set closures of its span and the ambient semiring span agree under separately
+continuous addition and coefficient continuity at the selected generators only.
+Generating sets may be empty or infinite; no additive inverses, separation or
+joint scalar continuity is assumed. Test and audit modules are separate.
 Theorems retain their stated separation, nonzero-generator and localization hypotheses.
 -/

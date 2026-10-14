@@ -2,12 +2,22 @@
 
 This library builds on mathlib's ideals, modules, canonical integer actions,
 inverse-limit adic completion, valuations, localization and uniform-space
-completion. Import `AdicModules` for the public producer API, or import a narrower
-module below. The files under `AdicModulesTest` contain downstream uses and
-separately importable named concrete model results. These models are not
-re-exported by `AdicModules`. The aggregate `AdicModulesTest.Axioms` is
-import-only and performs no axiom census; proof checking requires a transitive
-audit of all declarations, including private, generated and test declarations.
+completion. Import `AdicModules` for the public library API, or import a narrower
+module below. The files under `AdicModulesTest` contain downstream uses; some
+also expose separately importable named concrete results. The four left-ideal
+model files keep their declarations private and do not expose a new general
+theorem API. These models are not re-exported by `AdicModules`.
+The root exports `Ideal.sup_pow_eq_top_of_sup_eq_top` for comaximal powers of
+arbitrary semiring left ideals and `Ideal.dense_iff_sup_eq_top_of_hasBasis` for
+density in a supplied ring ideal-power topology, both with written proofs.
+The dense-subsemiring span-closure comparison uses additive closure, continuous
+dense images at selected generators and span induction. Its five model files
+retain original span and closure calculations independent of the comparison;
+the real model also applies it privately to the rational axis.
+The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
+none of the model files and performs no axiom census. Proof checking requires
+a transitive audit of all declarations, including private, generated, test and
+imported declarations. The application guides and complete module map follow.
 
 ## Uniform bounded torsion
 
@@ -129,6 +139,117 @@ is proper. The span of `E₀₁` contains `E₀₁` itself but not the identity 
 The identities `E₀₁ * E₁₀ = E₀₀` and `E₁₀ * E₀₁ = E₁₁` exhibit genuine
 noncommutativity, so a commutative-ring restriction would omit this client.
 
+## Closure of spans over a dense subsemiring
+
+Import [`AdicModules.Topology.Algebra.Module.Span`](../AdicModules/Topology/Algebra/Module/Span.lean)
+or the public root for `Submodule.closure_span_eq_of_dense_subsemiring`.
+The theorem has the following hypotheses and conclusion, with independent
+universe parameters `u` and `v`. The original span and closure calculations in
+its five model sources are independent of this theorem; `Real` also includes an
+additional private rational-axis application.
+
+```lean
+{R : Type u} [Semiring R] {M : Type v} [AddCommMonoid M] [Module R M]
+[TopologicalSpace R] [TopologicalSpace M] [SeparatelyContinuousAdd M]
+(A : Subsemiring R) (hA : Dense (A : Set R)) (E : Set M)
+(hE : ∀ m ∈ E, Continuous (fun r : R => r • m)) :
+closure (Submodule.span A E : Set M) = closure (Submodule.span R E : Set M)
+```
+
+Both spans live in the same module `M`; Mathlib's `Subsemiring.module` and
+`Subsemiring.smul_def` restrict the given action to `A`. These are **set-level
+closures**, not an equality of bundled submodules with different scalar types.
+The scalar topology is independent of the module topology. Separate continuity
+of addition is weaker than joint continuity, and the coefficient map
+`R → M`, `r ↦ r • m`, is required to be continuous only at each selected
+generator `m ∈ E`. Continuity of `M → M`, `x ↦ r • x`, for fixed `r` is a
+different condition and is not a premise. Neither continuity at every `m` nor
+`ContinuousSMul R M` is assumed. The statement needs no ring, commutativity,
+additive inverses, separation, finiteness, countability, nonzero-generator or
+nonempty-generator hypothesis.
+
+If `E = ∅` or `E = {0}`, both spans have carrier `{0}` and their closures equal
+`closure {0}`. Without `T1`, that closure need not be `{0}`: in a nontrivial
+indiscrete module it is the whole module. A subsingleton module is a degenerate
+boundary, not evidence of a nontrivial span comparison.
+
+For the closed `A`-span, the proof uses only its additive-submonoid structure:
+
+1. Let `S` be `(Submodule.span A E).toAddSubmonoid.topologicalClosure`.
+   Mathlib's `AddSubmonoid.coe_topologicalClosure` and
+   `Submodule.coe_toAddSubmonoid` identify its carrier with
+   `closure (Submodule.span A E : Set M)`. Separate continuity of addition
+   supplies its zero and addition closure; no `R`-submodule structure on `S`
+   is assumed.
+2. For each `m ∈ E`, apply
+   `Continuous.range_subset_closure_image_dense` to `r ↦ r • m` and the
+   density of `A`. Every `A`-multiple of `m` belongs to the `A`-span, so
+   every `R`-multiple of `m` belongs to `S`.
+3. Apply `Submodule.span_induction` with the strengthened assertion
+   `∀ r : R, r • x ∈ S`. Zero and addition use `smul_zero`, `smul_add`
+   and the additive closure of `S`. The scalar step uses
+   `r • (a • x) = (r * a) • x`, with no commutation of scalars.
+   Taking `r = 1` puts the entire `R`-span in `S`; closedness then puts
+   its set closure in `S` as well.
+4. For the other inclusion, `Submodule.span_subset_span A R E` embeds the
+   `A`-span into the `R`-span, and closure is monotone.
+
+The strengthened induction assertion avoids any need for coefficient continuity
+at elements outside `E` or fixed-scalar continuity on the closure.
+
+### Real and discrete-module calculations
+
+The two model sources provide four original calculations independent of the
+comparison theorem. The real source also imports the comparison and includes an
+additional private application of
+`Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying
+its proper closure and excluding the second coordinate unit. All their model
+constructions and controls, including this application, are private.
+
+| Model | Scalars, module and generators | Closure calculation and separating controls |
+| --- | --- | --- |
+| Rational first axis | Usual `ℝ`, `A = (Rat.castHom ℝ).rangeS`, `M = Fin 2 → ℝ`, `E = {Pi.single 0 1}` | Dense proper `A`; both closures are `{x \| x 1 = 0}`, excluding the second coordinate unit. `√2` times the first unit is in the closure but not the rational span. Addition and the selected coefficient map are continuous. |
+| Integer real line | Usual `R = M = ℝ`, `A = (Int.castRingHom ℝ).rangeS`, `E = {1}` | The integer span is closed and proper, whereas the real span and its closure are the whole line. `1 / 2` separates the closures. The coefficient map is continuous, but `A` is not dense. |
+| Discrete real module | Usual scalar `ℝ`, dense proper rational `A`, canonical `D = Fin 1 → ℝ` with local discrete topology, `E = {constantVector 1}` | Rational constant vectors form a closed proper span; the real span is top. The constant `√2` vector separates the closures. Addition and each fixed-scalar map are continuous, but the coefficient map is not: the preimage of the open zero singleton is the nonopen singleton `{0}` in usual `ℝ`. |
+| Mixed real module | Usual scalar `ℝ`, the same rational `A`, canonical `M = ℝ × D`, `E = {(1, 0)}` | Both closures are `{x \| x.2 = 0}`, excluding `(0, constantVector 1)`. `(√2, 0)` enlarges the rational span after closure. The selected coefficient map is continuous, but the coefficient map at the second unit is not; global coefficient continuity and `ContinuousSMul` both fail. |
+
+The discrete topology is installed **only on `D`**, not on the scalar real
+field. Its three local topology/addition instances leave the canonical Pi
+module action unchanged. The mixed model uses Mathlib's canonical product
+module and product topology. These ring-specific examples do not narrow the
+generic semiring statement.
+
+### Full model-source map
+
+All five model files below retain original span and closure calculations and
+controls independent of the comparison theorem. The real file also contains the
+additional private rational-axis application; its original calculations do not
+invoke the comparison.
+
+| Source under `AdicModulesTest.Topology.Algebra.Module.Span` | Mathematical role |
+| --- | --- |
+| [Real](../AdicModulesTest/Topology/Algebra/Module/Span/Real.lean) | Rational first-axis comparison and integer-line missing-density boundary, with `√2` and `1 / 2` separating controls. |
+| [Discrete](../AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean) | Discrete missing-coefficient-continuity boundary and mixed first-axis comparison without global coefficient continuity; only the independent module factor is discrete. |
+| [PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean) | Canonical `ℤ_[p]` with `Fact p.Prime`, its norm topology and self-action. Direct stock continuous-image closure calculations compare integer, integer-range-subsemiring and self-scalar singleton spans for arbitrary `x`. Units and `1` give whole closures; the nonzero nonunit `p` gives the closed proper ideal `p ℤ_[p] = {z \| ‖z‖ ≤ p⁻¹}`, excluding `1`, with a `p = 2` control; `0` gives `{0}`. Existing ideal-power neighborhoods include degree zero and zero membership; shifted norm balls test neighborhoods away from zero. No rational action is used. |
+| [Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean) | Unnamed calculations for empty generators, the zero generator and arbitrary generating sets in a subsingleton module, over a semiring and additive commutative monoid with independent universes. A nontrivial canonical rational self-module with indiscrete topology has `closure {0} = univ`, a nonclosed zero singleton and no `T1Space`; nonzero `1` is outside the empty and zero spans but inside their closures. |
+| [Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) | Indiscrete scalar `ℚ` and independent discrete `ULift.{v} ℚ`, using Mathlib's canonical module action. The integer-cast range subsemiring is dense and proper, addition is separately continuous and all fixed-scalar maps are continuous. The integer and restricted-subsemiring spans of transported `1` coincide, are closed and proper, and exclude transported `1 / 2`; the rational span and its closure are whole. The selected coefficient map is not continuous, so the span closures differ. |
+
+For singleton spans, Mathlib already supplies `Submodule.span_singleton_eq_range`,
+`closure_image_closure` and `DenseRange.closure_range`, together with
+`Set.image_univ` and `Set.range_comp`. The existing model calculations use
+`Submodule.mem_span_singleton` and
+`Continuous.range_subset_closure_image_dense` directly. Integer coefficients
+are related to ring coefficients by `Int.cast_smul_eq_zsmul` for the canonical
+`AddCommGroup.toIntModule` action. The p-adic model applies those stock
+continuous-image closure identities directly, retaining the canonical norm
+topology and ideal carriers. The independent rational module uses the stock
+`ULift.module'` action and transport described by `ULift.moduleEquiv`, not a
+new action or a replacement of the scalar topology. These interfaces do not
+require a new singleton closure construction or a duplicate of the library's
+integer-span properness theorem. A singleton comparison only uses continuity
+of its one coefficient map, not the separate-addition premise of the
+arbitrary-set statement.
+
 ## P-adic neighborhood bases and integer spans
 
 Import [`AdicModules.Topology.Algebra.PadicInt`](../AdicModules/Topology/Algebra/PadicInt.lean)
@@ -205,6 +326,186 @@ The positive-degree supremum client adds `1` with the degree-one restricted
 ideal and `PadicInt.inv (3 : ℤ_[2])` with the degree-two restricted ideal;
 both elements remain excluded from the original integer span of `3`.
 
+## Comaximal powers of left ideals
+
+Import [`AdicModules.RingTheory.Ideal.Operations`](../AdicModules/RingTheory/Ideal/Operations.lean)
+or the public root. The public theorem has the universe-polymorphic signature
+
+```lean
+Ideal.sup_pow_eq_top_of_sup_eq_top
+  {R : Type u} [Semiring R] {J I : Ideal R} {n : ℕ}
+  (h : J ⊔ I = ⊤) : J ⊔ I ^ n = ⊤
+```
+
+For a comaximality hypothesis `h`, use
+`Ideal.sup_pow_eq_top_of_sup_eq_top (J := J) (I := I) (n := n) h`.
+Here `J` is the unpowered ideal and `I` the powered ideal. Both are arbitrary
+left ideals of the original semiring. There is no commutativity, additive-inverse,
+domain, cancellation, nontriviality or two-sidedness hypothesis. Every natural
+exponent is covered: at `n = 0`, `I ^ 0 = ⊤`, so the conclusion is automatic.
+All coefficients and powers are those of the original semiring; `I ^ n` is
+not replaced by a span of powers of generators or by a restricted-scalar power.
+No topology is involved.
+
+The written proof is a subtraction-free geometric-sum recurrence. Decompose
+`1 = j + i` with `j ∈ J` and `i ∈ I`. Starting from `x = 0` at degree zero,
+maintain `x ∈ J` and `x + i ^ n = 1`. The successor certificate is
+`x + i ^ n * j ∈ J`, using only closure under **left** multiplication, and
+
+```text
+(x + i ^ n * j) + i ^ (n + 1) = x + i ^ n * (j + i) = 1.
+```
+
+Membership `i ^ n ∈ I ^ n` then puts `1` in `J ⊔ I ^ n`. The module credits
+Mathlib's ideal operations and Neil Strickland's geometric-sum formalization
+for the underlying APIs and proof idea; the recurrence requires neither
+subtraction nor a commutation premise.
+
+Mathlib's `Ideal.sup_pow_eq_top` and `Ideal.sup_pow_eq_top'` give the same
+conclusion with the unpowered or powered ideal, respectively, two-sided.
+Two private recovery lemmas apply the public theorem under those respective
+hypotheses. They are implementation details, not additional public entry points;
+use `Ideal.sup_pow_eq_top_of_sup_eq_top` directly. The independent semiring
+matrix calculations below show why two-sidedness and stronger semiring
+hypotheses would exclude useful examples. The density criterion uses this
+algebraic implication together with direct additive-group neighborhood
+arguments, as described next.
+
+## Left-ideal density and integer powers topologies
+
+Import [`AdicModules.Topology.Algebra.Ideal`](../AdicModules/Topology/Algebra/Ideal.lean)
+or the public root. `Ideal.dense_iff_sup_eq_top_of_hasBasis` has the signature
+
+```lean
+{R : Type u} [Ring R] [TopologicalSpace R] [IsTopologicalAddGroup R]
+{I J : Ideal R}
+(hI : (𝓝 (0 : R)).HasBasis (fun _n : ℕ ↦ True)
+  (fun n ↦ ((I ^ n : Ideal R) : Set R))) :
+Dense (J : Set R) ↔ J ⊔ I = ⊤
+```
+
+The ideals are left ideals in a possibly noncommutative ring. The topology is
+supplied, not constructed from an arbitrary filtration. No two-sidedness,
+separation, closedness, joint multiplication continuity or continuous ring
+scalar action is added. The powers and sums are formed as ideals over the
+original ring, with their whole coefficients and carriers.
+
+The written proof works directly in the given additive-group topology; it
+needs neither restriction to integer scalars nor the submodule closure formula.
+Mathlib's `Filter.HasBasis.nhds_of_zero` translates the basis to each `r : R`,
+with neighborhoods `{x | x - r ∈ I ^ n}`.
+`mem_closure_iff_nhds_basis` characterizes membership in the closure of `J`
+by whether each such neighborhood meets `J`.
+
+For the forward implication, density at `1` and degree one provide `j ∈ J`
+with `j - 1 ∈ I`. Then `j - (j - 1) = 1` belongs to `J ⊔ I`, so this
+supremum is top. Conversely, the
+[comaximal-powers theorem](#comaximal-powers-of-left-ideals) puts every
+`r : R` in `J ⊔ I ^ n`. Decompose `r = j + i` with `j ∈ J`, `i ∈ I ^ n`;
+then `j - r = -i ∈ I ^ n`, so each translated neighborhood meets `J`.
+The column models below compute particular cases independently of this
+criterion. No continuous ring scalar action or continuity of ring
+multiplication is used in the direct additive proof.
+
+The [integer model](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean) contains
+four private proofs independent of the general density criterion. They use the
+whole ideal `Ideal.span {(3 : ℤ)}`, not the numeral `(3 : Ideal ℤ)`. Membership
+of `3` and nonmembership of `1` witness nonzero properness. Mathlib's
+comaximal-power result gives `J ⊔ I ^ n = ⊤` for every natural `n` with
+`I = Ideal.span {(2 : ℤ)}`; decomposing each integer in this supremum gives a
+member of `J` in each residue modulo `2 ^ n`. The final proof explicitly
+installs `I.adicTopology` and its additive-group structure on the original
+integers, uses `I.hasBasis_nhds_zero_adic`, and computes top closure via
+`Submodule.topologicalClosure_eq_iInf_sup` after scalar restriction. It does
+not use the default discrete topology on `ℤ`, a completion, or density as a
+hypothesis. These four private proofs compute the integer example directly,
+without applying the general density criterion. The same file additionally
+contains a private application of `Ideal.dense_iff_sup_eq_top_of_hasBasis` to
+`(3)` with the supplied `(2)`-adic powers basis; that application does not
+replace any of the four direct proofs.
+
+## Matrix left-ideal models
+
+The [integer-matrix model](../AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean)
+uses the canonical ring `M₂(ℤ)` and its whole-ring scalar action. Write
+`I = Ideal.span {E00}` and `J = Ideal.span {E11}` with zero-based matrix
+indices. Its membership contracts identify `I` with matrices whose second
+column vanishes and `J` with matrices whose first column vanishes. Both ideals
+are nonzero, proper and not two-sided. The file calculates `I * I = I` and
+`I ^ (n + 1) = I`; splitting the columns gives `J ⊔ I = ⊤`. Together these
+give `J ⊔ I ^ n = ⊤` for every natural `n`, including degree zero.
+
+Let `π : M₂(ℤ) →+ ℤ²` take the second column. The topology is exactly
+`TopologicalSpace.induced π ⊥`, with the discrete topology on `ℤ²`; four
+local canonical instances supply these topologies, discreteness and the
+compatible topological additive-group structure. The zero-neighborhood filter
+is principal on the whole carrier of `I`, and all its ideal powers, including
+degree zero, form a basis. Every second-column fiber meets `J`, so its density
+is computed independently of the general density criterion. In this **same induced
+topology**, `J` is not closed and the space is not Hausdorff. Right
+multiplication by the column-swap matrix is discontinuous, so the topology is
+not a topological-ring structure. The model neither assumes continuity of
+multiplication nor replaces whole-matrix coefficients by integer multiples.
+
+The [natural-matrix model](../AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean)
+uses the canonical semiring `M₂(ℕ)`. Its auxiliary membership and idempotency
+contracts work over any coefficient semiring and any finite square-matrix
+index type with decidable equality. For `M₂(ℕ)`, the two column ideals again
+have both membership iff contracts, are nonzero and proper, are not two-sided,
+are comaximal, and are idempotent. Each positive power is the original ideal;
+each zeroth power is top. The file computes both `J ⊔ I ^ n = ⊤` and
+`I ⊔ J ^ n = ⊤` for every natural `n`. It also contrasts the automatic
+zeroth-power supremum with the failure at degree one for a proper column
+ideal summed with powers of bottom.
+
+Here an elementary **matrix unit** `Eij` is not an invertible element.
+The file proves `E01 * E10 = E00` and `E10 * E01 = E11`, with unequal
+products; none of the four elementary matrices is invertible. These are
+noncommutativity witnesses, not substitute examples involving invertible
+units. The nonzero diagonal matrix units have zero products, yielding explicit
+failures of left and right multiplication cancellation at nonzero factors.
+There is no additive inverse of `E00` for the canonical addition, hence no
+negation making that addition into a ring addition. This says nothing about
+unrelated operations transported onto the underlying type.
+
+The same semiring file includes the generator-power warning. Although
+`E01 ^ 2 = 0`, left multiplication by `E10` puts `E11` in
+`K = Ideal.span {E01}`. Thus `E11 ∈ K ^ 2`, so `K ^ 2 ≠ ⊥` and
+`K ^ 2 ≠ Ideal.span {E01 ^ 2}`; `K` is also not two-sided. Powers must be
+formed as ideals in the original semiring, not by powering a chosen generator
+or changing the coefficient action. These calculations require no commutative,
+domain, ring or multiplication-cancellation structure. The two matrix files
+retain independent algebraic and topological calculations without invoking the
+general density criterion. The natural-matrix file also contains an additional
+private application of `Ideal.sup_pow_eq_top_of_sup_eq_top` to its comaximal
+column ideals; it does not replace the original all-power calculations.
+
+## Ideal-power boundary models
+
+The [boundary file](../AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean)
+contains the following seven groups of calculations, independent of the
+general density criterion. Here `(m)` denotes `Ideal.span {(m : ℤ)}`,
+not the numeral `(m : Ideal ℤ)`.
+
+| Boundary | Mathematical scope |
+| --- | --- |
+| Zeroth and first powers | Over any semiring, `J ⊔ I ^ 0 = ⊤` automatically, while `J ⊔ I ^ 1 = ⊤ ↔ J ⊔ I = ⊤`. For `(2)` in `ℤ`, its sum with its zeroth power is top but its sum with its first power is not. |
+| Discrete integers | `(3)` is proper and not dense despite `(3) ⊔ (2) = ⊤`; powers of `(2)` are not a zero-neighborhood basis for the discrete topology. |
+| Actual `(2)`-adic integers | On the original `ℤ` with `I.adicTopology` for `I = Ideal.span {(2 : ℤ)}`, `I` has its powers basis, is closed and proper, is not dense and is not comaximal with itself. This is not a completion. |
+| Top and indiscrete bases | A top-ideal powers basis forces the given compatible additive-group topology to be indiscrete. Every ideal is dense because it contains zero; the empty set is not dense in the indiscrete integers, and that space is not T1. |
+| Bottom and discrete bases | A bottom-ideal powers basis forces the given compatible additive-group topology to be discrete. An ideal is then dense iff it is top. The canonical top- and bottom-adic topology equalities are also calculated over commutative rings. |
+| Extreme target ideals | The top ideal is dense over any semiring with any topology, and its supremum with every ideal power is top. Under the stated powers-basis hypothesis `hI`, in a ring with a compatible additive-group topology, the bottom ideal is dense iff `I = ⊤`. |
+| Subsingleton models | Over a subsingleton semiring every ideal and every natural power is both bottom and top. The one-element ring `PUnit` additionally realizes every ideal-power basis and density assertion, including all-power suprema. |
+
+The general basis computations use `[Ring R]`, `[TopologicalSpace R]` and
+`[IsTopologicalAddGroup R]`, with the displayed `hI` when a powers basis is
+needed; they add no T1 or Hausdorff assumption. The purely algebraic boundaries
+use only a semiring, and density of the top ideal uses only a semiring and a
+topology. Canonical integer scalar continuity in the bottom-density proof
+comes from the topological additive group, not from an assumed continuous
+`R`-action. These boundary calculations are independent of the general
+density criterion.
+
 ## Completion and valuation hypotheses
 
 [`AdicCompletion.abstractCompletion`](../AdicModules/AdicCompletion.lean)
@@ -232,10 +533,20 @@ local typeclass installations rather than silently adding global instances.
 
 ## Module map
 
-All module names below have prefix `AdicModules.`. The public root re-exports
-18 mathematical leaves; 19 separate test/audit source modules give 38 maintained
-source modules in total when the public root is included. These are source-file
-counts, not a compiled-declaration or axiom-audit inventory.
+The library module names in the first table have prefix `AdicModules.`.
+The public root re-exports 21 mathematical source leaves, including the
+comaximal-powers theorem, left-ideal density criterion and dense-subsemiring
+span comparison. There are 22 library sources including that root and 28
+separate test/model/audit source modules, hence **50 tracked Lean source
+modules**. These are source-file counts, not counts of mathematical models,
+compiled modules, kernel declarations or audited axioms. All four left-ideal
+and all five span-model files retain independent original calculations; `Int`,
+`MatrixNat` and `Real` additionally contain private applications of their
+respective library theorems. The tables enumerate every library leaf and
+test/model/audit source; [`AdicModules`](../AdicModules.lean) is the additional
+public root. Neither these counts nor mathematical proof descriptions certify
+complete transitive standard-axiom assurance for private, generated, model or
+imported declarations.
 
 | Module | Main role |
 | --- | --- |
@@ -244,7 +555,10 @@ counts, not a compiled-declaration or axiom-audit inventory.
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
+| [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | Public all-exponent semiring left-ideal comaximal-powers theorem with a written subtraction-free proof and private two-sided specializations |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
+| [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
+| [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | Set-closure comparison for arbitrary generators over a dense subsemiring with generatorwise coefficient continuity |
 | [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | P-adic ideal-power bases, linear topology, proper dense integer spans and top neighborhood suprema |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
@@ -257,6 +571,46 @@ counts, not a compiled-declaration or axiom-audit inventory.
 | [LocalizedQuotientValuationSubring](../AdicModules/LocalizedQuotientValuationSubring.lean) | Transport of the quotient factor at a nonzero prime |
 | [CompositeValuationSubring](../AdicModules/CompositeValuationSubring.lean) | Residue-preimage composite, localization and quotient factors |
 | [CompletedValuationComposite](../AdicModules/CompletedValuationComposite.lean) | Composite description of completed valuation integers |
+
+### Test and audit source roster
+
+All names in this table have prefix `AdicModulesTest.`. These are separate
+files, not imports of an `AdicModulesTest.lean` aggregate root (which does not
+exist). The four left-ideal and five `Span` model files retain original
+calculations independent of the corresponding library proofs, with additional
+private applications in `Int`, `MatrixNat` and `Real`. They are not re-exported
+by the public root.
+
+| Module | Main role |
+| --- | --- |
+| [BoundedIdealPowerTorsion](../AdicModulesTest/BoundedIdealPowerTorsion.lean) | Specified-exponent and existential uniform-torsion clients |
+| [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
+| [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
+| [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
+| [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) | Integer, all `ZMod n`, subsingleton and noncommutative matrix singleton-span clients |
+| [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) | Discrete, indiscrete and adic integer closures, proposition indices and active predicates |
+| [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) | Proper dense integer spans, excluded elements, positive-degree neighborhood suprema and basis boundaries |
+| [Topology.Algebra.Ideal.Int](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean) | Four original private `(3)`/`(2)` calculations on integers, including proper density; additional private density-criterion application |
+| [Topology.Algebra.Ideal.Matrix](../AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean) | Non-two-sided `M₂(ℤ)` columns, induced powers topology, nonclosed proper dense ideal, non-Hausdorffness and discontinuous right multiplication |
+| [RingTheory.Ideal.Operations.MatrixNat](../AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) | `M₂(ℕ)` columns, original all-power calculations, noncommuting noninvertible matrix units and generator-power warning; additional private comaximal-powers application |
+| [Topology.Algebra.Ideal.Boundary](../AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) | All seven ideal-power algebraic and topological boundary groups |
+| [Topology.Algebra.Module.Span.Real](../AdicModulesTest/Topology/Algebra/Module/Span/Real.lean) | Rational real axis and integer real line controls |
+| [Topology.Algebra.Module.Span.Discrete](../AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean) | Discrete and mixed real-module controls |
+| [Topology.Algebra.Module.Span.PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean) | Arbitrary singleton comparison, unit/nonunit/zero and norm-neighborhood controls |
+| [Topology.Algebra.Module.Span.Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean) | Empty, zero, subsingleton and non-T1 indiscrete self-module controls |
+| [Topology.Algebra.Module.Span.Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) | Dense integer casts with failed coefficient continuity on an independent discrete rational module |
+| [ValuationTopology](../AdicModulesTest/ValuationTopology.lean) | Principal-adic and valuation topology import client |
+| [CompletedIntegers](../AdicModulesTest/CompletedIntegers.lean) | Completed-valuation-integer equivalence and canonical-map client |
+| [CompletedLocalStructure](../AdicModulesTest/CompletedLocalStructure.lean) | Local domain, fraction-field and residue interfaces |
+| [PrincipalAdicSpectrum](../AdicModulesTest/PrincipalAdicSpectrum.lean) | Ideal and spectrum comparison clients with their hypotheses |
+| [LocalizedFiltration](../AdicModulesTest/LocalizedFiltration.lean) | Base-power images, localized topology and separation clients |
+| [LocalizedCompletion](../AdicModulesTest/LocalizedCompletion.lean) | Localized completion embedding client |
+| [LocalizedValuationSubring](../AdicModulesTest/LocalizedValuationSubring.lean) | Common completed-field realization client |
+| [LocalizedResidueField](../AdicModulesTest/LocalizedResidueField.lean) | Localization/completion residue comparison client |
+| [LocalizedQuotientValuationSubring](../AdicModulesTest/LocalizedQuotientValuationSubring.lean) | Nonzero-prime quotient-factor client |
+| [CompositeValuationSubring](../AdicModulesTest/CompositeValuationSubring.lean) | Residue-preimage composite and whole-field boundary client |
+| [CompletedValuationComposite](../AdicModulesTest/CompletedValuationComposite.lean) | Completed-composite identification client |
+| [Axioms](../AdicModulesTest/Axioms.lean) | Aggregate public-root import only; no axiom census |
 
 In `LocalizedFiltration`, `localizedPowerImage` is a submodule over the **base
 ring**, not the extended ideal. The comparison sandwiches it between successive
@@ -287,6 +641,19 @@ count; it does not cap the number of concurrent Lake jobs or processes, or total
 build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
+The default library targets are `AdicModules` and `AdicModulesTest`, with the
+`AdicModulesTest.+` glob including every independent test/model/audit file.
+The normal reproduction command is `lake build AdicModules AdicModulesTest`
+(or `lake build` for both default targets). This covers the current 22
+main-library and 28 test source files, including the three theorem modules
+for comaximal powers, ideal density and dense-subsemiring span closure, all
+with written proofs, the four left-ideal models and the five span models.
+Private verification fixtures may emit private-module advisories by design.
+Complete library proof-integrity assurance is not claimed by these descriptions
+or model calculations. A complete transitive
+audit must cover private, generated, test and imported declarations and permit
+only `propext`, `Classical.choice` and `Quot.sound`.
+
 ### Scalar-restriction resource sample
 
 This historical configured run for the scalar-restriction proof and client used
@@ -305,7 +672,8 @@ private-inclusive axiom checks, not just building.
 These are historical observations from that measured configuration, not
 measurements of the current dependency pins or clean-machine guarantees. No
 peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not a current whole-library estimate.
+observation below is historical, not an estimate for the current 50 source
+modules.
 
 ### Earlier module-readiness measurements
 
