@@ -6,7 +6,7 @@ Lean results on ideal-power torsion, adic completions, finite Chinese remainders
 integer spans, submodule closure, ideal-power density and valuation rings.
 Import `AdicModules` for the public library, or an individual module for narrower
 dependencies. The library reuses Lean and mathlib's ideals, modules, topologies
-and inverse limits; its mathematical API needs no source-research records.
+and inverse limits.
 
 ## Headline results
 
@@ -36,6 +36,24 @@ and inverse limits; its mathematical API needs no source-research records.
   it needs no finite generation, flatness, separatedness or completeness premise.
   See [completion hypotheses](docs/Guide.md#completion-and-valuation-hypotheses)
   and [scalar restriction](docs/Guide.md#restricting-scalars-in-adic-completions).
+
+- **Adic completion of finite projective modules.**
+  For a commutative ring `R`, an additive commutative group `M` with `Module R M`,
+  `Module.Finite R M` and `Module.Projective R M`, and any ideal `I`,
+  `AdicCompletion.ofTensorProduct_bijective_of_finite_of_projective I M` proves
+  bijectivity of Mathlib's canonical comparison. The constructed
+  `AdicCompletion.ofTensorProductEquivOfFiniteProjective I M` is an
+  **`AdicCompletion I R`-linear** equivalence
+  `AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M`.
+  Its underlying linear map is `AdicCompletion.ofTensorProduct I M`; its
+  characteristic lemmas give `a ⊗ₜ m ↦ a • AdicCompletion.of I M m` and
+  `AdicCompletion.of I M m ↦ 1 ⊗ₜ m` for the inverse. Ring and module universes
+  are independent; no Noetherian or finitely generated ideal hypothesis is needed.
+  The separate `ofTensorProductEquivOfFiniteProjective_eq_ofFiniteNoetherian`
+  lemma identifies it with Mathlib's Noetherian equivalence where both apply:
+  over a Noetherian ring, with the ring and module in the same universe.
+  See the [tensor comparison module](AdicModules/AdicCompletion/TensorProduct.lean)
+  and its [integer models](AdicModulesTest/AdicCompletion/TensorProduct.lean).
 
 - **Integer singleton spans in unital rings.**
   For a `NonAssocRing R`, additive cyclicity or a top singleton integer span
@@ -183,6 +201,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
 | [RingTheory.Ideal.Operations](AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (independent original calculations; additional private comaximal-powers application) |
@@ -231,6 +250,8 @@ review, source-author endorsement or complete formalization of a selected source
 The project uses [Apache-2.0](LICENSE). [Credits and provenance](docs/CREDITS.md)
 retain project authorship, upstream author notices, stock-API reuse and the full
 mathematical bibliography, including Kenny Lau and Patrick Massot's CRT credit.
+The tensor comparison reuses Mathlib's adic-completion API by Judith Ludwig and
+Christian Merten, including finite-product bijectivity and the Noetherian comparison.
 
 - K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I* (2017),
   [arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5).

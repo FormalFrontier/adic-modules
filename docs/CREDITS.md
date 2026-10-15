@@ -57,8 +57,7 @@ The dense-subsemiring span-comparison statement, its proof and all five model
 source files are original Formal Frontier Agent expression: rational-axis and
 integer-line, discrete-line and mixed-axis, p-adic singleton,
 empty/zero/subsingleton and indiscrete self-module, and independent discrete
-rational-module calculations. No complete transitive standard-axiom assurance
-is claimed for these span sources. The original span and closure calculations
+rational-module calculations. The original span and closure calculations
 are independent of the comparison theorem; the real model also includes an
 additional private application of
 `Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying

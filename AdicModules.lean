@@ -8,6 +8,7 @@ public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.Span.Basic
@@ -36,8 +37,11 @@ public import AdicModules.CompletedValuationComposite
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
-compares adic completions under restriction of scalars and describes submodule closure
-using a basis of submodule neighborhoods of zero in a given topological additive group.
+compares adic completions under restriction of scalars. For a finite projective module over
+any commutative ring, the canonical tensor comparison is a completion-ring-linear equivalence,
+with independent ring and module universes and no Noetherian hypothesis. It also describes
+submodule closure using a basis of submodule neighborhoods of zero in a given topological
+additive group.
 For unital rings, additive cyclicity implies surjective integer casts; nonsurjective
 integer casts force every singleton span under the canonical integer action to be proper.
 For the p-adic integers it gives ideal-power neighborhood bases and proper dense
