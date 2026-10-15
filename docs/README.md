@@ -9,8 +9,9 @@ while `api_sha256` binds the Markdown with the editorial note. That inventory
 predates the separate
 `PrimaryComponent`, `AdicCompletion.RestrictScalars`, `Algebra.Module.Int`,
 `Topology.Algebra.Submodule`, `Topology.Algebra.PadicInt`,
-`RingTheory.Ideal.Operations`, `Topology.Algebra.Ideal` and
-`Topology.Algebra.Module.Span` leaves and their test/model modules:
+`RingTheory.Ideal.Operations`, `Topology.Algebra.Ideal`,
+`RingTheory.Ideal.Quotient.Finite` and `Topology.Algebra.Module.Span` leaves
+and their test/model modules:
 it is **not** a current whole-library inventory. Read the
 [manual primary-component reference](PrimaryComponent.md) and the
 [scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
@@ -43,12 +44,13 @@ integers, and `MatrixNat` additionally applies the comaximal-powers theorem
 to its column ideals. The [matrix](Guide.md#matrix-left-ideal-models) and
 [boundary](Guide.md#ideal-power-boundary-models) calculations are documented
 separately.
-The current public root re-exports **21 mathematical source leaves**;
-**28 test/model/audit source modules** are not re-exported by `AdicModules`.
-Including the public root gives **50 maintained Lean source modules**: 22
-library sources including the root and 28 test sources. These are source-file
-counts, not counts of mathematical models, compiled modules, generated API
-entries, kernel declarations or audited axioms.
+
+For the current library and test/model/audit module maps, use the
+[mathematical guide](Guide.md#module-map) and the
+[README import map](../README.md#imports-and-module-map).
+The [finite-quotient guide](FiniteQuotient.md) covers the finite Chinese
+remainder API and its examples.
+
 The dense-subsemiring comparison,
 `Submodule.closure_span_eq_of_dense_subsemiring`, uses additive-submonoid
 closure, continuous dense images at selected generators and span induction.
@@ -61,46 +63,18 @@ Read the
 [span-comparison guide](Guide.md#closure-of-spans-over-a-dense-subsemiring)
 for the original calculations and private real application, canonical actions and
 separation and coefficient-continuity boundaries. None of these current sources is a regenerated
-entry in the historical native API snapshot. These counts, written proof
+entry in the historical native API snapshot. Source rosters, written proof
 descriptions and the generated snapshot do not certify complete transitive
 standard-axiom assurance for private, generated, model or imported declarations.
 The scalar-restriction [producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
 [client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
 source references, not regenerated entries in the historical snapshot.
 
-## Current source roster
+## Mathematical model map
 
-The table enumerates all 21 library leaves and all 28 test/model/audit sources;
-[`AdicModules`](../AdicModules.lean) is the additional public root. Module names
-use the prefixes `AdicModules.` and `AdicModulesTest.` respectively.
 The four left-ideal and five span model files retain original calculations
 independent of the corresponding library proofs; `Int`, `MatrixNat` and `Real`
 also include additional private applications.
-
-| Library leaf | Test/audit sources |
-| --- | --- |
-| [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](../AdicModulesTest/BoundedIdealPowerTorsion.lean) |
-| [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) |
-| [AdicCompletion](../AdicModules/AdicCompletion.lean) | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) |
-| [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
-| [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) |
-| [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](../AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (original calculations and additional private comaximal-powers application) |
-| [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](../AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](../AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (original calculations and additional private density application in Int) |
-| [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
-| [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) |
-| [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](../AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](../AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) |
-| [ValuationTopology](../AdicModules/ValuationTopology.lean) | [ValuationTopology](../AdicModulesTest/ValuationTopology.lean) |
-| [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | [CompletedIntegers](../AdicModulesTest/CompletedIntegers.lean) |
-| [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | [CompletedLocalStructure](../AdicModulesTest/CompletedLocalStructure.lean) |
-| [PrincipalAdicSpectrum](../AdicModules/PrincipalAdicSpectrum.lean) | [PrincipalAdicSpectrum](../AdicModulesTest/PrincipalAdicSpectrum.lean) |
-| [LocalizedFiltration](../AdicModules/LocalizedFiltration.lean) | [LocalizedFiltration](../AdicModulesTest/LocalizedFiltration.lean) |
-| [LocalizedCompletion](../AdicModules/LocalizedCompletion.lean) | [LocalizedCompletion](../AdicModulesTest/LocalizedCompletion.lean) |
-| [LocalizedValuationSubring](../AdicModules/LocalizedValuationSubring.lean) | [LocalizedValuationSubring](../AdicModulesTest/LocalizedValuationSubring.lean) |
-| [LocalizedResidueField](../AdicModules/LocalizedResidueField.lean) | [LocalizedResidueField](../AdicModulesTest/LocalizedResidueField.lean) |
-| [LocalizedQuotientValuationSubring](../AdicModules/LocalizedQuotientValuationSubring.lean) | [LocalizedQuotientValuationSubring](../AdicModulesTest/LocalizedQuotientValuationSubring.lean) |
-| [CompositeValuationSubring](../AdicModules/CompositeValuationSubring.lean) | [CompositeValuationSubring](../AdicModulesTest/CompositeValuationSubring.lean) |
-| [CompletedValuationComposite](../AdicModules/CompletedValuationComposite.lean) | [CompletedValuationComposite](../AdicModulesTest/CompletedValuationComposite.lean) |
-| No library leaf; aggregate root import | [Axioms](../AdicModulesTest/Axioms.lean) (import-only, no axiom census) |
 
 The model-source map uses the same fixed mathematical carriers and actions:
 
