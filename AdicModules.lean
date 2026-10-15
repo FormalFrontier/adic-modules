@@ -7,6 +7,7 @@ module
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
+public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int
@@ -42,6 +43,10 @@ any commutative ring, the canonical tensor comparison is a completion-ring-linea
 with independent ring and module universes and no Noetherian hypothesis. It also describes
 submodule closure using a basis of submodule neighborhoods of zero in a given topological
 additive group.
+For any ideal in a commutative ring, reduction at level one detects exactly the units,
+is a local homomorphism and has kernel in the completion's Jacobson radical. The completion
+is a local ring whenever the quotient by the ideal is a local ring. The unit, local-homomorphism
+and kernel results also include trivial rings and bottom and top ideals.
 For unital rings, additive cyclicity implies surjective integer casts; nonsurjective
 integer casts force every singleton span under the canonical integer action to be proper.
 For the p-adic integers it gives ideal-power neighborhood bases and proper dense

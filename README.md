@@ -37,6 +37,21 @@ and inverse limits.
   See [completion hypotheses](docs/Guide.md#completion-and-valuation-hypotheses)
   and [scalar restriction](docs/Guide.md#restricting-scalars-in-adic-completions).
 
+- **Unit detection and local adic completions.**
+  For a commutative ring `R` in any universe and any `I : Ideal R`, write
+  `C = AdicCompletion I R` and `q = AdicCompletion.evalOneₐ I`. The canonical
+  projection `q : C →ₐ[R] R ⧸ I` is reduction at **level one**. For every `x : C`,
+  `AdicCompletion.isUnit_evalOne_iff I x` gives `IsUnit (q x) ↔ IsUnit x`.
+  `AdicCompletion.isLocalHom_evalOne I` supplies an `IsLocalHom q.toRingHom`
+  instance, and `AdicCompletion.ker_evalOne_le_jacobson I` gives
+  `RingHom.ker q.toRingHom ≤ Ideal.jacobson (⊥ : Ideal C)`.
+  With **only `[IsLocalRing (R ⧸ I)]`**,
+  `AdicCompletion.isLocalRing_of_quotient I` gives `IsLocalRing C`.
+  No finite generation, Noetherianity or locality of `R` is required. The unit,
+  local-homomorphism and kernel results cover `I = ⊥`, `I = ⊤` and trivial
+  rings; the final premise includes nontriviality of `R ⧸ I`. See the
+  [unit detection and local-completion module](AdicModules/AdicCompletion/LocalRing.lean).
+
 - **Adic completion of finite projective modules.**
   For a commutative ring `R`, an additive commutative group `M` with `Module R M`,
   `Module.Finite R M` and `Module.Projective R M`, and any ideal `I`,
@@ -201,6 +216,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
 | [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
@@ -252,6 +268,13 @@ retain project authorship, upstream author notices, stock-API reuse and the full
 mathematical bibliography, including Kenny Lau and Patrick Massot's CRT credit.
 The tensor comparison reuses Mathlib's adic-completion API by Judith Ludwig and
 Christian Merten, including finite-product bijectivity and the Noetherian comparison.
+
+The local-completion results use Mathlib's canonical completion and algebraic
+projections (Judith Ludwig and Christian Merten), positive-power quotient-unit
+lifting, `IsLocalHom`/`isUnit_map_iff`, `Ideal.mem_jacobson_bot` and
+`RingHom.domain_isLocalRing`. The
+[local-completion module](AdicModules/AdicCompletion/LocalRing.lean) records
+the corresponding upstream author credits.
 
 - K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I* (2017),
   [arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5).
