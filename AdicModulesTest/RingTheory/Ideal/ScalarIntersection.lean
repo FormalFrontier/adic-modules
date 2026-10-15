@@ -43,6 +43,16 @@ namespace AdicModulesTest.ScalarIntersection
 
 universe u v
 
+universe w
+
+-- The submodule factor also covers the empty finite family.
+private abbrev finiteScalarIntersection
+    {R : Type u} {M : Type v} {ι : Type w}
+    [CommSemiring R] [AddCommMonoid M] [Module R M]
+    (I : ι → Ideal R) (s : Finset ι) (N : Submodule R M) : Prop :=
+  (s : Set ι).Pairwise (fun i j => I i ⊔ I j = ⊤) →
+    (⨅ i ∈ s, I i) • N = N ⊓ (⨅ i ∈ s, I i • N)
+
 -- Only the proposition is recorded here; no general proof is supplied.
 private abbrev scalarIntersection (R : Type u) (M : Type v)
     [CommSemiring R] [AddCommMonoid M] [Module R M] : Prop :=
@@ -121,6 +131,126 @@ private theorem int_common_witness :
   refine ⟨by norm_num, ?_⟩
   rw [int_ideal_meet, int_six_image]
   exact Ideal.mem_span_singleton_self _
+
+-- The ambient index type is infinite; only these three ideals are selected.
+private def intIndices : Finset ℕ := {2, 3, 5}
+
+private def intFamily (i : ℕ) : Ideal ℤ := intIdeal (i : ℤ)
+
+private lemma int_two_five_comaximal : intIdeal 2 ⊔ intIdeal 5 = ⊤ := by
+  apply (Ideal.eq_top_iff_one _).mpr
+  apply Submodule.mem_sup.mpr
+  refine ⟨-4, ?_, 5, Ideal.mem_span_singleton_self _, by norm_num⟩
+  exact (mem_intIdeal_iff 2 (-4)).mpr (by norm_num)
+
+private lemma int_three_five_comaximal : intIdeal 3 ⊔ intIdeal 5 = ⊤ := by
+  apply (Ideal.eq_top_iff_one _).mpr
+  apply Submodule.mem_sup.mpr
+  refine ⟨6, ?_, -5, ?_, by norm_num⟩
+  · exact (mem_intIdeal_iff 3 6).mpr (by norm_num)
+  · exact (mem_intIdeal_iff 5 (-5)).mpr (by norm_num)
+
+private theorem int_finite_comaximal :
+    (intIndices : Set ℕ).Pairwise (fun i j => intFamily i ⊔ intFamily j = ⊤) := by
+  intro i hi j hj hij
+  have hi' : i = 2 ∨ i = 3 ∨ i = 5 := by simpa [intIndices] using hi
+  have hj' : j = 2 ∨ j = 3 ∨ j = 5 := by simpa [intIndices] using hj
+  rcases hi' with rfl | rfl | rfl <;> rcases hj' with rfl | rfl | rfl
+  · exact (hij rfl).elim
+  · exact int_comaximal
+  · exact int_two_five_comaximal
+  · exact (sup_comm _ _).trans int_comaximal
+  · exact (hij rfl).elim
+  · exact int_three_five_comaximal
+  · exact (sup_comm _ _).trans int_two_five_comaximal
+  · exact (sup_comm _ _).trans int_three_five_comaximal
+  · exact (hij rfl).elim
+
+private theorem int_finite_ideals_proper :
+    ∀ i ∈ intIndices, intFamily i ≠ ⊤ := by
+  intro i hi htop
+  have h1 : (1 : ℤ) ∈ intFamily i := by
+    rw [htop]
+    exact Submodule.mem_top
+  have hi' : i = 2 ∨ i = 3 ∨ i = 5 := by simpa [intIndices] using hi
+  rcases hi' with rfl | rfl | rfl <;>
+    norm_num [intFamily, mem_intIdeal_iff] at h1
+
+private lemma int_finite_ideal_meet :
+    (⨅ i ∈ intIndices, intFamily i) = intIdeal 30 := by
+  have hp : (intIndices : Set ℕ).Pairwise
+      (fun i j => IsCoprime (intFamily i) (intFamily j)) := by
+    intro i hi j hj hij
+    exact Ideal.isCoprime_iff_sup_eq.mpr (int_finite_comaximal hi hj hij)
+  rw [← Ideal.prod_eq_iInf_of_pairwise_isCoprime hp]
+  simpa [intIndices, intFamily, intIdeal] using
+    Ideal.prod_span_singleton intIndices (fun i : ℕ => (i : ℤ))
+
+private lemma int_five_image : intIdeal 5 • intN = intIdeal 25 := by
+  change Ideal.span {(5 : ℤ)} * Ideal.span {5} = Ideal.span {25}
+  simpa using Ideal.span_singleton_mul_span_singleton (5 : ℤ) 5
+
+private lemma int_thirty_image : intIdeal 30 • intN = intIdeal 150 := by
+  change Ideal.span {(30 : ℤ)} * Ideal.span {5} = Ideal.span {150}
+  simpa using Ideal.span_singleton_mul_span_singleton (30 : ℤ) 5
+
+private lemma int_finite_image_meet :
+    (⨅ i ∈ intIndices, intFamily i • intN) = intIdeal 150 := by
+  have hfold : (⨅ i ∈ intIndices, intFamily i • intN) =
+      ((intIdeal 2 • intN) ⊓ (intIdeal 3 • intN)) ⊓ (intIdeal 5 • intN) := by
+    simp only [intIndices, Finset.iInf_insert, Finset.iInf_singleton, intFamily,
+      Nat.cast_ofNat, inf_assoc]
+  rw [hfold, int_image_meet, int_five_image]
+  ext x
+  simp only [Submodule.mem_inf, mem_intIdeal_iff]
+  have h := (lcm_dvd_iff (a := (30 : ℤ)) (b := 25) (c := x)).symm
+  norm_num [← Int.coe_lcm] at h
+  exact h
+
+private theorem int_finite_fixed_equality :
+    (⨅ i ∈ intIndices, intFamily i) • intN =
+      intN ⊓ (⨅ i ∈ intIndices, intFamily i • intN) := by
+  have hle : intIdeal 150 ≤ intN := by
+    rw [← int_thirty_image]
+    exact Submodule.smul_le_right
+  rw [int_finite_ideal_meet, int_thirty_image, int_finite_image_meet,
+    inf_eq_right.mpr hle]
+
+private theorem int_finite_statement :
+    finiteScalarIntersection intFamily intIndices intN := by
+  intro _
+  exact int_finite_fixed_equality
+
+private theorem int_finite_equality_of_comaximal :
+    (⨅ i ∈ intIndices, intFamily i) • intN =
+      intN ⊓ (⨅ i ∈ intIndices, intFamily i • intN) :=
+  Submodule.ideal_smul_iInf_of_pairwise_sup_eq_top
+    intFamily intIndices intN int_finite_comaximal
+
+private theorem int_finite_common_witness :
+    (150 : ℤ) ≠ 0 ∧
+      (150 : ℤ) ∈ intN ⊓ (⨅ i ∈ intIndices, intFamily i • intN) ∧
+      (5 : ℤ) ∈ intN ∧
+      (5 : ℤ) ∉ intN ⊓ (⨅ i ∈ intIndices, intFamily i • intN) := by
+  refine ⟨by norm_num, ?_, ?_, ?_⟩
+  · rw [← int_finite_fixed_equality, int_finite_ideal_meet, int_thirty_image]
+    exact Ideal.mem_span_singleton_self _
+  · exact Submodule.subset_span (Set.mem_singleton _)
+  · intro h
+    have hcommon := h.2
+    rw [int_finite_image_meet] at hcommon
+    have hd : (150 : ℤ) ∣ 5 := (mem_intIdeal_iff 150 5).mp hcommon
+    norm_num at hd
+
+private theorem int_empty_equality :
+    (⨅ i ∈ (∅ : Finset ℕ), intFamily i) • intN =
+      intN ⊓ (⨅ i ∈ (∅ : Finset ℕ), intFamily i • intN) := by
+  simp
+
+private theorem int_empty_omitted_cap_fails :
+    (⨅ i ∈ (∅ : Finset ℕ), intFamily i) • intN ≠
+      (⨅ i ∈ (∅ : Finset ℕ), intFamily i • intN) := by
+  simpa using int_proper
 
 end Integers
 
