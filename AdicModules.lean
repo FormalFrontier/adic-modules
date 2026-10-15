@@ -9,6 +9,7 @@ public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.Algebra.Module.Int
+public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.RingTheory.Ideal.Operations

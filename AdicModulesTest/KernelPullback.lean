@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+import AdicModules.LinearAlgebra.Descent
 import AdicModules.LinearAlgebra.Span.Basic
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.Tactic.NormNum
@@ -165,5 +166,30 @@ private theorem sumMap_boundary :
   intro heq
   rw [heq] at hp
   exact hn hp
+
+/-- Descending the nonzero cone map through its proper range recovers the
+range inclusion, with the expected unique factorization. -/
+private theorem coneMap_range_factorization :
+    coneMap.rangeRestrict.liftOfSurjective (τ := RingHom.id ℕ)
+        coneMap.surjective_rangeRestrict coneMap coneMap.ker_rangeRestrict.le =
+      coneMap.range.subtype ∧
+    (∃! h : coneMap.range →ₗ[ℕ] ℤ × ℕ,
+      h.comp coneMap.rangeRestrict = coneMap) ∧
+    coneMap (1, 0) ≠ 0 ∧ ((0, 1) : ℤ × ℕ) ∉ coneMap.range := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact ((coneMap.rangeRestrict.eq_liftOfSurjective_iff
+      (τ := RingHom.id ℕ) coneMap.surjective_rangeRestrict coneMap
+      coneMap.ker_rangeRestrict.le coneMap.range.subtype).2
+        coneMap.subtype_comp_rangeRestrict).symm
+  · exact (coneMap.rangeRestrict.ker_le_ker_iff_existsUnique_comp_eq
+      (τ := RingHom.id ℕ) coneMap.surjective_rangeRestrict coneMap).1
+        coneMap.ker_rangeRestrict.le
+  · intro h
+    have hfst := congrArg Prod.fst h
+    norm_num [coneMap_apply] at hfst
+  · intro h
+    obtain ⟨z, hz⟩ := LinearMap.mem_range.mp h
+    have hsnd := congrArg Prod.snd hz
+    norm_num [coneMap_apply] at hsnd
 
 end Submodule
