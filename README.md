@@ -238,6 +238,24 @@ and inverse limits.
   [quotient–tensor module](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean)
   and its [nonzero integer reduction example](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean).
 
+- **Adic completion of finitely presented modules.**
+  For any ideal `I` of a commutative ring `R`, assume induced/intrinsic cofinality
+  on all finitely generated submodules of finite free modules:
+  `hcofinal : ∀ n (K : Submodule R (Fin n → R)), K.FG →
+  ∀ k, ∃ l, K ⊓ (I ^ l • ⊤) ≤ I ^ k • K`.
+  For any finitely presented `R`-module `M`,
+  `AdicCompletion.ofTensorProductEquivOfFinitePresentation I M hcofinal` packages
+  the canonical comparison as an `AdicCompletion I R`-linear equivalence
+  `AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M`.
+  Ring and module universes are independent. No finite-generation hypothesis on
+  `I`, Noetherianity, projectivity or flatness is required. The pure-tensor,
+  inverse-on-canonical-element and uniqueness identities identify this equivalence
+  with the finite-projective and Mathlib finite-Noetherian comparisons where both
+  apply. Artin–Rees supplies the cofinality hypothesis over a Noetherian ring.
+  See the [finite-presentation comparison module](AdicModules/AdicCompletion/FinitePresentation.lean),
+  which reuses the canonical comparisons of Judith Ludwig and Christian Merten
+  in Mathlib, and the [integer residue module](AdicModulesTest/AdicCompletion/FinitePresentation.lean).
+
 - **Integer singleton spans in unital rings.**
   For a `NonAssocRing R`, additive cyclicity or a top singleton integer span
   implies surjectivity of `ℤ → R`. Nonsurjective casts therefore make **every**

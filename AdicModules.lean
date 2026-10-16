@@ -8,6 +8,8 @@ public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.Polynomial.Hensel
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
+public import AdicModules.AdicCompletion.Exactness
+public import AdicModules.AdicCompletion.FinitePresentation
 public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.PadicIntTopology
