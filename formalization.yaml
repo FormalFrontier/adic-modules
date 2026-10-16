@@ -5,7 +5,7 @@ project:
   name: "adic-modules"
   description: >-
     Bounded ideal-power torsion, primary-component exactness, abstract adic
-    completions, restriction of scalars for native adic completions, integer
+    completions, restriction of scalars for Mathlib adic completions, integer
     singleton spans in unital rings, kernel pullbacks of submodule images under
     semilinear maps to additive monoids, submodule closure from neighborhood bases,
     p-adic ideal-power bases and proper dense integer spans with top neighborhood
@@ -21,7 +21,10 @@ project:
     precision-reduction compatibility. Left-ideal and real, discrete,
     p-adic and degenerate-boundary model source files retain original independent
     calculations, alongside additional private integer-density, natural-matrix
-    comaximal-powers and real rational-axis applications.
+    comaximal-powers and real rational-axis applications. Coprime monic Hensel
+    factor lifting over adically complete commutative rings and irreducible
+    reduction from a global monic factor-lifting property, with an adically
+    complete corollary, are also included.
   authors:
     - "Formal Frontier Agents"
   responsible_maintainers:
@@ -33,7 +36,7 @@ sources:
     type: "folklore"
     relationship: "independently-proves"
     note: >-
-      Reusable mathematical constructions on native mathlib modules, ideals,
+      Reusable mathematical constructions on Mathlib modules, ideals,
       inverse limits, valuations, uniform completions and localization, together
       with cyclic additive groups and canonical integer singleton spans in unital
       rings. No mathematical novelty or source-author endorsement is claimed.
@@ -54,11 +57,25 @@ sources:
       and remaining gaps are recorded separately; no whole-source coverage or
       completion claim is made by this library or metadata.
 
+  - title: "Local Fields and Their Extensions"
+    authors:
+      - "Ivan B. Fesenko"
+      - "Sergei V. Vostokov"
+    type: "book"
+    relationship: "background"
+    note: >-
+      Second edition (2002), II, §1, Corollary 1, pp. 36–37, and Exercise 4, p. 38.
+      The factor-lifting result uses arbitrary adically complete commutative
+      rings. The irreducible-reduction criterion instead takes an explicit
+      global monic factor-lifting property in quotient form; no equivalence
+      with Mathlib's simple-root Henselian classes or whole-source coverage
+      is asserted.
+
 related_formalizations:
   - id: "https://github.com/leanprover-community/mathlib4"
     relationship: "builds-on"
     note: >-
-      Native mathematical infrastructure at revision
+      Mathematical infrastructure at revision
       83abb3e776bdefcbc447a1e44d0debe4010039e5 with Lean v4.34.0-rc2 and
       the complete pinned Lake dependency graph. The submodule-closure formula
       reuses Filter.HasBasis.iInter_add_right_eq_closure, canonical submodule
@@ -112,9 +129,26 @@ automation:
 
 status:
   scope: >-
+    Polynomial.exists_monic_factorization_of_isAdicComplete lifts coprime monic
+    residue factors with both prescribed reductions over any commutative ring R,
+    ideal I and IsAdicComplete I R. It requires no proper-ideal, local-ring,
+    Noetherian or finite-generation hypothesis.
+    Polynomial.exists_monic_irreducible_pow_of_monic_factorization takes an
+    arbitrary commutative ring R, a maximal ideal I and the global property that
+    every monic polynomial, including reducible ones, lifts all coprime monic
+    residue factorizations to monic factors with both prescribed reductions.
+    It shows that a monic irreducible polynomial reduces to q^e with q monic
+    irreducible and e positive, without domain, locality, completeness,
+    Noetherianity or finite-residue-field assumptions.
+    Polynomial.exists_monic_irreducible_pow_of_isAdicComplete is its corollary
+    for IsAdicComplete I R. The global input is not a new Henselian class or an
+    asserted equivalence with Mathlib's simple-root Henselian classes. The
+    5-adic examples independently prove irreducibility of X² - 5 over the field
+    and integer ring, its nonirreducible reduction X² with exponent 2, and an
+    exponent-1 example; the global input follows from the factor theorem.
     Uniform ideal-power torsion, height-one Dedekind primary-component exactness
     for torsion-source pairs, ordinary integer-prime subgroup restrictions and
-    valuation-free abstract completions for finitely generated ideals; native
+    valuation-free abstract completions for finitely generated ideals; Mathlib
     adic completion under restriction of scalars along arbitrary commutative
     algebras, with compatible module actions and ideal extension, without finite
     generation, flatness or separatedness; submodule closure as the infimum of
@@ -260,22 +294,13 @@ review:
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;
-  Anchor for the attributed earlier project development and assembly, the
-  original primary-component research contributor and its current port author,
-  the original scalar-restriction proof/client contributor and the distinct
-  library adaptation author as distinguished in docs/CREDITS.md, Rudder for
-  the bundled submodule-closure proof and its applications, the canonical
-  cyclic-ring integer-span results and clients, integer-span density and the
-  p-adic basis, linearity, properness and neighborhood-supremum chapter;
-  Formal Frontier Agents for the dense-subsemiring span statement, its proof and
-  the real, discrete, p-adic and degenerate-boundary model files with
-  independent original calculations and the additional private real rational-axis
-  application;
+  Formal Frontier Agents for the library's original mathematical statements,
+  proofs and applications, with original attributions and expression provenance
+  recorded in docs/CREDITS.md;
   Mathlib contributors, including Kenny Lau for left-ideal operations and
   Neil Strickland for the geometric-sum proof idea, for the ideal and translated
   neighborhood APIs;
   Mathlib contributors for canonical ULift module transport, p-adic approximation,
-  norm and ideal interfaces, singleton spans and continuous-image closure;
-  and independent Formal Frontier agent
-  reviewers of earlier work. Collective credit does not identify a legal
+  norm and ideal interfaces, singleton spans and continuous-image closure.
+  Collective credit does not identify a legal
   copyright holder or clear incorporated third-party material.

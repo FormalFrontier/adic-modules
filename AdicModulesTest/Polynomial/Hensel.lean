@@ -152,4 +152,26 @@ private theorem padicInt_five_X_reduction_one : (X : ℤ_[5][X]).Monic ∧ Irred
     (X : ℤ_[5][X]).map (Ideal.Quotient.mk I₅) = (X : F₅[X]) ^ 1 := by
   exact ⟨monic_X, irreducible_X, monic_X, irreducible_X, by simp⟩
 
+-- Global factor lifting over `ℤ₅` follows from adic completeness, independently of
+-- irreducible reduction. Only the output coprimality of the complete-ring theorem is discarded.
+private theorem padicInt_five_monic_factorization :
+    ∀ (F : ℤ_[5][X]) (g₀ h₀ : F₅[X]),
+      F.Monic → g₀.Monic → h₀.Monic → IsCoprime g₀ h₀ →
+      F.map (Ideal.Quotient.mk I₅) = g₀ * h₀ →
+      ∃ g h : ℤ_[5][X], g.Monic ∧ h.Monic ∧ F = g * h ∧
+        g.map (Ideal.Quotient.mk I₅) = g₀ ∧
+        h.map (Ideal.Quotient.mk I₅) = h₀ := by
+  intro F g₀ h₀ hF hg₀ hh₀ hcop hfac
+  obtain ⟨g, h, hgm, hhm, _, hgh, hg, hh⟩ :=
+    Polynomial.exists_monic_factorization_of_isAdicComplete I₅ hF hg₀ hh₀ hcop hfac
+  exact ⟨g, h, hgm, hhm, hgh, hg, hh⟩
+
+-- Apply the global factor-lifting criterion to the same ramified polynomial.
+private theorem padicInt_five_X_sq_sub_five_irreducible_reduction_of_monic_factorization :
+    ∃ (q : F₅[X]) (e : ℕ), q.Monic ∧ Irreducible q ∧ 0 < e ∧
+      (X ^ 2 - C (5 : ℤ_[5])).map (Ideal.Quotient.mk I₅) = q ^ e := by
+  exact Polynomial.exists_monic_irreducible_pow_of_monic_factorization I₅
+    padicInt_five_monic_factorization (monic_X_pow_sub_C _ (by decide))
+    padicInt_five_X_sq_sub_five_irreducible
+
 end AdicModulesTest.Polynomial.Hensel

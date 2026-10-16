@@ -21,23 +21,27 @@ and inverse limits.
   See the [factor-lifting module](AdicModules/Polynomial/Hensel.lean) and the
   [5-adic `X² - 6` example](AdicModulesTest/Polynomial/Hensel.lean).
 
-- **Irreducible reduction.**
-  `Polynomial.exists_monic_irreducible_pow_of_isAdicComplete` proves that for
-  a commutative ring `R`, a maximal ideal `I` and `[IsAdicComplete I R]`, a monic
-  irreducible `f : R[X]` reduces to `q ^ e`, with `q` monic irreducible and `e > 0`.
-  No domain, Noetherian or finite-residue-field hypothesis is imposed. The proof lifts
-  a coprime factorization separating one irreducible power from its complement;
-  irreducibility forces the complement to be 1.
+- **Irreducible reduction from global factor lifting.**
+  `Polynomial.exists_monic_irreducible_pow_of_monic_factorization` takes a
+  commutative ring `R`, a maximal ideal `I` and an explicit **global** property:
+  every monic polynomial, including reducible ones, admits monic lifts of each
+  coprime monic factorization modulo `I`, with both prescribed reductions.
+  Every monic irreducible `f : R[X]` then reduces to `q ^ e`, with `q` monic
+  irreducible and `e > 0`. No domain, local-ring, completeness, Noetherian or
+  finite-residue-field hypothesis is imposed. The proof separates one irreducible
+  power from its coprime complement; lifting and irreducibility force the complement to be 1.
+  `Polynomial.exists_monic_irreducible_pow_of_isAdicComplete` is the corollary
+  with `[IsAdicComplete I R]`, using the coprime factor theorem above.
   The [5-adic examples](AdicModulesTest/Polynomial/Hensel.lean) independently prove
-  that `X² - 5` is monic irreducible over `ℤ₅` and `ℚ₅` and reduces to `X²`,
-  which is not irreducible. They also apply the general theorem and exhibit exponent 1.
+  that `X² - 5` is monic irreducible over `ℤ₅` and `ℚ₅` and reduces to the
+  nonirreducible `X²`; they supply the global property, apply both criteria and exhibit exponent 1.
   Compare Fesenko–Vostokov, *Local Fields and Their Extensions*, II, §1,
-  Exercise 4, p. 38. For a valuation domain and its fraction field, Mathlib's
-  `Polynomial.Monic.irreducible_of_irreducible_map` supplies integer-polynomial
-  irreducibility from field irreducibility. The general coefficient-ring scope
-  differs from the source's Henselian valuation-field scope: completeness is more
-  restrictive in that setting, so this is only a partial treatment of Exercise 4,
-  not an equivalence of hypotheses or full coverage.
+  Exercise 4, p. 38. Monic integral representatives relate the source's global
+  factor-lifting property to this quotient formulation. For a valuation domain
+  and its fraction field, Mathlib's `Polynomial.Monic.irreducible_of_irreducible_map`
+  supplies integer-polynomial irreducibility from field irreducibility. No new
+  Henselian class, equivalence with Mathlib's simple-root Henselian classes or
+  whole-source coverage is asserted.
 
 - **Bounded torsion and primary components.**
   `Module.IsKilledByIdealPower R M I` means one exponent annihilates the whole

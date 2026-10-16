@@ -28,16 +28,20 @@ with the degrees of the given factors. Completeness for the top ideal forces the
 ring to be a subsingleton; this case is treated separately. We do not assert uniqueness of the
 lifts or construct a chosen factorization.
 
-For a maximal ideal, the reduction of a monic irreducible polynomial in `R[X]` is a positive
-power of a monic irreducible polynomial. The proof extracts the largest power of one normalized
-irreducible factor. Its coprime complement lifts, so irreducibility forces that complement to
-be 1. This argument allows coefficient rings with zero divisors. For a
-valuation domain with fraction field `F`, irreducibility over `F` implies the required
-irreducibility over the integer ring by Mathlib's
-`Polynomial.Monic.irreducible_of_irreducible_map`. Thus the coefficient-ring hypothesis does
-not require an additional irreducibility assumption in the complete discretely valued case.
-The source's Exercise 4 treats all Henselian valuation fields; adic completeness is a different,
-more restrictive hypothesis in that setting, and no equivalence with that scope is asserted.
+For any commutative ring and maximal ideal, a global monic factor-lifting property implies
+that every monic irreducible polynomial reduces to a positive power of a monic irreducible
+polynomial. The property quantifies over all monic polynomials, including reducible ones,
+and asks that coprime monic residue factors lift with both prescribed reductions. The proof
+extracts the largest power of one normalized irreducible factor. Its coprime complement lifts,
+so irreducibility forces that complement to be 1. This argument allows zero divisors and
+requires neither locality nor completeness; the adically complete result is a corollary.
+
+The global input is the source's factor-lifting property in quotient form, not a new class
+or an asserted equivalence with Mathlib's simple-root `HenselianRing` or `HenselianLocalRing`
+classes. For a valuation domain with fraction field `F`, Mathlib's
+`Polynomial.Monic.irreducible_of_irreducible_map` supplies integer-polynomial irreducibility
+from field irreducibility. Compare the Henselian valuation-field formulation in Exercise 4;
+no whole-source coverage is asserted.
 
 ## References
 
@@ -100,18 +104,24 @@ theorem exists_monic_factorization_of_isAdicComplete
   · exact congrArg Subtype.val hg.symm
   · exact congrArg Subtype.val hh.symm
 
-/-- A monic irreducible polynomial over a commutative ring complete for a maximal ideal
-reduces to a positive power of a single monic irreducible polynomial. No domain, Noetherian
-or residue-field finiteness hypothesis is imposed on the coefficient ring.
+/-- If every coprime monic factorization modulo a maximal ideal `I` lifts to monic factors
+with both prescribed reductions, then every monic irreducible polynomial reduces to a positive
+power of a single monic irreducible polynomial. The lifting hypothesis ranges over all monic
+polynomials in `R[X]`, including reducible ones; it does not require coprimality of the lifts.
+No domain, local-ring, completeness, Noetherian or residue-field finiteness hypothesis is imposed.
 
-Compare Fesenko–Vostokov, *Local Fields and Their Extensions*, II, §1, Exercise 4, p. 38:
-the source assumes a Henselian valuation field and irreducibility over that field. Here the
-coefficient ring need not be a valuation ring, but is assumed adically complete. In the
-complete discretely valued case, the source's field irreducibility supplies coefficient-ring
-irreducibility through Mathlib's `Polynomial.Monic.irreducible_of_irreducible_map`.
-The reduction need not itself be irreducible. -/
-theorem exists_monic_irreducible_pow_of_isAdicComplete
-    {R : Type u} [CommRing R] (I : Ideal R) [I.IsMaximal] [IsAdicComplete I R]
+Compare Fesenko–Vostokov, *Local Fields and Their Extensions*, II, §1, Exercise 4, p. 38,
+whose Henselian valuation fields satisfy this global monic factor-lifting property. The
+adically complete case is supplied by `exists_monic_factorization_of_isAdicComplete`, using
+Mathlib's universal coprime factorization ring and formally smooth lifting. -/
+theorem exists_monic_irreducible_pow_of_monic_factorization
+    {R : Type u} [CommRing R] (I : Ideal R) [I.IsMaximal]
+    (hLift : ∀ (F : R[X]) (g₀ h₀ : (R ⧸ I)[X]),
+      F.Monic → g₀.Monic → h₀.Monic → IsCoprime g₀ h₀ →
+      F.map (Ideal.Quotient.mk I) = g₀ * h₀ →
+      ∃ g h : R[X], g.Monic ∧ h.Monic ∧ F = g * h ∧
+        g.map (Ideal.Quotient.mk I) = g₀ ∧
+        h.map (Ideal.Quotient.mk I) = h₀)
     {f : R[X]} (hf : f.Monic) (hirr : Irreducible f) :
     ∃ (q : (R ⧸ I)[X]) (e : ℕ), q.Monic ∧ Irreducible q ∧ 0 < e ∧
       f.map (Ideal.Quotient.mk I) = q ^ e := by
@@ -130,8 +140,8 @@ theorem exists_monic_irreducible_pow_of_isAdicComplete
     have he0 : e = 0 := Nat.eq_zero_of_not_pos h
     exact hqa (by simpa [hfac, he0] using hqd)
   have ham : a.Monic := (hqm.pow e).of_mul_monic_left (hfac ▸ hF)
-  obtain ⟨g, h, hgm, hhm, _, hgh, hg, hh⟩ :=
-    exists_monic_factorization_of_isAdicComplete I hf (hqm.pow e) ham
+  obtain ⟨g, h, hgm, hhm, hgh, hg, hh⟩ :=
+    hLift f (q ^ e) a hf (hqm.pow e) ham
       ((hqi.coprime_iff_not_dvd.mpr hqa).pow_left) hfac
   -- The lift of the positive power cannot be a unit, so the other lift is 1.
   have ha : a = 1 := by
@@ -141,5 +151,26 @@ theorem exists_monic_irreducible_pow_of_isAdicComplete
       exact (hqi.not_isUnit (isUnit_of_dvd_one (hqpow ▸ dvd_pow_self q he.ne'))).elim
     · rw [← hh, hhm.eq_one_of_isUnit hhu, Polynomial.map_one]
   exact ⟨q, e, hqm, hqi, he, by simpa [ha] using hfac⟩
+
+/-- A monic irreducible polynomial over a commutative ring complete for a maximal ideal
+reduces to a positive power of a single monic irreducible polynomial. No domain, Noetherian
+or residue-field finiteness hypothesis is imposed on the coefficient ring.
+
+Compare Fesenko–Vostokov, *Local Fields and Their Extensions*, II, §1, Exercise 4, p. 38:
+the source assumes a Henselian valuation field and irreducibility over that field. Here the
+coefficient ring need not be a valuation ring, but is assumed adically complete. In the
+complete discretely valued case, the source's field irreducibility supplies coefficient-ring
+irreducibility through Mathlib's `Polynomial.Monic.irreducible_of_irreducible_map`.
+The reduction need not itself be irreducible. -/
+theorem exists_monic_irreducible_pow_of_isAdicComplete
+    {R : Type u} [CommRing R] (I : Ideal R) [I.IsMaximal] [IsAdicComplete I R]
+    {f : R[X]} (hf : f.Monic) (hirr : Irreducible f) :
+    ∃ (q : (R ⧸ I)[X]) (e : ℕ), q.Monic ∧ Irreducible q ∧ 0 < e ∧
+      f.map (Ideal.Quotient.mk I) = q ^ e := by
+  apply exists_monic_irreducible_pow_of_monic_factorization I ?_ hf hirr
+  intro F g₀ h₀ hF hg₀ hh₀ hcop hfac
+  obtain ⟨g, h, hgm, hhm, _, hgh, hg, hh⟩ :=
+    exists_monic_factorization_of_isAdicComplete I hF hg₀ hh₀ hcop hfac
+  exact ⟨g, h, hgm, hhm, hgh, hg, hh⟩
 
 end Polynomial
