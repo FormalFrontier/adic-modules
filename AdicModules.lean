@@ -27,6 +27,7 @@ public import AdicModules.RingTheory.Perfection
 public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.FrobeniusCore
 public import AdicModules.RingTheory.TeichmullerFractionField
+public import AdicModules.RingTheory.WittVector
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite

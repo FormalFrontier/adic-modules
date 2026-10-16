@@ -95,6 +95,11 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   with inverse-Frobenius approximation modulo `(ker f)^(n+1)` for every `n`.
   It is a ring homomorphism if **`CharP R p`**. No field, locality or finite
   residue hypothesis is needed. See [section and core details](docs/Results.md#headline-results).
+  For `p : ℕ` with `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`
+  and `[CharP R p]`, [`WittVector.charZero`](AdicModules/RingTheory/WittVector.lean)
+  supplies `CharZero (WittVector p R)`, without field, perfectness, finiteness,
+  domain, reducedness or extra `Nontrivial` assumptions. See the
+  [Witt-vector API and uses](docs/Guide.md#characteristic-zero-of-witt-vectors).
 
 - **Principal units.** In a commutative ring complete along `I`, for prime `p`
   with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical `ℤ_[p]`-powers
@@ -175,7 +180,7 @@ Related `AdicModulesTest` modules require separate imports and are not re-export
 that root; some expose named concrete results, while the left-ideal and span
 models keep their calculations private. The [mathematical guide](docs/Guide.md)
 provides detailed hypotheses, formulas, examples and the complete current roster:
-**104 Lean sources = 47 production (root included) + 57 tests/models/audit imports**.
+**106 Lean sources = 48 production (root included) + 58 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -186,6 +191,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
+| [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero cast of `3` over `ZMod 3` and `(ZMod 3)[X]`) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |

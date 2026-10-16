@@ -18,10 +18,26 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**47 production sources including root + 57 tests/models/audit imports**) follow.
+(**48 production sources including root + 58 tests/models/audit imports**) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
+
+## Characteristic zero of Witt vectors
+
+Import [`AdicModules.RingTheory.WittVector`](../AdicModules/RingTheory/WittVector.lean)
+(or the public root). For `p : ℕ` with `[Fact p.Prime]` and `R : Type u` with
+`[CommRing R]` and `[CharP R p]`, `WittVector.charZero.{u} p R` supplies
+`CharZero (WittVector p R)`, with no restriction on `u`. No field, perfectness,
+finiteness, domain, reducedness or extra `Nontrivial` premise is needed.
+Use the standard `CharZero` API, such as `Nat.cast_ne_zero` and `Int.cast_injective`.
+
+The proof embeds `ℤ_[p]` into `WittVector p (ZMod p)` via Mathlib's inverse
+comparison, then uses `ZMod.castHom` and injective coefficientwise `WittVector.map`.
+The separately imported [examples](../AdicModulesTest/RingTheory/WittVector.lean)
+prove `(3 : WittVector 3 (ZMod 3)) ≠ 0` and
+`(3 : WittVector 3 ((ZMod 3)[X])) ≠ 0`. The second coefficient ring is
+nonperfect and not a field.
 
 ## Uniform bounded torsion
 
@@ -648,12 +664,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 46 production source leaves re-exported by the public
+The first table lists all 47 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **47 production sources including the root and 57
-test/model/audit sources, hence 104 Lean source modules**. These are source-file
+comparison. There are **48 production sources including the root and 58
+test/model/audit sources, hence 106 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -694,6 +710,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [RingTheory.Teichmuller](../AdicModules/RingTheory/Teichmuller.lean) | Teichmüller sections of surjective residue maps and images of the perfection |
 | [RingTheory.FrobeniusCore](../AdicModules/RingTheory/FrobeniusCore.lean) | Perfect intersections of iterated Frobenius ranges and their prime-characteristic universal property |
 | [RingTheory.Perfection](../AdicModules/RingTheory/Perfection.lean) | Field structure on the inverse-Frobenius limit without perfectness of the original field |
+| [RingTheory.WittVector](../AdicModules/RingTheory/WittVector.lean) | Characteristic zero over any commutative ring of prime characteristic; [nonzero-cast uses](../AdicModulesTest/RingTheory/WittVector.lean) |
 | [RingTheory.TeichmullerFractionField](../AdicModules/RingTheory/TeichmullerFractionField.lean) | Teichmüller image in any fraction field of a complete valuation domain with maximal ideal and prime-characteristic residue |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
@@ -748,6 +765,7 @@ by the public root.
 | [LinearAlgebra.TensorProduct.Quotient](../AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) | Nonzero integer coefficient reduction from `(4)` to `(2)` and zero-map boundary |
 | [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
+| [RingTheory.WittVector](../AdicModulesTest/RingTheory/WittVector.lean) | Nonzero cast of `3` over `ZMod 3` and the nonperfect nonfield `(ZMod 3)[X]` |
 | [RingTheory.FrobeniusCore](../AdicModulesTest/RingTheory/FrobeniusCore.lean) | Imperfect Laurent-series noncube and constant-root inputs, inclusion universal property and reduced-product boundary |
 | [RingTheory.TeichmullerFractionFieldModel](../AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) | Independent usual 3-adic and imperfect-residue power-series fraction-field inputs; final image-law consumers |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | A nonzero class in the first principal-power quotient |
@@ -804,10 +822,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 57 current independent test/model/audit
+`AdicModulesTest.+` glob including all 58 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 47 production sources (including the root) and 57 test/model/audit
+This covers the 48 production sources (including the root) and 58 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.
