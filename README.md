@@ -96,6 +96,18 @@ and inverse limits.
   This is the perfect-residue interface, not an imperfect-residue perfect-core,
   intersection-of-power-images or Witt-vector characterization.
 
+- **Teichmüller images in fraction fields.**
+  For a valuation domain `R` complete along a maximal ideal `I`, a prime `p`
+  with `[CharP (R ⧸ I) p]`, and any specified fraction field `K`, the composite
+  of `Perfection.teichmuller₀ p I` with `algebraMap R K` has image
+  `⋂ n : ℕ, Set.range (fun y : K ↦ y ^ (p ^ n))`.
+  Equivalently, membership means that a separate `p^n`-th root exists at every
+  depth, including zero and `n = 0`. The universes of `R` and `K` are independent.
+  No perfectness or finiteness of the residue field, topology on `K`, or
+  compatible family of roots is assumed. See the
+  [fraction-field image laws](AdicModules/RingTheory/TeichmullerFractionField.lean)
+  and their [3-adic and imperfect infinite-residue models](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean).
+
 - **Coprime Hensel factor lifting.**
   For any commutative ring `R`, any ideal `I` and `[IsAdicComplete I R]`,
   a monic `f : R[X]` whose reduction is a product of **coprime monic**
@@ -434,6 +446,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [BoundedIdealPowerTorsion](AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean) |
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
+| [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
