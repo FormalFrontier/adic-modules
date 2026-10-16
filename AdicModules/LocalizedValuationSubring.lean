@@ -13,6 +13,13 @@ public import Mathlib.RingTheory.Valuation.ValuationSubring
 
 This file realizes a localized principal-adic completion as a valuation subring
 of the common completed fraction field.
+
+## References
+
+Mathlib's valuation-domain localization and valuation-subring realization are
+applied to the injective embedding in `AdicModules.LocalizedCompletion`.
+Equality is reflected through ring-equivalence injectivity and subtype
+extensionality.
 -/
 
 @[expose] public section

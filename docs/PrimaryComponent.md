@@ -49,6 +49,6 @@ uniform condition in [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPower
 primary membership allows a different exponent for each element;
 `Module.Finite` remains necessary for the library's uniform-exponent bridge.
 
-Run `lake exe cache get` in the pinned project before `lake --wfail build`.
+Run `lake exe cache get` in the pinned project before `lake build`.
 Passing the build and selected `#print axioms` checks does not replace complete
 transitive standard-axiom audit or independent review of the exact candidate.

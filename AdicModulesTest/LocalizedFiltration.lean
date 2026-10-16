@@ -22,6 +22,13 @@ representative theorem gives a nonzero representative of `X * C 3` in this model
 
 The proofs reuse Mathlib's power-series domain and prime-ideal results and the localized
 filtration API of AdicModules.
+
+## References
+
+The identity-localization model uses Mathlib's power-series domain, prime-ideal
+and unit-localization facts, together with the base-power sandwich,
+separatedness and denominator-clearing representative method of
+`AdicModules.LocalizedFiltration`.
 -/
 
 set_option warningAsError true

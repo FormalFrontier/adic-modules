@@ -31,6 +31,14 @@ Its reduction is `X²`, a nonirreducible positive power of the monic irreducible
 These model proofs do not use the general irreducible-reduction theorem. A subsequent
 application obtains a monic irreducible power from that theorem, while a linear example
 also exhibits exponent 1.
+
+## References
+
+The independent inputs use Mathlib's p-adic residue and adic-completeness APIs,
+valuation-based irreducibility, monic irreducibility transport and polynomial
+arithmetic. Subsequent consumers use the factor-lifting, global-criterion,
+simple-root and small-error laws in `AdicModules.Polynomial.Hensel`, whose
+References give the corresponding Fesenko–Vostokov sources.
 -/
 
 public section

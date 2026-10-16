@@ -5,70 +5,50 @@
 23 definitions, five instances), with one labeled authored editorial API note.
 The original source/tool/native-record bindings remain unchanged; the manifest's
 `original_api_sha256` identifies the original presentation retained in Git history,
-while `api_sha256` binds the Markdown with the editorial note. That inventory
-predates the separate
-`PrimaryComponent`, `AdicCompletion.RestrictScalars`, `Algebra.Module.Int`,
-`Topology.Algebra.Submodule`, `Topology.Algebra.PadicInt`,
-`RingTheory.Ideal.Operations`, `Topology.Algebra.Ideal`,
-`RingTheory.Ideal.Quotient.Finite` and `Topology.Algebra.Module.Span` leaves
-and their test/model modules:
-it is **not** a current whole-library inventory. Read the
-[manual primary-component reference](PrimaryComponent.md) and the
-[scalar-restriction guide](Guide.md#restricting-scalars-in-adic-completions)
-for those declarations and their ordinary-import clients, the
-[integer-singleton-span guide](Guide.md#integer-singleton-spans-in-unital-rings)
-and its [clients](../AdicModulesTest/Algebra/Module/Int.lean), and the
-[submodule-closure module](../AdicModules/Topology/Algebra/Submodule.lean) for
-its neighborhood-basis formula and
-[applications](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean).
-The [p-adic guide](Guide.md#p-adic-neighborhood-bases-and-integer-spans) describes
-the twelve-result generic-density and p-adic API: ideal-power bases, linear
-topology, density, properness and top suprema with restricted ideal neighborhoods.
-Its [clients](../AdicModulesTest/Topology/Algebra/PadicInt.lean) gain membership of
-excluded elements after adding positive-degree neighborhoods.
-The [comaximal-powers guide](Guide.md#comaximal-powers-of-left-ideals)
-describes `Ideal.sup_pow_eq_top_of_sup_eq_top` and its written subtraction-free
-proof for arbitrary semiring left ideals at every natural exponent, including
-zero. Neither ideal must be two-sided; powers are formed in the original
-semiring. Two private lemmas recover Mathlib's two-sided specializations
-without adding public entry points. The
-[left-ideal density guide](Guide.md#left-ideal-density-and-integer-powers-topologies)
-describes `Ideal.dense_iff_sup_eq_top_of_hasBasis` and its written direct
-additive proof by translated neighborhoods in the supplied powers topology.
-It needs only a ring with a compatible topological additive-group structure
-and a powers basis at zero, without two-sidedness or multiplication continuity;
-no restriction to integer scalars is needed. The four left-ideal model files
-retain original direct calculations independent of the general density
-criterion. `Int` additionally applies that criterion to `(3)` in the `(2)`-adic
-integers, and `MatrixNat` additionally applies the comaximal-powers theorem
-to its column ideals. The [matrix](Guide.md#matrix-left-ideal-models) and
-[boundary](Guide.md#ideal-power-boundary-models) calculations are documented
-separately.
+while `api_sha256` binds the Markdown with the editorial note. This inventory
+predates later library leaves: it is **not** a current whole-library inventory.
+The scalar-restriction [producer](../AdicModules/AdicCompletion/RestrictScalars.lean)
+and [client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean), like the other
+current sources, are maintained references, not regenerated historical entries.
 
-For the current library and test/model/audit module maps, use the
-[mathematical guide](Guide.md#module-map) and the
-[README import map](../README.md#imports-and-module-map).
-The [finite-quotient guide](FiniteQuotient.md) covers the finite Chinese
-remainder API and its examples.
+## Headline results
 
-The dense-subsemiring comparison,
-`Submodule.closure_span_eq_of_dense_subsemiring`, uses additive-submonoid
-closure, continuous dense images at selected generators and span induction.
-The original span and closure calculations in the five model files (`Real`,
-`Discrete`, `PadicInt`, `Boundary`, `Indiscrete`) are independent of the generic
-proof. `Real` also includes an additional private application of
-`Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying
-its proper closure and excluding the second coordinate unit.
-Read the
-[span-comparison guide](Guide.md#closure-of-spans-over-a-dense-subsemiring)
-for the original calculations and private real application, canonical actions and
-separation and coefficient-continuity boundaries. None of these current sources is a regenerated
-entry in the historical native API snapshot. Source rosters, written proof
-descriptions and the generated snapshot do not certify complete transitive
-standard-axiom assurance for private, generated, model or imported declarations.
-The scalar-restriction [producer](../AdicModules/AdicCompletion/RestrictScalars.lean) and
-[client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) are maintained
-source references, not regenerated entries in the historical snapshot.
+The current [root overview](../README.md#headline-results), [results reference](Results.md)
+and [Guide](Guide.md) describe bounded ideal-power torsion and source-torsion
+primary exactness; adic scalar restriction and conditional completion–tensor
+comparisons; Hensel lifting; Frobenius cores and Teichmüller images; ideal-power
+and valuation topologies; finite two-sided CRT; and span/closure comparisons.
+For example:
+
+- Over a commutative ring, the canonical completion–tensor comparison is an
+  equivalence for finitely presented modules under finite-free cofinality; finite
+  projective modules and finite modules over Noetherian rings have separate comparisons.
+- A finite pairwise comaximal family of **two-sided** ideals in a possibly
+  noncommutative ring gives the canonical ring CRT equivalence and a unique
+  quotient class, not a unique ring representative.
+- For a semiring module with separately continuous addition and a dense
+  subsemiring, span set-closures agree under coefficient continuity at the
+  selected generators, without global coefficient continuity.
+
+The linked statements retain all other hypotheses and boundaries.
+These are current mathematical interfaces built on dependency-provided ideals,
+quotients, completions, topologies and perfection, not newly generated API entries
+or assertions of independent constructions of those stock objects.
+
+For the complete current **104-source** map (**47 production including root,
+57 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
+and [root import map](../README.md#imports-and-module-map). The
+[primary-component reference](PrimaryComponent.md) and [finite-quotient guide](FiniteQuotient.md)
+give supplementary APIs. The Guide also covers scalar restriction, integer
+singleton spans, p-adic bases, left-ideal density and comaximal powers, and
+[dense-subsemiring span closure](Guide.md#closure-of-spans-over-a-dense-subsemiring).
+The original left-ideal and span calculations and their additional private
+applications are distinguished in the model map below and the Guide.
+
+Source rosters, written proof descriptions and the historical generated snapshot
+do not certify complete transitive standard-axiom assurance for private,
+generated, model or imported declarations. Source and tool bindings, authored-note
+labels and reproduction limits for the historical adapter are retained below.
 
 ## Mathematical model map
 

@@ -25,6 +25,13 @@ cast, hence every singleton integer span is proper. Two off-diagonal matrix
 units fail to commute, and the integer span of one of them contains itself but
 not the identity matrix. These clients use Mathlib's matrix-unit and
 singleton-span interfaces without introducing a new ring or scalar action.
+
+## References
+
+The inputs use Mathlib's `ZMod.intCast_surjective`, cyclic and singleton-span
+APIs, matrix units and scalar-diagonal integer casts. The proper-span conclusions
+apply the cyclic-ring integer-cast bridge in `AdicModules.Algebra.Module.Int`;
+upstream method and author credits are detailed in `docs/CREDITS.md`.
 -/
 
 @[expose] public section

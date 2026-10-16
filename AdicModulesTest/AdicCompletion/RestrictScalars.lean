@@ -13,6 +13,13 @@ import Mathlib.RingTheory.Polynomial.Basic
 The quotient and completion comparisons preserve representatives, transition maps and inverse
 identities. Integer and polynomial algebras give models, including the bottom and top ideals
 and the level-zero quotient.
+
+## References
+
+These models use the representative, transition and evaluation laws of
+`AdicModules.AdicCompletion.RestrictScalars`, with Mathlib's canonical integer,
+polynomial-algebra and quotient constructions for the bottom, top and level-zero
+cases.
 -/
 
 set_option warningAsError true

@@ -20,6 +20,14 @@ torsion of the middle or target module.
 For abelian groups, the component of the integer ideal `(p)` is the usual
 `p`-primary subgroup. We identify the carriers and the restricted homomorphisms
 and transport exactness to maps of those ordinary subgroups.
+
+## References
+
+The lifting argument uses Mathlib's Dedekind ideal-primary-component
+`map_surjective`, exactness and kernel corestriction APIs. The integer comparison
+uses the canonical integer action and ordinary torsion/primary-subgroup APIs;
+see `docs/PrimaryComponent.md` for the method and `docs/CREDITS.md` for the
+distinct source-research and library-adaptation contributions.
 -/
 
 @[expose] public section

@@ -22,6 +22,14 @@ equivalent over `R`. No finiteness, separatedness, or completeness assumption is
 The equivalence goes from completion along the extended ideal to completion
 along `I`. Its inverse, both quotient representatives, and the native transition
 maps are described by the accompanying lemmas.
+
+## References
+
+The comparison uses Mathlib's ideal-map/power identity,
+`Submodule.Quotient.restrictScalarsEquiv`, representative-preserving
+`Submodule.quotEquivOfEq` and compatible-family `AdicCompletion` interfaces.
+The original project implementation and its distinct library adaptation are
+credited in `docs/CREDITS.md`.
 -/
 
 @[expose] public section

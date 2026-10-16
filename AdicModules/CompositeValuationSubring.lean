@@ -11,6 +11,12 @@ public import Mathlib.RingTheory.Valuation.LocalSubring
 
 This file constructs the composite of a valuation subring of a field and a
 valuation subring of its residue field.
+
+## References
+
+The residue-preimage construction uses Mathlib's valuation and local-subring,
+residue-field, prime-localization and quotient APIs. It does not introduce a
+new completion convention.
 -/
 
 @[expose] public section

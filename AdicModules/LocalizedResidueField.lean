@@ -12,6 +12,13 @@ public import AdicModules.LocalizedValuationSubring
 This file identifies the residue field of the valuation subring obtained from a
 localized principal-adic completion with the residue field of the original
 localization.
+
+## References
+
+The comparison uses Mathlib's canonical residue-field maps and quotients,
+together with the local valuation-ring realization in
+`AdicModules.LocalizedValuationSubring`; representatives are normalized through
+these canonical maps.
 -/
 
 @[expose] public section

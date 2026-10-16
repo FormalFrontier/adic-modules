@@ -22,6 +22,13 @@ separately chosen power-series topology. The empty set contains no ideal power, 
 contains zero.
 
 The proofs use the valuation topology APIs of AdicModules and Mathlib.
+
+## References
+
+The model uses Mathlib's rational power-series DVR, fraction field and separated
+`(X)` powers. The zero-neighborhood criterion combines the principal-adic/valuation
+comparison of `AdicModules.ValuationTopology` with Mathlib's `IsAdic`
+neighborhood-basis interface.
 -/
 
 set_option warningAsError true

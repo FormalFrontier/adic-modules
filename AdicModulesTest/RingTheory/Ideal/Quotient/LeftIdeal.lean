@@ -26,6 +26,12 @@ surjective, even though all positive powers of these ideals are unchanged.
 The quotients and their scalar actions are the canonical quotients of the regular
 left module. No multiplication on these quotient modules is used. In contrast,
 the binary diagonal is surjective and admits the stock linear first isomorphism.
+
+## References
+
+These independent binary and ternary calculations use Mathlib's kernels of
+right matrix multiplication, regular-left-module quotients and linear first
+isomorphism API. They do not use a ring quotient CRT for arbitrary left ideals.
 -/
 
 namespace LeftIdealExamples

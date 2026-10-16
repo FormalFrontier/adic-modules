@@ -28,6 +28,13 @@ its `Bool`-indexed basis shows why the predicate selecting active indices cannot
 be dropped. The ring models obtain fixed-scalar continuity from the canonical
 integer action on a topological additive group,
 `AddGroup.continuousConstSMul_int`.
+
+## References
+
+These models use Mathlib's nonnegative additive-submonoid/ℕ-submodule
+correspondence, `AddGroup.continuousConstSMul_int` and discrete, indiscrete and
+adic bases. The active-index closure formula comes from
+`AdicModules.Topology.Algebra.Submodule`.
 -/
 
 @[expose] public section

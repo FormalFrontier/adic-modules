@@ -21,6 +21,13 @@ adic module topology is not discrete.
 
 These model calculations use only stock algebra and filter-basis APIs, not the
 four functoriality statements. No product-topology identification is used.
+
+## References
+
+The independent model uses Mathlib's canonical integer-pair linear projection
+and adic filter bases. Subsequent applications use the four functoriality laws
+in `AdicModules.Topology.Algebra.Module.AdicTopology`, not an identification
+with a product topology.
 -/
 
 open Filter Topology

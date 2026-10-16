@@ -14,6 +14,13 @@ The pure tensor `1 ⊗ 1` for the ideal `(4)` remains nonzero after coefficient
 reduction to `(2)` and application of Mathlib's quotient–tensor equivalence.
 The computation uses only the stock maps and characteristic equations, independently
 of the general naturality theorem. A zero module map gives the zero tensor.
+
+## References
+
+The independent reduction calculation uses Mathlib's `quotTensorEquivQuotSMul`,
+tensor-map characteristic equations and integer coefficient quotients. The final
+square applies the simultaneous naturality law in
+`AdicModules.LinearAlgebra.TensorProduct.Quotient`.
 -/
 
 open scoped TensorProduct

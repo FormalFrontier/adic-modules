@@ -22,6 +22,12 @@ zero is not that representative.
 
 The proofs reuse Mathlib's power-series discrete valuation ring, its separated maximal-ideal
 filtration, and the completed-localization comparison API of AdicModules.
+
+## References
+
+The units-localization model uses Mathlib's power-series DVR and separated
+maximal-ideal filtration. Its embedding and unique-base-representative criterion
+come from `AdicModules.LocalizedCompletion`.
 -/
 
 set_option warningAsError true

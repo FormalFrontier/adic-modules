@@ -18,6 +18,12 @@ square sends these coordinates to `0` modulo `2` and `2` modulo `3`, and the
 inverse square reduces their inverse class to the class of `8`. A mixed coarse
 precision of `0` and `1` includes the genuine modulus `2 ^ 0 = 1` and its
 trivial quotient.
+
+## References
+
+The forward and inverse precision-reduction squares come from
+`AdicModules.RingTheory.Ideal.Quotient.Finite`, using Mathlib's canonical quotient
+factors and integer residues, including the trivial zeroth-power quotient.
 -/
 
 namespace Ideal

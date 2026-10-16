@@ -24,6 +24,13 @@ for the valuation rings.
 All input rows, the noncube obstruction in the residue field, and the roots
 of zero and minus one are established independently of the image laws.
 Only the final consumer checks invoke those laws.
+
+## References
+
+The independent inputs use Mathlib's canonical `ℤ_[3] ⊆ ℚ_[3]` and
+power-series/Laurent-series fraction fields, maximal ideals, residue fields and
+monomial noncube argument. Only the final consumers use the image laws in
+`AdicModules.RingTheory.TeichmullerFractionField`.
 -/
 
 set_option linter.privateModule false

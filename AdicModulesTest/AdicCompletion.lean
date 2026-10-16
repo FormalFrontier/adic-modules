@@ -12,6 +12,12 @@ public import AdicModules.AdicCompletion
 
 The abstract-completion comparison is checked on its canonical map, including the top-adic
 boundary case. Membership in powers of the extended ideal is computed from the finite quotients.
+
+## References
+
+These calculations use Mathlib's canonical adic-completion algebra map and
+finite-quotient power-membership API, together with the abstract-completion
+package in `AdicModules.AdicCompletion`, including its top-adic boundary.
 -/
 
 set_option warningAsError true

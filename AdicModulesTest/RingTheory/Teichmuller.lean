@@ -23,6 +23,13 @@ model permits arbitrary perfect coefficient fields, including the infinite field
 The power-series comparison follows from the multiplicative universal property.
 The computation at `2` in `ℤ_[3]` uses only multiplicativity and reduction;
 naive integer-valued residue representatives are not multiplicative.
+
+## References
+
+The independent inputs use Mathlib's p-adic residue and unit arithmetic and
+power-series constant-coefficient, kernel, completeness and perfect-field
+infrastructure. The section comparison uses the multiplicative universal
+property in `AdicModules.RingTheory.Teichmuller`.
 -/
 
 -- This module supplies private examples and input helpers, not an exported API.

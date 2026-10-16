@@ -21,6 +21,13 @@ structure supplied by the public localization valuation-ring construction.
 
 The proofs reuse Mathlib's description of the power-series maximal ideal and its separated
 filtration, and the residue-comparison API of AdicModules.
+
+## References
+
+The units-localization inputs use Mathlib's power-series maximal ideal and
+separated filtration. The canonical local structure and residue-congruence
+criterion come from `AdicModules.LocalizedResidueField` and its valuation-subring
+realization.
 -/
 
 set_option warningAsError true

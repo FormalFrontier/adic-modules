@@ -16,6 +16,13 @@ public import AdicModules.ValuationTopology
 This file compares the powers of a principal ideal in a localization with the literal images of
 the corresponding powers from the base valuation ring.  The image is deliberately a submodule
 over the base ring, not the extended ideal in the localization.
+
+## References
+
+The base-power sandwich uses Mathlib's valuation-ring total divisibility,
+canonical localization representatives and adic-power APIs. Neighborhood-basis
+and separatedness transport use these interfaces together with
+`AdicModules.ValuationTopology`.
 -/
 
 @[expose] public section

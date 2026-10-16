@@ -17,6 +17,13 @@ ideal, this file identifies the localized adic uniformity with the one induced f
 fraction field. It then extends the localization embedding to an injective map from the localized
 principal-adic completion into the completed fraction field and proves that the latter is its
 fraction field.
+
+## References
+
+Mathlib's `Localization.mapToFractionRing` and uniform-ring completion
+extension and injectivity APIs are combined with the neighborhood basis of
+`AdicModules.LocalizedFiltration` and the completed-integers comparison of
+`AdicModules.CompletedIntegers`.
 -/
 
 @[expose] public section

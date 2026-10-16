@@ -21,6 +21,13 @@ transported valuation subring. The round-trip formula recovers both base images,
 fraction-field embedding of the quotient distinguishes the lifts.
 
 The proof uses the localized residue-field and valuation-subring APIs of AdicModules and Mathlib.
+
+## References
+
+These clients use the inverse residue transport and subtype-lift formulas of
+`AdicModules.LocalizedQuotientValuationSubring`, with Mathlib's rational
+power-series DVR, quotient and fraction-field embedding APIs for the distinct
+residue inputs.
 -/
 
 open scoped Topology

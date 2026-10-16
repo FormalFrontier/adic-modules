@@ -20,6 +20,13 @@ In particular, corresponding primes have the same height.
 This file also compares the extension of the original valuation to the canonical valuation of the
 completed valuation ring. The resulting `Valuation.IsEquiv` can be turned into the canonical
 ordered value-group isomorphism with `Valuation.IsEquiv.orderMonoidIso`.
+
+## References
+
+The associated-element argument uses the density comparison from
+`AdicModules.CompletedIntegers`. The ideal and spectrum consequences use
+Mathlib's map/comap, valuation-domain torsion-free/flat and faithfully-flat
+algebra APIs; value groups use `Valuation.IsEquiv.orderMonoidIso`.
 -/
 
 @[expose] public section

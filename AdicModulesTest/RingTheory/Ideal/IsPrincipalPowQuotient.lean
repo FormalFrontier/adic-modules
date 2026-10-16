@@ -14,6 +14,12 @@ For the ideal `(5)` in `ℤ`, the generator chosen by a proof of principality ha
 nonzero class in `I / (I • ⊤)`. The inverse representative formula recovers the
 nonzero class of `1` modulo `(5)`, without identifying the chosen generator
 with `5`.
+
+## References
+
+The model specializes Yakov Pechersky's Mathlib principal-power quotient
+equivalence to the integer ideal `(5)`, using its chosen-generator representative
+and inverse formulas from `AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient`.
 -/
 
 namespace Ideal

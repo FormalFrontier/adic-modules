@@ -18,6 +18,13 @@ roots of every Frobenius depth, supplied independently by the stock perfection
 lift from the prime field. The intersection's inclusion contract is instantiated
 on this imperfect ambient field, including the associated equivalence and
 universal property. A reduced product ring checks the non-domain boundary.
+
+## References
+
+The independent noncube and constant-root inputs use Mathlib's Laurent-series
+and Hahn monomial valuation and prime-field perfection lift. The stock-subfield
+inclusion, equivalence and universal-property consumers use
+`AdicModules.RingTheory.FrobeniusCore`.
 -/
 
 noncomputable section

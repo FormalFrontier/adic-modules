@@ -17,7 +17,11 @@ the real model also applies it privately to the rational axis.
 The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
-imported declarations. The application guides and complete module map follow.
+imported declarations. The application guides and complete current module map
+(**47 production sources including root + 57 tests/models/audit imports**) follow.
+The [results reference](Results.md) preserves the expanded mathematical catalogue,
+including completion–tensor alternatives, Hensel statements and
+Frobenius/Teichmüller interfaces.
 
 ## Uniform bounded torsion
 
@@ -644,16 +648,18 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists 39 mathematical source leaves re-exported by the public
-root, including the comaximal-powers theorems, finite Chinese remainder equivalence,
-left-ideal density criterion and dense-subsemiring span comparison. There are 40
-listed library sources including that root and 52 listed test/model/audit source
-modules, hence **92 listed Lean source modules**. These are source-file counts, not
+The first table lists all 46 production source leaves re-exported by the public
+root, including the completion-exactness and finite-presentation comparisons,
+Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
+remainder equivalence, left-ideal density criterion and dense-subsemiring span
+comparison. There are **47 production sources including the root and 57
+test/model/audit sources, hence 104 Lean source modules**. These are source-file
+counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
 and all five span-model files retain independent original calculations; `Int`,
 `MatrixNat` and `Real` additionally contain private applications of their
-respective library theorems. The tables describe the listed library leaves and
+respective library theorems. The tables describe all current library leaves and
 test/model/audit sources; [`AdicModules`](../AdicModules.lean) is the additional
 public root. Neither these counts nor mathematical proof descriptions certify
 complete transitive standard-axiom assurance for private, generated, model or
@@ -667,8 +673,11 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | --- | --- |
 | [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | Uniform torsion and finite-module bridge |
 | [Polynomial.Hensel](../AdicModules/Polynomial/Hensel.lean) | Coprime monic factor lifting and irreducible reduction from a global monic factor-lifting property |
+| [Polynomial.Evaluation](../AdicModules/Polynomial/Evaluation.lean) | Association of nearby polynomial values for a Jacobson-contained ideal, including nonunit derivatives |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
+| [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
+| [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
 | [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
 | [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
@@ -679,9 +688,13 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
 | [LinearAlgebra.Descent](../AdicModules/LinearAlgebra/Descent.lean) | Descent along surjective semilinear maps with additive-monoid targets |
 | [LinearAlgebra.Span.Basic](../AdicModules/LinearAlgebra/Span/Basic.lean) | Kernel pullbacks of submodule images for semilinear maps with additive-monoid targets |
+| [LinearAlgebra.SModEq.Pow](../AdicModules/LinearAlgebra/SModEq/Pow.lean) | Iterated ideal-power congruences from arbitrary positive starting depth |
 | [LinearAlgebra.Correspondence](../AdicModules/LinearAlgebra/Correspondence.lean) | Kernel–range order correspondence for submodules under semilinear maps |
 | [LinearAlgebra.TensorProduct.Quotient](../AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | Quotient–tensor naturality for ideal inclusions and module maps |
 | [RingTheory.Teichmuller](../AdicModules/RingTheory/Teichmuller.lean) | Teichmüller sections of surjective residue maps and images of the perfection |
+| [RingTheory.FrobeniusCore](../AdicModules/RingTheory/FrobeniusCore.lean) | Perfect intersections of iterated Frobenius ranges and their prime-characteristic universal property |
+| [RingTheory.Perfection](../AdicModules/RingTheory/Perfection.lean) | Field structure on the inverse-Frobenius limit without perfectness of the original field |
+| [RingTheory.TeichmullerFractionField](../AdicModules/RingTheory/TeichmullerFractionField.lean) | Teichmüller image in any fraction field of a complete valuation domain with maximal ideal and prime-characteristic residue |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | Finite two-sided ring CRT, inverse representatives, independent powers, common-ring linear equivalence with characteristic API and precision-reduction squares |
@@ -718,9 +731,11 @@ by the public root.
 | --- | --- |
 | [BoundedIdealPowerTorsion](../AdicModulesTest/BoundedIdealPowerTorsion.lean) | Specified-exponent and existential uniform-torsion clients |
 | [Polynomial.Hensel](../AdicModulesTest/Polynomial/Hensel.lean) | 5-adic factor lifting, independent `X² - 5` irreducibility and reduction, criterion applications and zero-ring boundary |
+| [Polynomial.Evaluation](../AdicModulesTest/Polynomial/Evaluation.lean) | Independent 3-adic proximity and nonunit derivative inputs, association consumer and zero boundary |
 | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
+| [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
 | [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
 | [AdicCompletion.PadicInt](../AdicModulesTest/AdicCompletion/PadicInt.lean) | Nonzero integer-completion and p-adic inputs, comparison laws and trivial-residue boundaries |
 | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
@@ -729,9 +744,12 @@ by the public root.
 | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) | Integer, all `ZMod n`, subsingleton and noncommutative matrix singleton-span clients |
 | [KernelPullback](../AdicModulesTest/KernelPullback.lean) | Kernel pullbacks of cones, monoid-target descent and source-inverse boundary |
 | [Correspondence](../AdicModulesTest/Correspondence.lean) | Natural-number-linear half-plane and ray correspondence with proper range |
+| [LinearAlgebra.SModEq.Pow](../AdicModulesTest/LinearAlgebra/SModEq/Pow.lean) | Independent exact-depth-two 3-adic inputs, positive-depth iteration and depth-one agreement |
 | [LinearAlgebra.TensorProduct.Quotient](../AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) | Nonzero integer coefficient reduction from `(4)` to `(2)` and zero-map boundary |
 | [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
+| [RingTheory.FrobeniusCore](../AdicModulesTest/RingTheory/FrobeniusCore.lean) | Imperfect Laurent-series noncube and constant-root inputs, inclusion universal property and reduced-product boundary |
+| [RingTheory.TeichmullerFractionFieldModel](../AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) | Independent usual 3-adic and imperfect-residue power-series fraction-field inputs; final image-law consumers |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | A nonzero class in the first principal-power quotient |
 | [RingTheory.Ideal.ScalarIntersection](../AdicModulesTest/RingTheory/Ideal/ScalarIntersection.lean) | Scalar images and intersections of comaximal ideals on integer, `ZMod 6` and natural-product modules |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) | Integer quotient and boundary calculations |
@@ -786,13 +804,12 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including the listed independent test/model/audit files
-and any additional registered test modules. The normal reproduction command is
+`AdicModulesTest.+` glob including all 57 current independent test/model/audit
+files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 40 listed main-library and 52 listed test source files and any
-additional registered modules, including the three theorem modules
-for comaximal powers, ideal density and dense-subsemiring span closure, all
-with written proofs, the four left-ideal models and the five span models.
+This covers the 47 production sources (including the root) and 57 test/model/audit
+sources in the complete current map. The four left-ideal models and five span
+models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.
 Complete library proof-integrity assurance is not claimed by these descriptions
 or model calculations. A complete transitive
@@ -827,43 +844,11 @@ kernel-declaration inventory. Use this guide, the
 [primary-component supplement](PrimaryComponent.md), the
 [finite-quotient guide](FiniteQuotient.md) and current Lean signatures instead.
 
-### Scalar-restriction resource sample
+### Build and documentation limits
 
-This historical configured run for the scalar-restriction proof and client used
-Lean v4.34.0-rc2, mathlib revision
-`e37d88a26f3791ed5a93daa1f949af1021b8d103` and the matching complete Lake
-dependency graph. It succeeded for both `AdicModules` and `AdicModulesTest`:
-fifteen public mathematical leaves, sixteen ordinary test/audit modules, and
-the public root (32 modules total). With those historical pins, the matching
-mathlib cache fetch took about 42.509s and decompressed 8892 entries. Cache
-verification then took about 6.137s and reported 8907 up-to-date jobs. The
-both-target build took about 41.119s and reported 2737 jobs; these are Lake job
-counts, not counts of fresh compilations or concurrent processes. The workflow
-elapsed about 378s including all its input collection and complete
-private-inclusive axiom checks, not just building.
-
-These are historical observations from that measured configuration, not
-measurements of the current dependency pins or clean-machine guarantees. No
-peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not an estimate for the listed source modules.
-
-### Earlier module-readiness measurements
-
-These are **historical author measurements**, not clean-machine guarantees:
-on the module-readiness sequence, the matching cache fetch took about 98 seconds.
-After a small normalization repair,
-the affected default build took 34.020 seconds and Lake reported 2711 jobs,
-mostly dependency/cache reuse rather than 2711 fresh compilations. That build
-used an already populated dependency cache and prior project artifacts. The
-combined native-lint/repair observations reached approximately 12.79 GB of total
-container memory, including other resident data and filesystem cache; this is
-not a per-process RSS measurement or minimum RAM requirement. No OOM event was
-recorded in that bounded run. Source-comment changes and documentation generation
-are separate subsequent work and are not benchmarked by those earlier numbers.
-
-Allow more time and memory on a cold or different machine. Build success and
-selected axiom output are distinct from the required complete transitive
-standard-axiom audit, including private/generated and test declarations.
-Native API documentation has
-its own source/pin binding and reproduction requirements; no documentation output
-should be used as proof-integrity or source-coverage evidence.
+Allow more time and memory on a cold or different machine; the thread setting
+above is not a whole-build memory or process cap. Build success and selected
+`#print axioms` output are distinct from a complete transitive standard-axiom
+audit, including private/generated and test declarations. Native API documentation
+has its own source/pin binding and reproduction requirements; documentation output
+is not proof-integrity or source-coverage evidence.

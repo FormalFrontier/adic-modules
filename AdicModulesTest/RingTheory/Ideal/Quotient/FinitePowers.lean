@@ -16,6 +16,12 @@ For the ideals spanned by `2`, `3`, and `5`, at precisions `2`, `2`, and `1`,
 the powers-surjectivity theorem supplies a preimage of the residue classes
 `0`, `1`, and `2`. Injectivity of the canonical map and elementary divisibility
 identify this preimage with the class of `172`.
+
+## References
+
+The independent-power surjectivity law comes from
+`AdicModules.RingTheory.Ideal.Quotient.Finite`. Mathlib's canonical quotient-map
+injectivity and elementary integer divisibility identify its preimage as `[172]`.
 -/
 
 namespace Ideal

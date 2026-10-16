@@ -37,6 +37,13 @@ and exhibit the role of pairwise comaximality.
 The commutative equivalences below use Mathlib's
 `Ideal.quotientInfRingEquivPiQuotient`. Principal ideals are specified by spans
 of integer elements, rather than by numerals in the ideal semiring.
+
+## References
+
+These original integer and boundary calculations use Mathlib's commutative
+`Ideal.quotientInfRingEquivPiQuotient`, canonical quotient module actions and
+integer span, divisibility, intersection and congruence APIs. They do not assume
+an arbitrary-left-ideal ring CRT.
 -/
 
 universe u v

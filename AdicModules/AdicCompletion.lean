@@ -14,6 +14,12 @@ public import Mathlib.Topology.UniformSpace.AbstractCompletion
 This file packages the inverse-limit `AdicCompletion I R` as an
 `AbstractCompletion R` whenever the given uniform topology on `R` is the
 `I`-adic topology and `I` is finitely generated.
+
+## References
+
+Mathlib's adic-completion completeness and topology APIs supply the algebraic
+completion; its `AbstractCompletion` and `WithIdeal` interfaces supply the
+uniform-completion packaging used here.
 -/
 
 @[expose] public section

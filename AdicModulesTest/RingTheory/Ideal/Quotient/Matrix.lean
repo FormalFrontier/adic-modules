@@ -37,6 +37,12 @@ matrix entry ideals use `Ideal.matrix`; their two-sidedness is transported from
 `TwoSidedIdeal.matrix` and `TwoSidedIdeal.asIdeal`. These examples do not assert
 an arbitrary-ring Chinese remainder construction or an arbitrary-power formula
 for matrix entry ideals.
+
+## References
+
+These calculations use Mathlib's coordinate quotient first isomorphisms,
+matrix-unit arithmetic, `Ideal.matrix`, `TwoSidedIdeal.matrix` and
+`TwoSidedIdeal.asIdeal`, with the canonical quotient and Pi actions.
 -/
 
 namespace Ideal

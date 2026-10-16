@@ -18,6 +18,13 @@ of the iterated-power result, using Mathlib's ideal and integer arithmetic APIs.
 
 The generic starting-depth-one specialization recovers Kenny Lau's
 `SModEq.pow_pow_add_one`, including its `n + 1` indexing convention.
+
+## References
+
+The independent 3-adic inputs use Mathlib's ideal and integer arithmetic APIs.
+The depth-one comparison is with Kenny Lau's `SModEq.pow_pow_add_one` and
+one-step power-congruence method; final consumers use the positive-depth
+iteration in `AdicModules.LinearAlgebra.SModEq.Pow`.
 -/
 
 namespace AdicModulesTest.SModEqPow

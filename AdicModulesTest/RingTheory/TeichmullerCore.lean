@@ -28,6 +28,14 @@ Quotient plumbing is given for arbitrary reduced commutative coefficient
 rings rather than requiring a field or perfectness. The same imperfect field also
 supplies examples of the field operations on its inverse-Frobenius limit, with
 unit inputs constructed using only the preexisting commutative ring structure.
+
+## References
+
+The independent inputs use Mathlib's Laurent-series monomial noncube,
+power-series quotient and completeness, preexisting perfection ring, prime-field
+units and coefficient ring-homomorphism laws. Only the indicated consumers use
+the image/injectivity laws in `AdicModules.RingTheory.Teichmuller` and the field
+interface in `AdicModules.RingTheory.Perfection`.
 -/
 
 -- This module supplies private input helpers and examples, not an exported API.

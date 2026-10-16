@@ -17,6 +17,12 @@ field of the top subring with the field itself; localization still recovers the 
 The other examples cover general membership, residue, quotient and localization APIs.
 
 The proofs use the composite-valuation and localization APIs of AdicModules and Mathlib.
+
+## References
+
+These models use the residue-preimage and localization APIs of
+`AdicModules.CompositeValuationSubring`, with Mathlib's Laurent-series field,
+power-series valuation ring and residue field of the top valuation subring.
 -/
 
 open IsLocalRing

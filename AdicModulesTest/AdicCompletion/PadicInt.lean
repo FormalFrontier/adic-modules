@@ -19,6 +19,13 @@ or any of its characteristic laws.
 
 At precision zero the residue ring is `ZMod 1`, so the same nonzero element has zero
 coordinate there. The unit generator also has only the trivial residue ring.
+
+## References
+
+The independent inputs use Mathlib's integer quotients, `ZMod`, p-adic residues
+and nonzero casts. The proper mod-four neighborhoods use evaluation kernels
+and norm neighborhoods under the comparison in `AdicModules.AdicCompletion.PadicInt`
+and its topological refinement.
 -/
 
 namespace AdicModulesTest.AdicCompletion.PadicInt

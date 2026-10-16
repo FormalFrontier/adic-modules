@@ -15,6 +15,13 @@ import Mathlib.Tactic.NormNum
 For the ideals spanned by `2` and `3`, the public linear equivalence sends
 `[8]` to `([0], [2])` and `2 • [8]` to `(2 • [0], 2 • [2])`. Both sides
 use the quotient module actions of the common base ring `ℤ`.
+
+## References
+
+The common-base linear CRT and its characteristic identities come from
+`AdicModules.RingTheory.Ideal.Quotient.Finite`, using Mathlib's canonical quotient
+and Pi module actions. Integer quotient arithmetic supplies the `[8]` and
+scalar-multiple calculations.
 -/
 
 universe u v

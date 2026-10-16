@@ -13,6 +13,12 @@ This file transports the quotient valuation ring at a nonzero prime into the
 residue field of the completed-localization valuation subring. The transport is
 the comap along the inverse of the localized-completion residue-field
 equivalence.
+
+## References
+
+The transport uses Mathlib's quotient valuation subring and valuation-subring
+comap along the inverse of the residue-field equivalence in
+`AdicModules.LocalizedResidueField`.
 -/
 
 @[expose] public section

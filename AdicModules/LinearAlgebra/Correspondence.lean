@@ -17,6 +17,12 @@ the semilinear map itself need not be surjective.
 
 The construction uses Mathlib's map/comap API and `OrderIso.ofHomInv`, together
 with `Submodule.comap_map_eq_sup_ker`.
+
+## References
+
+The order isomorphism uses Mathlib's `Submodule.map`, `Submodule.comap` and
+`OrderIso.ofHomInv`, together with `Submodule.comap_map_eq_sup_ker` from
+`AdicModules.LinearAlgebra.Span.Basic`.
 -/
 
 @[expose] public section

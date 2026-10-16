@@ -13,6 +13,13 @@ This file develops the elementary API for a module on which one power of a
 fixed ideal acts by zero. The exponent is uniform over the whole module. This
 is stronger than asking separately for every element to be killed by some
 ideal power.
+
+## References
+
+Mathlib's `Module.IsTorsionBySet`, annihilator and ideal-primary-component APIs
+supply the torsion interfaces used by the finite-module uniform-exponent bridge.
+The original bounded-torsion implementation and its project-source adaptation
+are credited separately in `docs/CREDITS.md`.
 -/
 
 @[expose] public section

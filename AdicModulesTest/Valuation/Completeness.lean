@@ -18,6 +18,13 @@ existing p-adic adic-completeness instance. The zero generator tests the separat
 
 The final example obtains maximal-ideal completeness for any discrete valuation ring
 presented as the integers of a complete valued field, with no residue-field restriction.
+
+## References
+
+The inputs use Mathlib's usual complete p-adic valued uniformity, valuation
+integers and DVR separated maximal-ideal powers. The principal-adic completeness
+bridge, including its zero-generator boundary, comes from
+`AdicModules.Valuation.Completeness`, whose References give its mathematical motivation.
 -/
 
 set_option warningAsError true

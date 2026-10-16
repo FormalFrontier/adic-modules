@@ -19,6 +19,12 @@ scalar law. This is separate from surjectivity of the module map. Neither `τ`
 nor `ρ` is required to be surjective. Identity scalar maps give ordinary
 linear descent over a semiring. In the ring and additive-group setting,
 descent along a quotient map agrees with `Submodule.liftQ`.
+
+## References
+
+The descent construction uses Mathlib's extension along a surjective map and
+semilinear and quotient-map APIs. Uniqueness is by cancellation of surjective
+precomposition; quotient descent is compared with Mathlib's `Submodule.liftQ`.
 -/
 
 @[expose] public section

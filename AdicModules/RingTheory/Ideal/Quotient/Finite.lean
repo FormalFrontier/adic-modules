@@ -34,6 +34,15 @@ product as a module. Its scalar kernel is the intersection of the ideals.
 The same canonical map is surjective for independently chosen natural powers
 of the original pairwise comaximal family. Zeroth powers are allowed; the
 pairwise comaximality of powers follows from `Ideal.pow_sup_pow_eq_top`.
+
+## References
+
+The finite-selector argument adapts Kenny Lau and Patrick Massot's Mathlib
+`Ideal.quotientInfToPiQuotient_surj` in
+`Mathlib.RingTheory.Ideal.Quotient.Operations`, with `Ideal.sup_iInf_eq_top`
+for the finite-intersection step. Canonical quotient formulas, injectivity,
+powers and the commutative equivalence reuse Mathlib's existing constructions;
+see `docs/FiniteQuotient.md` and `docs/CREDITS.md`.
 -/
 
 @[expose] public section

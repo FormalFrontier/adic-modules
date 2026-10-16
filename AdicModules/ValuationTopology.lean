@@ -18,6 +18,13 @@ This file compares the topology defined by a valuation on a valuation ring with 
 topology associated to a nonzero principal ideal. The Hausdorff hypothesis on the principal
 adic filtration is exactly the cofinality input; no rank, discreteness, or Noetherianity
 assumption is needed.
+
+## References
+
+The comparison uses Mathlib's valuation criterion for principal-ideal
+membership, separated adic powers, value-group restriction and valuation/adic
+neighborhood bases. General valuation and completion background is recorded
+in `docs/CREDITS.md`; no rank or discreteness theorem is substituted here.
 -/
 
 @[expose] public section

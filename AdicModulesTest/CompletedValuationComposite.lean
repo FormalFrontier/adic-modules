@@ -21,6 +21,12 @@ have distinct inverse images under the quotient comparison. The inverse image of
 of one is its canonical quotient class.
 
 The proofs use the completed-composite APIs of AdicModules and Mathlib.
+
+## References
+
+These clients use the residue and inverse-quotient formulas in
+`AdicModules.CompletedValuationComposite`, with Mathlib's rational power-series
+DVR, fraction-ring and separated maximal-ideal-power interfaces.
 -/
 
 open scoped Topology

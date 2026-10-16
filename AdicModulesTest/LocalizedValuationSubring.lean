@@ -21,6 +21,13 @@ units, the criterion distinguishes the completed-field realizations of zero and 
 
 The proofs reuse Mathlib's power-series discrete valuation ring and separated maximal-ideal
 filtration, and the completion and valuation-subring APIs of AdicModules.
+
+## References
+
+The units-localization model uses Mathlib's power-series DVR and separated
+powers. The completion embedding and valuation-subring coercion equality
+criterion come from `AdicModules.LocalizedValuationSubring` and
+`AdicModules.LocalizedCompletion`.
 -/
 
 set_option warningAsError true

@@ -19,6 +19,13 @@ the `X`-adic completion. Contracting either lift recovers its original prime. Th
 associated-element, faithful-flatness, height and value-group applications are retained as well.
 
 The proofs use the completion, spectrum and valuation APIs of AdicModules and Mathlib.
+
+## References
+
+The model uses Mathlib's rational power-series DVR, bottom and maximal primes,
+and separated powers. Contraction inverse laws and the associated-element,
+flatness, height and value-group interfaces come from
+`AdicModules.PrincipalAdicSpectrum`.
 -/
 
 set_option warningAsError true

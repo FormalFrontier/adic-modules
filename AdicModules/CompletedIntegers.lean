@@ -14,6 +14,13 @@ public import Mathlib.Topology.Algebra.Valued.ValuedField
 This file identifies a separated principal-adic completion of a valuation ring with the
 valuation-integer subring of the completion of its fraction field. The construction works for
 arbitrary value-group rank and does not assume Noetherianity or discreteness.
+
+## References
+
+The comparison combines `AdicModules.ValuationTopology` with Mathlib's valuation
+integers and valued-field uniform completion, using `AbstractCompletion.funext`
+for the two-variable density argument. The consulted Laurent-series comparison
+and its authors are credited in `docs/CREDITS.md`; its proof is not copied here.
 -/
 
 @[expose] public section

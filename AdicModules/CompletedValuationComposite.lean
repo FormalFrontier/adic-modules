@@ -14,6 +14,13 @@ This file identifies the completed valuation-integer subring with the composite
 of the completed localization at a nonzero prime and the transported quotient
 valuation ring. It also recovers the localized factor and quotient factor from
 the distinguished prime of that composite.
+
+## References
+
+The proof combines `AdicModules.LocalizedQuotientValuationSubring` with the
+residue-preimage construction of `AdicModules.CompositeValuationSubring`.
+The distinguished-prime localization, residue-kernel and quotient-equivalence
+steps use Mathlib's corresponding interfaces.
 -/
 
 @[expose] public section

@@ -15,6 +15,13 @@ This file transports the algebraic structure of the completed valuation integers
 principal-adic comparison. It also identifies the completed fraction field and proves that the
 canonical map is local and induces an isomorphism on residue fields when the generator lies in the
 maximal ideal.
+
+## References
+
+The construction transports structure through
+`ValuationRing.principalAdicCompletionEquiv` from `AdicModules.CompletedIntegers`,
+using Mathlib's completed valuation-ring, fraction-field, local-homomorphism and
+residue-field interfaces.
 -/
 
 @[expose] public section
