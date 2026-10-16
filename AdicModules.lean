@@ -18,12 +18,14 @@ public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.LinearAlgebra.TensorProduct.Quotient
+public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite
 public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
 public import AdicModules.Topology.Algebra.PadicInt
+public import AdicModules.Topology.Algebra.PrincipalUnits
 public import AdicModules.Valuation.Completeness
 public import AdicModules.ValuationTopology
 public import AdicModules.CompletedIntegers

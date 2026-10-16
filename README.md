@@ -22,6 +22,34 @@ and inverse limits.
   natural coordinates fail ordinary reduction from degree three to degree two,
   whereas the sign-normalized coordinates agree.
 
+- **p-adic powers of principal units.**
+  For a commutative ring `R`, an ideal `I` with `IsAdicComplete I R`, and a
+  prime `p` with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical
+  `ℤ_[p]`-powers. They agree with all integer powers and define an explicitly
+  supplied `ℤ_[p]`-module on the kernel's additive form. For an `I`-adic
+  topology, powering is jointly continuous and characterized by continuous
+  agreement with integer powers. See
+  [principal-unit powers](AdicModules/Topology/Algebra/PrincipalUnits.lean).
+
+- **Perfect-residue Teichmüller sections.**
+  For commutative rings `R`, `κ` in independent universes, a prime `p`,
+  `[CharP κ p]`, `[PerfectRing κ p]`, a surjective ring map `f : R →+* κ`
+  and `[IsAdicComplete (RingHom.ker f) R]`,
+  `RingHom.teichmullerSection p f hf : κ →*₀ R` is a multiplicative section,
+  unique among all multiplicative zero-and-one-preserving sections. Every lift of the
+  `n`-fold inverse-Frobenius root of `a` has `p^n`-th power congruent to the
+  section value modulo `(RingHom.ker f)^(n+1)`, including `n = 0` and `a = 0`.
+  With **`[CharP R p]`**, the same function is a ring homomorphism; perfection
+  of `R` is not required. No topology, continuity, field, locality, finite residue,
+  Noetherianity, torsion-freeness or odd-prime assumption is imposed.
+  The construction reuses Mathlib's ideal-based Teichmüller map and perfection
+  lift, with an agreement law for quotient maps. See the
+  [section module](AdicModules/RingTheory/Teichmuller.lean) and
+  [3-adic and perfect-field power-series models](AdicModulesTest/RingTheory/Teichmuller.lean),
+  including infinite residue fields and failure of additivity in mixed characteristic.
+  This is the perfect-residue interface, not an imperfect-residue perfect-core,
+  intersection-of-power-images or Witt-vector characterization.
+
 - **Coprime Hensel factor lifting.**
   For any commutative ring `R`, any ideal `I` and `[IsAdicComplete I R]`,
   a monic `f : R[X]` whose reduction is a product of **coprime monic**
@@ -301,6 +329,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | --- | --- |
 | [BoundedIdealPowerTorsion](AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean) |
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean) |
+| [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
@@ -316,6 +345,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [Topology.Algebra.Ideal](AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (independent original calculations; additional private density application in Int) |
 | [Topology.Algebra.Submodule](AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
 | [Topology.Algebra.PadicInt](AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](AdicModulesTest/Topology/Algebra/PadicInt.lean) |
+| [Topology.Algebra.PrincipalUnits](AdicModules/Topology/Algebra/PrincipalUnits.lean) | [Topology.Algebra.PrincipalUnits](AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) (`p`-adic integer, 2-torsion and `X`-adic power-series models) |
 | [Topology.Algebra.Module.Span](AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) (independent original calculations; additional private comparison application in Real) |
 | [Valuation.Completeness](AdicModules/Valuation/Completeness.lean) | [Valuation.Completeness](AdicModulesTest/Valuation/Completeness.lean) |
 | [ValuationTopology](AdicModules/ValuationTopology.lean) | [ValuationTopology](AdicModulesTest/ValuationTopology.lean) |
@@ -361,6 +391,11 @@ mathematical bibliography, including Kenny Lau and Patrick Massot's CRT credit.
 The tensor comparison reuses Mathlib's adic-completion API by Judith Ludwig and
 Christian Merten, including finite-product bijectivity and the Noetherian comparison.
 
+The Teichmüller sections follow the perfect-residue and equal-characteristic
+corollaries of I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*,
+second edition (2002), I §7, (7.3). The construction and approximation proofs reuse
+Kenny Lau's Mathlib Teichmüller and perfection APIs.
+
 The coprime Hensel theorem follows the factor-lifting form in I. B. Fesenko and
 S. V. Vostokov, *Local Fields and Their Extensions*, second edition (2002), II, §1,
 Corollary 1, generalized to adically complete rings. Its proof assembles Andrew Yang's
@@ -390,3 +425,19 @@ together with Mathlib's sequence functors, sections and adic completion. Its
 signed successor proof follows the scalar-transition calculation with the sign
 unit inserted degreewise. The rational nonvanishing argument follows Group
 Theory's rational half-class test.
+
+## Reduced-residue Teichmüller image
+
+For a commutative ring `R`, a prime `p` and an ideal `I` with
+`[CharP (R ⧸ I) p]`, `[IsAdicComplete I R]` and `[IsReduced (R ⧸ I)]`,
+`Perfection.teichmuller₀ p I` is injective, and its image is exactly
+`⋂ n : ℕ, Set.range (fun r : R ↦ r ^ (p ^ n))`. This includes zero and
+`n = 0`; the roots may be chosen independently at each degree. Reducedness
+forces their residue classes to be compatible, without requiring residue
+Frobenius to be surjective. These are the adic-ring forms of
+Fesenko–Vostokov, I §7, (7.1), using Kenny Lau's Mathlib perfection and
+Teichmüller construction, not an ambient-field or integrality characterization.
+The [imperfect-residue model](AdicModulesTest/RingTheory/TeichmullerCore.lean)
+uses `((ZMod 3)((T)))[[X]]` along its nonzero ideal `(X)`, distinguishes the
+images of two and zero, and shows that the constant Laurent monomial `T`
+is outside the image because it has no cube root.
