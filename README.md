@@ -10,6 +10,13 @@ and inverse limits.
 
 ## Headline results
 
+- **Iterated ideal-power congruences.** For a commutative ring `R`, an ideal `I`,
+  and a natural number `q` with `(q : R) ∈ I`, a congruence
+  `x ≡ y [SMOD I ^ m]` at positive depth `m` implies
+  `x ^ (q ^ n) ≡ y ^ (q ^ n) [SMOD I ^ (m + n)]` for every natural `n`.
+  No primality, reducedness or completeness is required. See
+  [`SModEq.pow_pow_add`](AdicModules/LinearAlgebra/SModEq/Pow.lean).
+
 - **Functoriality of adic module topologies.**
   For commutative rings `R`, `S`, a ring homomorphism `φ : R →+* S`,
   additive commutative groups `M`, `N` with `Module R M`, `Module S N`,

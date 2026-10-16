@@ -18,6 +18,7 @@ public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
+public import AdicModules.LinearAlgebra.SModEq.Pow
 public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.LinearAlgebra.TensorProduct.Quotient
