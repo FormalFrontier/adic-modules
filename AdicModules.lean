@@ -10,6 +10,7 @@ public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.PadicInt
+public import AdicModules.AdicCompletion.PadicIntTopology
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
@@ -24,6 +25,7 @@ public import AdicModules.RingTheory.Ideal.Quotient.Finite
 public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
+public import AdicModules.Topology.Algebra.Module.AdicTopology
 public import AdicModules.Topology.Algebra.PadicInt
 public import AdicModules.Topology.Algebra.PrincipalUnits
 public import AdicModules.Valuation.Completeness
