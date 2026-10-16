@@ -60,6 +60,23 @@ and inverse limits.
   structure on the limit does not make the original field perfect or assert
   surjectivity of the zeroth coefficient onto an imperfect field.
 
+- **Perfect cores from Frobenius ranges.**
+  For a reduced commutative ring `R` of exponential characteristic `p`, the
+  stock subring `B = ⨅ n : ℕ, (iterateFrobenius R p n).range` is perfect,
+  and every `PerfectRing S p` subring `S` lies in `B`. For a field `K` of
+  exponential characteristic `p`, the analogous stock field-range intersection
+  is the largest perfect subfield. Exponential characteristic one is included.
+  For prime `p` and `[CharP R p]`, the inclusion `B →+* R` is a
+  `PerfectionMap`; Mathlib's associated equivalence has zeroth coefficient as
+  its inverse's underlying value, and its `lift` gives the universal property.
+  No perfectness of the ambient ring, domain, valuation, topology or completeness
+  premise is added. See the [Frobenius-range module](AdicModules/RingTheory/FrobeniusCore.lean)
+  and the [imperfect Laurent-series and reduced-product models](AdicModulesTest/RingTheory/FrobeniusCore.lean).
+  This generalizes the algebraic perfect-core consequence of Fesenko–Vostokov,
+  *Local Fields and Their Extensions*, I §7, (7.1), not its full
+  residue-representative theorem. The proof reuses Kenny Lau's Mathlib
+  perfection and Teichmüller constructions.
+
 - **Perfect-residue Teichmüller sections.**
   For commutative rings `R`, `κ` in independent universes, a prime `p`,
   `[CharP κ p]`, `[PerfectRing κ p]`, a surjective ring map `f : R →+* κ`
@@ -418,6 +435,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
+| [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |

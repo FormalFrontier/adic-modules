@@ -23,6 +23,7 @@ public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.LinearAlgebra.TensorProduct.Quotient
 public import AdicModules.RingTheory.Perfection
 public import AdicModules.RingTheory.Teichmuller
+public import AdicModules.RingTheory.FrobeniusCore
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite
