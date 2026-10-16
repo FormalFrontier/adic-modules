@@ -13,6 +13,11 @@ name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
 rev = "83abb3e776bdefcbc447a1e44d0debe4010039e5"
 
+[[require]]
+name = "groupTheory"
+git = "https://github.com/FormalFrontier/group-theory.git"
+rev = "fcd072c51cbda8c94f91f69f251b9572e79f0e63"
+
 [[lean_lib]]
 name = "AdicModules"
 

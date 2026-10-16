@@ -9,6 +9,7 @@ public import AdicModules.Polynomial.Hensel
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.LocalRing
+public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int

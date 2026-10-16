@@ -10,6 +10,18 @@ and inverse limits.
 
 ## Headline results
 
+- **Scalar-power torsion and completion coordinates.** For an
+  additive commutative group `V`, subgroup `L`, and integer `ℓ` acting bijectively
+  on `V`, the [comparison](AdicModules/AdicCompletion/QuotientTorsion.lean)
+  constructs a linear equivalence from stock compatible sections of the kernels
+  of `ℓ ^ n` on `V / L` to `AdicCompletion (Ideal.span {ℓ}) L`. Its coordinate
+  statements send `[v]` to `[ℓ ^ n • v]`; negative scalars require a degreewise
+  sign twist of the natural-scalar quotient-torsion equivalence. The independent
+  [rational model](AdicModulesTest/ScalarTorsionSections.lean)
+  constructs the nonzero family `[1 / (-2) ^ n]` and proves that its untwisted
+  natural coordinates fail ordinary reduction from degree three to degree two,
+  whereas the sign-normalized coordinates agree.
+
 - **Coprime Hensel factor lifting.**
   For any commutative ring `R`, any ideal `I` and `[IsAdicComplete I R]`,
   a monic `f : R[X]` whose reduction is a product of **coprime monic**
@@ -260,6 +272,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
+| [AdicCompletion.QuotientTorsion](AdicModules/AdicCompletion/QuotientTorsion.lean) | [ScalarTorsionSections](AdicModulesTest/ScalarTorsionSections.lean) |
 | [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
@@ -335,3 +348,10 @@ the corresponding upstream author credits.
 General nonseparated reduction, arbitrary-denominator localization, value-group
 exact sequences, height/rational-rank additivity and whole-source coverage or
 correspondence are outside the asserted scope of this source-independent library.
+
+The scalar-torsion comparison reuses the quotient-torsion equivalence and its
+representative formula from [Group Theory](https://github.com/FormalFrontier/group-theory),
+together with Mathlib's sequence functors, sections and adic completion. Its
+signed successor proof follows the scalar-transition calculation with the sign
+unit inserted degreewise. The rational nonvanishing argument follows Group
+Theory's rational half-class test.
