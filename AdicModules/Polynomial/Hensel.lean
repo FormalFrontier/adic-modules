@@ -6,12 +6,19 @@ module
 
 public import Mathlib.RingTheory.Polynomial.UniversalFactorizationRing
 public import Mathlib.RingTheory.Smooth.AdicCompletion
+public import Mathlib.RingTheory.Henselian
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.RingTheory.Etale.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
 
 /-!
 # Hensel factor lifting and irreducible reduction
+
+For a Henselian local ring, a simple root modulo the maximal ideal lifts for every polynomial,
+not only for a monic polynomial. A reciprocal-polynomial substitution reduces to Mathlib's
+monic simple-root theorem, using its Taylor expansion and coefficient-reflection API. This
+argument inverts only units and works in the presence of zero divisors. The all-polynomial
+criterion is equivalent to the stock monic definition of `HenselianLocalRing`.
 
 A coprime monic factorization modulo an ideal lifts to a coprime monic factorization over
 any commutative ring complete and separated for that ideal. The factors have their prescribed
@@ -43,6 +50,14 @@ classes. For a valuation domain with fraction field `F`, Mathlib's
 from field irreducibility. Compare the Henselian valuation-field formulation in Exercise 4;
 no whole-source coverage is asserted.
 
+For an ideal contained in the Jacobson radical, the same global factor-lifting family
+constructs `HenselianRing R I`. A simple residue root gives a monic linear factor coprime
+to its complement; its monic lift still has degree one and supplies the required root.
+The Jacobson-containment hypothesis supplies the other field of Mathlib's class. It cannot
+be replaced by properness: a product of two algebraically closed fields has the global
+factor-lifting property at the kernel of either projection, but this ideal is not contained
+in the Jacobson radical. No converse or equivalence is asserted.
+
 ## References
 
 * I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second edition,
@@ -51,8 +66,14 @@ no whole-source coverage is asserted.
 * I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second edition,
   AMS, 2002, Chapter II, §1, Exercise 4, p. 38 (irreducible reduction over Henselian
   valuation fields).
+* I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second edition,
+  AMS, 2002, Chapter II, §1, Corollary 2, p. 37 (the factor-to-simple-root argument).
+  The construction here applies to arbitrary commutative rings and ideals contained
+  in the Jacobson radical. Mathlib's Henselian classes were formalized by Johan Commelin.
 * Mathlib's `Polynomial.UniversalCoprimeFactorizationRing.homEquiv` and
   `Algebra.FormallySmooth.exists_mkₐ_comp_eq_of_isAdicComplete`.
+* Mathlib's monic Hensel formalization by Johan Commelin, and its polynomial Taylor expansion
+  and reflection API. The reciprocal-polynomial reduction is due to Formal Frontier Agents.
 -/
 
 @[expose] public section
@@ -174,3 +195,199 @@ theorem exists_monic_irreducible_pow_of_isAdicComplete
   exact ⟨g, h, hgm, hhm, hgh, hg, hh⟩
 
 end Polynomial
+
+namespace HenselianRing
+
+open Polynomial
+
+/-- An ideal contained in the Jacobson radical is Henselian if every coprime monic
+factorization modulo that ideal lifts to monic factors with both prescribed reductions.
+The lifting hypothesis ranges over all monic polynomials, including reducible ones, and
+requires no coprimality of the lifts. No locality, completeness, domain or residue-field
+hypothesis is needed. Properness follows from Jacobson containment when the ring is nontrivial;
+the zero ring is also allowed.
+
+The Jacobson-containment hypothesis is essential for Mathlib's class, independently of
+simple-root lifting: it fails for the kernel of a projection from a product of two
+algebraically closed fields, although the global factor-lifting family holds there.
+
+The proof follows the factor-to-simple-root argument of Fesenko–Vostokov,
+*Local Fields and Their Extensions*, II, §1, Corollary 2, p. 37, generalized beyond
+valued fields. It uses Mathlib's polynomial division and monic-degree APIs and the
+Henselian class formalized by Johan Commelin. This is a non-instance constructor. -/
+theorem of_monic_factorization
+    {R : Type u} [CommRing R] (I : Ideal R) (hjac : I ≤ Ideal.jacobson ⊥)
+    (hLift : ∀ (F : R[X]) (g₀ h₀ : (R ⧸ I)[X]),
+      F.Monic → g₀.Monic → h₀.Monic → IsCoprime g₀ h₀ →
+      F.map (Ideal.Quotient.mk I) = g₀ * h₀ →
+      ∃ g h : R[X], g.Monic ∧ h.Monic ∧ F = g * h ∧
+        g.map (Ideal.Quotient.mk I) = g₀ ∧
+        h.map (Ideal.Quotient.mk I) = h₀) :
+    HenselianRing R I := by
+  classical
+  refine ⟨hjac, ?_⟩
+  intro f hf a₀ herr hder
+  rcases subsingleton_or_nontrivial R with hR | hR
+  · let := hR
+    exact ⟨a₀, Subsingleton.elim _ _, by simpa only [sub_self] using I.zero_mem⟩
+  let := hR
+  have hI : I ≠ ⊤ := by
+    intro hI
+    have hjtop : Ideal.jacobson (⊥ : Ideal R) = ⊤ := eq_top_iff.mpr (hI ▸ hjac)
+    exact bot_ne_top (Ideal.jacobson_eq_top_iff.mp hjtop)
+  let : Nontrivial (R ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hI
+  let π := Ideal.Quotient.mk I
+  let a := π a₀
+  let F := f.map π
+  let H := F /ₘ (X - C a)
+  have hroot : F.IsRoot a := by
+    simpa only [IsRoot.def, F, a, eval_map_apply] using
+      (Ideal.Quotient.eq_zero_iff_mem.mpr herr)
+  have hfac : F = (X - C a) * H := (mul_divByMonic_eq_iff_isRoot.mpr hroot).symm
+  have hFm : F.Monic := hf.map π
+  have hHm : H.Monic := (monic_X_sub_C a).of_mul_monic_left (hfac ▸ hFm)
+  have hHeval : H.eval a = π (f.derivative.eval a₀) := by
+    calc
+      _ = F.derivative.eval a := by rw [hfac, derivative_mul]; simp
+      _ = _ := by simp only [F, a, derivative_map, eval_map_apply]
+  -- A unit value gives a Bezout identity over the quotient ring, not just over a field.
+  have hcop : IsCoprime (X - C a) H := by
+    obtain ⟨t, ht⟩ := X_sub_C_dvd_sub_C_eval (p := H) (a := a)
+    obtain ⟨u, hu⟩ := isUnit_iff_exists_inv.mp (hHeval.symm ▸ hder)
+    refine ⟨-(C u * t), C u, ?_⟩
+    calc
+      _ = C u * H - C u * ((X - C a) * t) := by
+        rw [neg_mul, mul_assoc, mul_comm t (X - C a), neg_add_eq_sub]
+      _ = C u * (H - (X - C a) * t) := (mul_sub _ _ _).symm
+      _ = C u * C (H.eval a) := by rw [← ht, sub_sub_cancel]
+      _ = 1 := by rw [← C_mul, mul_comm u, hu, C_1]
+  obtain ⟨g, h, hgm, _, hgh, hg, _⟩ :=
+    hLift f (X - C a) H hf (monic_X_sub_C a) hHm hcop hfac
+  have hgdeg : g.natDegree = 1 := by
+    simpa only [hgm.natDegree_map, natDegree_X_sub_C] using congrArg natDegree hg
+  have hgr : g.eval (-g.coeff 0) = 0 := by
+    rw [hgm.eq_X_add_C hgdeg]
+    simp
+  have hcoeff : π (g.coeff 0) = -a := by
+    simpa only [coeff_map, coeff_sub, coeff_X_zero, coeff_C_zero, zero_sub] using
+      congrArg (fun p => p.coeff 0) hg
+  refine ⟨-g.coeff 0, ?_, ?_⟩
+  · rw [IsRoot.def, hgh, eval_mul, hgr, zero_mul]
+  · apply Ideal.Quotient.eq.mp
+    change π (-g.coeff 0) = a
+    rw [map_neg, hcoeff, neg_neg]
+
+end HenselianRing
+
+open Polynomial IsLocalRing
+
+/-- Henselianity at the maximal ideal of a local ring gives the Henselian local-ring class.
+This is the converse of Mathlib's instance from `HenselianLocalRing` to `HenselianRing`.
+It is not an instance, so the two directions do not form a typeclass-search cycle. -/
+theorem HenselianRing.toHenselianLocalRing
+    (R : Type u) [CommRing R] [IsLocalRing R]
+    [HenselianRing R (maximalIdeal R)] : HenselianLocalRing R where
+  is_henselian f hf a₀ h₀ h₁ :=
+    HenselianRing.is_henselian f hf a₀ h₀ (h₁.map (residue R))
+
+namespace HenselianLocalRing
+
+variable {R : Type u} [CommRing R] [HenselianLocalRing R]
+
+-- Reciprocal substitution makes the equation monic without dividing by its constant term.
+private theorem exists_root_of_constant_mem
+    (b : R) (q : R[X]) (hb : b ∈ maximalIdeal R) (hu : IsUnit (q.coeff 0)) :
+    ∃ c : R, (C b + X * q).IsRoot c ∧ c ∈ maximalIdeal R := by
+  let p := q.comp (C (-b) * X)
+  let n := p.natDegree
+  let g := X ^ (n + 1) - p.reflect n
+  have hdeg : (p.reflect n).natDegree ≤ n := by
+    simpa only [n, max_self] using (natDegree_reflect_le (N := n) (p := p))
+  have hmonic : g.Monic := by
+    apply monic_X_pow_sub
+    exact degree_le_natDegree.trans_lt (WithBot.coe_lt_coe.mpr (Nat.lt_succ_of_le hdeg))
+  have hbm : residue R b = 0 := (residue_eq_zero_iff b).mpr hb
+  have hred : g.map (residue R) =
+      (X - C (residue R (q.coeff 0))) * X ^ n := by
+    calc
+      g.map (residue R) = X ^ (n + 1) -
+          (C (residue R (q.coeff 0))).reflect n := by
+        simp [g, ← reflect_map, p, hbm, Polynomial.map_comp, ← coeff_zero_eq_eval_zero]
+      _ = (X - C (residue R (q.coeff 0))) * X ^ n := by
+        simp only [reflect_C, sub_mul, pow_succ']
+  have hzero : g.eval (q.coeff 0) ∈ maximalIdeal R := by
+    apply (residue_eq_zero_iff _).mp
+    rw [← eval_map_apply, hred]
+    simp
+  have hderiv : IsUnit (g.derivative.eval (q.coeff 0)) := by
+    apply (residue_ne_zero_iff_isUnit _).mp
+    rw [← eval_map_apply, ← derivative_map, hred]
+    simpa [derivative_mul] using
+      pow_ne_zero n ((residue_ne_zero_iff_isUnit _).mpr hu)
+  obtain ⟨y, hy, hym⟩ := HenselianLocalRing.is_henselian g hmonic (q.coeff 0) hzero hderiv
+  have hyres : residue R y = residue R (q.coeff 0) := by
+    simpa only [map_sub, sub_eq_zero] using (residue_eq_zero_iff _).mpr hym
+  have hyunit : IsUnit y := (residue_ne_zero_iff_isUnit _).mp (by
+    rw [hyres]
+    exact (residue_ne_zero_iff_isUnit _).mpr hu)
+  obtain ⟨y, rfl⟩ := hyunit
+  have hreflect : p.eval (⅟(y : R)) * (y : R) ^ n = (p.reflect n).eval (y : R) := by
+    simpa only [reflect_reflect, eval₂_id] using
+      eval₂_reflect_mul_pow (RingHom.id R) (y : R) n (p.reflect n) hdeg
+  have hq : q.eval (-b * ⅟(y : R)) = y := by
+    apply ((y.isUnit).pow n).mul_left_inj.mp
+    calc
+      q.eval (-b * ⅟(y : R)) * (y : R) ^ n =
+          p.eval (⅟(y : R)) * (y : R) ^ n := by simp [p, eval_comp]
+      _ = (p.reflect n).eval (y : R) := hreflect
+      _ = (y : R) ^ (n + 1) := by
+        exact (sub_eq_zero.mp (by simpa only [g, IsRoot, eval_sub, eval_pow, eval_X] using hy)).symm
+      _ = (y : R) * (y : R) ^ n := pow_succ' _ _
+  refine ⟨-b * ⅟(y : R), ?_, (maximalIdeal R).mul_mem_right _ ((maximalIdeal R).neg_mem hb)⟩
+  change (C b + X * q).eval (-b * ⅟(y : R)) = 0
+  simp only [eval_add, eval_C, eval_mul, eval_X, hq]
+  rw [mul_assoc, invOf_mul_self, mul_one, add_neg_cancel]
+
+/-- A simple root modulo the maximal ideal of a Henselian local ring lifts to a root of an
+arbitrary polynomial. No monicity, domain or completeness hypothesis is required.
+
+The proof reduces to Mathlib's monic Hensel lemma by a reciprocal-polynomial substitution;
+only units are inverted, so the coefficient ring may have zero divisors. -/
+theorem exists_root (f : R[X]) (a₀ : R)
+    (h₀ : f.eval a₀ ∈ maximalIdeal R) (h₁ : IsUnit (f.derivative.eval a₀)) :
+    ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal R := by
+  let F := f.taylor a₀
+  obtain ⟨c, hc, hcm⟩ := exists_root_of_constant_mem (f.eval a₀) F.divX h₀
+    (by simpa only [coeff_divX, zero_add, F, taylor_coeff_one] using h₁)
+  have hF : C (f.eval a₀) + X * F.divX = F := by
+    rw [add_comm, ← taylor_coeff_zero a₀ f]
+    exact X_mul_divX_add F
+  refine ⟨c + a₀, ?_, by simpa only [add_sub_cancel_right] using hcm⟩
+  simpa only [hF, IsRoot, F, taylor_eval] using hc
+
+/-- The residue-field form of simple-root lifting for an arbitrary polynomial over a
+Henselian local ring. -/
+theorem exists_root_residue (f : R[X]) (a₀ : R)
+    (h₀ : f.eval a₀ ∈ maximalIdeal R) (h₁ : IsUnit (f.derivative.eval a₀)) :
+    ∃ a : R, f.eval a = 0 ∧ residue R a = residue R a₀ := by
+  obtain ⟨a, ha, ham⟩ := exists_root f a₀ h₀ h₁
+  refine ⟨a, ha, ?_⟩
+  simpa only [map_sub, sub_eq_zero] using (residue_eq_zero_iff _).mpr ham
+
+end HenselianLocalRing
+
+/-- Mathlib's monic simple-root definition of a Henselian local ring is equivalent to the
+same criterion for all polynomials. In particular the general lifting theorem recovers the
+monic endpoint used in the class definition. -/
+theorem HenselianLocalRing.iff_exists_root
+    (R : Type u) [CommRing R] [IsLocalRing R] :
+    HenselianLocalRing R ↔
+      ∀ (f : R[X]) (a₀ : R), f.eval a₀ ∈ maximalIdeal R →
+        IsUnit (f.derivative.eval a₀) →
+        ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal R := by
+  constructor
+  · intro h
+    let := h
+    exact HenselianLocalRing.exists_root
+  · intro h
+    exact { is_henselian := fun f _ a₀ h₀ h₁ => h f a₀ h₀ h₁ }

@@ -644,34 +644,55 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The public root re-exports 22 mathematical source leaves, including the
-comaximal-powers theorems, finite Chinese remainder equivalence, left-ideal
-density criterion and dense-subsemiring span comparison. There are 23 library
-sources including that root and 36 separate test/model/audit source modules,
-hence **59 tracked Lean source modules**. These are source-file counts, not
+The first table lists 39 mathematical source leaves re-exported by the public
+root, including the comaximal-powers theorems, finite Chinese remainder equivalence,
+left-ideal density criterion and dense-subsemiring span comparison. There are 40
+listed library sources including that root and 52 listed test/model/audit source
+modules, hence **92 listed Lean source modules**. These are source-file counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
 and all five span-model files retain independent original calculations; `Int`,
 `MatrixNat` and `Real` additionally contain private applications of their
-respective library theorems. The tables enumerate every library leaf and
-test/model/audit source; [`AdicModules`](../AdicModules.lean) is the additional
+respective library theorems. The tables describe the listed library leaves and
+test/model/audit sources; [`AdicModules`](../AdicModules.lean) is the additional
 public root. Neither these counts nor mathematical proof descriptions certify
 complete transitive standard-axiom assurance for private, generated, model or
 imported declarations.
 
+See the [public root](../AdicModules.lean) for its direct public imports. Among the
+listed leaves, `AdicCompletion.Topology` and `Topology.Algebra.AdicTopology` are
+re-exported through `AdicCompletion.PadicIntTopology`.
+
 | Module | Main role |
 | --- | --- |
 | [BoundedIdealPowerTorsion](../AdicModules/BoundedIdealPowerTorsion.lean) | Uniform torsion and finite-module bridge |
+| [Polynomial.Hensel](../AdicModules/Polynomial/Hensel.lean) | Coprime monic factor lifting and irreducible reduction from a global monic factor-lifting property |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
+| [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
+| [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
+| [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
+| [AdicCompletion.QuotientTorsion](../AdicModules/AdicCompletion/QuotientTorsion.lean) | Scalar-power torsion sections and subgroup adic completion with signed coordinates |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
+| [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Completion-ring-linear tensor comparison for finite projective modules |
+| [AdicCompletion.Topology](../AdicModules/AdicCompletion/Topology.lean) | Evaluation neighborhoods in an adic completion |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
+| [LinearAlgebra.Descent](../AdicModules/LinearAlgebra/Descent.lean) | Descent along surjective semilinear maps with additive-monoid targets |
+| [LinearAlgebra.Span.Basic](../AdicModules/LinearAlgebra/Span/Basic.lean) | Kernel pullbacks of submodule images for semilinear maps with additive-monoid targets |
+| [LinearAlgebra.Correspondence](../AdicModules/LinearAlgebra/Correspondence.lean) | Kernel–range order correspondence for submodules under semilinear maps |
+| [LinearAlgebra.TensorProduct.Quotient](../AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | Quotient–tensor naturality for ideal inclusions and module maps |
+| [RingTheory.Teichmuller](../AdicModules/RingTheory/Teichmuller.lean) | Teichmüller sections of surjective residue maps and images of the perfection |
+| [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | Finite two-sided ring CRT, inverse representatives, independent powers, common-ring linear equivalence with characteristic API and precision-reduction squares |
+| [Topology.Algebra.AdicTopology](../AdicModules/Topology/Algebra/AdicTopology.lean) | Adic module and algebra topologies |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
 | [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
 | [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | Set-closure comparison for arbitrary generators over a dense subsemiring with generatorwise coefficient continuity |
+| [Topology.Algebra.Module.AdicTopology](../AdicModules/Topology/Algebra/Module/AdicTopology.lean) | Functoriality of adic module topologies |
 | [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | P-adic ideal-power bases, linear topology, proper dense integer spans and top neighborhood suprema |
+| [Topology.Algebra.PrincipalUnits](../AdicModules/Topology/Algebra/PrincipalUnits.lean) | Continuous p-adic powers of principal units |
+| [Valuation.Completeness](../AdicModules/Valuation/Completeness.lean) | Completeness of valuation integers for separated principal-ideal filtrations |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
 | [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | Domain, valuation-ring, fraction-field, local and residue properties |
@@ -696,10 +717,23 @@ by the public root.
 | Module | Main role |
 | --- | --- |
 | [BoundedIdealPowerTorsion](../AdicModulesTest/BoundedIdealPowerTorsion.lean) | Specified-exponent and existential uniform-torsion clients |
+| [Polynomial.Hensel](../AdicModulesTest/Polynomial/Hensel.lean) | 5-adic factor lifting, independent `X² - 5` irreducibility and reduction, criterion applications and zero-ring boundary |
 | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
+| [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
+| [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
+| [AdicCompletion.PadicInt](../AdicModulesTest/AdicCompletion/PadicInt.lean) | Nonzero integer-completion and p-adic inputs, comparison laws and trivial-residue boundaries |
 | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
+| [AdicCompletion.TensorProduct](../AdicModulesTest/AdicCompletion/TensorProduct.lean) | Integer rank-two tensor comparison, pure-tensor and inverse identities, and rank-zero boundary |
+| [ScalarTorsionSections](../AdicModulesTest/ScalarTorsionSections.lean) | Nonzero rational `-2` torsion sections and independent finite-level sign calibration |
 | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) | Integer, all `ZMod n`, subsingleton and noncommutative matrix singleton-span clients |
+| [KernelPullback](../AdicModulesTest/KernelPullback.lean) | Kernel pullbacks of cones, monoid-target descent and source-inverse boundary |
+| [Correspondence](../AdicModulesTest/Correspondence.lean) | Natural-number-linear half-plane and ray correspondence with proper range |
+| [LinearAlgebra.TensorProduct.Quotient](../AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) | Nonzero integer coefficient reduction from `(4)` to `(2)` and zero-map boundary |
+| [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
+| [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
+| [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | A nonzero class in the first principal-power quotient |
+| [RingTheory.Ideal.ScalarIntersection](../AdicModulesTest/RingTheory/Ideal/ScalarIntersection.lean) | Scalar images and intersections of comaximal ideals on integer, `ZMod 6` and natural-product modules |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) | Integer quotient and boundary calculations |
 | [RingTheory.Ideal.Quotient.FiniteEquivalence](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) | Canonical equivalence sending `[8]` to `([0], [2])` modulo `(2)` and `(3)` |
 | [RingTheory.Ideal.Quotient.FinitePowers](../AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) | Independent powers-surjectivity example `[172]` modulo `(4)`, `(9)` and `(5)` |
@@ -710,6 +744,7 @@ by the public root.
 | [RingTheory.Ideal.Quotient.LeftIdeal](../AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) | Surjective binary left-module diagonal and nonsurjective pairwise comaximal ternary diagonal |
 | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) | Discrete, indiscrete and adic integer closures, proposition indices and active predicates |
 | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) | Proper dense integer spans, excluded elements, positive-degree neighborhood suprema and basis boundaries |
+| [Topology.Algebra.PrincipalUnits](../AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) | Principal units in mixed and equal characteristic |
 | [Topology.Algebra.Ideal.Int](../AdicModulesTest/Topology/Algebra/Ideal/Int.lean) | Four original private `(3)`/`(2)` calculations on integers, including proper density; additional private density-criterion application |
 | [Topology.Algebra.Ideal.Matrix](../AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean) | Non-two-sided `M₂(ℤ)` columns, induced powers topology, nonclosed proper dense ideal, non-Hausdorffness and discontinuous right multiplication |
 | [RingTheory.Ideal.Operations.MatrixNat](../AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) | `M₂(ℕ)` columns, original all-power calculations, noncommuting noninvertible matrix units and generator-power warning; additional private comaximal-powers application |
@@ -719,6 +754,8 @@ by the public root.
 | [Topology.Algebra.Module.Span.PadicInt](../AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean) | Arbitrary singleton comparison, unit/nonunit/zero and norm-neighborhood controls |
 | [Topology.Algebra.Module.Span.Boundary](../AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean) | Empty, zero, subsingleton and non-T1 indiscrete self-module controls |
 | [Topology.Algebra.Module.Span.Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) | Dense integer casts with failed coefficient continuity on an independent discrete rational module |
+| [Topology.Algebra.Module.AdicTopology](../AdicModulesTest/Topology/Algebra/Module/AdicTopology.lean) | The integer-pair projection and adic module neighborhoods |
+| [Valuation.Completeness](../AdicModulesTest/Valuation/Completeness.lean) | 5-adic and complete discrete-valuation integer examples, including the zero generator |
 | [ValuationTopology](../AdicModulesTest/ValuationTopology.lean) | Principal-adic and valuation topology import client |
 | [CompletedIntegers](../AdicModulesTest/CompletedIntegers.lean) | Completed-valuation-integer equivalence and canonical-map client |
 | [CompletedLocalStructure](../AdicModulesTest/CompletedLocalStructure.lean) | Local domain, fraction-field and residue interfaces |
@@ -749,10 +786,11 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including every independent test/model/audit file.
-The normal reproduction command is `lake build AdicModules AdicModulesTest`
-(or `lake build` for both default targets). This covers the current 23
-main-library and 36 test source files, including the three theorem modules
+`AdicModulesTest.+` glob including the listed independent test/model/audit files
+and any additional registered test modules. The normal reproduction command is
+`lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
+This covers the 40 listed main-library and 52 listed test source files and any
+additional registered modules, including the three theorem modules
 for comaximal powers, ideal density and dense-subsemiring span closure, all
 with written proofs, the four left-ideal models and the five span models.
 Private verification fixtures may emit private-module advisories by design.
@@ -807,8 +845,7 @@ private-inclusive axiom checks, not just building.
 These are historical observations from that measured configuration, not
 measurements of the current dependency pins or clean-machine guarantees. No
 peak-memory measurement was established for this 32-module run. The older memory
-observation below is historical, not an estimate for the current 59 source
-modules.
+observation below is historical, not an estimate for the listed source modules.
 
 ### Earlier module-readiness measurements
 

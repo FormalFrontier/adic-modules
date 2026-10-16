@@ -5,10 +5,12 @@ Authors: Formal Frontier Agents
 module
 
 import AdicModules.RingTheory.Teichmuller
+import AdicModules.RingTheory.Perfection
 import Mathlib.RingTheory.AdicCompletion.Completeness
 import Mathlib.RingTheory.PowerSeries.Basic
 import Mathlib.RingTheory.LaurentSeries
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.RingTheory.SimpleRing.Basic
 meta import Lean.Elab.Tactic.Omega
 
 /-!
@@ -23,7 +25,9 @@ proved independently of the image characterization and injectivity laws.
 Injectivity distinguishes the Teichmüller images of the distinct inputs two
 and zero. The final proper-image boundary uses the image characterization.
 Quotient plumbing is given for arbitrary reduced commutative coefficient
-rings rather than requiring a field or perfectness.
+rings rather than requiring a field or perfectness. The same imperfect field also
+supplies examples of the field operations on its inverse-Frobenius limit, with
+unit inputs constructed using only the preexisting commutative ring structure.
 -/
 
 -- This module supplies private input helpers and examples, not an exported API.
@@ -81,7 +85,7 @@ noncomputable example : Field κ := inferInstance
 example : IsReduced κ := inferInstance
 example : CharP κ 3 := inferInstance
 
-example : Infinite κ :=
+private theorem residue_infinite : Infinite κ :=
   Infinite.of_injective (fun n : ℤ ↦ (HahnSeries.single n (1 : ZMod 3) : κ)) (by
     intro a b h
     simpa only [HahnSeries.order_single one_ne_zero] using congrArg HahnSeries.order h)
@@ -152,5 +156,70 @@ example : C (HahnSeries.single (1 : ℤ) (1 : ZMod 3) : κ) ∉
   obtain ⟨r, hr⟩ := (Perfection.mem_range_teichmuller₀_iff 3 (seriesIdeal κ) _).mp h 1
   apply T_not_cube
   exact ⟨constantCoeff r, by simpa using congrArg (constantCoeff (R := κ)) hr⟩
+
+-- These inputs use only the preexisting perfection ring and prime-field units.
+-- Disabling the field instance for each declaration keeps it out of their inputs.
+attribute [-instance] Perfection.instField in
+private noncomputable def primeFieldLift : ZMod 3 →+* Perfection κ 3 :=
+  (Perfection.lift 3 (ZMod 3) κ) HahnSeries.C
+
+attribute [-instance] Perfection.instField in
+private noncomputable def coreUnitTwo : (Perfection κ 3)ˣ :=
+  Units.map primeFieldLift.toMonoidHom (Units.mk0 (2 : ZMod 3) (by decide))
+
+attribute [-instance] Perfection.instField in
+private theorem coeff_coreUnitTwo (n : ℕ) :
+    Perfection.coeff κ 3 n (coreUnitTwo : Perfection κ 3) = 2 := by
+  change Perfection.coeff κ 3 n (primeFieldLift (2 : ZMod 3)) = 2
+  simp only [map_ofNat]
+
+attribute [-instance] Perfection.instField in
+private theorem coeff_coreUnitTwo_ne (n : ℕ) :
+    Perfection.coeff κ 3 n (coreUnitTwo : Perfection κ 3) ≠ 0 ∧
+      Perfection.coeff κ 3 n (coreUnitTwo : Perfection κ 3) ≠ 1 := by
+  simp only [coeff_coreUnitTwo]
+  constructor
+  · intro h
+    apply (by decide : (2 : ZMod 3) ≠ 0)
+    apply HahnSeries.C_injective (Γ := ℤ)
+    simpa only [map_ofNat, map_zero] using h
+  · intro h
+    apply (by decide : (2 : ZMod 3) ≠ 1)
+    apply HahnSeries.C_injective (Γ := ℤ)
+    simpa only [map_ofNat, map_one] using h
+
+attribute [-instance] Perfection.instField in
+private theorem core_zero_ne_one : (0 : Perfection κ 3) ≠ 1 := by
+  intro h
+  have hc := congrArg (Perfection.coeff κ 3 0) h
+  exact (zero_ne_one : (0 : κ) ≠ 1) (by simpa only [map_zero, map_one] using hc)
+
+-- The field constructor retains the exact preexisting ring data.
+example : (Perfection.instField (K := κ) 3).toCommRing =
+    inferInstanceAs (CommRing (Perfection.subring κ 3)) := rfl
+
+-- Inversion is read through a ring homomorphism, not by reducing its definition.
+example (n : ℕ) :
+    Perfection.coeff κ 3 n ((coreUnitTwo : Perfection κ 3)⁻¹) = (2 : κ)⁻¹ := by
+  rw [map_inv₀, coeff_coreUnitTwo]
+
+-- The zeroth coefficient and the nonzero input are included in division.
+example : Perfection.coeff κ 3 0
+    ((coreUnitTwo : Perfection κ 3) / (coreUnitTwo : Perfection κ 3)) = 1 := by
+  rw [map_div₀]
+  exact div_self (coeff_coreUnitTwo_ne 0).1
+
+example (n : ℕ) :
+    Perfection.coeff κ 3 n
+      (((coreUnitTwo : Perfection κ 3) ^ 2) / (coreUnitTwo : Perfection κ 3) ^ (-1 : ℤ)) =
+      (2 : κ) ^ 2 / (2 : κ) ^ (-1 : ℤ) := by
+  simp only [map_div₀, map_pow, map_zpow₀, coeff_coreUnitTwo]
+
+example : (0 : Perfection κ 3)⁻¹ = 0 ∧ (coreUnitTwo : Perfection κ 3) / 0 = 0 := by
+  simp
+
+-- Surjectivity here uses the perfect prime field, not the imperfect Laurent field.
+example : Function.Bijective (Perfection.coeff (ZMod 3) 3 0) :=
+  ⟨RingHom.injective _, Perfection.coeff_surjective (surjective_frobenius (ZMod 3) 3) 0⟩
 
 end ImperfectResidue

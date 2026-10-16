@@ -11,6 +11,7 @@ import Mathlib.Algebra.Polynomial.Eval.Irreducible
 import Mathlib.Algebra.Group.Irreducible.Lemmas
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
+import Mathlib.Tactic.ComputeDegree
 
 /-!
 # Hensel lifting and irreducible reduction over the 5-adic integers
@@ -173,5 +174,70 @@ private theorem padicInt_five_X_sq_sub_five_irreducible_reduction_of_monic_facto
   exact Polynomial.exists_monic_irreducible_pow_of_monic_factorization I₅
     padicInt_five_monic_factorization (monic_X_pow_sub_C _ (by decide))
     padicInt_five_X_sq_sub_five_irreducible
+
+-- The class is constructed from the independent global family, not inferred from completeness.
+private theorem padicInt_five_henselian_of_monic_factorization : HenselianRing ℤ_[5] I₅ :=
+  HenselianRing.of_monic_factorization I₅ (IsLocalRing.maximalIdeal_le_jacobson ⊥)
+    padicInt_five_monic_factorization
+
+/-- The class obtained from global factor lifting supplies a root of `X² - 6` congruent to 1.
+The evaluation error and unit residue derivative are checked independently of the root. -/
+theorem padicInt_five_X_sq_sub_six_root_of_monic_factorization :
+    ∃ a : ℤ_[5], (X ^ 2 - C (6 : ℤ_[5])).IsRoot a ∧ a - 1 ∈ I₅ := by
+  have herr : (X ^ 2 - C (6 : ℤ_[5])).eval 1 ∈ I₅ := by
+    have heval : (X ^ 2 - C (6 : ℤ_[5])).eval 1 = -(5 : ℤ_[5]) := by norm_num
+    apply Ideal.Quotient.eq_zero_iff_mem.mp
+    rw [heval, map_neg, map_ofNat, five_eq_zero, neg_zero]
+  have hd : (X ^ 2 - C (6 : ℤ_[5])).derivative.eval 1 = 2 := by norm_num
+  have hder : IsUnit (Ideal.Quotient.mk I₅
+      ((X ^ 2 - C (6 : ℤ_[5])).derivative.eval 1)) := by
+    rw [hd, map_ofNat]
+    refine isUnit_iff_exists_inv.mpr ⟨(3 : F₅), ?_⟩
+    calc
+      (2 : F₅) * 3 = 5 + 1 := by ring
+      _ = 1 := by rw [five_eq_zero, zero_add]
+  exact @HenselianRing.is_henselian ℤ_[5] _ I₅
+    padicInt_five_henselian_of_monic_factorization (X ^ 2 - C (6 : ℤ_[5]))
+    (monic_X_pow_sub_C _ (by decide)) 1 herr hder
+
+-- At the top ideal the quotient is zero and the global family is trivial (use F and 1),
+-- but a nontrivial ring cannot satisfy the Jacobson field of the Henselian class.
+private theorem zmod_two_not_henselian_top : ¬ HenselianRing (ZMod 2) ⊤ := by
+  intro h
+  have hj : Ideal.jacobson (⊥ : Ideal (ZMod 2)) = ⊤ := eq_top_iff.mpr h.jac
+  exact bot_ne_top (Ideal.jacobson_eq_top_iff.mp hj)
+
+-- The simple-root class is obtained from the canonical maximal-ideal completion instance.
+local instance : HenselianLocalRing ℤ_[5] := HenselianRing.toHenselianLocalRing ℤ_[5]
+
+private lemma nonmonic_simple_root_data :
+    (5 : ℤ_[5]) ≠ 0 ∧ (5 : ℤ_[5]) ∈ I₅ ∧
+      ¬ IsUnit (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).leadingCoeff := by
+  have hne : (5 : ℤ_[5]) ≠ 0 := by norm_num
+  have hmem : (5 : ℤ_[5]) ∈ I₅ := Ideal.Quotient.eq_zero_iff_mem.mp (by
+    simpa only [map_ofNat] using five_eq_zero)
+  have hdegree : (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).natDegree = 2 := by
+    compute_degree!
+  have hlc : (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).leadingCoeff = 5 := by
+    rw [leadingCoeff, hdegree]
+    simp [coeff_X]
+  refine ⟨hne, hmem, ?_⟩
+  rw [hlc, ← IsLocalRing.residue_ne_zero_iff_isUnit]
+  exact not_not.mpr ((IsLocalRing.residue_eq_zero_iff _).mpr hmem)
+
+/-- The nonmonic polynomial `5X² + X + 5` has a root congruent to zero in `ℤ₅`.
+Its initial error is nonzero and its leading coefficient is a nonunit, so the monic
+simple-root theorem does not apply directly. -/
+theorem padicInt_five_nonmonic_simple_root :
+    ¬ IsUnit (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).leadingCoeff ∧
+      (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).eval 0 ≠ 0 ∧
+      ∃ b : ℤ_[5], (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).eval b = 0 ∧
+        IsLocalRing.residue ℤ_[5] b = 0 := by
+  obtain ⟨hne, hmem, hlc⟩ := nonmonic_simple_root_data
+  have heval : (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).eval 0 = 5 := by simp
+  refine ⟨hlc, by rwa [heval], ?_⟩
+  obtain ⟨b, hb, hbr⟩ := HenselianLocalRing.exists_root_residue
+    (C (5 : ℤ_[5]) * X ^ 2 + X + C 5) 0 (by rwa [heval]) (by simp)
+  exact ⟨b, hb, by simpa only [map_zero] using hbr⟩
 
 end AdicModulesTest.Polynomial.Hensel

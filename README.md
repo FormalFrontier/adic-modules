@@ -46,6 +46,20 @@ and inverse limits.
   agreement with integer powers. See
   [principal-unit powers](AdicModules/Topology/Algebra/PrincipalUnits.lean).
 
+- **Field structure on an inverse-Frobenius limit.**
+  The mathematical contract of the
+  [perfection field interface](AdicModules/RingTheory/Perfection.lean) is
+  `Field (Perfection K p)` for any field `K` of prime characteristic `p`, with
+  the existing commutative ring data unchanged. Perfectness of `K` is not a
+  hypothesis. This inverse limit is not a field extension formed by adjoining
+  roots. Its coefficient ring maps use Mathlib's `map_inv₀`, `map_div₀`,
+  `map_zpow₀` and `map_pow`; inversion is not specified by definitional reduction.
+  The [Laurent-series model](AdicModulesTest/RingTheory/TeichmullerCore.lean)
+  uses the infinite imperfect field `(ZMod 3)((T))` and a unit lifted from the
+  prime field, alongside zero and perfect-prime-field boundaries. A field
+  structure on the limit does not make the original field perfect or assert
+  surjectivity of the zeroth coefficient onto an imperfect field.
+
 - **Perfect-residue Teichmüller sections.**
   For commutative rings `R`, `κ` in independent universes, a prime `p`,
   `[CharP κ p]`, `[PerfectRing κ p]`, a surjective ring map `f : R →+* κ`
@@ -75,6 +89,15 @@ and inverse limits.
   assumption. It does not assert uniqueness or supply a chosen factorization.
   See the [factor-lifting module](AdicModules/Polynomial/Hensel.lean) and the
   [5-adic `X² - 6` example](AdicModulesTest/Polynomial/Hensel.lean).
+
+- **Simple roots over Henselian local rings.**
+  For a commutative ring `R` with Mathlib's stock `[HenselianLocalRing R]`, an
+  arbitrary polynomial `f : R[X]` and `a₀ : R` with `f.eval a₀` in the maximal
+  ideal and `IsUnit (f.derivative.eval a₀)` admit a root `b` with
+  `f.eval b = 0` and the same residue as `a₀`.
+  `HenselianLocalRing.exists_root_residue` needs no monicity, domain,
+  completeness or unit-leading-coefficient hypothesis. See the
+  [Hensel module](AdicModules/Polynomial/Hensel.lean).
 
 - **Irreducible reduction from global factor lifting.**
   `Polynomial.exists_monic_irreducible_pow_of_monic_factorization` takes a
@@ -371,6 +394,7 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [BoundedIdealPowerTorsion](AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean) |
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
+| [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
@@ -442,7 +466,9 @@ Mathlib linear equivalence and its plain equivalence wrapper.
 The Teichmüller sections follow the perfect-residue and equal-characteristic
 corollaries of I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*,
 second edition (2002), I §7, (7.3). The construction and approximation proofs reuse
-Kenny Lau's Mathlib Teichmüller and perfection APIs.
+Kenny Lau's Mathlib Teichmüller and perfection APIs. The field interface for
+perfection also uses Mathlib's `Field.ofIsUnitOrEqZero` and unit-mapping
+constructions, retaining the original perfection ring data.
 
 The coprime Hensel theorem follows the factor-lifting form in I. B. Fesenko and
 S. V. Vostokov, *Local Fields and Their Extensions*, second edition (2002), II, §1,
