@@ -72,6 +72,18 @@ mathematical references, not permission to copy protected expression or claims
 of complete source correspondence. No source PDF, scan, figure or substantial
 source excerpt is bundled.
 
+The valuation-integers completeness bridge is motivated by I. Fesenko and
+S. Vostokov, *Local Fields and Their Extensions*, second edition (2002),
+II §1, Corollary 1. It independently assembles Mathlib's valuation-integers,
+`WithVal`, closed-range completeness and adic-topology APIs with this library's
+principal-adic topology comparison and uniform-inducing fraction-field map.
+It is not a formalization of factor lifting. The relevant Mathlib files credit
+Adam Topaz, Salvatore Mercuri, Patrick Massot, Johannes Hölzl, Sébastien Gouëzel
+and Andrew Yang. The p-adic and discrete-valuation examples additionally reuse
+Mathlib's developments by Robert Y. Lewis, Mario Carneiro, Johan Commelin,
+Kevin Buzzard, María Inés de Frutos-Fernández and Filippo A. E. Nuccio.
+Their upstream author and license notices remain in Mathlib.
+
 The submodule-closure theorem is motivated by Fujiwara and Kato,
 *Foundations of Rigid Geometry I* (2017), Proposition 7.1.6 and Exercise 0.7.1.
 It generalizes the filtered ring-module setting to any submodule neighborhood

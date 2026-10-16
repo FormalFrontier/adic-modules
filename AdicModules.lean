@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.BoundedIdealPowerTorsion
+public import AdicModules.Polynomial.Hensel
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.LocalRing
@@ -20,6 +21,7 @@ public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
 public import AdicModules.Topology.Algebra.PadicInt
+public import AdicModules.Valuation.Completeness
 public import AdicModules.ValuationTopology
 public import AdicModules.CompletedIntegers
 public import AdicModules.CompletedLocalStructure
@@ -68,5 +70,7 @@ the set closures of its span and the ambient semiring span agree under separatel
 continuous addition and coefficient continuity at the selected generators only.
 Generating sets may be empty or infinite; no additive inverses, separation or
 joint scalar continuity is assumed. Test and audit modules are separate.
+The integers of a complete valued field are complete for every separated principal-ideal
+filtration, including the zero ideal, without rank or residue-field restrictions.
 Theorems retain their stated separation, nonzero-generator and localization hypotheses.
 -/
