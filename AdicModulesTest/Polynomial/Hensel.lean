@@ -240,4 +240,101 @@ theorem padicInt_five_nonmonic_simple_root :
     (C (5 : ℤ_[5]) * X ^ 2 + X + C 5) 0 (by rwa [heval]) (by simp)
   exact ⟨b, hb, by simpa only [map_zero] using hbr⟩
 
+/-- The canonical complete-ring construction makes the ideal `(5)` of `ℤ₅` Henselian. -/
+theorem padicInt_five_henselian_span :
+    HenselianRing ℤ_[5] (Ideal.span {(5 : ℤ_[5])}) := by
+  have hI : IsLocalRing.maximalIdeal ℤ_[5] = Ideal.span {(5 : ℤ_[5])} := by
+    simpa only [Nat.cast_ofNat] using (PadicInt.maximalIdeal_eq_span_p (p := 5))
+  rw [← hI]
+  exact IsAdicComplete.henselianRing _ _
+
+/-- At zero, `5X² + X + 5` has nonzero error in `(5)` and unit derivative modulo `(5)`.
+Its leading coefficient is a nonunit. -/
+theorem padicInt_five_nonmonic_root_data :
+    ¬ IsUnit (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).leadingCoeff ∧
+      (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).eval 0 ≠ 0 ∧
+      (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).eval 0 ∈ Ideal.span {(5 : ℤ_[5])} ∧
+      IsUnit (Ideal.Quotient.mk (Ideal.span {(5 : ℤ_[5])})
+        ((C (5 : ℤ_[5]) * X ^ 2 + X + C 5).derivative.eval 0)) := by
+  obtain ⟨_, _, hlc⟩ := nonmonic_simple_root_data
+  exact ⟨hlc, by simp, by simp, by simp⟩
+
+/-- General simple-root lifting gives a root of the nonmonic polynomial `5X² + X + 5`
+in the ideal `(5)` of `ℤ₅`. -/
+theorem padicInt_five_nonmonic_root_of_henselian_ideal :
+    ∃ b : ℤ_[5], (C (5 : ℤ_[5]) * X ^ 2 + X + C 5).IsRoot b ∧
+      b ∈ Ideal.span {(5 : ℤ_[5])} := by
+  let : HenselianRing ℤ_[5] (Ideal.span {(5 : ℤ_[5])}) := padicInt_five_henselian_span
+  obtain ⟨_, _, herr, hder⟩ := padicInt_five_nonmonic_root_data
+  simpa only [sub_zero] using HenselianRing.exists_root
+    (Ideal.span {(5 : ℤ_[5])}) (C (5 : ℤ_[5]) * X ^ 2 + X + C 5) 0 herr hder
+
+/-- For `f = X⁵ + 124` at 1 in `ℤ₅`, the derivative and the error coefficient are both 5:
+`f(1) = 125 = 5² · 5`, with `5 ∈ (5)`. The error is nonzero and the derivative is a nonunit. -/
+theorem padicInt_five_small_error_data :
+    (X ^ 5 + C (124 : ℤ_[5])).derivative.eval 1 = 5 ∧
+      (X ^ 5 + C (124 : ℤ_[5])).eval 1 = 125 ∧
+      (5 : ℤ_[5]) ∈ Ideal.span {(5 : ℤ_[5])} ∧
+      (X ^ 5 + C (124 : ℤ_[5])).eval 1 =
+        (X ^ 5 + C (124 : ℤ_[5])).derivative.eval 1 ^ 2 * 5 ∧
+      (X ^ 5 + C (124 : ℤ_[5])).eval 1 ∈
+        Ideal.span {(X ^ 5 + C (124 : ℤ_[5])).derivative.eval 1 ^ 2} *
+          Ideal.span {(5 : ℤ_[5])} ∧
+      (X ^ 5 + C (124 : ℤ_[5])).eval 1 ≠ 0 ∧
+      ¬ IsUnit ((X ^ 5 + C (124 : ℤ_[5])).derivative.eval 1) := by
+  have hd : (X ^ 5 + C (124 : ℤ_[5])).derivative.eval 1 = 5 := by norm_num
+  have he : (X ^ 5 + C (124 : ℤ_[5])).eval 1 = 125 := by norm_num
+  have hc : (5 : ℤ_[5]) ∈ Ideal.span {(5 : ℤ_[5])} :=
+    Ideal.subset_span (Set.mem_singleton _)
+  refine ⟨hd, he, hc, ?_, ?_, ?_, ?_⟩
+  · norm_num [hd, he]
+  · exact Ideal.mem_span_singleton_mul.mpr ⟨5, hc, by norm_num [hd, he]⟩
+  · rw [he]
+    norm_num
+  · rw [hd]
+    exact (PadicInt.prime_p (p := 5)).not_isUnit
+
+/-- Small-error lifting for `X⁵ + 124` at 1 in `ℤ₅` gives a root with displacement in `(25)`
+and a unit relation between 125 and five times that displacement. -/
+theorem padicInt_five_small_error_root :
+    ∃ b : ℤ_[5], (X ^ 5 + C (124 : ℤ_[5])).IsRoot b ∧
+      b - 1 ∈ Ideal.span {(5 : ℤ_[5])} * Ideal.span {(5 : ℤ_[5])} ∧
+      Associated (125 : ℤ_[5]) (5 * (b - 1)) := by
+  let : HenselianRing ℤ_[5] (Ideal.span {(5 : ℤ_[5])}) := padicInt_five_henselian_span
+  obtain ⟨hd, he, _, _, herr, _, _⟩ := padicInt_five_small_error_data
+  simpa only [hd, he] using HenselianRing.exists_root_of_eval_mem_span_derivative_sq_mul
+    (Ideal.span {(5 : ℤ_[5])}) (X ^ 5 + C (124 : ℤ_[5])) 1 herr
+
+/-- The zero ring is Henselian at its top ideal by the complete-ring construction. -/
+theorem zmod_one_henselian_top : HenselianRing (ZMod 1) ⊤ :=
+  IsAdicComplete.henselianRing _ _
+
+/-- The zero polynomial at zero over the zero ring meets both lifting hypotheses,
+even though its derivative is zero. -/
+theorem zmod_one_root_data :
+    (0 : (ZMod 1)[X]).eval 0 ∈ (⊤ : Ideal (ZMod 1)) ∧
+      IsUnit (Ideal.Quotient.mk (⊤ : Ideal (ZMod 1))
+        ((0 : (ZMod 1)[X]).derivative.eval 0)) ∧
+      (0 : (ZMod 1)[X]).eval 0 ∈
+        Ideal.span {(0 : (ZMod 1)[X]).derivative.eval 0 ^ 2} * (⊤ : Ideal (ZMod 1)) := by
+  refine ⟨by simp, ?_, ?_⟩
+  · have h : Ideal.Quotient.mk (⊤ : Ideal (ZMod 1))
+        ((0 : (ZMod 1)[X]).derivative.eval 0) = 1 := Subsingleton.elim _ _
+    rw [h]
+    exact isUnit_one
+  · simp
+
+/-- Both root-lifting conclusions include the zero ring, the top ideal and a zero derivative. -/
+theorem zmod_one_root_lifts :
+    (∃ b : ZMod 1, (0 : (ZMod 1)[X]).IsRoot b ∧ b ∈ (⊤ : Ideal (ZMod 1))) ∧
+      (∃ b : ZMod 1, (0 : (ZMod 1)[X]).IsRoot b ∧
+        b ∈ Ideal.span {(0 : ZMod 1)} * (⊤ : Ideal (ZMod 1)) ∧
+        Associated (0 : ZMod 1) (0 * b)) := by
+  let : HenselianRing (ZMod 1) ⊤ := zmod_one_henselian_top
+  obtain ⟨herr, hder, hsmall⟩ := zmod_one_root_data
+  constructor
+  · simpa only [sub_zero] using HenselianRing.exists_root ⊤ (0 : (ZMod 1)[X]) 0 herr hder
+  · simpa only [derivative_zero, eval_zero, sub_zero] using
+      HenselianRing.exists_root_of_eval_mem_span_derivative_sq_mul ⊤ (0 : (ZMod 1)[X]) 0 hsmall
+
 end AdicModulesTest.Polynomial.Hensel

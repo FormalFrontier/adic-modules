@@ -90,14 +90,19 @@ and inverse limits.
   See the [factor-lifting module](AdicModules/Polynomial/Hensel.lean) and the
   [5-adic `X² - 6` example](AdicModulesTest/Polynomial/Hensel.lean).
 
-- **Simple roots over Henselian local rings.**
-  For a commutative ring `R` with Mathlib's stock `[HenselianLocalRing R]`, an
-  arbitrary polynomial `f : R[X]` and `a₀ : R` with `f.eval a₀` in the maximal
-  ideal and `IsUnit (f.derivative.eval a₀)` admit a root `b` with
-  `f.eval b = 0` and the same residue as `a₀`.
-  `HenselianLocalRing.exists_root_residue` needs no monicity, domain,
-  completeness or unit-leading-coefficient hypothesis. See the
-  [Hensel module](AdicModules/Polynomial/Hensel.lean).
+- **Roots and derivative-square error estimates over Henselian pairs.**
+  For a commutative ring `R`, ideal `I` and stock `[HenselianRing R I]`,
+  `HenselianRing.exists_root` lifts any root of an arbitrary `f : R[X]` modulo
+  `I` whose derivative is a unit modulo `I`, preserving its congruence class.
+  With `d = f.derivative.eval a`, the stronger error condition
+  `f.eval a ∈ Ideal.span {d ^ 2} * I` gives a root `b` such that
+  `b - a ∈ Ideal.span {d} * I` and `Associated (f.eval a) (d * (b - a))`, by
+  `HenselianRing.exists_root_of_eval_mem_span_derivative_sq_mul`.
+  In this estimate `d` may vanish, be a nonunit or be a zero divisor.
+  Neither result requires monicity, locality, completeness or a domain; the
+  zero ring is allowed. The local-ring root and prescribed-residue APIs,
+  including `HenselianLocalRing.exists_root_residue`, are specializations.
+  See the [Hensel module](AdicModules/Polynomial/Hensel.lean).
 
 - **Irreducible reduction from global factor lifting.**
   `Polynomial.exists_monic_irreducible_pow_of_monic_factorization` takes a

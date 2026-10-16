@@ -10,6 +10,7 @@ public import Mathlib.RingTheory.Henselian
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.RingTheory.Etale.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
+import Mathlib.Tactic.Ring
 
 /-!
 # Hensel factor lifting and irreducible reduction
@@ -70,6 +71,11 @@ in the Jacobson radical. No converse or equivalence is asserted.
   AMS, 2002, Chapter II, §1, Corollary 2, p. 37 (the factor-to-simple-root argument).
   The construction here applies to arbitrary commutative rings and ideals contained
   in the Jacobson radical. Mathlib's Henselian classes were formalized by Johan Commelin.
+* I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second edition,
+  AMS, 2002, Chapter II, §1, Corollary 3, p. 37 (small-error root lifting for monic
+  polynomials over complete discrete valuation rings). The ideal-theoretic root estimate
+  below extends this to arbitrary polynomials over Henselian pairs. Corollary 4 applies
+  the root estimate to neighborhoods of powers.
 * Mathlib's `Polynomial.UniversalCoprimeFactorizationRing.homEquiv` and
   `Algebra.FormallySmooth.exists_mkₐ_comp_eq_of_isAdicComplete`.
 * Mathlib's monic Hensel formalization by Johan Commelin, and its polynomial Taylor expansion
@@ -290,14 +296,16 @@ theorem HenselianRing.toHenselianLocalRing
   is_henselian f hf a₀ h₀ h₁ :=
     HenselianRing.is_henselian f hf a₀ h₀ (h₁.map (residue R))
 
-namespace HenselianLocalRing
+namespace HenselianRing
 
-variable {R : Type u} [CommRing R] [HenselianLocalRing R]
+variable {R : Type u} [CommRing R] (I : Ideal R) [HenselianRing R I]
 
 -- Reciprocal substitution makes the equation monic without dividing by its constant term.
 private theorem exists_root_of_constant_mem
-    (b : R) (q : R[X]) (hb : b ∈ maximalIdeal R) (hu : IsUnit (q.coeff 0)) :
-    ∃ c : R, (C b + X * q).IsRoot c ∧ c ∈ maximalIdeal R := by
+    [Nontrivial R] (b : R) (q : R[X]) (hb : b ∈ I) (hu : IsUnit (q.coeff 0)) :
+    ∃ c : R, (C b + X * q).IsRoot c ∧ c ∈ I := by
+  let : IsLocalHom (Ideal.Quotient.mk I) :=
+    isLocalHom_of_le_jacobson_bot I HenselianRing.jac
   let p := q.comp (C (-b) * X)
   let n := p.natDegree
   let g := X ^ (n + 1) - p.reflect n
@@ -306,30 +314,28 @@ private theorem exists_root_of_constant_mem
   have hmonic : g.Monic := by
     apply monic_X_pow_sub
     exact degree_le_natDegree.trans_lt (WithBot.coe_lt_coe.mpr (Nat.lt_succ_of_le hdeg))
-  have hbm : residue R b = 0 := (residue_eq_zero_iff b).mpr hb
-  have hred : g.map (residue R) =
-      (X - C (residue R (q.coeff 0))) * X ^ n := by
+  have hbm : Ideal.Quotient.mk I b = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr hb
+  have hred : g.map (Ideal.Quotient.mk I) =
+      (X - C (Ideal.Quotient.mk I (q.coeff 0))) * X ^ n := by
     calc
-      g.map (residue R) = X ^ (n + 1) -
-          (C (residue R (q.coeff 0))).reflect n := by
+      g.map (Ideal.Quotient.mk I) = X ^ (n + 1) -
+          (C (Ideal.Quotient.mk I (q.coeff 0))).reflect n := by
         simp [g, ← reflect_map, p, hbm, Polynomial.map_comp, ← coeff_zero_eq_eval_zero]
-      _ = (X - C (residue R (q.coeff 0))) * X ^ n := by
+      _ = (X - C (Ideal.Quotient.mk I (q.coeff 0))) * X ^ n := by
         simp only [reflect_C, sub_mul, pow_succ']
-  have hzero : g.eval (q.coeff 0) ∈ maximalIdeal R := by
-    apply (residue_eq_zero_iff _).mp
+  have hzero : g.eval (q.coeff 0) ∈ I := by
+    apply Ideal.Quotient.eq_zero_iff_mem.mp
     rw [← eval_map_apply, hred]
     simp
-  have hderiv : IsUnit (g.derivative.eval (q.coeff 0)) := by
-    apply (residue_ne_zero_iff_isUnit _).mp
+  have hderiv : IsUnit (Ideal.Quotient.mk I (g.derivative.eval (q.coeff 0))) := by
     rw [← eval_map_apply, ← derivative_map, hred]
-    simpa [derivative_mul] using
-      pow_ne_zero n ((residue_ne_zero_iff_isUnit _).mpr hu)
-  obtain ⟨y, hy, hym⟩ := HenselianLocalRing.is_henselian g hmonic (q.coeff 0) hzero hderiv
-  have hyres : residue R y = residue R (q.coeff 0) := by
-    simpa only [map_sub, sub_eq_zero] using (residue_eq_zero_iff _).mpr hym
-  have hyunit : IsUnit y := (residue_ne_zero_iff_isUnit _).mp (by
+    simpa [derivative_mul] using (hu.map (Ideal.Quotient.mk I)).pow n
+  obtain ⟨y, hy, hym⟩ := HenselianRing.is_henselian g hmonic (q.coeff 0) hzero hderiv
+  have hyres : Ideal.Quotient.mk I y = Ideal.Quotient.mk I (q.coeff 0) :=
+    Ideal.Quotient.eq.mpr hym
+  have hyunit : IsUnit y := IsUnit.of_map (Ideal.Quotient.mk I) y (by
     rw [hyres]
-    exact (residue_ne_zero_iff_isUnit _).mpr hu)
+    exact hu.map (Ideal.Quotient.mk I))
   obtain ⟨y, rfl⟩ := hyunit
   have hreflect : p.eval (⅟(y : R)) * (y : R) ^ n = (p.reflect n).eval (y : R) := by
     simpa only [reflect_reflect, eval₂_id] using
@@ -343,10 +349,116 @@ private theorem exists_root_of_constant_mem
       _ = (y : R) ^ (n + 1) := by
         exact (sub_eq_zero.mp (by simpa only [g, IsRoot, eval_sub, eval_pow, eval_X] using hy)).symm
       _ = (y : R) * (y : R) ^ n := pow_succ' _ _
-  refine ⟨-b * ⅟(y : R), ?_, (maximalIdeal R).mul_mem_right _ ((maximalIdeal R).neg_mem hb)⟩
+  refine ⟨-b * ⅟(y : R), ?_, I.mul_mem_right _ (I.neg_mem hb)⟩
   change (C b + X * q).eval (-b * ⅟(y : R)) = 0
   simp only [eval_add, eval_C, eval_mul, eval_X, hq]
   rw [mul_assoc, invOf_mul_self, mul_one, add_neg_cancel]
+
+/-- A simple root modulo a Henselian ideal lifts to a root of an arbitrary polynomial.
+The derivative need only be a unit modulo the ideal. Monicity, locality, completeness
+and the absence of zero divisors are not required; the zero ring is allowed.
+
+This generalizes the root-existence and congruence assertion of Fesenko and Vostokov,
+*Local Fields and Their Extensions*, Chapter II, §1, Corollary 2, p. 37, from monic
+polynomials over valuation rings of Henselian fields to arbitrary polynomials over Henselian
+pairs.
+The lifted root is simple in the source's field setting by derivative congruence. -/
+theorem exists_root (f : R[X]) (a₀ : R)
+    (h₀ : f.eval a₀ ∈ I)
+    (h₁ : IsUnit (Ideal.Quotient.mk I (f.derivative.eval a₀))) :
+    ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ I := by
+  rcases subsingleton_or_nontrivial R with hR | hR
+  · let := hR
+    exact ⟨a₀, Subsingleton.elim _ _, by simpa only [sub_self] using I.zero_mem⟩
+  let := hR
+  let : IsLocalHom (Ideal.Quotient.mk I) :=
+    isLocalHom_of_le_jacobson_bot I HenselianRing.jac
+  let F := f.taylor a₀
+  obtain ⟨c, hc, hcm⟩ := exists_root_of_constant_mem I (f.eval a₀) F.divX h₀
+    (by simpa only [coeff_divX, zero_add, F, taylor_coeff_one] using
+      IsUnit.of_map (Ideal.Quotient.mk I) _ h₁)
+  have hF : C (f.eval a₀) + X * F.divX = F := by
+    rw [add_comm, ← taylor_coeff_zero a₀ f]
+    exact X_mul_divX_add F
+  refine ⟨c + a₀, ?_, by simpa only [add_sub_cancel_right] using hcm⟩
+  simpa only [hF, IsRoot, F, taylor_eval] using hc
+
+/-- If the evaluation error lies in the square of the derivative times a Henselian ideal,
+there is a root whose displacement lies in the derivative times that ideal. The error
+and the derivative times the displacement differ by a unit factor.
+
+The derivative may be zero, a zero divisor or a nonunit. No cancellation, locality,
+domain or completeness hypothesis is imposed, and the zero ring is allowed.
+
+This is an ideal-theoretic strengthening of Fesenko and Vostokov,
+*Local Fields and Their Extensions*, Chapter II, §1, Corollary 3, p. 37: the source treats
+monic polynomials over complete discrete valuation rings, whereas this statement treats
+arbitrary polynomials over Henselian pairs. The association, not displacement membership
+alone, recovers the source's power-ideal precision. -/
+theorem exists_root_of_eval_mem_span_derivative_sq_mul (f : R[X]) (a : R)
+    (h : f.eval a ∈ Ideal.span {f.derivative.eval a ^ 2} * I) :
+    ∃ b : R, f.IsRoot b ∧ b - a ∈ Ideal.span {f.derivative.eval a} * I ∧
+      Associated (f.eval a) (f.derivative.eval a * (b - a)) := by
+  let d := f.derivative.eval a
+  obtain ⟨c, hc, hdc⟩ := Ideal.mem_span_singleton_mul.mp h
+  change d ^ 2 * c = f.eval a at hdc
+  let F := f.taylor a
+  let H := F.divX.divX
+  have hdiv : F.divX = X * H + C d := by
+    have hcoeff : F.divX.coeff 0 = d := by
+      simp only [coeff_divX, zero_add, F, taylor_coeff_one, d]
+    simpa only [H, hcoeff] using (X_mul_divX_add F.divX).symm
+  have hF : F = C (f.eval a) + C d * X + X ^ 2 * H := by
+    calc
+      F = X * F.divX + C (F.coeff 0) := (X_mul_divX_add F).symm
+      _ = C (f.eval a) + C d * X + X ^ 2 * H := by
+        rw [hdiv, show F.coeff 0 = f.eval a from taylor_coeff_zero a f]
+        ring
+  -- Normalize the equation without cancelling either d or d².
+  let Q := C c + X + X ^ 2 * H.comp (C d * X)
+  have heval (x : R) : f.eval (a + d * x) = d ^ 2 * Q.eval x := by
+    calc
+      f.eval (a + d * x) = F.eval (d * x) := by
+        rw [taylor_eval, add_comm]
+      _ = d ^ 2 * Q.eval x := by
+        rw [hF]
+        simp only [eval_add, eval_C, eval_mul, eval_X, eval_pow]
+        rw [← hdc]
+        simp only [Q, eval_add, eval_C, eval_mul, eval_X, eval_pow, eval_comp]
+        ring
+  obtain ⟨y, hy, hym⟩ := exists_root I Q 0
+    (by simpa [Q] using hc)
+    (by simp [Q, derivative_add, derivative_mul, derivative_pow])
+  have hyI : y ∈ I := by simpa only [sub_zero] using hym
+  have hyeq : c + y + y ^ 2 * H.eval (d * y) = 0 := by
+    simpa only [Q, IsRoot, eval_add, eval_C, eval_mul, eval_X, eval_pow, eval_comp] using hy
+  have hu : IsUnit (-(1 + y * H.eval (d * y))) := by
+    have hj : y * H.eval (d * y) ∈ Ideal.jacobson (⊥ : Ideal R) :=
+      HenselianRing.jac (I.mul_mem_right _ hyI)
+    have hunit : IsUnit (1 + y * H.eval (d * y)) := by
+      simpa only [mul_one, add_comm] using (Ideal.mem_jacobson_bot.mp hj) 1
+    exact hunit.neg
+  have hcy : c = y * (-(1 + y * H.eval (d * y))) := by
+    calc
+      c = c - (c + y + y ^ 2 * H.eval (d * y)) := by rw [hyeq, sub_zero]
+      _ = y * (-(1 + y * H.eval (d * y))) := by ring
+  refine ⟨a + d * y, ?_, ?_, ?_⟩
+  · change f.eval (a + d * y) = 0
+    rw [heval, show Q.eval y = 0 from hy, mul_zero]
+  · exact Ideal.mem_span_singleton_mul.mpr
+      ⟨y, hyI, by dsimp only [d]; ring⟩
+  · change Associated (f.eval a) (d * (a + d * y - a))
+    have herr : f.eval a = (d * (a + d * y - a)) * (-(1 + y * H.eval (d * y))) := by
+      rw [← hdc, hcy]
+      ring
+    rw [herr]
+    exact associated_mul_unit_left _ _ hu
+
+end HenselianRing
+
+namespace HenselianLocalRing
+
+variable {R : Type u} [CommRing R] [HenselianLocalRing R]
 
 /-- A simple root modulo the maximal ideal of a Henselian local ring lifts to a root of an
 arbitrary polynomial. No monicity, domain or completeness hypothesis is required.
@@ -356,14 +468,7 @@ only units are inverted, so the coefficient ring may have zero divisors. -/
 theorem exists_root (f : R[X]) (a₀ : R)
     (h₀ : f.eval a₀ ∈ maximalIdeal R) (h₁ : IsUnit (f.derivative.eval a₀)) :
     ∃ a : R, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal R := by
-  let F := f.taylor a₀
-  obtain ⟨c, hc, hcm⟩ := exists_root_of_constant_mem (f.eval a₀) F.divX h₀
-    (by simpa only [coeff_divX, zero_add, F, taylor_coeff_one] using h₁)
-  have hF : C (f.eval a₀) + X * F.divX = F := by
-    rw [add_comm, ← taylor_coeff_zero a₀ f]
-    exact X_mul_divX_add F
-  refine ⟨c + a₀, ?_, by simpa only [add_sub_cancel_right] using hcm⟩
-  simpa only [hF, IsRoot, F, taylor_eval] using hc
+  exact HenselianRing.exists_root (maximalIdeal R) f a₀ h₀ (h₁.map (residue R))
 
 /-- The residue-field form of simple-root lifting for an arbitrary polynomial over a
 Henselian local ring. -/
