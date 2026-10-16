@@ -9,6 +9,7 @@ public import AdicModules.Polynomial.Hensel
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.LocalRing
+public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
@@ -16,6 +17,7 @@ public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
+public import AdicModules.LinearAlgebra.TensorProduct.Quotient
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite
 public import AdicModules.Topology.Algebra.Submodule

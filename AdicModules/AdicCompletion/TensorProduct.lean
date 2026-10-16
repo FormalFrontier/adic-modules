@@ -7,9 +7,10 @@ module
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
 import Mathlib.RingTheory.Finiteness.Projective
+import Mathlib.RingTheory.Finiteness.Small
 
 /-!
-# Adic completion of finite projective modules
+# Adic completion and tensor products
 
 For a finite projective module over a commutative ring, the canonical comparison from tensoring
 with the completed ring to the completed module is bijective. The resulting equivalence is
@@ -26,12 +27,20 @@ hypothesis on the ideal is needed.
 The ring and module universes are independent. Only the agreement with Mathlib's Noetherian
 equivalence uses a common universe, as required by that equivalence.
 
+For a finite module over a commutative Noetherian ring, the same canonical comparison is
+bijective without projectivity. The ring and module universes are independent, and the
+common-universe comparison with Mathlib identifies the equivalence obtained by
+`LinearEquiv.ofBijective` with Mathlib's finite-Noetherian equivalence.
+
 ## References
 
 Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and Christian Merten,
 supplies the canonical comparison, its naturality, the finite-power comparison, finite-module
 surjectivity, and the Noetherian equivalence. Mathlib's `RingTheory/Finiteness/Projective.lean`,
 by Johan Commelin, supplies the finite free retraction used in the proof.
+The independent-universe Noetherian comparison uses finite-module smallness from Mathlib's
+`RingTheory/Finiteness/Small.lean`, by Antoine Chambert-Loir and María-Inés de Frutos-Fernández,
+and the `Shrink` linear equivalence from Kim Morrison's module API.
 -/
 
 set_option warningAsError true
@@ -107,6 +116,22 @@ theorem ofTensorProductEquivOfFiniteProjective_symm_of
   apply (ofTensorProductEquivOfFiniteProjective I M).injective
   simp
 
+/-- For a finite module over a commutative Noetherian ring, the canonical comparison from
+tensoring with the completed ring to the completed module is bijective for every ideal.
+This generalizes the finite-Noetherian comparison of Judith Ludwig and Christian Merten in
+Mathlib to independent ring and module universes. -/
+theorem ofTensorProduct_bijective [IsNoetherianRing R] [Module.Finite R M] :
+    Function.Bijective (ofTensorProduct I M) := by
+  have : Small.{uR} M := Module.Finite.small R M
+  let e : M ≃ₗ[R] Shrink.{uR} M := (Shrink.linearEquiv R M).symm
+  let : Module.Finite R (Shrink.{uR} M) := Module.Finite.equiv e
+  have hc := ofTensorProduct_bijective_of_finite_of_isNoetherian I (Shrink.{uR} M)
+  have he : Function.Bijective (map I e.toLinearMap) := (congr I e).bijective
+  apply (Function.Bijective.of_comp_iff' he _).mp
+  change Function.Bijective (map I e.toLinearMap ∘ₗ ofTensorProduct I M)
+  rw [ofTensorProduct_naturality]
+  exact hc.comp (e.baseChange R (AdicCompletion I R) _ _).bijective
+
 section Noetherian
 
 variable {R : Type uR} [CommRing R] (I : Ideal R)
@@ -119,6 +144,16 @@ theorem ofTensorProductEquivOfFiniteProjective_eq_ofFiniteNoetherian
     ofTensorProductEquivOfFiniteProjective I M = ofTensorProductEquivOfFiniteNoetherian I M := by
   ext x
   rfl
+
+/-- Mathlib's finite-Noetherian equivalence is the equivalence obtained from the canonical
+completed-ring-linear comparison and its bijectivity. -/
+theorem ofTensorProductEquivOfFiniteNoetherian_eq_ofBijective
+    [IsNoetherianRing R] [Module.Finite R M] :
+    ofTensorProductEquivOfFiniteNoetherian I M =
+      LinearEquiv.ofBijective (ofTensorProduct I M) (ofTensorProduct_bijective I M) := by
+  apply LinearEquiv.ext
+  intro x
+  exact ofTensorProductEquivOfFiniteNoetherian_apply I M x
 
 end Noetherian
 

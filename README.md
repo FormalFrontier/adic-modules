@@ -82,6 +82,18 @@ and inverse limits.
   See [completion hypotheses](docs/Guide.md#completion-and-valuation-hypotheses)
   and [scalar restriction](docs/Guide.md#restricting-scalars-in-adic-completions).
 
+- **Integer adic completion and p-adic integers.**
+  For `p : ℕ` with `[Fact p.Prime]`, `AdicCompletion.padicIntEquiv p` is the
+  canonical `ℤ`-algebra equivalence
+  `AdicCompletion (Ideal.span {(p : ℤ)}) ℤ ≃ₐ[ℤ] ℤ_[p]`.
+  In namespace `AdicCompletion`, `toZModPow_padicIntEquiv` identifies every
+  residue modulo `p ^ n` with `evalZModPow p n`, including `n = 0`;
+  `toZModPow_comp_padicIntEquiv` gives the bundled ring-homomorphism identity.
+  `evalZModPow_padicIntEquiv_symm` recovers every residue in the inverse direction.
+  `padicIntEquiv_of` and `padicIntEquiv_symm_intCast` identify canonical integer
+  images with p-adic integer casts in both directions. These are algebraic
+  statements only. See the [comparison module](AdicModules/AdicCompletion/PadicInt.lean).
+
 - **Unit detection and local adic completions.**
   For a commutative ring `R` in any universe and any `I : Ideal R`, write
   `C = AdicCompletion I R` and `q = AdicCompletion.evalOneₐ I`. The canonical
@@ -114,6 +126,27 @@ and inverse limits.
   over a Noetherian ring, with the ring and module in the same universe.
   See the [tensor comparison module](AdicModules/AdicCompletion/TensorProduct.lean)
   and its [integer models](AdicModulesTest/AdicCompletion/TensorProduct.lean).
+- **Adic completion of finite Noetherian modules.**
+  For a commutative Noetherian ring `R`, a finite `R`-module `M` and any ideal `I`,
+  `AdicCompletion.ofTensorProduct_bijective I M` states bijectivity of the canonical
+  completed-ring-linear tensor comparison, with independent ring and module universes.
+  Its common-universe bridge identifies `LinearEquiv.ofBijective` of that same map with
+  Mathlib's finite-Noetherian equivalence. See the
+  [tensor comparison module](AdicModules/AdicCompletion/TensorProduct.lean) and the
+  [lifted residue-module model](AdicModulesTest/AdicCompletion/FiniteNoetherian.lean).
+
+- **Naturality of quotient–tensor comparison.**
+  For any commutative ring `R`, ideals `I ≤ J`, additive commutative groups
+  `M`, `N` with `R`-module structures and any `R`-linear map `f : M →ₗ[R] N`,
+  `TensorProduct.quotTensorEquivQuotSMul_naturality` proves that the canonical
+  quotient–tensor equivalences commute with coefficient reduction tensor `f`
+  and the induced module quotient map. Ring and module universes are independent;
+  no finite generation, freeness, flatness, Noetherian or nonzero premise is needed.
+  For principal ideals, `quotTensorEquivQuotSMul_span_singleton` identifies the
+  equivalence with the inverse of Mathlib's `QuotSMulTop.equivQuotTensor`, after
+  representative-preserving quotient transport. See the
+  [quotient–tensor module](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean)
+  and its [nonzero integer reduction example](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean).
 
 - **Integer singleton spans in unital rings.**
   For a `NonAssocRing R`, additive cyclicity or a top singleton integer span
@@ -272,10 +305,12 @@ provides detailed hypotheses, formulas, examples and the full source roster.
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
+| [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.QuotientTorsion](AdicModules/AdicCompletion/QuotientTorsion.lean) | [ScalarTorsionSections](AdicModulesTest/ScalarTorsionSections.lean) |
 | [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
+| [LinearAlgebra.TensorProduct.Quotient](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | [LinearAlgebra.TensorProduct.Quotient](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) |
 | [RingTheory.Ideal.Operations](AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (independent original calculations; additional private comaximal-powers application) |
 | [RingTheory.Ideal.Quotient.Finite](AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | [RingTheory.Ideal.Quotient.Finite](AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) (integer quotient and boundary calculations), [RingTheory.Ideal.Quotient.FiniteEquivalence](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) (equivalence client), [RingTheory.Ideal.Quotient.FinitePowers](AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) (powers-surjectivity client), [RingTheory.Ideal.Quotient.FiniteInverse](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteInverse.lean) (inverse and representatives client), [RingTheory.Ideal.Quotient.FiniteLinear](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteLinear.lean) (linear definition and integer client), [RingTheory.Ideal.Quotient.FiniteReduction](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) (precision-reduction client), [RingTheory.Ideal.Quotient.Matrix](AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) (two-sided matrix examples), [RingTheory.Ideal.Quotient.LeftIdeal](AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) (left-ideal counterexample) |
 | [Topology.Algebra.Ideal](AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (independent original calculations; additional private density application in Int) |
