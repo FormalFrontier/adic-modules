@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**48 production sources including root + 60 tests/models/audit imports**) follow.
+(**48 production sources including root + 62 tests/models/audit imports**) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -675,8 +675,8 @@ The first table lists all 47 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **48 production sources including the root and 60
-test/model/audit sources, hence 108 Lean source modules**. These are source-file
+comparison. There are **48 production sources including the root and 62
+test/model/audit sources, hence 110 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -769,6 +769,8 @@ by the public root.
 | [KernelPullback](../AdicModulesTest/KernelPullback.lean) | Kernel pullbacks of cones, monoid-target descent and source-inverse boundary |
 | [Correspondence](../AdicModulesTest/Correspondence.lean) | Natural-number-linear half-plane and ray correspondence with proper range |
 | [LinearAlgebra.SModEq.Pow](../AdicModulesTest/LinearAlgebra/SModEq/Pow.lean) | Independent exact-depth-two 3-adic inputs, positive-depth iteration and depth-one agreement |
+| [ValuationPower](../AdicModulesTest/ValuationPower.lean) | Private finite power estimates for normalized additive valuations on canonical integer rings |
+| [ValuationPowerModel](../AdicModulesTest/ValuationPowerModel.lean) | Independent 3-adic canonical-integer inputs and exact one-step and zero-depth bounds |
 | [LinearAlgebra.TensorProduct.Quotient](../AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) | Nonzero integer coefficient reduction from `(4)` to `(2)` and zero-map boundary |
 | [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
@@ -831,10 +833,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 60 current independent test/model/audit
+`AdicModulesTest.+` glob including all 62 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 48 production sources (including the root) and 60 test/model/audit
+This covers the 48 production sources (including the root) and 62 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

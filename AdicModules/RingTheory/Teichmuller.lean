@@ -20,18 +20,26 @@ The reduction, inverse-Frobenius congruence and uniqueness laws characterize the
 section without a topology or continuity assumption. In characteristic `p` on `R`
 it is the underlying function of a ring homomorphism. Perfectness of `R` is not needed.
 
+The section's image is the intersection of all `p^n`-power images in `R`.
+Membership is equivalent to the separate existence of a `p^n`-th root at each
+depth, including zero and `n = 0`; no compatible root tower is assumed. This
+follows from the reduced-residue image theorem below and Mathlib's universal
+property of the perfection.
+
 ## Scope
 
-This perfect-residue interface does not assert the imperfect-residue perfect-core
-or intersection-of-power-images characterization. The construction and its proofs
-use algebraic adic completeness; no topology is chosen.
+The construction and its proofs use algebraic adic completeness; no topology
+is chosen. The ideal-based image theorem below also applies to imperfect
+reduced residue rings, without constructing a section on the whole residue ring.
 
 ## References
 
-* Mathlib's `Mathlib/RingTheory/Teichmuller.lean` (Kenny Lau), for the complete
-  ideal-based construction and its approximation API.
+* Mathlib's `Mathlib/RingTheory/Teichmuller.lean` and
+  `Mathlib/RingTheory/Perfection.lean` (Kenny Lau), for the complete ideal-based
+  construction, its approximation API and the perfection's universal property.
 * I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second
-  edition, I §7, (7.3), for the perfect-residue and equal-characteristic corollaries.
+  edition, I §7, (7.1) and (7.3), for the image characterization and the
+  perfect-residue and equal-characteristic corollaries.
 -/
 
 @[expose] public section
@@ -314,3 +322,75 @@ theorem mem_range_teichmuller₀_iff (x : R) :
 end ReducedResidue
 
 end Perfection
+
+namespace RingHom
+
+variable (p : ℕ) [Fact p.Prime] {R : Type u} {κ : Type v}
+    [CommRing R] [CommRing κ] [CharP κ p] [PerfectRing κ p]
+    (f : R →+* κ) (hf : Function.Surjective f) [IsAdicComplete (ker f) R]
+
+/-- The canonical Teichmüller section has image the intersection of all
+`p^n`-power images, including zero and `n = 0`. No compatibility between root
+witnesses is assumed. This follows from `Perfection.range_teichmuller₀`, the
+adic-ring form of Fesenko–Vostokov, I §7, (7.1), and Mathlib's perfection
+universal property. -/
+theorem range_teichmullerSection :
+    Set.range (teichmullerSection p f hf) =
+      ⋂ n : ℕ, Set.range (fun r : R ↦ r ^ (p ^ n)) := by
+  let B := R ⧸ ker f
+  let e : B ≃+* κ := f.quotientKerEquivOfSurjective hf
+  let : CharP B p :=
+    charP_of_injective_ringHom (f := e.symm.toRingHom) e.symm.injective p
+  -- Perfectness makes the residue reduced; no extra reducedness assumption is needed.
+  let : IsReduced κ :=
+    (isReduced_iff_pow_one_lt p (Fact.out : p.Prime).one_lt).mpr fun a ha ↦
+      (injective_frobenius κ p) (ha.trans (map_zero (frobenius κ p)).symm)
+  let : IsReduced B := isReduced_of_injective e.toRingHom e.injective
+  let L : κ →+* Perfection B p := (Perfection.lift p κ B) e.symm.toRingHom
+  -- Coefficient zero determines maps from a perfect ring into the perfection.
+  have hright :
+      L.comp (e.toRingHom.comp (Perfection.coeff B p 0)) =
+        RingHom.id (Perfection B p) := by
+    apply Perfection.hom_ext (p := p)
+    intro y
+    simpa only [L, RingHom.comp_apply, RingHom.id_apply,
+      Perfection.coeff_lift, Function.iterate_zero, id_eq,
+      RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom] using
+      e.symm_apply_apply (Perfection.coeff B p 0 y)
+  have hL : Function.Surjective L := by
+    intro y
+    exact ⟨e (Perfection.coeff B p 0 y), DFunLike.congr_fun hright y⟩
+  let s : κ →*₀ R := (Perfection.teichmuller₀ p (ker f)).comp L.toMonoidWithZeroHom
+  have hs : ∀ a, f (s a) = a := by
+    intro a
+    calc
+      f (s a) = e (Ideal.Quotient.mk (ker f) (s a)) :=
+        (quotientKerEquivOfSurjective_apply_mk (f := f) hf (s a)).symm
+      _ = e (Perfection.coeff B p 0 (L a)) :=
+        congrArg e (Perfection.mk_teichmuller₀ (L a))
+      _ = a := by
+        simpa only [L, Perfection.coeff_lift, Function.iterate_zero, id_eq,
+          RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom] using
+          e.apply_symm_apply a
+  have hsection : s = teichmullerSection p f hf :=
+    teichmullerSection_unique p f hf s hs
+  have hrange : Set.range (teichmullerSection p f hf) =
+      Set.range (Perfection.teichmuller₀ p (ker f)) := by
+    rw [← hsection]
+    apply Set.Subset.antisymm
+    · rintro _ ⟨a, rfl⟩
+      exact ⟨L a, rfl⟩
+    · rintro _ ⟨y, rfl⟩
+      obtain ⟨a, ha⟩ := hL y
+      exact ⟨a, congrArg (Perfection.teichmuller₀ p (ker f)) ha⟩
+  exact hrange.trans (Perfection.range_teichmuller₀ p (ker f))
+
+/-- Membership in the canonical Teichmüller image means that a `p^n`-th root
+exists for every `n`. The witnesses need not form a compatible tower. -/
+theorem mem_range_teichmullerSection_iff (x : R) :
+    x ∈ Set.range (teichmullerSection p f hf) ↔
+      ∀ n : ℕ, ∃ r : R, r ^ (p ^ n) = x := by
+  rw [range_teichmullerSection p f hf]
+  simp only [Set.mem_iInter, Set.mem_range]
+
+end RingHom

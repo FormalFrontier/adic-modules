@@ -92,6 +92,8 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   `f : R →+* κ`, with `κ` perfect of prime characteristic `p` and `R` complete
   along `ker f`, there is a unique multiplicative zero-and-one-preserving section,
   with inverse-Frobenius approximation modulo `(ker f)^(n+1)` for every `n`.
+  Its image is `⋂ n, Set.range (fun r : R ↦ r^(p^n))`, including zero and
+  `n = 0`, with no compatibility condition on root witnesses.
   It is a ring homomorphism if **`CharP R p`**. No field, locality or finite
   residue hypothesis is needed. See [section and core details](docs/Results.md#headline-results).
   For `p : ℕ` with `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`
@@ -184,7 +186,7 @@ The `AdicModulesTest` modules require separate imports and are not re-exported;
 some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private.
 The [Guide](docs/Guide.md#module-map) lists all
-**108 Lean sources: 48 production (root included) + 60 tests/models/audit imports**.
+**110 Lean sources: 48 production (root included) + 62 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |

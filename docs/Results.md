@@ -97,8 +97,12 @@ These are statements about the current library, not the historical API inventory
   [section module](../AdicModules/RingTheory/Teichmuller.lean) and
   [3-adic and perfect-field power-series models](../AdicModulesTest/RingTheory/Teichmuller.lean),
   including infinite residue fields and failure of additivity in mixed characteristic.
-  This is the perfect-residue interface, not an imperfect-residue perfect-core,
-  intersection-of-power-images or Witt-vector characterization.
+  `RingHom.range_teichmullerSection` identifies its image with
+  `⋂ n : ℕ, Set.range (fun r : R ↦ r^(p^n))`, and
+  `RingHom.mem_range_teichmullerSection_iff` expresses membership by separate
+  root witnesses at every depth, including zero and `n = 0`. The proof combines
+  the reduced-residue image theorem with Mathlib's perfection universal property
+  and the section's uniqueness law. No Witt-vector characterization is asserted.
 
 - **Polynomial-value association.**
   For a commutative ring `R`, an ideal `I ≤ Ideal.jacobson ⊥`, any polynomial

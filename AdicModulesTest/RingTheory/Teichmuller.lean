@@ -85,6 +85,12 @@ private theorem sectionThree_two : sectionThree 2 = -1 := by
     exact ((by decide : (1 : ZMod 3) ≠ 2) hr).elim
   · exact h
 
+-- The computed representative belongs to every iterated power image.
+example :
+    (-1 : ℤ_[3]) ∈ ⋂ n : ℕ, Set.range (fun r : ℤ_[3] ↦ r ^ (3 ^ n)) := by
+  rw [← RingHom.range_teichmullerSection 3 toZMod reduction_three_surjective]
+  exact ⟨2, sectionThree_two⟩
+
 example : sectionThree 0 = 0 := map_zero _
 example : sectionThree 1 = 1 := map_one _
 
