@@ -25,6 +25,10 @@ implies completeness of the field. Uniform equivalences transport completeness b
 canonical valuation and the supplied valuation on the same field. The zero ideal is handled
 separately, since its adic topology need not be the valuation topology.
 
+More generally, a right-uniform group is complete whenever some complete set is a
+neighborhood of the identity; the additive counterpart uses a neighborhood of zero.
+Neither criterion requires separation or weak local compactness.
+
 ## References
 
 Fesenko–Vostokov, *Local Fields and Their Extensions*, second edition, II §1, Corollary 1,
@@ -101,7 +105,7 @@ open scoped Topology
 /-- A right-uniform group with a complete neighborhood of the identity is complete. -/
 @[to_additive
 /-- A right-uniform additive group with a complete neighborhood of zero is complete. -/]
-private theorem IsRightUniformGroup.completeSpace_of_isComplete_mem_nhds
+theorem IsRightUniformGroup.completeSpace_of_isComplete_mem_nhds
     {G : Type*} [Group G] [UniformSpace G] [IsRightUniformGroup G]
     (s : Set G) (hs : IsComplete s) (hs_mem : s ∈ 𝓝 (1 : G)) : CompleteSpace G where
   complete {f} hf := by
