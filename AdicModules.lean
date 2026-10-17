@@ -12,6 +12,7 @@ public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
+public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.PadicIntTopology

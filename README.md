@@ -47,6 +47,14 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   [coordinate statements](docs/Results.md#headline-results) and
   [scalar-restriction guide](docs/Guide.md#restricting-scalars-in-adic-completions).
 
+- **Finite-power completion kernels.** For a commutative ring `R`, an additive
+  commutative group module `M` and any `n : ℕ`, finite generation of **only
+  `I ^ n`** gives `(I ^ n) • ⊤ = (AdicCompletion.eval I M n).ker` in the
+  completed module. Ring and module universes are independent; degree zero is
+  included. No separate `I.FG`, finite-module, Noetherian, completeness or
+  separatedness hypothesis is required. See the [kernel API](AdicModules/AdicCompletion/Kernel.lean)
+  and [usage](docs/Guide.md#finite-power-completion-kernels).
+
 - **Completion–tensor comparisons.** For any ideal in a commutative ring and an
   additive commutative group module, the canonical `AdicCompletion I R`-linear
   tensor comparison is an equivalence for finite projective modules, or for
@@ -197,7 +205,7 @@ Related `AdicModulesTest` modules require separate imports and are not re-export
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
 provides detailed hypotheses, formulas, examples and the complete current roster:
-**112 Lean sources = 49 production (root included) + 63 tests/models/audit imports**.
+**114 Lean sources = 50 production (root included) + 64 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -212,6 +220,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
+| [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |

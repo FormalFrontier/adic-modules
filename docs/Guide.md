@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**49 production sources including root + 63 tests/models/audit imports**) follow.
+(**50 production sources including root + 64 tests/models/audit imports**) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -68,6 +68,37 @@ subgroup as its component, and maps restricted to these ordinary subgroups
 are exact when the source group is torsion. Read the
 [manual reference](PrimaryComponent.md) and its
 [ordinary-import client](../AdicModulesTest/PrimaryComponent.lean) for signatures.
+
+## Finite-power completion kernels
+
+Import [`AdicModules.AdicCompletion.Kernel`](../AdicModules/AdicCompletion/Kernel.lean)
+or the public root for `AdicCompletion.pow_smul_top_eq_ker_eval_of_fg_pow`:
+
+```lean
+{R : Type u} [CommRing R] {I : Ideal R}
+{M : Type v} [AddCommGroup M] [Module R M] {n : ℕ}
+(h : (I ^ n).FG) :
+  (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) =
+    (AdicCompletion.eval I M n).ker
+```
+
+Use `AdicCompletion.pow_smul_top_eq_ker_eval_of_fg_pow (I := I) (M := M) h`
+for the selected exponent. Only that ideal power must be finitely generated;
+there is no separate `I.FG`, finite-module, Noetherian, completeness,
+separatedness or kernel-equality premise. The universes `u` and `v` are
+independent. The completion, scalar action and evaluation are Mathlib's existing
+ones. At degree zero the quotient is trivial and the evaluation kernel is top.
+
+The proof adapts Mathlib's `AdicCompletion.pow_smul_top_eq_ker_eval` argument.
+Given `hI : I.FG`, use `Ideal.FG.pow (n := n) hI` for the power hypothesis to
+recover its conclusion. The separately imported
+[private client](../AdicModulesTest/AdicCompletionKernel.lean) includes this
+recovery and a separate fixed-power theorem use. Its independent integer `(2)`
+calibration uses Mathlib's kernel theorem and `Int.quotientSpanNatEquivZMod 2`
+directly: evaluation of the canonical image of `1` at degree one is nonzero.
+For the same inputs at degree zero, the kernel is top and the ideal quotient
+has characteristic one. These residue calculations assert no characteristic
+of the completion.
 
 ## Restricting scalars in adic completions
 
@@ -692,12 +723,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 48 production source leaves re-exported by the public
+The first table lists all 49 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **49 production sources including the root and 63
-test/model/audit sources, hence 112 Lean source modules**. These are source-file
+comparison. There are **50 production sources including the root and 64
+test/model/audit sources, hence 114 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -723,6 +754,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
+| [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
 | [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
 | [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
@@ -781,6 +813,7 @@ by the public root.
 | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
 | [AdicCompletion.CompletenessTheorems](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) | Suprema, finite spans, Hausdorffification and principal-ideal completeness examples |
+| [AdicCompletionKernel](../AdicModulesTest/AdicCompletionKernel.lean) | Private integer `(2)` degree-one nonzero evaluation, independent kernel and degree-zero calibration, finite-generation recovery and separate fixed-power use |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
 | [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
 | [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
@@ -856,10 +889,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 63 current independent test/model/audit
+`AdicModulesTest.+` glob including all 64 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 49 production sources (including the root) and 63 test/model/audit
+This covers the 50 production sources (including the root) and 64 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.
