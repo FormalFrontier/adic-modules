@@ -21,7 +21,11 @@ imported declarations. The application guides and complete current module map
 (**54 production sources including root + 68 tests/models/audit imports**, 122 total) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
-Frobenius/Teichmüller interfaces.
+Frobenius/Teichmüller interfaces. Over any commutative ring of prime characteristic,
+Witt vectors have characteristic zero. Separately, the
+[prime-multiplication kernel and regularity criterion](#prime-multiplication-and-reduced-coefficients)
+describes the kernel coefficientwise and makes `p` regular exactly when the
+coefficient ring is reduced.
 
 ## Characteristic zero of Witt vectors
 
@@ -38,6 +42,42 @@ The separately imported [examples](../AdicModulesTest/RingTheory/WittVector.lean
 prove `(3 : WittVector 3 (ZMod 3)) ≠ 0` and
 `(3 : WittVector 3 ((ZMod 3)[X])) ≠ 0`. The second coefficient ring is
 nonperfect and not a field.
+
+### Prime multiplication and reduced coefficients
+
+For `p : ℕ` with `[Fact p.Prime]` and any `k : Type u` with `[CommRing k]`
+and `[CharP k p]`,
+[`WittVector.mul_p_eq_zero_iff_coeff_pow_eq_zero`](../AdicModules/RingTheory/WittVector.lean)
+gives, for every `x : WittVector p k`,
+
+```lean
+x * (p : WittVector p k) = 0 ↔ ∀ n : ℕ, x.coeff n ^ p = 0
+```
+
+The kernel formula needs no reducedness input. The same module's
+[`WittVector.isRegular_p_iff_isReduced`](../AdicModules/RingTheory/WittVector.lean)
+states
+
+```lean
+IsRegular (p : WittVector p k) ↔ IsReduced k
+```
+
+Thus multiplication by `p` on `WittVector p k` is injective exactly when `k`
+is reduced. Neither theorem requires a field, perfectness, a domain, finiteness
+or a topology, and `u` is unrestricted. These statements are distinct from
+`WittVector.charZero`, which also applies to nonreduced coefficient rings.
+
+Beyond the two nonzero-cast examples above, the same separately imported
+[example module](../AdicModulesTest/RingTheory/WittVector.lean) applies the
+regularity criterion to `Polynomial (ZMod 3) × ZMod 3`. This coefficient ring
+is reduced but nonperfect and has nonzero zero divisors, witnessed by
+`(1, 0)` and `(0, 1)`; multiplication by `3` on its Witt vectors is injective.
+In contrast, in `TrivSqZeroExt (ZMod 3) (ZMod 3)`, the element
+`ε = TrivSqZeroExt.inr (1 : ZMod 3)` is nonzero and satisfies `ε ^ 2 = 0`.
+Its Teichmüller lift is nonzero but is killed by `3`; the coefficientwise
+kernel criterion gives zero cubes for every coefficient of that lift.
+A private perfect-coefficient comparison relates the same kernel description
+to Mathlib's zero-kernel theorem and Frobenius injectivity.
 
 ## Uniform bounded torsion
 
@@ -841,7 +881,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [RingTheory.Teichmuller](../AdicModules/RingTheory/Teichmuller.lean) | Teichmüller sections of surjective residue maps and images of the perfection |
 | [RingTheory.FrobeniusCore](../AdicModules/RingTheory/FrobeniusCore.lean) | Perfect intersections of iterated Frobenius ranges and their prime-characteristic universal property |
 | [RingTheory.Perfection](../AdicModules/RingTheory/Perfection.lean) | Field structure on the inverse-Frobenius limit without perfectness of the original field |
-| [RingTheory.WittVector](../AdicModules/RingTheory/WittVector.lean) | Characteristic zero over any commutative ring of prime characteristic; [nonzero-cast uses](../AdicModulesTest/RingTheory/WittVector.lean) |
+| [RingTheory.WittVector](../AdicModules/RingTheory/WittVector.lean) | Characteristic zero over any commutative ring of prime characteristic; coefficientwise prime-multiplication kernel and `p`-regularity iff reduced coefficients; [cast, reduced-product and square-zero uses](../AdicModulesTest/RingTheory/WittVector.lean) |
 | [RingTheory.WittVector.Complete](../AdicModules/RingTheory/WittVector/Complete.lean) | Coefficient criterion for `(p)^n` and `(p)`-adic completeness over any characteristic-`p` commutative ring |
 | [RingTheory.TeichmullerFractionField](../AdicModules/RingTheory/TeichmullerFractionField.lean) | Teichmüller image in any fraction field of a complete valuation domain with maximal ideal and prime-characteristic residue |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
@@ -904,7 +944,7 @@ by the public root.
 | [LinearAlgebra.TensorProduct.Quotient](../AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) | Nonzero integer coefficient reduction from `(4)` to `(2)` and zero-map boundary |
 | [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
-| [RingTheory.WittVector](../AdicModulesTest/RingTheory/WittVector.lean) | Nonzero cast of `3` over `ZMod 3` and the nonperfect nonfield `(ZMod 3)[X]` |
+| [RingTheory.WittVector](../AdicModulesTest/RingTheory/WittVector.lean) | Nonzero casts of `3` over `ZMod 3` and the nonperfect nonfield `(ZMod 3)[X]`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)` |
 | [RingTheory.WittVector.Complete](../AdicModulesTest/RingTheory/WittVector/Complete.lean) | Prime-field and nonperfect polynomial examples: independent roots, nondivisibility, completion bijectivity and zero precision |
 | [RingTheory.FrobeniusCore](../AdicModulesTest/RingTheory/FrobeniusCore.lean) | Imperfect Laurent-series noncube and constant-root inputs, inclusion universal property and reduced-product boundary |
 | [RingTheory.TeichmullerFractionFieldModel](../AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) | Independent usual 3-adic and imperfect-residue power-series fraction-field inputs; final image-law consumers |

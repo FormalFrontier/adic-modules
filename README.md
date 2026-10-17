@@ -126,6 +126,18 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   domain, reducedness or extra `Nontrivial` assumptions. See the
   [Witt-vector API and uses](docs/Guide.md#characteristic-zero-of-witt-vectors).
 
+- **Prime multiplication in Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
+  and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
+  [`WittVector.mul_p_eq_zero_iff_coeff_pow_eq_zero`](AdicModules/RingTheory/WittVector.lean)
+  gives `x * (p : WittVector p k) = 0 ↔ ∀ n : ℕ, x.coeff n ^ p = 0`
+  for every `x : WittVector p k`. Moreover,
+  [`WittVector.isRegular_p_iff_isReduced`](AdicModules/RingTheory/WittVector.lean)
+  gives `IsRegular (p : WittVector p k) ↔ IsReduced k`.
+  The kernel formula needs no reducedness assumption; reducedness is exactly
+  the condition for injectivity of multiplication by `p`, not for characteristic
+  zero. No field, perfectness, domain, finiteness or topology is required.
+  See the [kernel and regularity uses](docs/Guide.md#prime-multiplication-and-reduced-coefficients).
+
 - **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
   of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
   Membership in `(p)^n` means that the first `n` coefficients vanish and each
@@ -235,7 +247,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
-| [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero cast of `3` over `ZMod 3` and `(ZMod 3)[X]`) |
+| [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`) |
 | [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
