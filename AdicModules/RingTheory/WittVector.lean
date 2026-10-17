@@ -7,11 +7,12 @@ module
 public import Mathlib.Algebra.GroupWithZero.Basic
 public import Mathlib.Algebra.Regular.Defs
 public import Mathlib.RingTheory.WittVector.Basic
+public import Mathlib.RingTheory.WittVector.TeichmullerSeries
 import Mathlib.Algebra.CharP.Algebra
 import Mathlib.RingTheory.WittVector.Compare
 
 /-!
-# Characteristic zero and prime multiplication in Witt vectors
+# Characteristic zero and prime multiplication and Teichmüller expansions in Witt vectors
 
 For a prime `p` and a commutative ring `R` of characteristic `p`, `WittVector p R`
 has characteristic zero. The proof uses Mathlib's comparison with the `p`-adic
@@ -29,6 +30,13 @@ Consequently, `p` is a regular element of `WittVector p R` exactly when `R` is
 reduced. This criterion allows reduced rings with zero divisors and does not
 require perfectness.
 
+For reduced coefficient rings, `teichmuller_expansion_unique` states uniqueness of
+the digits in two Teichmüller expansions approximating the same Witt vector
+modulo every positive power of `p`. Reducedness makes Frobenius injective, allowing
+digits to be recovered from their iterated `p`-th powers. The statement requires
+neither perfectness nor a topology and does not assert existence of an expansion
+for every Witt vector.
+
 ## References
 
 * I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second
@@ -42,6 +50,8 @@ require perfectness.
   `Algebra/CharP/Reduced.lean` for injectivity of Frobenius on reduced rings.
 * Mathlib's `RingTheory/WittVector/Complete.lean` for the perfect-coefficient
   zero-kernel criterion with which the coefficientwise criterion is compared.
+* Mathlib's `RingTheory/WittVector/TeichmullerSeries.lean` (Jiedong Jiang) for
+  finite-sum and Teichmüller-term coefficient formulas.
 -/
 
 @[expose] public section
@@ -60,6 +70,57 @@ instance charZero (p : ℕ) [Fact p.Prime] (R : Type u) [CommRing R] [CharP R p]
   exact charZero_of_injective_ringHom
     (f := map (p := p) (ZMod.castHom (dvd_refl p) R))
     (map_injective _ (ZMod.castHom_injective R))
+
+/-- Two Teichmüller digit sequences approximating the same Witt vector modulo every
+positive power of `p` are equal over a reduced coefficient ring. -/
+theorem teichmuller_expansion_unique {p : ℕ} [Fact p.Prime] {R : Type u}
+    [CommRing R] [CharP R p] [IsReduced R]
+    (x : WittVector p R) (a b : ℕ → R)
+    (ha : ∀ n : ℕ, (p : WittVector p R) ^ (n + 1) ∣
+      x - ∑ i ∈ Finset.range (n + 1),
+        teichmuller p (a i) * (p : WittVector p R) ^ i)
+    (hb : ∀ n : ℕ, (p : WittVector p R) ^ (n + 1) ∣
+      x - ∑ i ∈ Finset.range (n + 1),
+        teichmuller p (b i) * (p : WittVector p R) ^ i) :
+    a = b := by
+  classical
+  have coeff_approx (c : ℕ → R) (n : ℕ)
+      (hc : (p : WittVector p R) ^ (n + 1) ∣
+        x - ∑ i ∈ Finset.range (n + 1),
+          teichmuller p (c i) * (p : WittVector p R) ^ i) :
+      x.coeff n = c n ^ (p ^ n) := by
+    -- Multiples of p^(n+1) have zero coefficients through degree n.
+    have hlow : ∀ i < n + 1,
+        x.coeff i =
+          (∑ j ∈ Finset.range (n + 1),
+            teichmuller p (c j) * (p : WittVector p R) ^ j).coeff i := by
+      apply le_coeff_eq_iff_le_sub_coeff_eq_zero.mpr
+      obtain ⟨y, hy⟩ := hc
+      intro i hi
+      rw [hy, mul_comm]
+      exact mul_pow_charP_coeff_zero y hi
+    rw [hlow n (Nat.lt_succ_self n)]
+    -- The Teichmüller terms have disjoint coefficient supports.
+    rw [sum_coeff_eq_coeff_sum]
+    · rw [Finset.sum_eq_single_of_mem n
+        (Finset.mem_range.mpr (Nat.lt_succ_self n))]
+      · exact teichmuller_mul_pow_coeff n (c n)
+      · intro i _ hin
+        exact teichmuller_mul_pow_coeff_of_ne (c i) hin.symm
+    · intro m
+      refine ⟨fun i j => ?_⟩
+      apply Subtype.ext
+      have hi : m = i.1 := by
+        by_contra hmi
+        exact i.2.2 (teichmuller_mul_pow_coeff_of_ne (c i.1) hmi)
+      have hj : m = j.1 := by
+        by_contra hmj
+        exact j.2.2 (teichmuller_mul_pow_coeff_of_ne (c j.1) hmj)
+      exact hi.symm.trans hj
+  funext n
+  apply _root_.iterateFrobenius_inj R p n
+  change a n ^ (p ^ n) = b n ^ (p ^ n)
+  exact (coeff_approx a n (ha n)).symm.trans (coeff_approx b n (hb n))
 
 variable {p : ℕ} [Fact p.Prime] {k : Type u} [CommRing k] [CharP k p]
 

@@ -125,6 +125,12 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   supplies `CharZero (WittVector p R)`, without field, perfectness, finiteness,
   domain, reducedness or extra `Nontrivial` assumptions. See the
   [Witt-vector API and uses](docs/Guide.md#characteristic-zero-of-witt-vectors).
+  For a **reduced** commutative coefficient ring of prime characteristic `p`,
+  [`WittVector.teichmuller_expansion_unique`](AdicModules/RingTheory/WittVector.lean)
+  states that two digit sequences `a, b : ℕ → R` are equal if their partial sums
+  `∑ i ∈ Finset.range (n + 1), teichmuller p (a i) * p^i` and the analogous
+  sums for `b` both agree with the same Witt vector modulo `p^(n+1)` for every
+  `n`. No perfectness, field, completeness or topology assumption is required.
 
 - **Prime multiplication in Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
   and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
