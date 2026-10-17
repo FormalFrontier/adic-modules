@@ -16,6 +16,7 @@ public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.PadicIntTopology
+public import AdicModules.AdicCompletion.Quotient
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
 public import AdicModules.AdicCompletion.TensorProduct
