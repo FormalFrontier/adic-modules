@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**53 production sources including root + 67 tests/models/audit imports**, 120 total) follow.
+(**54 production sources including root + 68 tests/models/audit imports**, 122 total) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -790,12 +790,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 52 production source leaves re-exported by the public
+The first table lists all 53 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **53 production sources including the root and 67
-test/model/audit sources, hence 120 Lean source modules**. These are source-file
+comparison. There are **54 production sources including the root and 68
+test/model/audit sources, hence 122 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -842,6 +842,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [RingTheory.FrobeniusCore](../AdicModules/RingTheory/FrobeniusCore.lean) | Perfect intersections of iterated Frobenius ranges and their prime-characteristic universal property |
 | [RingTheory.Perfection](../AdicModules/RingTheory/Perfection.lean) | Field structure on the inverse-Frobenius limit without perfectness of the original field |
 | [RingTheory.WittVector](../AdicModules/RingTheory/WittVector.lean) | Characteristic zero over any commutative ring of prime characteristic; [nonzero-cast uses](../AdicModulesTest/RingTheory/WittVector.lean) |
+| [RingTheory.WittVector.Complete](../AdicModules/RingTheory/WittVector/Complete.lean) | Coefficient criterion for `(p)^n` and `(p)`-adic completeness over any characteristic-`p` commutative ring |
 | [RingTheory.TeichmullerFractionField](../AdicModules/RingTheory/TeichmullerFractionField.lean) | Teichmüller image in any fraction field of a complete valuation domain with maximal ideal and prime-characteristic residue |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
@@ -904,6 +905,7 @@ by the public root.
 | [RingTheory.Teichmuller](../AdicModulesTest/RingTheory/Teichmuller.lean) | Standard p-adic and perfect-coefficient power-series models of Teichmüller sections |
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
 | [RingTheory.WittVector](../AdicModulesTest/RingTheory/WittVector.lean) | Nonzero cast of `3` over `ZMod 3` and the nonperfect nonfield `(ZMod 3)[X]` |
+| [RingTheory.WittVector.Complete](../AdicModulesTest/RingTheory/WittVector/Complete.lean) | Prime-field and nonperfect polynomial examples: independent roots, nondivisibility, completion bijectivity and zero precision |
 | [RingTheory.FrobeniusCore](../AdicModulesTest/RingTheory/FrobeniusCore.lean) | Imperfect Laurent-series noncube and constant-root inputs, inclusion universal property and reduced-product boundary |
 | [RingTheory.TeichmullerFractionFieldModel](../AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) | Independent usual 3-adic and imperfect-residue power-series fraction-field inputs; final image-law consumers |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | A nonzero class in the first principal-power quotient |
@@ -962,10 +964,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 67 current independent test/model/audit
+`AdicModulesTest.+` glob including all 68 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 53 production sources (including the root) and 67 test/model/audit
+This covers the 54 production sources (including the root) and 68 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

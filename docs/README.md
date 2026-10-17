@@ -42,8 +42,8 @@ These are current mathematical interfaces built on dependency-provided ideals,
 quotients, completions, topologies and perfection, not newly generated API entries
 or assertions of independent constructions of those stock objects.
 
-For the complete current **120-source** map (**53 production including root
-(52 leaves) + 67 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
+For the complete current **122-source** map (**54 production including root
+(53 leaves) + 68 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
 and [root import map](../README.md#imports-and-module-map). See also
 [dependent products and completeness models](Guide.md#dependent-products-and-completeness-models)
 for the two product library leaves and the separate test-only proposition checks/contracts

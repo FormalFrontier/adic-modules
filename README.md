@@ -126,6 +126,15 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   domain, reducedness or extra `Nontrivial` assumptions. See the
   [Witt-vector API and uses](docs/Guide.md#characteristic-zero-of-witt-vectors).
 
+- **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
+  of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
+  Membership in `(p)^n` means that the first `n` coefficients vanish and each
+  remaining coefficient has a `p^n`-th root. For fixed `n`, the roots are
+  independent; no perfectness, reducedness or field hypothesis is needed.
+  A zero prefix alone does not suffice over a nonperfect ring. See the
+  [coefficient and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
+  and its [polynomial-coefficient examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
+
 - **Principal units.** In a commutative ring complete along `I`, for prime `p`
   with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical `ℤ_[p]`-powers
   agreeing with integer powers and an explicitly supplied additive-form module.
@@ -215,7 +224,7 @@ Related `AdicModulesTest` modules require separate imports and are not re-export
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
 provides detailed hypotheses, formulas, examples and the complete current roster:
-**120 Lean sources = 53 production (root included, 52 leaves) + 67 tests/models/audit imports**.
+**122 Lean sources = 54 production (root included, 53 leaves) + 68 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -227,6 +236,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
 | [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero cast of `3` over `ZMod 3` and `(ZMod 3)[X]`) |
+| [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
