@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**48 production sources including root + 58 tests/models/audit imports**) follow.
+(**48 production sources including root + 60 tests/models/audit imports**) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -602,6 +602,13 @@ for that structure, and a finitely generated ideal `I`. It does not require a
 valuation ring. Its canonical map is definitionally the algebra map, with the
 public `abstractCompletion_coe` equation.
 
+The [valuation-integers completeness equivalence](Results.md#principal-adic-completeness-and-the-valued-fraction-field)
+identifies principal-adic completeness at a **nonzero separated generator**
+with completeness for the **given field valuation uniformity**. Its integer-ring
+identification supplies the domain, valuation-ring and fraction-field properties;
+no topology on the integer ring is assumed. The linked reference gives the
+natural signature, zero-generator limitation and 3-adic and series models.
+
 For valuation-ring results, keep the ring `V` and fraction field `K` explicit.
 Their universes are independent. `ValuationRing.CompletionIntegers V K` is the
 valuation-integer subring in the uniform completion of `K`, with the canonical
@@ -668,8 +675,8 @@ The first table lists all 47 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **48 production sources including the root and 58
-test/model/audit sources, hence 106 Lean source modules**. These are source-file
+comparison. There are **48 production sources including the root and 60
+test/model/audit sources, hence 108 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -722,7 +729,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Topology.Algebra.Module.AdicTopology](../AdicModules/Topology/Algebra/Module/AdicTopology.lean) | Functoriality of adic module topologies |
 | [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | P-adic ideal-power bases, linear topology, proper dense integer spans and top neighborhood suprema |
 | [Topology.Algebra.PrincipalUnits](../AdicModules/Topology/Algebra/PrincipalUnits.lean) | Continuous p-adic powers of principal units |
-| [Valuation.Completeness](../AdicModules/Valuation/Completeness.lean) | Completeness of valuation integers for separated principal-ideal filtrations |
+| [Valuation.Completeness](../AdicModules/Valuation/Completeness.lean) | Valuation-integer principal-adic completeness; equivalence with valued-field completeness for a nonzero separated generator |
 | [ValuationTopology](../AdicModules/ValuationTopology.lean) | Principal-adic versus valuation topology; radical containment |
 | [CompletedIntegers](../AdicModules/CompletedIntegers.lean) | Comparison with completed valuation integers |
 | [CompletedLocalStructure](../AdicModules/CompletedLocalStructure.lean) | Domain, valuation-ring, fraction-field, local and residue properties |
@@ -792,6 +799,8 @@ by the public root.
 | [Topology.Algebra.Module.Span.Indiscrete](../AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) | Dense integer casts with failed coefficient continuity on an independent discrete rational module |
 | [Topology.Algebra.Module.AdicTopology](../AdicModulesTest/Topology/Algebra/Module/AdicTopology.lean) | The integer-pair projection and adic module neighborhoods |
 | [Valuation.Completeness](../AdicModulesTest/Valuation/Completeness.lean) | 5-adic and complete discrete-valuation integer examples, including the zero generator |
+| [FractionFieldCompletenessPadicClient](../AdicModulesTest/FractionFieldCompletenessPadicClient.lean) | Private 3-adic maximal-ideal valuation, independent norm-uniformity comparison and adic completeness, and converse application |
+| [FractionFieldCompletenessSeriesClient](../AdicModulesTest/FractionFieldCompletenessSeriesClient.lean) | Private power/Laurent-series valuation identification and coefficientwise completeness over any field, adic applications and negative-degree obstruction |
 | [ValuationTopology](../AdicModulesTest/ValuationTopology.lean) | Principal-adic and valuation topology import client |
 | [CompletedIntegers](../AdicModulesTest/CompletedIntegers.lean) | Completed-valuation-integer equivalence and canonical-map client |
 | [CompletedLocalStructure](../AdicModulesTest/CompletedLocalStructure.lean) | Local domain, fraction-field and residue interfaces |
@@ -822,10 +831,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 58 current independent test/model/audit
+`AdicModulesTest.+` glob including all 60 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 48 production sources (including the root) and 58 test/model/audit
+This covers the 48 production sources (including the root) and 60 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

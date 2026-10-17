@@ -408,6 +408,8 @@ These are statements about the current library, not the historical API inventory
   or local-compactness hypothesis. No topology on `V` is assumed. See the
   [completeness module](../AdicModules/Valuation/Completeness.lean) and its
   [5-adic and discrete-valuation examples](../AdicModulesTest/Valuation/Completeness.lean).
+  For the converse at a nonzero generator, see the
+  [equivalence and models](#principal-adic-completeness-and-the-valued-fraction-field).
 
 - **Valuation topology, completed integers and spectra.**
   For a valuation domain `V`, fraction field `K`, nonzero `a : V` and separated
@@ -451,6 +453,78 @@ These are statements about the current library, not the historical API inventory
   See the [span-comparison guide](Guide.md#closure-of-spans-over-a-dense-subsemiring)
   for real, discrete, mixed, p-adic and indiscrete examples and counterexamples.
 
+## Principal-adic completeness and the valued fraction field
+
+Import [`AdicModules.Valuation.Completeness`](../AdicModules/Valuation/Completeness.lean)
+or the public root. Let `R` be a commutative ring, `K` a field with an
+`R`-algebra structure, and `Γ₀` a linearly ordered commutative group with zero.
+For a specified `[hv : Valued K Γ₀]`, `hR : hv.v.Integers R` says that the
+algebra map is injective and its image is exactly the elements of valuation at
+most one. For a nonzero `a : R` whose principal-ideal powers are separated,
+`Valuation.Integers.isAdicComplete_span_singleton_iff` has the signature:
+
+```lean
+{R : Type u} {K : Type v} {Γ₀ : Type w}
+[CommRing R] [Field K] [Algebra R K]
+[LinearOrderedCommGroupWithZero Γ₀] [hv : Valued K Γ₀]
+(hR : hv.v.Integers R) {a : R} (ha0 : a ≠ 0)
+[IsHausdorff (Ideal.span {a}) R] :
+IsAdicComplete (Ideal.span {a}) R ↔ CompleteSpace K
+```
+
+The three universes are independent. In particular, `CompleteSpace K` is a
+conclusion of the adic-to-field direction, not a caller hypothesis. The domain,
+valuation-ring and fraction-field structures follow from `hR`; callers do not
+supply them separately. No topology on `R`, rank, discreteness, normed-field
+structure, Noetherianity, finite or perfect residue field, characteristic,
+local compactness or additional cofinality assumption is required.
+`CompleteSpace K` always refers to the uniformity of the supplied `hv`, not to
+a newly chosen norm or a different field structure. The proof compares it with
+the canonical valuation through identity-on-elements uniform equivalences.
+
+The nonzero hypothesis is essential to this equivalence: the zero ideal is
+adically complete even when the ambient field is incomplete. The earlier
+`Valuation.Integers.isAdicComplete_span_singleton` retains the field-to-adic
+implication for `a = 0`. Separation excludes the unit-ideal filtration on a
+nontrivial ring. Adic completeness here is the algebraic predicate for the
+powers of `(a)`, not an assumed completeness of a separately chosen topology
+on `R`. In the converse proof, the principal-adic topology comparison makes the
+valuation integers complete; their image is a complete neighborhood of zero
+in `K`, so the valued field is complete.
+
+### 3-adic and series models
+
+The two separately imported model modules retain the usual field operations
+and integer embeddings. Their valuation-integer identifications, nonzero
+separated generators and field-completeness inputs are established using
+Mathlib independently of the equivalence.
+
+- The [3-adic module](../AdicModulesTest/FractionFieldCompletenessPadicClient.lean)
+  uses `ℤ_[3] → ℚ_[3]` and the valuation associated to the height-one maximal
+  ideal of `ℤ_[3]`. That ideal is `(3)`, and the value of `3` is
+  `WithZero.exp (-1 : ℤ)`. Mathlib's maximal-adic completeness supplies
+  `IsAdicComplete (Ideal.span {(3 : ℤ_[3])}) ℤ_[3]`. Independently,
+  completeness for this specified valuation follows from the usual 3-adic norm
+  via an identity-on-elements uniform equivalence, preserving the integer
+  embedding. The adic-to-field implication recovers completeness for the same
+  maximal-ideal valuation, not merely for an unspecified uniformity.
+
+- The [power-series/Laurent-series module](../AdicModulesTest/FractionFieldCompletenessSeriesClient.lean)
+  works over **any field `κ`**, with no topology or completeness assumption on
+  `κ`. It keeps Mathlib's Hahn-series embedding `κ[[X]] → κ((X))` and identifies
+  the power-series maximal-ideal valuation with the usual `X`-adic valuation
+  on Laurent series. Mathlib's coefficientwise construction supplies valued
+  Laurent-series completeness independently. The field-to-adic theorem gives
+  power-series completeness at `(X)` (also its maximal ideal), and the converse
+  recovers completeness for that same valuation. This last application is a
+  compatibility check, not another independent construction of field completeness.
+  The coefficient in degree `-1` proves that `X⁻¹` is outside the power-series
+  image and is not a valuation integer.
+
+These model declarations are private calculations, not additional public API
+names. The [5-adic and discrete-valuation examples](../AdicModulesTest/Valuation/Completeness.lean)
+also retain the zero-generator boundary for the field-to-adic implication.
+
 ## Reduced-residue Teichmüller image
 
 For a commutative ring `R`, a prime `p` and an ideal `I` with
@@ -478,6 +552,27 @@ The tensor comparison reuses Mathlib's adic-completion API by Judith Ludwig and
 Christian Merten, including finite-product bijectivity and the Noetherian comparison.
 The principal-power quotient representative formulas use Yakov Pechersky's
 Mathlib linear equivalence and its plain equivalence wrapper.
+
+The valuation-integers equivalence extends the completeness bridge motivated
+by Fesenko–Vostokov, II §1, Corollary 1; it is not a factor-lifting theorem.
+Its complete-neighborhood argument generalizes Mathlib's right-uniform group
+completeness proof by Patrick Massot and Johannes Hölzl in
+`Mathlib.Topology.Algebra.IsUniformGroup.Basic`. The authentic upstream
+copyright, license and author notice is retained with that adapted argument in
+the [completeness module](../AdicModules/Valuation/Completeness.lean).
+The proof also uses Mathlib's valuation-integers and `WithVal` interfaces and
+this library's principal-adic topology and uniform-inducing fraction-field map;
+[CREDITS](CREDITS.md) records their contributors.
+
+The 3-adic model reuses Mathlib's p-adic work by Robert Y. Lewis, Mario Carneiro
+and Johan Commelin, valuation and DVR APIs by Kenny Lau and María Inés de
+Frutos-Fernández, and normed-valued comparison by María Inés de
+Frutos-Fernández and Filippo A. E. Nuccio. The series model reuses Mathlib's
+power-series, Laurent-series and discrete-valuation identifications and
+coefficientwise completeness, particularly the work of Aaron Anderson,
+María Inés de Frutos-Fernández and Filippo A. E. Nuccio. Both use Mathlib's
+uniform-space completeness infrastructure; their module references give the
+corresponding formalization credits. No upstream notices are replaced.
 
 The Teichmüller sections follow the perfect-residue and equal-characteristic
 corollaries of I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*,

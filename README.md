@@ -45,11 +45,10 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   additive commutative group module, the canonical `AdicCompletion I R`-linear
   tensor comparison is an equivalence for finite projective modules, or for
   finite modules over a Noetherian ring,
-  with independent ring/module universes. For finitely presented modules it is
-  an equivalence assuming **finite-free cofinality**:
-  `∀ n (K : Submodule R (Fin n → R)), K.FG → ∀ k, ∃ l, K ⊓ (I^l • ⊤) ≤ I^k • K`.
-  This last alternative needs no `I.FG`, projectivity, flatness or Noetherianity;
-  Artin–Rees supplies cofinality in the Noetherian case. Agreement with Mathlib's
+  with independent ring/module universes. For finitely presented modules,
+  **finite-free induced/intrinsic cofinality** suffices, without `I.FG`,
+  projectivity, flatness or Noetherianity; Artin–Rees supplies it over Noetherian
+  rings. Agreement with Mathlib's
   finite-Noetherian equivalence uses a common universe. Quotient–tensor
   naturality holds for ideal inclusions and linear maps without finiteness.
   See [comparison formulas and overlap laws](docs/Results.md#headline-results).
@@ -140,9 +139,19 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   and forward/inverse precision squares use the same data. This is not general
   module CRT for arbitrary left ideals. See [finite quotients](docs/FiniteQuotient.md).
 
-- **Valuation completions, localization and composites.** Integers of a field
-  complete for its **valuation uniformity** are complete for any separated
-  principal-ideal filtration, including the zero generator. For a valuation
+- **Valuation-integer completeness.** Let `R` be a commutative ring and `K`
+  a valued field with an `R`-algebra structure identifying `R` with its valuation
+  integers. For **nonzero** `a : R` with **separated** powers of `(a)`,
+  `IsAdicComplete (Ideal.span {a}) R ↔ CompleteSpace K`, for the **given
+  valuation uniformity** on `K`. No topology on `R`, rank or norm is required;
+  domain, valuation-ring and fraction-field properties follow from the integer
+  identification, rather than being caller hypotheses. Field completeness
+  implies adic completeness also for `a = 0`. See the
+  [theorem](AdicModules/Valuation/Completeness.lean), [details](docs/Results.md#principal-adic-completeness-and-the-valued-fraction-field),
+  [3-adic model](AdicModulesTest/FractionFieldCompletenessPadicClient.lean)
+  and [power-series/Laurent-series model](AdicModulesTest/FractionFieldCompletenessSeriesClient.lean).
+
+- **Valuation completions, localization and composites.** For a valuation
   domain, a **nonzero** generator and **separated** principal-adic filtration,
   the inverse limit agrees with the valuation integers of the completed fraction
   field; nonfield, faithful-flatness and spectrum laws additionally require the
@@ -170,17 +179,12 @@ and [fraction-field laws](AdicModules/RingTheory/TeichmullerFractionField.lean).
 
 ## Imports and module map
 
-Use the public root, or a narrower library leaf from the table:
-
-```lean
-import AdicModules
-```
-
-Related `AdicModulesTest` modules require separate imports and are not re-exported by
-that root; some expose named concrete results, while the left-ideal and span
-models keep their calculations private. The [mathematical guide](docs/Guide.md)
-provides detailed hypotheses, formulas, examples and the complete current roster:
-**106 Lean sources = 48 production (root included) + 58 tests/models/audit imports**.
+Import `AdicModules`, or a narrower library leaf from the table.
+The `AdicModulesTest` modules require separate imports and are not re-exported;
+some expose named concrete results, while the left-ideal, span and
+fraction-field completeness models keep their calculations private.
+The [Guide](docs/Guide.md#module-map) lists all
+**108 Lean sources: 48 production (root included) + 60 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -214,7 +218,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [Topology.Algebra.AdicTopology](AdicModules/Topology/Algebra/AdicTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (module-to-mapped-ideal topology application) |
 | [Topology.Algebra.PrincipalUnits](AdicModules/Topology/Algebra/PrincipalUnits.lean) | [Topology.Algebra.PrincipalUnits](AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) (`p`-adic integer, 2-torsion and `X`-adic power-series models) |
 | [Topology.Algebra.Module.Span](AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) (independent original calculations; additional private comparison application in Real) |
-| [Valuation.Completeness](AdicModules/Valuation/Completeness.lean) | [Valuation.Completeness](AdicModulesTest/Valuation/Completeness.lean) |
+| [Valuation.Completeness](AdicModules/Valuation/Completeness.lean) | [Valuation.Completeness](AdicModulesTest/Valuation/Completeness.lean) (5-adic and discrete-valuation examples), [FractionFieldCompletenessPadicClient](AdicModulesTest/FractionFieldCompletenessPadicClient.lean) (3-adic maximal-ideal valuation), [FractionFieldCompletenessSeriesClient](AdicModulesTest/FractionFieldCompletenessSeriesClient.lean) (power/Laurent series over any field, with no coefficient topology) |
 | [ValuationTopology](AdicModules/ValuationTopology.lean) | [ValuationTopology](AdicModulesTest/ValuationTopology.lean) |
 | [CompletedIntegers](AdicModules/CompletedIntegers.lean) | [CompletedIntegers](AdicModulesTest/CompletedIntegers.lean) |
 | [CompletedLocalStructure](AdicModules/CompletedLocalStructure.lean) | [CompletedLocalStructure](AdicModulesTest/CompletedLocalStructure.lean) |
@@ -252,19 +256,15 @@ and current Lean signatures.
 ## Credits, references and scope
 
 Developed and reviewed by Formal Frontier AI agents; not human peer review,
-source-author endorsement or complete source formalization. The project uses
-[Apache-2.0](LICENSE). [Credits and provenance](docs/CREDITS.md) retain original
-project/adaptation authorship and authentic upstream notices; the
-[detailed result credits](docs/Results.md#credits-references-and-scope) identify
-Mathlib methods and contributors, including Kenny Lau, Patrick Massot,
-Judith Ludwig, Christian Merten and Yakov Pechersky, and the
-[Group Theory](https://github.com/FormalFrontier/group-theory) scalar-torsion interface.
+source-author endorsement or complete source formalization. License: [Apache-2.0](LICENSE).
+[Credits and provenance](docs/CREDITS.md) retain project/adaptation authorship
+and authentic upstream notices. The [detailed credits](docs/Results.md#credits-references-and-scope)
+retain the mathematical bibliography, Mathlib contributor credits and reuse of
+[Group Theory](https://github.com/FormalFrontier/group-theory)'s scalar-torsion interface.
 
-Mathematical references include Fesenko–Vostokov, *Local Fields and Their
-Extensions*, second edition (2002), and Fujiwara–Kato, *Foundations of Rigid
-Geometry I* (2017), [arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5).
-The library depends on [Lean](https://lean-lang.org/) and
-[mathlib4](https://github.com/leanprover-community/mathlib4).
+Mathematical references include Fesenko–Vostokov, *Local Fields and Their Extensions*,
+and Fujiwara–Kato, *Foundations of Rigid Geometry I* ([arXiv](https://arxiv.org/abs/1308.4734v5)).
+Dependencies: [Lean](https://lean-lang.org/) and [mathlib4](https://github.com/leanprover-community/mathlib4).
 General nonseparated reduction, arbitrary-denominator localization, value-group
 exact sequences, height/rational-rank additivity and whole-source coverage or
 correspondence are outside the asserted scope. Ordinary builds and historical
