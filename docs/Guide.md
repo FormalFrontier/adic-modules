@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**48 production sources including root + 62 tests/models/audit imports**) follow.
+(**49 production sources including root + 63 tests/models/audit imports**) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -593,6 +593,27 @@ examples and the boundary separating two-sided ring CRT from arbitrary-left-idea
 module diagonals. Finiteness is of the index type, not of `R`; no topology,
 completion or general module CRT is asserted.
 
+## Finite sets of adic generators
+
+The [completeness API](../AdicModules/AdicCompletion/Completeness.lean) lets one
+work with a chosen `s : Finset R` over any commutative ring and any `R`-module
+with an additive commutative group structure. Use `IsPrecomplete.span_finset`
+to pass from precompleteness for each `Ideal.span {a}`, `a ∈ s`, to
+precompleteness for `Ideal.span (s : Set R)`. With Hausdorffness for this whole
+generated ideal, `isAdicComplete_span_finset_iff` gives the corresponding
+completeness equivalence. Hausdorffness for the principal ideals alone is not
+the premise of the reverse implication.
+
+For a finite subset `t : Set R`, use `ht.toFinset` and the stock membership and
+coercion equalities to apply the finite-generator result. Principal completeness
+then yields precompleteness for `Ideal.span t`; the existing Hausdorffification
+instance gives completeness of `Hausdorffification (Ideal.span t) M` without
+Hausdorffness of `M`. The
+[examples](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) include
+this general finite-subset use, the generators `{2, 4}` on the completion of
+`ℤ` at `(2)`, and the empty finite set. No Noetherianity or finite generation
+of the module is required by the two finite-generator theorems.
+
 ## Completion and valuation hypotheses
 
 [`AdicCompletion.abstractCompletion`](../AdicModules/AdicCompletion.lean)
@@ -671,12 +692,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 47 production source leaves re-exported by the public
+The first table lists all 48 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **48 production sources including the root and 62
-test/model/audit sources, hence 110 Lean source modules**. These are source-file
+comparison. There are **49 production sources including the root and 63
+test/model/audit sources, hence 112 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -699,6 +720,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Polynomial.Evaluation](../AdicModules/Polynomial/Evaluation.lean) | Association of nearby polynomial values for a Jacobson-contained ideal, including nonunit derivatives |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
+| [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
@@ -758,6 +780,7 @@ by the public root.
 | [Polynomial.Evaluation](../AdicModulesTest/Polynomial/Evaluation.lean) | Independent 3-adic proximity and nonunit derivative inputs, association consumer and zero boundary |
 | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
+| [AdicCompletion.CompletenessTheorems](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) | Suprema, finite spans, Hausdorffification and principal-ideal completeness examples |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
 | [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
 | [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
@@ -833,10 +856,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 62 current independent test/model/audit
+`AdicModulesTest.+` glob including all 63 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 48 production sources (including the root) and 62 test/model/audit
+This covers the 49 production sources (including the root) and 63 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

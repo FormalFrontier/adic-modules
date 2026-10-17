@@ -6,6 +6,7 @@ module
 
 import AdicModules
 public import AdicModules.AdicCompletion
+import AdicModulesTest.AdicCompletion.CompletenessTheorems
 
 /-!
 # Canonical maps and power membership in adic completions

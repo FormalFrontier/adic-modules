@@ -35,8 +35,8 @@ These are current mathematical interfaces built on dependency-provided ideals,
 quotients, completions, topologies and perfection, not newly generated API entries
 or assertions of independent constructions of those stock objects.
 
-For the complete current **110-source** map (**48 production including root,
-62 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
+For the complete current **112-source** map (**49 production including root,
+63 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
 and [root import map](../README.md#imports-and-module-map). The
 [primary-component reference](PrimaryComponent.md) and [finite-quotient guide](FiniteQuotient.md)
 give supplementary APIs. The Guide also covers scalar restriction, integer

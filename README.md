@@ -10,6 +10,12 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
 
 ## Headline results
 
+- **Precompleteness and adic completeness.** Precompleteness for arbitrary
+  ideals `I` and `J` implies precompleteness for `I ⊔ J`, without finite
+  generation, Noetherianity or Hausdorffness. Finite families, surjective images,
+  the separated quotient and principal-ideal completeness fit the same theory.
+  See [completeness results](docs/Results.md#precompleteness-and-adic-completeness).
+
 - **Congruences and polynomial values.** In a commutative ring, `(q : R) ∈ I`
   and `x ≡ y [SMOD I ^ m]` with **positive `m`** imply
   `x^(q^n) ≡ y^(q^n) [SMOD I^(m+n)]` for every natural `n`.
@@ -181,12 +187,17 @@ and [fraction-field laws](AdicModules/RingTheory/TeichmullerFractionField.lean).
 
 ## Imports and module map
 
-Import `AdicModules`, or a narrower library leaf from the table.
-The `AdicModulesTest` modules require separate imports and are not re-exported;
-some expose named concrete results, while the left-ideal, span and
-fraction-field completeness models keep their calculations private.
-The [Guide](docs/Guide.md#module-map) lists all
-**110 Lean sources: 48 production (root included) + 62 tests/models/audit imports**.
+Use the public root, or a narrower library leaf from the table:
+
+```lean
+import AdicModules
+```
+
+Related `AdicModulesTest` modules require separate imports and are not re-exported by
+that root; some expose named concrete results, while the left-ideal, span and
+fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
+provides detailed hypotheses, formulas, examples and the complete current roster:
+**112 Lean sources = 49 production (root included) + 63 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -200,6 +211,7 @@ The [Guide](docs/Guide.md#module-map) lists all
 | [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero cast of `3` over `ZMod 3` and `(ZMod 3)[X]`) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
+| [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
