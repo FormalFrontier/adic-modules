@@ -255,13 +255,17 @@ These are statements about the current library, not the historical API inventory
   rings; the final premise includes nontriviality of `R ⧸ I`. See the
   [unit detection and local-completion module](../AdicModules/AdicCompletion/LocalRing.lean).
 
-- **Adic completion of finite projective modules.**
-  For a commutative ring `R`, an additive commutative group `M` with `Module R M`,
-  `Module.Finite R M` and `Module.Projective R M`, and any ideal `I`,
+- **Adic completion of projective modules.**
+  For a commutative ring `R`, an additive commutative group `M` with `Module R M`
+  and `Module.Projective R M`, and any ideal `I`,
+  `AdicCompletion.ofTensorProduct_injective_of_projective I M` proves injectivity
+  of Mathlib's canonical **`AdicCompletion I R`-linear** comparison
+  `AdicCompletion I R ⊗[R] M →ₗ[AdicCompletion I R] AdicCompletion I M`.
+  No finiteness assumption on `M` is needed for injectivity. With the additional
+  hypothesis `Module.Finite R M`,
   `AdicCompletion.ofTensorProduct_bijective_of_finite_of_projective I M` proves
-  bijectivity of Mathlib's canonical comparison. The constructed
-  `AdicCompletion.ofTensorProductEquivOfFiniteProjective I M` is an
-  **`AdicCompletion I R`-linear** equivalence
+  bijectivity, and `AdicCompletion.ofTensorProductEquivOfFiniteProjective I M`
+  gives an **`AdicCompletion I R`-linear** equivalence
   `AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M`.
   Its underlying linear map is `AdicCompletion.ofTensorProduct I M`; its
   characteristic lemmas give `a ⊗ₜ m ↦ a • AdicCompletion.of I M m` and
@@ -270,8 +274,12 @@ These are statements about the current library, not the historical API inventory
   The separate `ofTensorProductEquivOfFiniteProjective_eq_ofFiniteNoetherian`
   lemma identifies it with Mathlib's Noetherian equivalence where both apply:
   over a Noetherian ring, with the ring and module in the same universe.
-  See the [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean)
-  and its [integer models](../AdicModulesTest/AdicCompletion/TensorProduct.lean).
+  The [integer models](../AdicModulesTest/AdicCompletion/TensorProduct.lean) retain
+  the finite rank-two canonical-map, pure-tensor and inverse identities and the
+  rank-zero boundary. They also include a projective, non-finite countable Finsupp
+  module `ℕ →₀ ℤ` with a nonzero canonical tensor and completion image, and apply
+  injectivity to that same module. See the
+  [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean).
 - **Adic completion of finite Noetherian modules.**
   For a commutative Noetherian ring `R`, a finite `R`-module `M` and any ideal `I`,
   `AdicCompletion.ofTensorProduct_bijective I M` states bijectivity of the canonical
@@ -594,7 +602,10 @@ The project uses [Apache-2.0](../LICENSE). [Credits and provenance](CREDITS.md)
 retain project authorship, upstream author notices, stock-API reuse and the full
 mathematical bibliography, including Kenny Lau and Patrick Massot's CRT credit.
 The tensor comparison reuses Mathlib's adic-completion API by Judith Ludwig and
-Christian Merten, including finite-product bijectivity and the Noetherian comparison.
+Christian Merten, including naturality, finite-module surjectivity, finite-product
+bijectivity and the Noetherian comparison; the projective splitting API by Kevin
+Buzzard and Antoine Labelle; and the tensor/Finsupp equivalence by Johannes Hölzl
+and Antoine Chambert-Loir.
 The principal-power quotient representative formulas use Yakov Pechersky's
 Mathlib linear equivalence and its plain equivalence wrapper.
 

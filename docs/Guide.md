@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**51 production sources including root + 65 tests/models/audit imports**, 116 total) follow.
+(**53 production sources including root + 67 tests/models/audit imports**, 120 total) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces.
@@ -189,6 +189,38 @@ The [ordinary-import client](../AdicModulesTest/AdicCompletion/RestrictScalars.l
 exercises these directions and boundary cases. The 103-display-site native
 `docs/API.md` snapshot predates this module and remains historical; this guide
 and the Lean source describe the current scalar-restriction API.
+
+## Dependent products and completeness models
+
+Import [`AdicModules.LinearAlgebra.Pi`](../AdicModules/LinearAlgebra/Pi.lean)
+for finitely generated ideal action on arbitrary dependent products of submodules
+and the coordinatewise quotient-reduction kernel. The action formula works over
+commutative semirings on additive commutative monoid modules; the kernel statement
+uses commutative rings and additive commutative group modules. Both assume ideal
+finite generation; the index type need not be finite.
+Import [`AdicModules.AdicCompletion.Pi`](../AdicModules/AdicCompletion/Pi.lean)
+for naturality of Mathlib's existing `AdicCompletion.pi` under componentwise
+linear maps, as an equality of completed-ring-linear maps for **every ideal**
+and arbitrary indexing types. Both leaves are re-exported by the public root.
+
+The separately imported
+[dependent-product models](../AdicModulesTest/AdicCompletion/DependentPi.lean)
+record two private generic `Prop` contracts, not proofs of universal bijectivity
+or an equivalence. The canonical completion element of the constant-one family
+on `ℕ → ℤ` and its image under the same comparison are nonzero. The finite-index
+comparison with `piEquivOfFintype` needs no ideal finite-generation hypothesis. These results do
+not identify an infinite product's intrinsic adic topology with its product topology.
+
+The [completeness models](../AdicModulesTest/AdicCompletion/Completeness.lean)
+contain three proposition `#check`s, not proofs of those propositions.
+They distinguish arbitrary-ideal binary precompleteness from finite-generator
+Hausdorff completeness of the canonical separated quotient; the completeness
+equivalence for the original module retains separatedness. The binary contract
+differs from Fujiwara–Kato, Exercise 0.7.4. Concrete inputs include a nonzero proper 2-adic
+ideal and nonzero separated quotient, singleton principal/generated-ideal
+completeness, and bottom/top/empty-generator boundaries.
+For projective completion–tensor injectivity and the finite equivalence
+alternatives, see the [results reference](Results.md#headline-results).
 
 ## Integer singleton spans in unital rings
 
@@ -758,12 +790,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 50 production source leaves re-exported by the public
+The first table lists all 52 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **51 production sources including the root and 65
-test/model/audit sources, hence 116 Lean source modules**. These are source-file
+comparison. There are **53 production sources including the root and 67
+test/model/audit sources, hence 120 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -793,13 +825,15 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
 | [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
 | [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
+| [AdicCompletion.Pi](../AdicModules/AdicCompletion/Pi.lean) | Naturality of the canonical completion comparison for arbitrary dependent products and every ideal |
 | [AdicCompletion.Quotient](../AdicModules/AdicCompletion/Quotient.lean) | Canonical algebra equivalence between the completion modulo an extended ideal power and the original ring modulo that power, assuming only finite generation of the selected power |
 | [AdicCompletion.QuotientTorsion](../AdicModules/AdicCompletion/QuotientTorsion.lean) | Scalar-power torsion sections and subgroup adic completion with signed coordinates |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
-| [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Completion-ring-linear tensor comparison for finite projective modules |
+| [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Completion-ring-linear projective injectivity, finite-projective equivalence and finite-Noetherian comparison |
 | [AdicCompletion.Topology](../AdicModules/AdicCompletion/Topology.lean) | Evaluation neighborhoods in an adic completion |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
 | [LinearAlgebra.Descent](../AdicModules/LinearAlgebra/Descent.lean) | Descent along surjective semilinear maps with additive-monoid targets |
+| [LinearAlgebra.Pi](../AdicModules/LinearAlgebra/Pi.lean) | Finitely generated ideal action on arbitrary dependent products of submodules and the coordinatewise reduction kernel |
 | [LinearAlgebra.Span.Basic](../AdicModules/LinearAlgebra/Span/Basic.lean) | Kernel pullbacks of submodule images for semilinear maps with additive-monoid targets |
 | [LinearAlgebra.SModEq.Pow](../AdicModules/LinearAlgebra/SModEq/Pow.lean) | Iterated ideal-power congruences from arbitrary positive starting depth |
 | [LinearAlgebra.Correspondence](../AdicModules/LinearAlgebra/Correspondence.lean) | Kernel–range order correspondence for submodules under semilinear maps |
@@ -848,15 +882,17 @@ by the public root.
 | [Polynomial.Evaluation](../AdicModulesTest/Polynomial/Evaluation.lean) | Independent 3-adic proximity and nonunit derivative inputs, association consumer and zero boundary |
 | [PrimaryComponent](../AdicModulesTest/PrimaryComponent.lean) | Primary exactness and ordinary integer-prime subgroup clients |
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
+| [AdicCompletion.Completeness](../AdicModulesTest/AdicCompletion/Completeness.lean) | Three proposition `#check`s and separated-quotient completeness/boundary models; no universal proof in this model file |
 | [AdicCompletion.CompletenessTheorems](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) | Suprema, finite spans, Hausdorffification and principal-ideal completeness examples |
 | [AdicCompletionKernel](../AdicModulesTest/AdicCompletionKernel.lean) | Private integer `(2)` degree-one nonzero evaluation, independent kernel and degree-zero calibration, finite-generation recovery and separate fixed-power use |
 | [AdicCompletionQuotient](../AdicModulesTest/AdicCompletionQuotient.lean) | Integer `(2)` completion quotient and `ZMod 2` comparison, inverse representative and quotient-map formulas, and degree-zero boundary |
+| [AdicCompletion.DependentPi](../AdicModulesTest/AdicCompletion/DependentPi.lean) | Private generic product `Prop` contracts, the nonzero completion element of the constant-one `ℕ → ℤ` family and its comparison image; no universal bijectivity proof |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
 | [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
 | [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
 | [AdicCompletion.PadicInt](../AdicModulesTest/AdicCompletion/PadicInt.lean) | Nonzero integer-completion and p-adic inputs, comparison laws and trivial-residue boundaries |
 | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
-| [AdicCompletion.TensorProduct](../AdicModulesTest/AdicCompletion/TensorProduct.lean) | Integer rank-two tensor comparison, pure-tensor and inverse identities, and rank-zero boundary |
+| [AdicCompletion.TensorProduct](../AdicModulesTest/AdicCompletion/TensorProduct.lean) | Integer rank-two tensor comparison, pure-tensor and inverse identities, rank-zero boundary, and a projective non-finite countable Finsupp module with nonzero tensor/image and injectivity |
 | [ScalarTorsionSections](../AdicModulesTest/ScalarTorsionSections.lean) | Nonzero rational `-2` torsion sections and independent finite-level sign calibration |
 | [Algebra.Module.Int](../AdicModulesTest/Algebra/Module/Int.lean) | Integer, all `ZMod n`, subsingleton and noncommutative matrix singleton-span clients |
 | [KernelPullback](../AdicModulesTest/KernelPullback.lean) | Kernel pullbacks of cones, monoid-target descent and source-inverse boundary |
@@ -926,10 +962,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 65 current independent test/model/audit
+`AdicModulesTest.+` glob including all 67 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 51 production sources (including the root) and 65 test/model/audit
+This covers the 53 production sources (including the root) and 67 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

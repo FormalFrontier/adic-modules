@@ -6,21 +6,22 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
+import Mathlib.Algebra.Module.Projective
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.Finiteness.Small
 
 /-!
 # Adic completion and tensor products
 
-For a finite projective module over a commutative ring, the canonical comparison from tensoring
-with the completed ring to the completed module is bijective. The resulting equivalence is
-linear over the completed ring, sends pure tensors to scalar multiples of the canonical map
-into the completion, and agrees with Mathlib's Noetherian equivalence when both apply.
+For a projective module over a commutative ring, the canonical comparison from tensoring with
+the completed ring to the completed module is injective, for any ideal. If the module is also
+finite, the comparison is bijective. The resulting equivalence is linear over the completed
+ring, sends pure tensors to scalar multiples of the canonical map into the completion, and
+agrees with Mathlib's Noetherian equivalence when both apply.
 
-The proof realizes a finite projective module as a retract of a finite power of the ring and
-uses naturality of the canonical comparison. The finite-power comparison and surjectivity for
-finite modules are reused from Mathlib. No Noetherian hypothesis on the ring or finite-generation
-hypothesis on the ideal is needed.
+The proof detects coefficients in a free Finsupp module and uses a projective retraction and
+naturality of the canonical comparison. Surjectivity for finite modules is reused from Mathlib.
+No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
 
 ## Implementation notes
 
@@ -36,8 +37,11 @@ common-universe comparison with Mathlib identifies the equivalence obtained by
 
 Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and Christian Merten,
 supplies the canonical comparison, its naturality, the finite-power comparison, finite-module
-surjectivity, and the Noetherian equivalence. Mathlib's `RingTheory/Finiteness/Projective.lean`,
-by Johan Commelin, supplies the finite free retraction used in the proof.
+surjectivity, and the Noetherian equivalence. Mathlib's `Algebra/Module/Projective.lean`, by
+Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction. Mathlib's
+`LinearAlgebra/DirectSum/Finsupp.lean`, by Johannes Hölzl and Antoine Chambert-Loir, supplies
+the tensor/Finsupp coefficient equivalence. Related finite-projective retraction results are
+in Mathlib's `RingTheory/Finiteness/Projective.lean`, by Johan Commelin.
 The independent-universe Noetherian comparison uses finite-module smallness from Mathlib's
 `RingTheory/Finiteness/Small.lean`, by Antoine Chambert-Loir and María-Inés de Frutos-Fernández,
 and the `Shrink` linear equivalence from Kim Morrison's module API.
@@ -49,39 +53,90 @@ set_option warningAsError true
 
 noncomputable section
 
-universe uR uM
+universe uR uM uσ
 
 open TensorProduct
 
 namespace AdicCompletion
 
 variable {R : Type uR} [CommRing R] (I : Ideal R)
+
+/-- The comparison for the scalar module agrees pointwise with the tensor right unitor. -/
+private lemma ofTensorProduct_self_eq_rid_apply
+    (x : AdicCompletion I R ⊗[R] R) :
+    ofTensorProduct I R x =
+      AlgebraTensorModule.rid R R (AdicCompletion I R) x := by
+  induction x using TensorProduct.inductionOn with
+  | tmul a r =>
+      rw [ofTensorProduct_tmul, AlgebraTensorModule.rid_tmul]
+      apply AdicCompletion.ext
+      intro n
+      rw [smul_eval, of_apply, val_smul_apply]
+      induction a.val n using Quotient.inductionOn' with
+      | _ s =>
+          change
+            (Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R R)) (s * r)) =
+              Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R R)) (r * s)
+          rw [mul_comm]
+  | add x y hx hy =>
+      simp only [map_add, hx, hy]
+
+/-- A coefficient of the tensor/Finsupp equivalence is the completion of the corresponding
+coefficient of the canonical comparison. -/
+private lemma finsuppScalarRight_apply_eq_map_ofTensorProduct
+    (σ : Type uσ) [DecidableEq σ]
+    (x : AdicCompletion I R ⊗[R] (σ →₀ R)) (b : σ) :
+    TensorProduct.finsuppScalarRight R R (AdicCompletion I R) σ x b =
+      map I (Finsupp.lapply b : (σ →₀ R) →ₗ[R] R)
+        (ofTensorProduct I (σ →₀ R) x) := by
+  rw [TensorProduct.finsuppScalarRight_apply, ← ofTensorProduct_self_eq_rid_apply I]
+  rw [← LinearMap.baseChange_eq_ltensor]
+  exact (LinearMap.congr_fun
+    (ofTensorProduct_naturality I (Finsupp.lapply b : (σ →₀ R) →ₗ[R] R)) x).symm
+
+/-- The canonical tensor comparison is injective on an arbitrary Finsupp module. -/
+private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
+    Function.Injective (ofTensorProduct I (σ →₀ R)) := by
+  classical
+  intro x y hxy
+  apply (TensorProduct.finsuppScalarRight R R (AdicCompletion I R) σ).injective
+  apply Finsupp.ext
+  intro b
+  rw [finsuppScalarRight_apply_eq_map_ofTensorProduct I σ x b,
+    finsuppScalarRight_apply_eq_map_ofTensorProduct I σ y b, hxy]
+
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
-/-- For a finite projective module, tensoring with the completed ring gives its adic completion.
-The canonical comparison is bijective over an arbitrary commutative ring and for any ideal.
-The proof uses the finite free retraction from Mathlib's finite-projective module API and the
-finite-power comparison of Judith Ludwig and Christian Merten. -/
-theorem ofTensorProduct_bijective_of_finite_of_projective
-    [Module.Finite R M] [Module.Projective R M] :
-    Function.Bijective (ofTensorProduct I M) := by
-  obtain ⟨n, f, g, _, _, hfg⟩ := Module.Finite.exists_comp_eq_id_of_projective R M
+/-- For a projective module over a commutative ring, the canonical comparison from tensoring
+with the completed ring to the completed module is injective, for any ideal. -/
+theorem ofTensorProduct_injective_of_projective
+    [Module.Projective R M] :
+    Function.Injective (ofTensorProduct I M) := by
+  obtain ⟨g, hfg⟩ := (Module.projective_def' (R := R) (P := M)).mp inferInstance
   have hsplit :
-      f.baseChange (AdicCompletion I R) ∘ₗ g.baseChange (AdicCompletion I R) =
-        LinearMap.id := by
+      (Finsupp.linearCombination R id).baseChange (AdicCompletion I R) ∘ₗ
+          g.baseChange (AdicCompletion I R) = LinearMap.id := by
     rw [← LinearMap.baseChange_comp, hfg, LinearMap.baseChange_id]
-  refine ⟨?_, ofTensorProduct_surjective_of_finite I M⟩
   have hg := LinearMap.injective_of_comp_eq_id _ _ hsplit
   intro x y hxy
   apply hg
-  apply (ofTensorProduct_bijective_of_pi_of_fintype I (Fin n)).injective
+  apply ofTensorProduct_injective_finsupp I M
   calc
-    ofTensorProduct I (Fin n → R) (g.baseChange (AdicCompletion I R) x) =
+    ofTensorProduct I (M →₀ R) (g.baseChange (AdicCompletion I R) x) =
         map I g (ofTensorProduct I M x) :=
       (LinearMap.congr_fun (ofTensorProduct_naturality I g) x).symm
     _ = map I g (ofTensorProduct I M y) := congrArg (map I g) hxy
-    _ = ofTensorProduct I (Fin n → R) (g.baseChange (AdicCompletion I R) y) :=
+    _ = ofTensorProduct I (M →₀ R) (g.baseChange (AdicCompletion I R) y) :=
       LinearMap.congr_fun (ofTensorProduct_naturality I g) y
+
+/-- For a finite projective module, tensoring with the completed ring gives its adic completion.
+The canonical comparison is bijective over an arbitrary commutative ring and for any ideal,
+by projective injectivity and finite-module surjectivity. -/
+theorem ofTensorProduct_bijective_of_finite_of_projective
+    [Module.Finite R M] [Module.Projective R M] :
+    Function.Bijective (ofTensorProduct I M) :=
+  ⟨ofTensorProduct_injective_of_projective I M,
+    ofTensorProduct_surjective_of_finite I M⟩
 
 /-- The canonical tensor comparison as an equivalence over the completed ring for a finite
 projective module. -/

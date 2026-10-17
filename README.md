@@ -66,7 +66,8 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
 
 - **Completion–tensor comparisons.** For any ideal in a commutative ring and an
   additive commutative group module, the canonical `AdicCompletion I R`-linear
-  tensor comparison is an equivalence for finite projective modules, or for
+  tensor comparison is injective for projective modules without module finiteness.
+  It is an equivalence for finite projective modules, or for
   finite modules over a Noetherian ring,
   with independent ring/module universes. For finitely presented modules,
   **finite-free induced/intrinsic cofinality** suffices, without `I.FG`,
@@ -214,7 +215,7 @@ Related `AdicModulesTest` modules require separate imports and are not re-export
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
 provides detailed hypotheses, formulas, examples and the complete current roster:
-**116 Lean sources = 51 production (root included, 50 leaves) + 65 tests/models/audit imports**.
+**120 Lean sources = 53 production (root included, 52 leaves) + 67 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -235,10 +236,13 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
+| [AdicCompletion.Pi](AdicModules/AdicCompletion/Pi.lean) (naturality for every ideal) | [AdicCompletion.DependentPi](AdicModulesTest/AdicCompletion/DependentPi.lean) (private generic `Prop` contracts and a nonzero `ℕ → ℤ` model, not a universal bijectivity proof) |
+| Separate completeness contract/model file | [AdicCompletion.Completeness](AdicModulesTest/AdicCompletion/Completeness.lean) (three proposition `#check`s and completeness/boundary models) |
 | [AdicCompletion.Topology](AdicModules/AdicCompletion/Topology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (evaluation-kernel basis application) |
 | [AdicCompletion.QuotientTorsion](AdicModules/AdicCompletion/QuotientTorsion.lean) | [ScalarTorsionSections](AdicModulesTest/ScalarTorsionSections.lean) |
-| [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) |
+| [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) (finite-projective comparison and non-finite countable Finsupp injectivity) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
+| [LinearAlgebra.Pi](AdicModules/LinearAlgebra/Pi.lean) (finitely generated ideal action on dependent products and coordinatewise reduction kernel) | See the `AdicCompletion.DependentPi` models above |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
 | [LinearAlgebra.TensorProduct.Quotient](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | [LinearAlgebra.TensorProduct.Quotient](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (representatives and inverse formulas) | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (nonzero chosen-generator class for `(5)` in `ℤ`) |
