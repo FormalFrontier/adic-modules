@@ -16,7 +16,7 @@ import Mathlib.RingTheory.WittVector.Compare
 import Mathlib.RingTheory.WittVector.Domain
 
 /-!
-# Characteristic zero, units, locality, reducedness and prime multiplication and Teichmüller expansions in Witt vectors
+# Characteristic zero, units, locality, reducedness and prime-power multiplication and Teichmüller expansions in Witt vectors
 
 For a prime `p` and a commutative ring `R` of characteristic `p`, `WittVector p R`
 has characteristic zero. The proof uses Mathlib's comparison with the `p`-adic
@@ -46,8 +46,10 @@ in particular, it includes the zero ring.
 
 For the prime-multiplication criterion, assume that `R` has characteristic `p`.
 
-Multiplication by `p` has a more sensitive dependence on the coefficient ring:
-its kernel consists of Witt vectors whose coefficients have zero `p`-th power.
+Multiplication by `p ^ n` has a more sensitive dependence on the coefficient ring:
+for every natural `n`, including zero, its kernel consists of Witt vectors whose
+coefficients have zero `(p ^ n)`-th power. The multiplication-by-`p` criterion is
+the specialization at `n = 1`.
 Consequently, `p` is a regular element of `WittVector p R` exactly when `R` is
 reduced. This criterion allows reduced rings with zero divisors and does not
 require perfectness.
@@ -254,20 +256,28 @@ theorem teichmuller_expansion_unique {p : ℕ} [Fact p.Prime] {R : Type u}
 
 variable {p : ℕ} [Fact p.Prime] {k : Type u} [CommRing k] [CharP k p]
 
+/-- A Witt vector over a ring of characteristic `p` is killed by multiplication by
+`p ^ n` exactly when every coefficient has zero `(p ^ n)`-th power. -/
+theorem mul_p_pow_eq_zero_iff_coeff_pow_eq_zero (x : WittVector p k) (n : ℕ) :
+    x * (p : WittVector p k) ^ n = 0 ↔ ∀ i : ℕ, x.coeff i ^ (p ^ n) = 0 := by
+  constructor
+  · intro h i
+    simpa only [mul_pow_charP_coeff_succ, zero_coeff] using
+      congrArg (fun y : WittVector p k => y.coeff (i + n)) h
+  · intro h
+    apply WittVector.ext
+    intro i
+    rw [zero_coeff]
+    by_cases hi : i < n
+    · exact mul_pow_charP_coeff_zero x hi
+    · rw [← Nat.sub_add_cancel (Nat.le_of_not_gt hi), mul_pow_charP_coeff_succ,
+        h (i - n)]
+
 /-- A Witt vector over a ring of characteristic `p` is killed by multiplication by `p`
 exactly when every coefficient has zero `p`-th power. -/
 theorem mul_p_eq_zero_iff_coeff_pow_eq_zero (x : WittVector p k) :
     x * (p : WittVector p k) = 0 ↔ ∀ n : ℕ, x.coeff n ^ p = 0 := by
-  constructor
-  · intro h n
-    simpa only [mul_charP_coeff_succ, zero_coeff] using
-      congrArg (fun y : WittVector p k => y.coeff (n + 1)) h
-  · intro h
-    apply WittVector.ext
-    intro n
-    cases n with
-    | zero => rw [mul_charP_coeff_zero, zero_coeff]
-    | succ n => rw [mul_charP_coeff_succ, zero_coeff, h n]
+  simpa only [pow_one] using mul_p_pow_eq_zero_iff_coeff_pow_eq_zero x 1
 
 /-- The prime `p` is a regular element of the Witt vector ring exactly when the
 coefficient ring is reduced. No perfectness or domain hypothesis is required. -/

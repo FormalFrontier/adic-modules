@@ -20,6 +20,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.LocalRing.NonLocalRing
 public import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.FieldTheory.Perfect
+import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.RingTheory.Nilpotent.Basic
 import Mathlib.RingTheory.Polynomial.Basic
 import Mathlib.RingTheory.WittVector.Complete
@@ -344,5 +345,91 @@ private theorem perfect_mul_p_kernel_comparison
       change x.coeff n ^ p = (0 : k) ^ p
       rw [h n, zero_pow hp.out.ne_zero]
     rw [hx, zero_mul]
+
+/-- The same reduced, imperfect product ring has a Teichmüller lift that survives every
+power of `3`; the case `n = 0` also detects that the lift itself is nonzero. -/
+private theorem polynomial_zmod_three_prod_teichmuller_mul_three_pow_ne_zero (n : ℕ) :
+    teichmuller 3 ((X, 0) : Polynomial (ZMod 3) × ZMod 3) *
+      (3 : WittVector 3 (Polynomial (ZMod 3) × ZMod 3)) ^ n ≠ 0 := by
+  intro h
+  have hcoeff := (mul_p_pow_eq_zero_iff_coeff_pow_eq_zero
+    (teichmuller 3 ((X, 0) : Polynomial (ZMod 3) × ZMod 3)) n).mp h 0
+  have hX : (X : Polynomial (ZMod 3)) ^ (3 ^ n) = 0 := by
+    simpa only [teichmuller_coeff_zero, map_pow, map_zero, RingHom.coe_fst] using
+      congrArg (RingHom.fst (Polynomial (ZMod 3)) (ZMod 3)) hcoeff
+  exact (pow_ne_zero _ Polynomial.X_ne_zero) hX
+
+/-- In `(ZMod 3)[X]/(X^4)`, the Teichmüller lift of the root is nonzero and is killed
+by `3^2`, but not by `3`. -/
+private theorem adjoinRoot_zmod_three_X_fourth_teichmuller_torsion :
+    teichmuller 3 (AdjoinRoot.root ((X : Polynomial (ZMod 3)) ^ 4)) ≠ 0 ∧
+      teichmuller 3 (AdjoinRoot.root ((X : Polynomial (ZMod 3)) ^ 4)) *
+        (3 : WittVector 3 (AdjoinRoot ((X : Polynomial (ZMod 3)) ^ 4))) ≠ 0 ∧
+      teichmuller 3 (AdjoinRoot.root ((X : Polynomial (ZMod 3)) ^ 4)) *
+        (3 : WittVector 3 (AdjoinRoot ((X : Polynomial (ZMod 3)) ^ 4))) ^ 2 = 0 := by
+  let f : Polynomial (ZMod 3) := X ^ 4
+  let t : AdjoinRoot f := AdjoinRoot.root f
+  let x : WittVector 3 (AdjoinRoot f) := teichmuller 3 t
+  have hf : f.Monic := Polynomial.monic_X_pow 4
+  letI : CharP (AdjoinRoot f) 3 :=
+    charP_of_injective_ringHom (f := AdjoinRoot.of f)
+      (AdjoinRoot.of.injective_of_monic_of_degree_pos hf (by simp [f])) 3
+  have ht_cube : t ^ 3 ≠ 0 := by
+    have h := AdjoinRoot.mk_ne_zero_of_natDegree_lt (f := f) hf
+      (g := (X : Polynomial (ZMod 3)) ^ 3)
+      (pow_ne_zero 3 Polynomial.X_ne_zero) (by simp [f])
+    simpa only [map_pow, AdjoinRoot.mk_X, t] using h
+  have ht_fourth : t ^ 4 = 0 := by
+    calc
+      t ^ 4 = AdjoinRoot.mk f ((X : Polynomial (ZMod 3)) ^ 4) :=
+        (map_pow (AdjoinRoot.mk f) X 4).symm
+      _ = 0 := AdjoinRoot.mk_self
+  change x ≠ 0 ∧ x * (3 : WittVector 3 (AdjoinRoot f)) ≠ 0 ∧
+    x * (3 : WittVector 3 (AdjoinRoot f)) ^ 2 = 0
+  refine ⟨?_, ?_, ?_⟩
+  · intro hx
+    have ht : t = 0 := by
+      simpa only [x, teichmuller_coeff_zero, zero_coeff] using
+        congrArg (fun y : WittVector 3 (AdjoinRoot f) => y.coeff 0) hx
+    apply ht_cube
+    rw [ht, zero_pow (by decide)]
+  · intro hx
+    apply ht_cube
+    simpa only [x, teichmuller_coeff_zero] using
+      (mul_p_eq_zero_iff_coeff_pow_eq_zero x).mp hx 0
+  · apply (mul_p_pow_eq_zero_iff_coeff_pow_eq_zero x 2).mpr
+    intro i
+    cases i with
+    | zero =>
+        change t ^ (3 ^ 2) = 0
+        exact pow_eq_zero_of_le (by decide : 4 ≤ 3 ^ 2) ht_fourth
+    | succ i =>
+        change (teichmuller 3 t).coeff (i + 1) ^ (3 ^ 2) = 0
+        rw [teichmuller_coeff_pos 3 _ _ (Nat.succ_pos _), zero_pow (by decide)]
+
+/-- The characteristic-`p` hypothesis in the coefficientwise multiplication kernel
+criterion is necessary: over `ZMod 4`, the Teichmüller lift of `2` has zero cubed
+coefficients but is not killed by `3`. -/
+private theorem zmod_four_teichmuller_coeff_cube_zero_mul_three_ne_zero :
+    ¬CharP (ZMod 4) 3 ∧
+      (∀ i : ℕ, (teichmuller 3 (2 : ZMod 4)).coeff i ^ 3 = 0) ∧
+      teichmuller 3 (2 : ZMod 4) * (3 : WittVector 3 (ZMod 4)) ≠ 0 := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro h
+    letI : CharP (ZMod 4) 3 := h
+    exact (by decide : (3 : ZMod 4) ≠ 0) (CharP.cast_eq_zero (ZMod 4) 3)
+  · intro i
+    cases i with
+    | zero =>
+        rw [teichmuller_coeff_zero]
+        decide
+    | succ i =>
+        rw [teichmuller_coeff_pos 3 _ _ (Nat.succ_pos _), zero_pow (by decide)]
+  · intro h
+    have hcoeff := congrArg (constantCoeff : WittVector 3 (ZMod 4) →+* ZMod 4) h
+    rw [map_mul,
+      map_ofNat (constantCoeff : WittVector 3 (ZMod 4) →+* ZMod 4) 3,
+      map_zero, constantCoeff_apply, teichmuller_coeff_zero] at hcoeff
+    exact (by decide : (2 : ZMod 4) * 3 ≠ 0) hcoeff
 
 end WittVector

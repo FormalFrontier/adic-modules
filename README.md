@@ -120,6 +120,16 @@ Then `import AdicModules`, or choose an individual module from the table below.
   residue coordinates, and is a homeomorphism for the mapped-ideal adic topology
   and the usual p-adic norm topology. See [details](docs/Results.md#headline-results).
 
+- **Compactness for a given adic uniformity.** For a commutative ring `R` with
+  a given `UniformSpace R`, `IsLeftUniformAddGroup R` and `IsAdic I` for the
+  induced topology,
+  `CompactSpace R ↔ CompleteSpace R ∧ ∀ n : ℕ, Finite (R ⧸ I ^ n)`.
+  All natural powers, including `n = 0`, occur. If `I.FG`, this reduces to
+  `CompactSpace R ↔ CompleteSpace R ∧ Finite (R ⧸ I)`.
+  Completeness is uniform completeness for this given uniformity, not algebraic
+  `IsAdicComplete`. No separation axiom or properness of `I` is required.
+  See the [compactness criteria](AdicModules/Topology/Algebra/AdicCompactness.lean).
+
 - **Hensel lifting.** For a commutative ring complete along any ideal, a monic
   polynomial's **coprime monic** residue factors lift with prescribed reductions;
   no locality or properness is required, and uniqueness is not asserted.
@@ -183,7 +193,15 @@ Then `import AdicModules`, or choose an individual module from the table below.
   and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
   [`WittVector.mul_p_eq_zero_iff_coeff_pow_eq_zero`](AdicModules/RingTheory/WittVector.lean)
   gives `x * (p : WittVector p k) = 0 ↔ ∀ n : ℕ, x.coeff n ^ p = 0`
-  for every `x : WittVector p k`. Moreover,
+  for every `x : WittVector p k`.
+
+- **Prime-power multiplication in Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
+  and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
+  [`WittVector.mul_p_pow_eq_zero_iff_coeff_pow_eq_zero`](AdicModules/RingTheory/WittVector.lean)
+  gives `x * (p : WittVector p k) ^ n = 0 ↔ ∀ i : ℕ, x.coeff i ^ (p ^ n) = 0`
+  for every `x : WittVector p k` and every `n : ℕ`, including zero.
+  [`WittVector.mul_p_eq_zero_iff_coeff_pow_eq_zero`](AdicModules/RingTheory/WittVector.lean)
+  is its `n = 1` specialization. Moreover,
   [`WittVector.isRegular_p_iff_isReduced`](AdicModules/RingTheory/WittVector.lean)
   gives `IsRegular (p : WittVector p k) ↔ IsReduced k`.
   The kernel formula needs no reducedness assumption; reducedness is exactly
@@ -203,6 +221,22 @@ Then `import AdicModules`, or choose an individual module from the table below.
   nonperfect ring. See the
   [coefficient, ideal and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
   and its [examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
+
+- **Domain criterion for Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
+  and any `R : Type u` with `[CommRing R]`,
+  [`WittVector.isDomain_iff`](AdicModules/RingTheory/WittVector/Domain.lean)
+  gives `IsDomain (WittVector p R) ↔ IsDomain R ∧ CharP R p`.
+  Domainhood and characteristic `p` of `R` are conclusions, not hypotheses.
+  See the [imperfect polynomial, integer and zero-ring models](AdicModulesTest/RingTheory/WittVector/Domain.lean).
+
+- **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
+  of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
+  Membership in `(p)^n` means that the first `n` coefficients vanish and each
+  remaining coefficient has a `p^n`-th root. For fixed `n`, the roots are
+  independent; no perfectness, reducedness or field hypothesis is needed.
+  A zero prefix alone does not suffice over a nonperfect ring. See the
+  [coefficient and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
+  and its [polynomial-coefficient examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
 
 - **Principal units.** In a commutative ring complete along `I`, for prime `p`
   with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical `ℤ_[p]`-powers
@@ -301,8 +335,9 @@ import AdicModules
 Related `AdicModulesTest` modules require separate imports and are not re-exported by
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
-provides detailed hypotheses, formulas, examples and the complete current roster:
-**126 Lean sources = 56 production (root included, 55 leaves) + 70 tests/models/audit imports**.
+provides detailed hypotheses, formulas, examples and the complete current roster.
+The current source roster is
+**130 Lean sources = 58 production (root included, 57 leaves) + 72 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -314,7 +349,8 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
 | [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; reducedness over `ℤ × ZMod 2`, nonreduced `ZMod 4`, and the zero ring `ZMod 1`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`; the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal product `ZMod 2 × ZMod 2`) |
-| [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field, product and nonperfect polynomial coefficients, independent roots and zero precision) |
+| [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field, product and nonperfect polynomial coefficients, independent roots and zero precision; prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
+| [RingTheory.WittVector.Domain](AdicModules/RingTheory/WittVector/Domain.lean) | [RingTheory.WittVector.Domain](AdicModulesTest/RingTheory/WittVector/Domain.lean) (imperfect polynomial domain, characteristic-zero integers and zero-ring boundary) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
@@ -343,6 +379,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [Topology.Algebra.Submodule](AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
 | [Topology.Algebra.PadicInt](AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](AdicModulesTest/Topology/Algebra/PadicInt.lean) |
 | [Topology.Algebra.AdicTopology](AdicModules/Topology/Algebra/AdicTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (module-to-mapped-ideal topology application) |
+| [Topology.Algebra.AdicCompactness](AdicModules/Topology/Algebra/AdicCompactness.lean) | [Topology.Algebra.AdicCompactness](AdicModulesTest/Topology/Algebra/AdicCompactness.lean) (3-adic applications, complete discrete integers with infinite first quotient, and zero-ring/zeroth-power boundaries) |
 | [Topology.Algebra.PrincipalUnits](AdicModules/Topology/Algebra/PrincipalUnits.lean) | [Topology.Algebra.PrincipalUnits](AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) (`p`-adic integer, 2-torsion and `X`-adic power-series models) |
 | [Topology.Algebra.Module.Span](AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) (independent original calculations; additional private comparison application in Real) |
 | [Valuation.Completeness](AdicModules/Valuation/Completeness.lean) | [Valuation.Completeness](AdicModulesTest/Valuation/Completeness.lean) (5-adic and discrete-valuation examples), [FractionFieldCompletenessPadicClient](AdicModulesTest/FractionFieldCompletenessPadicClient.lean) (3-adic maximal-ideal valuation), [FractionFieldCompletenessSeriesClient](AdicModulesTest/FractionFieldCompletenessSeriesClient.lean) (power/Laurent series over any field, with no coefficient topology) |

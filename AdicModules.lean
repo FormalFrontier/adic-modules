@@ -34,6 +34,7 @@ public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.FrobeniusCore
 public import AdicModules.RingTheory.TeichmullerFractionField
 public import AdicModules.RingTheory.WittVector
+public import AdicModules.RingTheory.WittVector.Domain
 public import AdicModules.RingTheory.WittVector.Complete
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
@@ -44,6 +45,7 @@ public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
 public import AdicModules.Topology.Algebra.Module.AdicTopology
 public import AdicModules.Topology.Algebra.PadicInt
+public import AdicModules.Topology.Algebra.AdicCompactness
 public import AdicModules.Topology.Algebra.PrincipalUnits
 public import AdicModules.Valuation.Completeness
 public import AdicModules.ValuationTopology

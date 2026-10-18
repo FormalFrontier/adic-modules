@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**56 production sources including root + 70 tests/models/audit imports**, 126 total) follow.
+(**58 production sources including root + 72 tests/models/audit imports**, 130 total) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces. Over any commutative ring of prime characteristic,
@@ -78,6 +78,14 @@ Its Teichmüller lift is nonzero but is killed by `3`; the coefficientwise
 kernel criterion gives zero cubes for every coefficient of that lift.
 A private perfect-coefficient comparison relates the same kernel description
 to Mathlib's zero-kernel theorem and Frobenius injectivity.
+
+### Domain criterion for Witt vectors
+
+For `p : ℕ` with `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`,
+[`WittVector.isDomain_iff`](../AdicModules/RingTheory/WittVector/Domain.lean)
+gives `IsDomain (WittVector p R) ↔ IsDomain R ∧ CharP R p`.
+Domainhood and characteristic `p` of `R` are conclusions, not input assumptions.
+See the [imperfect polynomial, integer and zero-ring models](../AdicModulesTest/RingTheory/WittVector/Domain.lean).
 
 ## Uniform bounded torsion
 
@@ -864,12 +872,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 55 production source leaves re-exported by the public
+The first table lists all 57 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **56 production sources including the root and 70
-test/model/audit sources, hence 126 Lean source modules**. These are source-file
+comparison. There are **58 production sources including the root and 72
+test/model/audit sources, hence 130 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -918,11 +926,13 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [RingTheory.Perfection](../AdicModules/RingTheory/Perfection.lean) | Field structure on the inverse-Frobenius limit without perfectness of the original field |
 | [RingTheory.WittVector](../AdicModules/RingTheory/WittVector.lean) | Characteristic zero over any commutative ring of prime characteristic; coefficientwise prime-multiplication kernel and `p`-regularity iff reduced coefficients; [cast, reduced-product and square-zero uses](../AdicModulesTest/RingTheory/WittVector.lean) |
 | [RingTheory.WittVector.Complete](../AdicModules/RingTheory/WittVector/Complete.lean) | Coefficient criterion for `(p)^n` and `(p)`-adic completeness over any characteristic-`p` commutative ring |
+| [RingTheory.WittVector.Domain](../AdicModules/RingTheory/WittVector/Domain.lean) | For prime `p` and any commutative ring `R`, `IsDomain (WittVector p R) ↔ IsDomain R ∧ CharP R p` |
 | [RingTheory.TeichmullerFractionField](../AdicModules/RingTheory/TeichmullerFractionField.lean) | Teichmüller image in any fraction field of a complete valuation domain with maximal ideal and prime-characteristic residue |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | Finite two-sided ring CRT, inverse representatives, independent powers, common-ring linear equivalence with characteristic API and precision-reduction squares |
 | [RingTheory.Ideal.Quotient.SMulTop](../AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean) | Two-sided scalar-ideal view over semirings; ring and algebra structures on the submodule quotient over rings, with projection compatibility |
+| [Topology.Algebra.AdicCompactness](../AdicModules/Topology/Algebra/AdicCompactness.lean) | Ideal-adic compactness for a given uniformity via completeness and finite quotients by all ideal powers; first-quotient criterion for finitely generated ideals |
 | [Topology.Algebra.AdicTopology](../AdicModules/Topology/Algebra/AdicTopology.lean) | Adic module and algebra topologies |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
 | [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
@@ -983,6 +993,7 @@ by the public root.
 | [RingTheory.TeichmullerCore](../AdicModulesTest/RingTheory/TeichmullerCore.lean) | Teichmüller image with imperfect Laurent-series residue |
 | [RingTheory.WittVector](../AdicModulesTest/RingTheory/WittVector.lean) | Nonzero casts of `3` over `ZMod 3` and the nonperfect nonfield `(ZMod 3)[X]`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)` |
 | [RingTheory.WittVector.Complete](../AdicModulesTest/RingTheory/WittVector/Complete.lean) | Prime-field and nonperfect polynomial examples: independent roots, nondivisibility, completion bijectivity and zero precision |
+| [RingTheory.WittVector.Domain](../AdicModulesTest/RingTheory/WittVector/Domain.lean) | Imperfect polynomial domain and stock-instance characteristic bridge; characteristic-zero integers and zero-ring boundary |
 | [RingTheory.FrobeniusCore](../AdicModulesTest/RingTheory/FrobeniusCore.lean) | Imperfect Laurent-series noncube and constant-root inputs, inclusion universal property and reduced-product boundary |
 | [RingTheory.TeichmullerFractionFieldModel](../AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) | Independent usual 3-adic and imperfect-residue power-series fraction-field inputs; final image-law consumers |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | A nonzero class in the first principal-power quotient |
@@ -996,6 +1007,7 @@ by the public root.
 | [RingTheory.Ideal.Quotient.Matrix](../AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) | Two-sided matrix quotient examples |
 | [RingTheory.Ideal.Quotient.LeftIdeal](../AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) | Surjective binary left-module diagonal and nonsurjective pairwise comaximal ternary diagonal |
 | [RingTheory.Ideal.Quotient.SMulTop](../AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean) | Noncommuting integer matrix units and scalar-sensitive commutator in the bottom-ideal quotient at level one |
+| [Topology.Algebra.AdicCompactness](../AdicModulesTest/Topology/Algebra/AdicCompactness.lean) | P-adic power quotients and compactness applications; complete discrete integers with infinite first quotient; zero-ring and zeroth-power boundaries |
 | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) | Discrete, indiscrete and adic integer closures, proposition indices and active predicates |
 | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) | Proper dense integer spans, excluded elements, positive-degree neighborhood suprema and basis boundaries |
 | [Topology.Algebra.PrincipalUnits](../AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) | Principal units in mixed and equal characteristic |
@@ -1042,10 +1054,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 70 current independent test/model/audit
+`AdicModulesTest.+` glob including all 72 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 56 production sources (including the root) and 70 test/model/audit
+This covers the 58 production sources (including the root) and 72 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

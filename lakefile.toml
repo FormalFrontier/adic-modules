@@ -16,7 +16,7 @@ rev = "83abb3e776bdefcbc447a1e44d0debe4010039e5"
 [[require]]
 name = "groupTheory"
 git = "https://github.com/FormalFrontier/group-theory.git"
-rev = "fcd072c51cbda8c94f91f69f251b9572e79f0e63"
+rev = "b5eb0fb8f71c80d4604c2ea90be67312c185701a"
 
 [[lean_lib]]
 name = "AdicModules"
