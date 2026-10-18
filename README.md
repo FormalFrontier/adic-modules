@@ -247,6 +247,15 @@ Then `import AdicModules`, or choose an individual module from the table below.
   Domainhood and characteristic `p` of `R` are conclusions, not hypotheses.
   See the [imperfect polynomial, integer and zero-ring models](AdicModulesTest/RingTheory/WittVector/Domain.lean).
 
+- **Discrete valuation criterion for Witt vectors.** For `p : ℕ` with
+  `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`,
+  [`WittVector.isDiscreteValuationRing_iff`](AdicModules/RingTheory/WittVector/DiscreteValuationRing.lean)
+  equates the existence of `hD : IsDomain (WittVector p R)` satisfying
+  `@IsDiscreteValuationRing (WittVector p R) inferInstance hD` with
+  `IsField R ∧ CharP R p ∧ PerfectRing R p`.
+  The domain proof is bound within the left-hand condition; field,
+  characteristic and perfectness of `R` are conclusions, not hypotheses.
+
 - **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
   of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
   Membership in `(p)^n` means that the first `n` coefficients vanish and each
