@@ -29,6 +29,16 @@ Then `import AdicModules`, or choose an individual module from the table below.
 
 ## Headline results
 
+- **Adic completion as a functor.** For any ideal `I` of a commutative ring
+  `R`, `AdicCompletion.functor I` maps `R`-modules to modules over
+  `AdicCompletion I R`, preserving the carrier universe independently of the ring.
+  It is additive and `R`-linear, and its action on module isomorphisms agrees with
+  `AdicCompletion.congr`. The relative `R`-linear API uses
+  `open scoped ModuleCat.Algebra`. Import the
+  [functor module](AdicModules/AdicCompletion/Functor.lean) directly; its
+  [product-inclusion example](AdicModulesTest/AdicCompletion/Functor.lean) uses
+  a specified splitting and includes a nonzero integer-completion boundary.
+
 - **Precompleteness and adic completeness.** Precompleteness for arbitrary
   ideals `I` and `J` implies precompleteness for `I ⊔ J`, without finite
   generation, Noetherianity or Hausdorffness. Finite families, surjective images,
@@ -335,9 +345,8 @@ import AdicModules
 Related `AdicModulesTest` modules require separate imports and are not re-exported by
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
-provides detailed hypotheses, formulas, examples and the complete current roster.
-The current source roster is
-**130 Lean sources = 58 production (root included, 57 leaves) + 72 tests/models/audit imports**.
+provides detailed hypotheses, formulas and examples. The table below lists library
+leaves and their related modules.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -353,6 +362,7 @@ The current source roster is
 | [RingTheory.WittVector.Domain](AdicModules/RingTheory/WittVector/Domain.lean) | [RingTheory.WittVector.Domain](AdicModulesTest/RingTheory/WittVector/Domain.lean) (imperfect polynomial domain, characteristic-zero integers and zero-ring boundary) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
+| [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
