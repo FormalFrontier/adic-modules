@@ -41,6 +41,20 @@ These are statements about the current library, not the historical API inventory
   natural coordinates fail ordinary reduction from degree three to degree two,
   whereas the sign-normalized coordinates agree.
 
+- **Natural powers of principal units over Henselian pairs.**
+  For a commutative ring `R`, ideal `I`, `[HenselianRing R I]` and `n : ℕ`
+  with `IsUnit (n : R ⧸ I)`,
+  `HenselianRing.bijective_pow_principal_units` gives bijectivity of
+  `fun u => u ^ n` on `(Units.map (Ideal.Quotient.mk I).toMonoidHom).ker`.
+  Every unit reducing to one therefore has a unique `n`-th root reducing to
+  one. No complete-ring, local-ring, domain, topology, nontriviality or
+  positive-exponent assumption is needed. The [principal-unit module](../AdicModules/Topology/Algebra/PrincipalUnits.lean)
+  also supplies `Ideal.mem_ker_unitsMap_quotient_iff`, identifying membership
+  with `(u : R) - 1 ∈ I`. The [Henselian examples](../AdicModulesTest/Topology/Algebra/PrincipalUnits/Henselian.lean)
+  exhibit the square root `-2` of `4` in `ℤ_[3]`, the Henselian pair
+  `ZMod 9` at `(3)` where the nonunit exponent `3` gives noninjective cubing,
+  the bottom ideal and the zero ring at exponent zero.
+
 - **p-adic powers of principal units.**
   For a commutative ring `R`, an ideal `I` with `IsAdicComplete I R`, and a
   prime `p` with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical

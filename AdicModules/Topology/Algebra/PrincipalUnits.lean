@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModules.Polynomial.Hensel
 public import Mathlib.NumberTheory.Padics.RingHoms
 public import Mathlib.LinearAlgebra.SModEq.Pow
 public import Mathlib.RingTheory.AdicCompletion.Topology
@@ -15,7 +16,14 @@ public import Mathlib.Algebra.Module.Defs
 import Mathlib.Topology.Algebra.IsOpenUnits
 
 /-!
-# Continuous p-adic powers of principal units
+# Powers of principal units
+
+For a Henselian pair `(R, I)`, the natural `n`-th power map on the kernel of
+reduction `Rˣ → (R ⧸ I)ˣ` is bijective whenever `n` is a unit in `R ⧸ I`.
+This uses the existing subgroup and its natural powers; no topology or
+positivity assumption on `n` is required. The proof uses simple-root lifting
+from `AdicModules.Polynomial.Hensel`, together with Mathlib's finite geometric
+sums and reflection of units modulo ideals contained in the Jacobson radical.
 
 Let `R` be an algebraically `I`-adically complete commutative ring, and
 suppose that the prime `p` belongs to `I`. The kernel of reduction
@@ -421,3 +429,67 @@ theorem continuousSMul_padicModule (hI : IsAdic I) :
     inferInstance inferInstance (I.continuous_padicPow p hpI hI)
 
 end Ideal
+
+/-- Raising principal units of a Henselian pair to the `n`-th power is bijective
+when `n` is a unit in the residue quotient. The principal units are the kernel of
+reduction on units, with their existing subgroup powers. No topology or positivity
+assumption on `n` is required. -/
+theorem HenselianRing.bijective_pow_principal_units {R : Type u} [CommRing R]
+    (I : Ideal R) [HenselianRing R I] (n : ℕ) (hn : IsUnit (n : R ⧸ I)) :
+    Function.Bijective
+      (fun u : (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker => u ^ n) := by
+  classical
+  letI : IsLocalHom (Ideal.Quotient.mk I) :=
+    isLocalHom_of_le_jacobson_bot I (HenselianRing.jac (R := R) (I := I))
+  have hquot (u : (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker) :
+      Ideal.Quotient.mk I ((u : Rˣ) : R) = 1 :=
+    (Ideal.Quotient.mk_eq_one_iff_sub_mem _).mpr
+      ((Ideal.mem_ker_unitsMap_quotient_iff I (u : Rˣ)).mp u.property)
+  constructor
+  · intro u v huv
+    have hp := congrArg
+      (fun w : (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker => ((w : Rˣ) : R)) huv
+    change ((u : Rˣ) : R) ^ n = ((v : Rˣ) : R) ^ n at hp
+    -- The power-difference factor reduces to the unit exponent in the quotient.
+    let s : R := (Finset.range n).sum fun i =>
+      ((u : Rˣ) : R) ^ i * ((v : Rˣ) : R) ^ (n - 1 - i)
+    have hs : Ideal.Quotient.mk I s = (n : R ⧸ I) := by
+      dsimp only [s]
+      rw [RingHom.map_geom_sum₂, hquot u, hquot v, geom_sum₂_self, one_pow, mul_one]
+    have hsunit : IsUnit s := by
+      apply IsUnit.of_map (Ideal.Quotient.mk I) s
+      rwa [hs]
+    have hzero : s * (((u : Rˣ) : R) - ((v : Rˣ) : R)) = 0 := by
+      dsimp only [s]
+      rw [geom_sum₂_mul, hp, sub_self]
+    apply Subtype.ext
+    apply Units.ext
+    apply sub_eq_zero.mp
+    exact hsunit.mul_left_cancel (hzero.trans (mul_zero s).symm)
+  · intro u
+    have hu : ((u : Rˣ) : R) - 1 ∈ I :=
+      (Ideal.mem_ker_unitsMap_quotient_iff I (u : Rˣ)).mp u.property
+    -- Nonmonic simple-root lifting also covers the zeroth exponent.
+    obtain ⟨x, hx, hxI⟩ := HenselianRing.exists_root I
+      (Polynomial.X ^ n - Polynomial.C ((u : Rˣ) : R)) 1
+      (by
+        simpa only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X,
+          one_pow, Polynomial.eval_C, neg_sub] using I.neg_mem hu)
+      (by
+        simpa only [Polynomial.derivative_sub, Polynomial.derivative_X_pow,
+          Polynomial.derivative_C, sub_zero, Polynomial.eval_mul, Polynomial.eval_C,
+          Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_natCast, one_pow, mul_one,
+          map_natCast] using hn)
+    have hxpow : x ^ n = ((u : Rˣ) : R) := by
+      simpa only [Polynomial.IsRoot.def, Polynomial.eval_sub, Polynomial.eval_pow,
+        Polynomial.eval_X, Polynomial.eval_C, sub_eq_zero] using hx
+    have hxunit : IsUnit x := by
+      apply IsUnit.of_map (Ideal.Quotient.mk I) x
+      rw [(Ideal.Quotient.mk_eq_one_iff_sub_mem x).mpr hxI]
+      exact isUnit_one
+    refine ⟨⟨hxunit.unit, (Ideal.mem_ker_unitsMap_quotient_iff I _).mpr ?_⟩, ?_⟩
+    · simpa only [hxunit.unit_spec] using hxI
+    · apply Subtype.ext
+      apply Units.ext
+      change (hxunit.unit : R) ^ n = ((u : Rˣ) : R)
+      simpa only [hxunit.unit_spec] using hxpow

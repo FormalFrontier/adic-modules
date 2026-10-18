@@ -227,6 +227,13 @@ Then `import AdicModules`, or choose an individual module from the table below.
   zero. No field, perfectness, domain, finiteness or topology is required.
   See the [kernel and regularity uses](docs/Guide.md#prime-multiplication-and-reduced-coefficients).
 
+- **Integer torsion in Witt vectors.** For prime `p` and any commutative ring
+  `R : Type u` of characteristic `p`,
+  [`WittVector.isTorsionFree_int_iff_isReduced`](AdicModules/RingTheory/WittVector/Torsion.lean)
+  states `Module.IsTorsionFree ℤ (WittVector p R) ↔ IsReduced R` for the canonical
+  integer action. Reduced non-domains are included; no perfectness or finiteness
+  is required. See the [criterion and examples](docs/Guide.md#integer-torsion-in-witt-vectors).
+
 - **Ideals and completeness of Witt vectors.** For prime `p` and any commutative
   ring `k` of characteristic `p`, `WittVector p k` is Hausdorff and complete
   for `(p)`. Membership in `(p)^n` means that the first `n` coefficients vanish
@@ -265,8 +272,11 @@ Then `import AdicModules`, or choose an individual module from the table below.
   [coefficient and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
   and its [polynomial-coefficient examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
 
-- **Principal units.** In a commutative ring complete along `I`, for prime `p`
-  with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical `ℤ_[p]`-powers
+- **Principal units.** For a Henselian pair `(R, I)`, the natural `n`-th power
+  map on the kernel of `Rˣ → (R ⧸ I)ˣ` is bijective whenever `n` is a unit in
+  `R ⧸ I`, without a topology or positivity assumption on `n`.
+  In a commutative ring complete along `I`, for prime `p`
+  with `(p : R) ∈ I`, the same kernel has canonical `ℤ_[p]`-powers
   agreeing with integer powers and an explicitly supplied additive-form module.
   For an `I`-adic topology, powering is jointly continuous and uniquely
   characterized by continuous agreement with integer powers. See
@@ -378,6 +388,7 @@ leaves and their related modules.
 | [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; reducedness over `ℤ × ZMod 2`, nonreduced `ZMod 4`, and the zero ring `ZMod 1`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`; the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal product `ZMod 2 × ZMod 2`) |
 | [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field, product and nonperfect polynomial coefficients, independent roots and zero precision; prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [RingTheory.WittVector.Domain](AdicModules/RingTheory/WittVector/Domain.lean) | [RingTheory.WittVector.Domain](AdicModulesTest/RingTheory/WittVector/Domain.lean) (imperfect polynomial domain, characteristic-zero integers and zero-ring boundary) |
+| [RingTheory.WittVector.Torsion](AdicModules/RingTheory/WittVector/Torsion.lean) | [RingTheory.WittVector.Torsion](AdicModulesTest/RingTheory/WittVector/Torsion.lean) (reduced non-domain product and dual-number integer torsion) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
@@ -408,7 +419,7 @@ leaves and their related modules.
 | [Topology.Algebra.PadicInt](AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](AdicModulesTest/Topology/Algebra/PadicInt.lean) |
 | [Topology.Algebra.AdicTopology](AdicModules/Topology/Algebra/AdicTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (module-to-mapped-ideal topology application) |
 | [Topology.Algebra.AdicCompactness](AdicModules/Topology/Algebra/AdicCompactness.lean) | [Topology.Algebra.AdicCompactness](AdicModulesTest/Topology/Algebra/AdicCompactness.lean) (3-adic applications, complete discrete integers with infinite first quotient, and zero-ring/zeroth-power boundaries) |
-| [Topology.Algebra.PrincipalUnits](AdicModules/Topology/Algebra/PrincipalUnits.lean) | [Topology.Algebra.PrincipalUnits](AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) (`p`-adic integer, 2-torsion and `X`-adic power-series models) |
+| [Topology.Algebra.PrincipalUnits](AdicModules/Topology/Algebra/PrincipalUnits.lean) | [Topology.Algebra.PrincipalUnits](AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) (`p`-adic integer, 2-torsion and `X`-adic power-series models); [Topology.Algebra.PrincipalUnits.Henselian](AdicModulesTest/Topology/Algebra/PrincipalUnits/Henselian.lean) (3-adic square roots, a `ZMod 9` nonunit-exponent boundary, bottom ideal and zero ring) |
 | [Topology.Algebra.Module.Span](AdicModules/Topology/Algebra/Module/Span.lean) | [Topology.Algebra.Module.Span.Real](AdicModulesTest/Topology/Algebra/Module/Span/Real.lean), [Topology.Algebra.Module.Span.Discrete](AdicModulesTest/Topology/Algebra/Module/Span/Discrete.lean), [Topology.Algebra.Module.Span.PadicInt](AdicModulesTest/Topology/Algebra/Module/Span/PadicInt.lean), [Topology.Algebra.Module.Span.Boundary](AdicModulesTest/Topology/Algebra/Module/Span/Boundary.lean), [Topology.Algebra.Module.Span.Indiscrete](AdicModulesTest/Topology/Algebra/Module/Span/Indiscrete.lean) (independent original calculations; additional private comparison application in Real) |
 | [Valuation.Completeness](AdicModules/Valuation/Completeness.lean) | [Valuation.Completeness](AdicModulesTest/Valuation/Completeness.lean) (5-adic and discrete-valuation examples), [FractionFieldCompletenessPadicClient](AdicModulesTest/FractionFieldCompletenessPadicClient.lean) (3-adic maximal-ideal valuation), [FractionFieldCompletenessSeriesClient](AdicModulesTest/FractionFieldCompletenessSeriesClient.lean) (power/Laurent series over any field, with no coefficient topology) |
 | [ValuationTopology](AdicModules/ValuationTopology.lean) | [ValuationTopology](AdicModulesTest/ValuationTopology.lean) |
