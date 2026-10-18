@@ -164,6 +164,38 @@ theorem isUniformInducing_algebraMap_fractionRing :
       rw [Valuation.restrict_lt_iff_lt_embedding] at hb ⊢
       simpa [δ, νV, νK, ha, hx] using hb
 
+/-- The fraction-field embedding of a valuation ring is an open embedding for the canonical
+valuation topologies. -/
+theorem isOpenEmbedding_algebraMap_fractionRing :
+    @Topology.IsOpenEmbedding V K
+      (Valued.mk' ((valuation V K).comap (algebraMap V K))).toUniformSpace.toTopologicalSpace
+      (Valued.mk' (valuation V K)).toUniformSpace.toTopologicalSpace
+      (algebraMap V K) := by
+  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  letI : Valued V (ValueGroup V K) :=
+    Valued.mk' ((valuation V K).comap (algebraMap V K))
+  refine ⟨⟨(isUniformInducing_algebraMap_fractionRing (V := V) (K := K)).isInducing,
+    IsFractionRing.injective V K⟩, ?_⟩
+  convert (Valued.isClopen_integer K).isOpen using 1
+  exact (congrArg (fun S : Subring K ↦ (S : Set K))
+    (ValuationRing.range_algebraMap_eq (A := V) (K := K))).symm
+
+/-- The fraction-field embedding of a valuation ring is a closed embedding for the canonical
+valuation topologies. -/
+theorem isClosedEmbedding_algebraMap_fractionRing :
+    @Topology.IsClosedEmbedding V K
+      (Valued.mk' ((valuation V K).comap (algebraMap V K))).toUniformSpace.toTopologicalSpace
+      (Valued.mk' (valuation V K)).toUniformSpace.toTopologicalSpace
+      (algebraMap V K) := by
+  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  letI : Valued V (ValueGroup V K) :=
+    Valued.mk' ((valuation V K).comap (algebraMap V K))
+  refine ⟨⟨(isUniformInducing_algebraMap_fractionRing (V := V) (K := K)).isInducing,
+    IsFractionRing.injective V K⟩, ?_⟩
+  convert (Valued.isClopen_integer K).isClosed using 1
+  exact (congrArg (fun S : Subring K ↦ (S : Set K))
+    (ValuationRing.range_algebraMap_eq (A := V) (K := K))).symm
+
 /-- The completed valuation integers are an abstract completion of the valuation ring. -/
 noncomputable def completionIntegersAbstractCompletion :
     letI : Valued V (ValueGroup V K) :=

@@ -79,10 +79,8 @@ theorem Valuation.Integers.isAdicComplete_span_singleton
     Valued.mk' (ν.comap (algebraMap V K))
   have hi : IsUniformInducing (algebraMap V K) :=
     ValuationRing.isUniformInducing_algebraMap_fractionRing
-  have hrange : IsClosed (Set.range (algebraMap V K)) := by
-    convert Valued.isClosed_integer K using 1
-    exact (congrArg (fun S : Subring K ↦ (S : Set K))
-      (ValuationRing.range_algebraMap_eq (A := V) (K := K))).symm
+  have hrange : IsClosed (Set.range (algebraMap V K)) :=
+    (ValuationRing.isClosedEmbedding_algebraMap_fractionRing (V := V) (K := K)).isClosed_range
   have : CompleteSpace V := hi.completeSpace hrange.isComplete
   have : T2Space V := (Topology.IsEmbedding.mk hi.isInducing hV.hom_inj).t2Space
   exact (ValuationRing.isAdic_valuationTopology_span_singleton (K := K) ha).isAdicComplete_iff.mpr
