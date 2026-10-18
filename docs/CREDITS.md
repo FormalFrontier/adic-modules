@@ -100,6 +100,19 @@ credits Aaron Anderson, María Inés de Frutos-Fernández and Filippo A. E. Nucc
 under Apache-2.0 and bears copyright (c) 2021 Aaron Anderson. The present
 completed-integer comparison instead uses a two-variable density argument via
 `AbstractCompletion.funext`; it does not copy the Laurent-series proof.
+The Witt-vector unit proofs reuse `WittVector.mkUnit` and `coe_mkUnit` from
+Mathlib's `RingTheory/WittVector/DiscreteValuationRing.lean` (Robert Y. Lewis,
+Heather Macbeth and Johan Commelin), `constantCoeff` from
+`RingTheory/WittVector/Basic.lean` (Johan Commelin and Robert Y. Lewis), and
+`isUnit_iff_ne_zero` from `Algebra/GroupWithZero/Units/Basic.lean` (Johan Commelin).
+The locality equivalence combines the unit criterion with
+`constantCoeff_surjective` from `RingTheory/WittVector/Teichmuller.lean`
+(Johan Commelin) and `IsLocalRing.of_surjective'`,
+`IsLocalRing.of_isUnit_or_isUnit_one_sub_self` and
+`IsLocalRing.isUnit_or_isUnit_one_sub_self` from `RingTheory/LocalRing/Basic.lean`
+(Kenny Lau, Chris Hughes and Mario Carneiro). These are reused constructors and
+criteria, not a copied Witt-vector locality proof; their upstream notices remain
+in Mathlib.
 
 The scalar-restriction leaf uses mathlib's native ideal-map/power identity,
 `Submodule.Quotient.restrictScalarsEquiv`, `Submodule.quotEquivOfEq` and
@@ -210,6 +223,18 @@ approaches and interfaces are reused, not their upstream proof bodies. Their
 Apache-2.0 copyright, author and license notices remain upstream. Mathematical
 credit is distinct from the redistribution basis for original project expression;
 no additional third-party source text, assets or figures are bundled.
+
+The Witt-vector reducedness equivalence reuses Mathlib's
+`RingTheory/WittVector/Teichmuller.lean` (Johan Commelin) for the
+multiplicative Teichmüller lift reflecting reducedness to the coefficient ring,
+`RingTheory/WittVector/Domain.lean` (Robert Y. Lewis) for the domain instance in
+characteristic `p`, and `RingTheory/WittVector/Basic.lean` (Johan Commelin and
+Robert Y. Lewis) for `WittVector.ghostEquiv` when `p` is invertible.
+`RingTheory/Nilpotent/Lemmas.lean` (Oliver Nash) supplies
+`nilpotent_iff_mem_prime`, the all-prime-ideal nilpotence test. The proof here
+combines the two field cases through fraction fields of prime quotients and
+uses that test to make each coefficient nilpotent, hence zero over a reduced
+coefficient ring. Their author and Apache-2.0 notices remain in Mathlib.
 
 ## Comaximal powers and finite Chinese remainders
 

@@ -21,6 +21,8 @@ It does not require finite generation or Hausdorffness.
 
 Precompleteness descends along surjective linear maps. Consequently, the
 Hausdorffification of a precomplete module is adically complete.
+A module annihilated by one power of an ideal is complete for that ideal;
+`IsAdicComplete.of_pow_smul_top_eq_bot` applies directly to the original module.
 
 Completeness for an arbitrary ideal implies completeness for every principal
 subideal. Finite coefficient tails provide the principal-power witnesses; ambient
@@ -36,6 +38,9 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
 
 * K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5,
   Exercise 0.7.4, for the motivating finite family of principal ideals.
+* Mathlib's adic completeness API by Kenny Lau, Judith Ludwig, Christian Merten
+  and Jiedong Jiang, and its submodule congruence API by Kenny Lau, provide
+  the predicates and zero-submodule congruence criterion used here.
 -/
 
 @[expose] public section
@@ -138,6 +143,21 @@ instance (I : Ideal R) [IsPrecomplete I M] : IsAdicComplete I (Hausdorffificatio
 end Hausdorffification
 
 namespace IsAdicComplete
+
+/-- A module annihilated by one power of an ideal is complete for that ideal,
+including annihilation at exponent zero. -/
+theorem of_pow_smul_top_eq_bot {I : Ideal R} {n : ℕ}
+    (h : (I ^ n • ⊤ : Submodule R M) = ⊥) : IsAdicComplete I M := by
+  refine { toIsHausdorff := ⟨?_⟩, toIsPrecomplete := ⟨?_⟩ }
+  · intro x hx
+    simpa only [h, SModEq.bot] using hx n
+  · intro f hf
+    refine ⟨f n, fun k => ?_⟩
+    rcases le_total k n with hkn | hnk
+    · exact hf hkn
+    · have heq : f n = f k := by
+        simpa only [h, SModEq.bot] using hf hnk
+      rw [heq]
 
 open scoped Pointwise
 

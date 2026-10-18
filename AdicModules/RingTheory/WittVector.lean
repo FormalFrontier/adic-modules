@@ -6,13 +6,17 @@ module
 
 public import Mathlib.Algebra.GroupWithZero.Basic
 public import Mathlib.Algebra.Regular.Defs
+public import Mathlib.RingTheory.Nilpotent.Defs
 public import Mathlib.RingTheory.WittVector.Basic
+public import Mathlib.RingTheory.WittVector.DiscreteValuationRing
+public import Mathlib.RingTheory.WittVector.Teichmuller
 public import Mathlib.RingTheory.WittVector.TeichmullerSeries
 import Mathlib.Algebra.CharP.Algebra
 import Mathlib.RingTheory.WittVector.Compare
+import Mathlib.RingTheory.WittVector.Domain
 
 /-!
-# Characteristic zero and prime multiplication and Teichmüller expansions in Witt vectors
+# Characteristic zero, units, locality, reducedness and prime multiplication and Teichmüller expansions in Witt vectors
 
 For a prime `p` and a commutative ring `R` of characteristic `p`, `WittVector p R`
 has characteristic zero. The proof uses Mathlib's comparison with the `p`-adic
@@ -24,13 +28,31 @@ Nontriviality of `R` follows from `CharP R p` and primality of `p`, so it is not
 an additional hypothesis. The instance supplies the usual characteristic-zero
 API, including `Nat.cast_inj`, `Nat.cast_ne_zero` and `Int.cast_injective`.
 
+For prime `p` and a commutative ring `R` with `CharP R p`, the unit criterion
+states `IsUnit x ↔ IsUnit (x.coeff 0)`. For coefficient fields this becomes
+`IsUnit x ↔ x.coeff 0 ≠ 0`. Under the same prime-characteristic
+commutative-ring hypotheses, the locality criterion states
+`IsLocalRing (WittVector p R) ↔ IsLocalRing R`. Neither the generic unit
+criterion nor the locality criterion requires a field or perfectness.
+
+Both the prime-multiplication statements and the uniqueness statement below
+also assume prime `p`, `[CommRing R]` and `[CharP R p]`; uniqueness additionally
+assumes `[IsReduced R]` and does not require perfectness.
+
+For any prime `p` and commutative ring `R`, `WittVector.isReduced_iff` states that
+`WittVector p R` is reduced if and only if `R` is reduced. This equivalence has no
+characteristic, nontriviality, domain, perfectness or completeness hypothesis;
+in particular, it includes the zero ring.
+
+For the prime-multiplication criterion, assume that `R` has characteristic `p`.
+
 Multiplication by `p` has a more sensitive dependence on the coefficient ring:
 its kernel consists of Witt vectors whose coefficients have zero `p`-th power.
 Consequently, `p` is a regular element of `WittVector p R` exactly when `R` is
 reduced. This criterion allows reduced rings with zero divisors and does not
 require perfectness.
 
-For reduced coefficient rings, `teichmuller_expansion_unique` states uniqueness of
+For reduced coefficient rings of characteristic `p`, `teichmuller_expansion_unique` states uniqueness of
 the digits in two Teichmüller expansions approximating the same Witt vector
 modulo every positive power of `p`. Reducedness makes Frobenius injective, allowing
 digits to be recovered from their iterated `p`-th powers. The statement requires
@@ -52,6 +74,25 @@ for every Witt vector.
   zero-kernel criterion with which the coefficientwise criterion is compared.
 * Mathlib's `RingTheory/WittVector/TeichmullerSeries.lean` (Jiedong Jiang) for
   finite-sum and Teichmüller-term coefficient formulas.
+* Mathlib's `RingTheory/WittVector/DiscreteValuationRing.lean` (Robert Y. Lewis,
+  Heather Macbeth and Johan Commelin) for the generic unit constructor
+  `WittVector.mkUnit` and its field consequence, and
+  `RingTheory/WittVector/Teichmuller.lean` for the surjective constant-coefficient map.
+* Mathlib's `RingTheory/LocalRing/Basic.lean` (Kenny Lau, Chris Hughes and
+  Mario Carneiro) for the local-ring unit criteria and descent along a surjective
+  ring homomorphism.
+* Mathlib's `RingTheory/WittVector/Teichmuller.lean` (Johan Commelin) for
+  `WittVector.teichmuller`, used to reflect reducedness to the coefficient ring.
+* Mathlib's `RingTheory/WittVector/Domain.lean` (Robert Y. Lewis) for the
+  characteristic-`p` Witt-vector domain instance, and
+  `RingTheory/WittVector/Basic.lean` (Johan Commelin and Robert Y. Lewis) for
+  `WittVector.ghostEquiv` when `p` is invertible.
+* Mathlib's `RingTheory/Nilpotent/Lemmas.lean` (Oliver Nash) for
+  `nilpotent_iff_mem_prime`, the all-prime-ideal nilpotence criterion.
+
+The reducedness proof here combines the two field cases through fraction fields
+of prime quotients. The all-prime-ideal test makes each coefficient nilpotent,
+so reducedness of the coefficient ring makes it zero.
 -/
 
 @[expose] public section
@@ -70,6 +111,95 @@ instance charZero (p : ℕ) [Fact p.Prime] (R : Type u) [CommRing R] [CharP R p]
   exact charZero_of_injective_ringHom
     (f := map (p := p) (ZMod.castHom (dvd_refl p) R))
     (map_injective _ (ZMod.castHom_injective R))
+
+/-- A Witt vector over a commutative ring of prime characteristic is a unit exactly
+when its constant coefficient is a unit. This characterizes the vectors represented
+by Mathlib's `WittVector.mkUnit` without a field hypothesis. -/
+theorem isUnit_iff_isUnit_coeff_zero {p : ℕ} [Fact p.Prime] {R : Type u}
+    [CommRing R] [CharP R p] (x : WittVector p R) :
+    IsUnit x ↔ IsUnit (x.coeff 0) := by
+  constructor
+  · intro hx
+    simpa only [constantCoeff_apply] using
+      (constantCoeff : WittVector p R →+* R).isUnit_map hx
+  · rintro ⟨a, ha⟩
+    exact ⟨mkUnit ha.symm, coe_mkUnit ha.symm⟩
+
+/-- Over a field of prime characteristic, a Witt vector is a unit exactly when its
+constant coefficient is nonzero. The reverse implication is Mathlib's
+`WittVector.isUnit_of_coeff_zero_ne_zero`. -/
+theorem isUnit_iff_coeff_zero_ne_zero {p : ℕ} [Fact p.Prime] {k : Type u}
+    [Field k] [CharP k p] (x : WittVector p k) :
+    IsUnit x ↔ x.coeff 0 ≠ 0 := by
+  exact (isUnit_iff_isUnit_coeff_zero x).trans isUnit_iff_ne_zero
+
+/-- For a commutative ring of prime characteristic, its Witt vector ring is local
+exactly when the coefficient ring is local. -/
+theorem isLocalRing_iff {p : ℕ} [Fact p.Prime] {R : Type u}
+    [CommRing R] [CharP R p] :
+    IsLocalRing (WittVector p R) ↔ IsLocalRing R := by
+  constructor
+  · intro h
+    letI := h
+    letI : Nontrivial R := CharP.nontrivial_of_char_ne_one (Fact.out : p.Prime).ne_one
+    exact IsLocalRing.of_surjective' (constantCoeff : WittVector p R →+* R)
+      (constantCoeff_surjective p)
+  · intro h
+    letI := h
+    apply IsLocalRing.of_isUnit_or_isUnit_one_sub_self
+    intro x
+    simp only [isUnit_iff_isUnit_coeff_zero]
+    change IsUnit (constantCoeff x) ∨ IsUnit (constantCoeff (1 - x))
+    simpa only [map_sub, map_one] using
+      IsLocalRing.isUnit_or_isUnit_one_sub_self (constantCoeff x)
+
+/-- For a prime `p`, the Witt vectors over a commutative ring are reduced if and only
+if the coefficient ring is reduced, without any characteristic or nontriviality assumption. -/
+theorem isReduced_iff {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] :
+    IsReduced (WittVector p R) ↔ IsReduced R := by
+  classical
+  constructor
+  · intro hW
+    letI : IsReduced (WittVector p R) := hW
+    constructor
+    intro r hr
+    have ht : IsNilpotent (teichmuller p r) := by
+      rcases hr with ⟨n, hn⟩
+      refine ⟨n, ?_⟩
+      rw [← map_pow, hn, teichmuller_zero]
+    have hz : teichmuller p r = 0 := ht.eq_zero
+    simpa only [teichmuller_coeff_zero, zero_coeff] using
+      congrArg (fun w : WittVector p R => w.coeff 0) hz
+  · intro hR
+    letI : IsReduced R := hR
+    have hfield : ∀ (K : Type u) [Field K], IsReduced (WittVector p K) := by
+      intro K hK
+      by_cases hp : (p : K) = 0
+      · letI : CharP K p :=
+          (CharP.charP_iff_prime_eq_zero (R := K) (Fact.out : p.Prime)).2 hp
+        letI : IsDomain (WittVector p K) := inferInstance
+        infer_instance
+      · letI : Invertible (p : K) := invertibleOfNonzero hp
+        exact isReduced_of_injective (ghostEquiv p K).toRingHom
+          (ghostEquiv p K).injective
+    constructor
+    intro x hx
+    apply WittVector.ext
+    intro n
+    rw [zero_coeff]
+    apply IsNilpotent.eq_zero
+    apply nilpotent_iff_mem_prime.mpr
+    intro P hP
+    letI : P.IsPrime := hP
+    let f : R →+* FractionRing (R ⧸ P) :=
+      (algebraMap (R ⧸ P) (FractionRing (R ⧸ P))).comp (Ideal.Quotient.mk P)
+    letI : IsReduced (WittVector p (FractionRing (R ⧸ P))) :=
+      hfield (FractionRing (R ⧸ P))
+    have hmap : map (p := p) f x = 0 := (hx.map (map (p := p) f)).eq_zero
+    have hcoeff : f (x.coeff n) = 0 := (map_eq_zero_iff f).mp hmap n
+    apply Ideal.Quotient.eq_zero_iff_mem.mp
+    apply IsFractionRing.injective (R ⧸ P) (FractionRing (R ⧸ P))
+    simpa only [f, RingHom.comp_apply, map_zero] using hcoeff
 
 /-- Two Teichmüller digit sequences approximating the same Witt vector modulo every
 positive power of `p` are equal over a reduced coefficient ring. -/

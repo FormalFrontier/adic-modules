@@ -123,14 +123,33 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   For `p : ℕ` with `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`
   and `[CharP R p]`, [`WittVector.charZero`](AdicModules/RingTheory/WittVector.lean)
   supplies `CharZero (WittVector p R)`, without field, perfectness, finiteness,
-  domain, reducedness or extra `Nontrivial` assumptions. See the
+  domain, reducedness or extra `Nontrivial` assumptions. The same module proves
+  `WittVector.isUnit_iff_isUnit_coeff_zero`: a Witt vector is a unit exactly when
+  its constant coefficient is a unit, with the field specialization
+  `WittVector.isUnit_iff_coeff_zero_ne_zero`. It also proves
+  `WittVector.isLocalRing_iff`: `IsLocalRing (WittVector p R) ↔ IsLocalRing R`,
+  with the same prime-characteristic commutative-ring hypotheses.
+  See the
   [Witt-vector API and uses](docs/Guide.md#characteristic-zero-of-witt-vectors).
+  The [concrete Witt-vector models](AdicModulesTest/RingTheory/WittVector.lean)
+  also give the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the
+  local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal
+  product `ZMod 2 × ZMod 2`.
   For a **reduced** commutative coefficient ring of prime characteristic `p`,
   [`WittVector.teichmuller_expansion_unique`](AdicModules/RingTheory/WittVector.lean)
   states that two digit sequences `a, b : ℕ → R` are equal if their partial sums
   `∑ i ∈ Finset.range (n + 1), teichmuller p (a i) * p^i` and the analogous
   sums for `b` both agree with the same Witt vector modulo `p^(n+1)` for every
   `n`. No perfectness, field, completeness or topology assumption is required.
+
+- **Reducedness of Witt vectors.** For any prime `p` and commutative ring
+  `R : Type u`, [`WittVector.isReduced_iff`](AdicModules/RingTheory/WittVector.lean)
+  states `IsReduced (WittVector p R) ↔ IsReduced R`. No characteristic,
+  nontriviality, domain, perfectness or completeness assumption is required.
+  The clients at prime `2` include the mixed-characteristic reduced ring
+  `ℤ × ZMod 2`, where `2` is a nonzero zero divisor; `ZMod 4`, with a nonzero
+  square-zero Teichmüller lift of `2` and nonreduced Witt ring; and the zero ring
+  `ZMod 1`, whose Witt ring is subsingleton and reduced.
 
 - **Prime multiplication in Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
   and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
@@ -253,7 +272,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
-| [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`) |
+| [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; reducedness over `ℤ × ZMod 2`, nonreduced `ZMod 4`, and the zero ring `ZMod 1`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`; the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal product `ZMod 2 × ZMod 2`) |
 | [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
@@ -327,6 +346,13 @@ and authentic upstream notices. The [detailed credits](docs/Results.md#credits-r
 retain the mathematical bibliography, Mathlib contributor credits and reuse of
 [Group Theory](https://github.com/FormalFrontier/group-theory)'s scalar-torsion interface.
 
+The Witt-vector unit criteria follow Mathlib's generic unit constructor and
+field criterion in `RingTheory/WittVector/DiscreteValuationRing.lean`, by
+Robert Y. Lewis, Heather Macbeth and Johan Commelin; the constant-coefficient
+surjection is provided by Mathlib's `RingTheory/WittVector/Teichmuller.lean`.
+The locality equivalence combines this surjection and the unit criterion with
+Mathlib's local-ring criteria in `RingTheory/LocalRing/Basic.lean`, by Kenny Lau,
+Chris Hughes and Mario Carneiro.
 Mathematical references include Fesenko–Vostokov, *Local Fields and Their Extensions*,
 and Fujiwara–Kato, *Foundations of Rigid Geometry I* ([arXiv](https://arxiv.org/abs/1308.4734v5)).
 Dependencies: [Lean](https://lean-lang.org/) and [mathlib4](https://github.com/leanprover-community/mathlib4).

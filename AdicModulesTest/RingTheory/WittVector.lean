@@ -17,6 +17,8 @@ import Mathlib.Algebra.Polynomial.Degree.Domain
 import Mathlib.Algebra.Ring.Prod
 import Mathlib.Algebra.TrivSqZeroExt.Basic
 import Mathlib.Data.ZMod.Basic
+import Mathlib.RingTheory.LocalRing.NonLocalRing
+public import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.FieldTheory.Perfect
 import Mathlib.RingTheory.Nilpotent.Basic
 import Mathlib.RingTheory.Polynomial.Basic
@@ -25,12 +27,21 @@ import Mathlib.RingTheory.WittVector.Identities
 import Mathlib.RingTheory.WittVector.Teichmuller
 
 /-!
-# Characteristic casts and prime multiplication and Teichmüller expansions in Witt vectors
+# Characteristic casts, units, locality, reducedness and prime multiplication and Teichmüller expansions in Witt vectors
 
 Although `3` vanishes in each coefficient ring of the two characteristic-three
 cast examples below, its cast into the Witt
 vectors is nonzero. Besides the prime field `ZMod 3`, the characteristic-zero
 tests include the nonperfect, nonfield coefficient ring `(ZMod 3)[X]`.
+
+Over `ZMod 2`, the Witt vector ring is local and `2` is a nonzero nonunit.
+Over `PowerSeries (ZMod 2)`, a local nonfield in which `X` is not a square,
+Teichmüller representatives of `1 + X` and `X` give a unit and a nonunit.
+The product `ZMod 2 × ZMod 2` gives a nonlocal Witt vector ring.
+
+The reducedness examples at prime `2` use the mixed-characteristic reduced ring
+`ℤ × ZMod 2`, where `2` is a nonzero zero divisor; the nonreduced ring `ZMod 4`,
+whose Teichmüller lift of `2` is nonzero and square-zero; and the zero ring `ZMod 1`.
 
 The coefficient ring `Polynomial (ZMod 3) × ZMod 3` is reduced, has nonzero zero
 divisors, and is not perfect: a cube root of `(X, 0)` would give a polynomial
@@ -65,6 +76,83 @@ example : (3 : WittVector 3 (ZMod 3)) ≠ 0 :=
 
 example : (3 : WittVector 3 ((ZMod 3)[X])) ≠ 0 :=
   Nat.cast_ne_zero.mpr (by decide)
+
+/-- The Witt vectors over the field with two elements form a local ring in which
+`2` is nonzero but not a unit. -/
+theorem zmod_two_local_nonzero_nonunit :
+    IsLocalRing (WittVector 2 (ZMod 2)) ∧
+    (2 : WittVector 2 (ZMod 2)) ≠ 0 ∧
+    ¬IsUnit (2 : WittVector 2 (ZMod 2)) := by
+  refine ⟨(isLocalRing_iff (p := 2) (R := ZMod 2)).2 inferInstance, ?_, ?_⟩
+  · exact Nat.cast_ne_zero.mpr (by decide)
+  · rw [isUnit_iff_isUnit_coeff_zero]
+    change ¬IsUnit (WittVector.constantCoeff (p := 2) (R := ZMod 2) 2)
+    rw [map_ofNat, CharP.ofNat_eq_zero (ZMod 2) 2]
+    exact not_isUnit_zero
+
+/-- Power series over the field with two elements give local, nonfield coefficients
+with nonsquare `X`. Their Witt vectors are local, with a unit represented by `1 + X`
+and a nonunit represented by `X`. -/
+theorem powerSeries_zmod_two_local_units :
+    IsLocalRing (WittVector 2 (PowerSeries (ZMod 2))) ∧
+    ¬IsField (PowerSeries (ZMod 2)) ∧
+    (¬∃ f : PowerSeries (ZMod 2), f ^ 2 = PowerSeries.X) ∧
+    IsUnit (WittVector.teichmuller 2
+      (1 + PowerSeries.X : PowerSeries (ZMod 2))) ∧
+    ¬IsUnit (WittVector.teichmuller 2
+      (PowerSeries.X : PowerSeries (ZMod 2))) := by
+  let : CharP (PowerSeries (ZMod 2)) 2 :=
+    charP_of_injective_ringHom
+      (f := PowerSeries.C (R := ZMod 2)) PowerSeries.C_injective 2
+  refine ⟨(isLocalRing_iff (p := 2) (R := PowerSeries (ZMod 2))).2 inferInstance,
+    PowerSeries.not_isField, ?_, ?_, ?_⟩
+  · rintro ⟨f, hf⟩
+    have h2 : (2 : ZMod 2) = 0 := CharP.cast_eq_zero (ZMod 2) 2
+    simpa [PowerSeries.coeff_one_pow, h2] using congrArg (PowerSeries.coeff 1) hf
+  · rw [isUnit_iff_isUnit_coeff_zero, WittVector.teichmuller_coeff_zero,
+      PowerSeries.isUnit_iff_constantCoeff]
+    simp
+  · rw [isUnit_iff_isUnit_coeff_zero, WittVector.teichmuller_coeff_zero,
+      PowerSeries.isUnit_iff_constantCoeff]
+    simp
+
+/-- The product of two fields with two elements is a nonlocal coefficient ring,
+and its Witt vector ring is nonlocal as well. -/
+theorem prod_zmod_two_not_isLocalRing :
+    ¬IsLocalRing (WittVector 2 (ZMod 2 × ZMod 2)) := by
+  intro h
+  exact IsLocalRing.not_isLocalRing_of_prod_of_nontrivial
+    (ZMod 2) (ZMod 2)
+    ((isLocalRing_iff (p := 2) (R := ZMod 2 × ZMod 2)).1 h)
+
+-- Reducedness does not require a domain, prime characteristic, or regularity of `p`.
+example : IsReduced (WittVector 2 (ℤ × ZMod 2)) ∧
+    (2 : ℤ × ZMod 2) ≠ 0 ∧ ((0, 1) : ℤ × ZMod 2) ≠ 0 ∧
+    (2 : ℤ × ZMod 2) * (0, 1) = 0 := by
+  refine ⟨(isReduced_iff (p := 2) (R := ℤ × ZMod 2)).2 inferInstance, ?_, ?_, ?_⟩ <;>
+    decide
+
+-- A concrete square-zero lift and the converse direction of the reducedness equivalence.
+example : teichmuller 2 (2 : ZMod 4) ≠ 0 ∧
+    (teichmuller 2 (2 : ZMod 4)) ^ 2 = 0 ∧ ¬ IsReduced (WittVector 2 (ZMod 4)) := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro h
+    have hz : (2 : ZMod 4) = 0 := by
+      simpa only [teichmuller_coeff_zero, zero_coeff]
+        using congrArg (fun w : WittVector 2 (ZMod 4) => w.coeff 0) h
+    exact (by decide : (2 : ZMod 4) ≠ 0) hz
+  · rw [← map_pow, show (2 : ZMod 4) ^ 2 = 0 by decide, teichmuller_zero]
+  · intro hw
+    letI : IsReduced (ZMod 4) := (isReduced_iff (p := 2) (R := ZMod 4)).1 hw
+    exact (by decide : (2 : ZMod 4) ≠ 0)
+      (eq_zero_of_pow_eq_zero (n := 2) (by decide : (2 : ZMod 4) ^ 2 = 0))
+
+-- The zero coefficient ring is allowed, without a prime-characteristic premise.
+example : (0 : ZMod 1) = 1 ∧ Subsingleton (WittVector 2 (ZMod 1)) ∧
+    IsReduced (WittVector 2 (ZMod 1)) := by
+  refine ⟨Subsingleton.elim _ _, ?_,
+    (isReduced_iff (p := 2) (R := ZMod 1)).2 inferInstance⟩
+  exact ⟨fun x y => WittVector.ext fun n => Subsingleton.elim _ _⟩
 
 /-- The nonzero Teichmüller lift of `1` over `ZMod 2` has the canonical finite
 digit expansion, which agrees with every expansion of the same Witt vector. -/

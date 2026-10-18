@@ -9,6 +9,7 @@ public import Mathlib.RingTheory.AdicCompletion.Basic
 public import Mathlib.RingTheory.AdicCompletion.Completeness
 public import Mathlib.RingTheory.AdicCompletion.Noetherian
 public import Mathlib.Basic.Nontrivial.Defs
+public import Mathlib.Data.ZMod.Basic
 public import Mathlib.RingTheory.Int.Basic
 public import Mathlib.Tactic.NormNum
 
@@ -29,6 +30,10 @@ The finite generators `{2, 4}` also illustrate precompleteness for their span an
 the completeness equivalence with Hausdorffness for the whole span. For any finite
 subset of a commutative ring, principal completeness gives completeness of the
 Hausdorffification for its generated ideal, without Hausdorffness of the source.
+
+The original integer module `ZMod 8` is complete for `(2)`: the ideal `(2)^3 = (8)`
+annihilates its canonical integer action. The original integer module `ZMod 1`
+illustrates annihilation at exponent zero. Neither application changes the module data.
 -/
 
 set_option warningAsError true
@@ -38,6 +43,25 @@ set_option warningAsError true
 local notation "I₂" => (Ideal.span {(2 : ℤ)} : Ideal ℤ)
 local notation "I₄" => (Ideal.span {(4 : ℤ)} : Ideal ℤ)
 local notation "M₂" => AdicCompletion I₂ ℤ
+
+private theorem zmod_eight_pow_smul_top_eq_bot :
+    (I₂ ^ 3 • ⊤ : Submodule ℤ (ZMod 8)) = ⊥ := by
+  rw [Ideal.span_singleton_pow, show (2 : ℤ) ^ 3 = 8 from by decide]
+  apply le_bot_iff.mp
+  apply Submodule.smul_le.mpr
+  intro r hr x _
+  obtain ⟨s, rfl⟩ := Ideal.mem_span_singleton.mp hr
+  exact (Submodule.mem_bot ℤ).mpr (by
+    rw [mul_smul, zsmul_eq_mul, show ((8 : ℤ) : ZMod 8) = 0 from by decide, zero_mul])
+
+example : IsAdicComplete I₂ (ZMod 8) :=
+  IsAdicComplete.of_pow_smul_top_eq_bot zmod_eight_pow_smul_top_eq_bot
+
+example : IsAdicComplete I₂ (ZMod 1) := by
+  apply IsAdicComplete.of_pow_smul_top_eq_bot (n := 0)
+  apply le_bot_iff.mp
+  intro x _
+  exact (Submodule.mem_bot ℤ).mpr (Subsingleton.elim x 0)
 
 local instance : IsAdicComplete I₂ M₂ :=
   AdicCompletion.isAdicComplete (M := ℤ) (Submodule.fg_span_singleton (2 : ℤ))
