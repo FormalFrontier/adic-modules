@@ -117,3 +117,159 @@ private theorem mem_span_p_pow_zero_iff
   simp
 
 end WittVector
+
+namespace WittVector
+
+section SpanThree
+
+private theorem zmod_three_domain_surjective_frobenius :
+    IsDomain (ZMod 3) ∧ Function.Surjective (_root_.frobenius (ZMod 3) 3) := by
+  exact ⟨inferInstance, _root_.surjective_frobenius (ZMod 3) 3⟩
+
+private theorem zmod_three_ker_constantCoeff_and_span_three_isPrime :
+    (RingHom.ker (constantCoeff : WittVector 3 (ZMod 3) →+* ZMod 3) =
+      Ideal.span {(3 : WittVector 3 (ZMod 3))}) ∧
+      (Ideal.span {(3 : WittVector 3 (ZMod 3))}).IsPrime := by
+  have hker : RingHom.ker (constantCoeff : WittVector 3 (ZMod 3) →+* ZMod 3) =
+      Ideal.span {(3 : WittVector 3 (ZMod 3))} :=
+    @WittVector.ker_constantCoeff 3 Nat.fact_prime_three (ZMod 3) _ _ _
+  refine ⟨hker, ?_⟩
+  rw [← hker]
+  exact RingHom.ker_isPrime (constantCoeff : WittVector 3 (ZMod 3) →+* ZMod 3)
+
+private theorem prod_zmod_three_surjective_frobenius_not_isDomain :
+    Function.Surjective (_root_.frobenius (ZMod 3 × ZMod 3) 3) ∧
+      ¬ IsDomain (ZMod 3 × ZMod 3) := by
+  constructor
+  · exact @_root_.surjective_frobenius (ZMod 3 × ZMod 3) 3 _ _
+      (_root_.instPerfectRingProd (ZMod 3) 3 (ZMod 3))
+  · intro h
+    letI := h
+    exact false_of_nontrivial_of_product_domain (ZMod 3) (ZMod 3)
+
+private theorem prod_zmod_three_teichmuller_zero_divisors_mod_span_three :
+    let a : WittVector 3 (ZMod 3 × ZMod 3) :=
+      teichmuller 3 ((1, 0) : ZMod 3 × ZMod 3)
+    let b : WittVector 3 (ZMod 3 × ZMod 3) :=
+      teichmuller 3 ((0, 1) : ZMod 3 × ZMod 3)
+    a * b = 0 ∧
+      a ∉ Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))} ∧
+      b ∉ Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))} := by
+  let a : WittVector 3 (ZMod 3 × ZMod 3) :=
+    teichmuller 3 ((1, 0) : ZMod 3 × ZMod 3)
+  let b : WittVector 3 (ZMod 3 × ZMod 3) :=
+    teichmuller 3 ((0, 1) : ZMod 3 × ZMod 3)
+  change a * b = 0 ∧
+    a ∉ Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))} ∧
+    b ∉ Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))}
+  refine ⟨?_, ?_, ?_⟩
+  · change teichmuller 3 ((1, 0) : ZMod 3 × ZMod 3) *
+      teichmuller 3 ((0, 1) : ZMod 3 × ZMod 3) = 0
+    rw [← map_mul]
+    have hzero : ((1, 0) : ZMod 3 × ZMod 3) * (0, 1) = 0 := by
+      ext <;> simp
+    rw [hzero, teichmuller_zero]
+  · intro ha
+    have hcoeff := (mem_span_p_iff_coeff_zero_eq_zero a).mp ha
+    have hfst : (1 : ZMod 3) = 0 := by
+      simpa [a] using congrArg Prod.fst hcoeff
+    exact one_ne_zero hfst
+  · intro hb
+    have hcoeff := (mem_span_p_iff_coeff_zero_eq_zero b).mp hb
+    have hsnd : (1 : ZMod 3) = 0 := by
+      simpa [b] using congrArg Prod.snd hcoeff
+    exact one_ne_zero hsnd
+
+private theorem prod_zmod_three_ker_constantCoeff_and_not_isPrime_span_three :
+    (RingHom.ker
+        (constantCoeff : WittVector 3 (ZMod 3 × ZMod 3) →+* (ZMod 3 × ZMod 3)) =
+      Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))}) ∧
+      ¬ (Ideal.span {(3 : WittVector 3 (ZMod 3 × ZMod 3))}).IsPrime := by
+  refine ⟨?_, ?_⟩
+  · exact @WittVector.ker_constantCoeff 3 Nat.fact_prime_three (ZMod 3 × ZMod 3) _ _
+      (_root_.instPerfectRingProd (ZMod 3) 3 (ZMod 3))
+  · intro hprime
+    obtain ⟨hab, ha, hb⟩ := prod_zmod_three_teichmuller_zero_divisors_mod_span_three
+    rcases hprime.mem_or_mem_of_mul_eq_zero hab with h | h
+    · exact ha h
+    · exact hb h
+
+private theorem polynomial_zmod_three_domain_not_surjective_frobenius :
+    IsDomain (Polynomial (ZMod 3)) ∧
+      ¬ Function.Surjective (_root_.frobenius (Polynomial (ZMod 3)) 3) := by
+  refine ⟨inferInstance, ?_⟩
+  intro hsurj
+  obtain ⟨q, hq⟩ := hsurj (Polynomial.X : Polynomial (ZMod 3))
+  exact polynomial_X_not_cube q (by simpa only [_root_.frobenius_def] using hq)
+
+private theorem polynomial_zmod_three_verschiebung_teichmuller_X_mod_span_three :
+    let z : WittVector 3 (Polynomial (ZMod 3)) :=
+      verschiebung (teichmuller 3 (Polynomial.X : Polynomial (ZMod 3)))
+    z.coeff 0 = 0 ∧
+      z.coeff 1 = (Polynomial.X : Polynomial (ZMod 3)) ∧
+      z ∈ RingHom.ker
+        (constantCoeff : WittVector 3 (Polynomial (ZMod 3)) →+* Polynomial (ZMod 3)) ∧
+      z ∉ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))} ∧
+      z ^ 2 ∈ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))} := by
+  let t : WittVector 3 (Polynomial (ZMod 3)) :=
+    teichmuller 3 (Polynomial.X : Polynomial (ZMod 3))
+  let z : WittVector 3 (Polynomial (ZMod 3)) := verschiebung t
+  change z.coeff 0 = 0 ∧
+    z.coeff 1 = (Polynomial.X : Polynomial (ZMod 3)) ∧
+    z ∈ RingHom.ker
+      (constantCoeff : WittVector 3 (Polynomial (ZMod 3)) →+* Polynomial (ZMod 3)) ∧
+    z ∉ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))} ∧
+    z ^ 2 ∈ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))}
+  obtain ⟨hz0, hnot⟩ : z.coeff 0 = 0 ∧
+      z ∉ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))} :=
+    verschiebung_teichmuller_X_zero_not_mem_span_three
+  have hz1 : z.coeff 1 = (Polynomial.X : Polynomial (ZMod 3)) := by
+    simp [z, t]
+  have hzker : z ∈ RingHom.ker
+      (constantCoeff : WittVector 3 (Polynomial (ZMod 3)) →+* Polynomial (ZMod 3)) := by
+    change z.coeff 0 = 0
+    exact hz0
+  have hsq : z ^ 2 ∈ Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))} := by
+    apply Ideal.mem_span_singleton'.mpr
+    refine ⟨verschiebung (t * t), ?_⟩
+    -- Additivity moves the natural scalar through Verschiebung.
+    calc
+      verschiebung (t * t) * 3 = verschiebung ((t * t) * 3) := by
+        simpa only [nsmul_eq_mul, Nat.cast_ofNat, mul_comm] using
+          (map_nsmul (verschiebung : WittVector 3 (Polynomial (ZMod 3)) →+
+            WittVector 3 (Polynomial (ZMod 3))) 3 (t * t)).symm
+      _ = verschiebung (t * frobenius (verschiebung t)) := by
+        simp only [frobenius_verschiebung, Nat.cast_ofNat, mul_assoc]
+      _ = verschiebung t * verschiebung t :=
+        verschiebung_mul_frobenius t (verschiebung t)
+      _ = z ^ 2 := by rw [pow_two]
+  exact ⟨hz0, hz1, hzker, hnot, hsq⟩
+
+private theorem polynomial_zmod_three_ker_constantCoeff_ne_and_not_isPrime_span_three :
+    (RingHom.ker
+        (constantCoeff : WittVector 3 (Polynomial (ZMod 3)) →+* Polynomial (ZMod 3)) ≠
+      Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))}) ∧
+      ¬ (Ideal.span {(3 : WittVector 3 (Polynomial (ZMod 3)))}).IsPrime := by
+  obtain ⟨_, _, hzker, hnot, hsq⟩ :=
+    polynomial_zmod_three_verschiebung_teichmuller_X_mod_span_three
+  constructor
+  · intro hker
+    exact hnot (hker ▸ hzker)
+  · intro hprime
+    exact hnot (hprime.mem_of_pow_mem 2 hsq)
+
+end SpanThree
+
+/-- Perfectness specializes the kernel criterion to the usual coefficient kernel. -/
+private theorem ker_constantCoeff_eq_span_p_of_perfectRing
+    {p : ℕ} [Fact p.Prime] {k : Type u} [CommRing k] [CharP k p] [PerfectRing k p] :
+    RingHom.ker (constantCoeff : WittVector p k →+* k) =
+      Ideal.span {(p : WittVector p k)} := by
+  exact (ker_constantCoeff_eq_span_p_iff_surjective_frobenius (p := p)).mpr
+    (_root_.surjective_frobenius k p)
+
+private theorem zmod_three_span_three_isPrime_of_domain_surjective_frobenius :
+    (Ideal.span {(3 : WittVector 3 (ZMod 3))}).IsPrime := by
+  exact (span_p_isPrime_iff (p := 3)).mpr zmod_three_domain_surjective_frobenius
+
+end WittVector

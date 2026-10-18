@@ -163,14 +163,18 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   zero. No field, perfectness, domain, finiteness or topology is required.
   See the [kernel and regularity uses](docs/Guide.md#prime-multiplication-and-reduced-coefficients).
 
-- **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
-  of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
-  Membership in `(p)^n` means that the first `n` coefficients vanish and each
-  remaining coefficient has a `p^n`-th root. For fixed `n`, the roots are
-  independent; no perfectness, reducedness or field hypothesis is needed.
-  A zero prefix alone does not suffice over a nonperfect ring. See the
-  [coefficient and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
-  and its [polynomial-coefficient examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
+- **Ideals and completeness of Witt vectors.** For prime `p` and any commutative
+  ring `k` of characteristic `p`, `WittVector p k` is Hausdorff and complete
+  for `(p)`. Membership in `(p)^n` means that the first `n` coefficients vanish
+  and each remaining coefficient has a `p^n`-th root. For fixed `n`, the roots
+  are independent; no perfectness, reducedness or field hypothesis is needed.
+  The constant-coefficient kernel equals `(p)` exactly when Frobenius on `k`
+  is surjective, and `(p)` is prime exactly when `k` is a domain with
+  surjective Frobenius. Prime-field, product and polynomial examples
+  distinguish these conditions; a zero prefix alone does not suffice over a
+  nonperfect ring. See the
+  [coefficient, ideal and completeness API](AdicModules/RingTheory/WittVector/Complete.lean)
+  and its [examples](AdicModulesTest/RingTheory/WittVector/Complete.lean).
 
 - **Principal units.** In a commutative ring complete along `I`, for prime `p`
   with `(p : R) ∈ I`, the kernel of `Rˣ → (R ⧸ I)ˣ` has canonical `ℤ_[p]`-powers
@@ -273,7 +277,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
 | [RingTheory.FrobeniusCore](AdicModules/RingTheory/FrobeniusCore.lean) | [RingTheory.FrobeniusCore](AdicModulesTest/RingTheory/FrobeniusCore.lean) (imperfect Laurent-series field, universal property, characteristic-one and reduced-product boundaries) |
 | [RingTheory.WittVector](AdicModules/RingTheory/WittVector.lean) | [RingTheory.WittVector](AdicModulesTest/RingTheory/WittVector.lean) (nonzero casts of `3` over `ZMod 3` and `(ZMod 3)[X]`; reducedness over `ℤ × ZMod 2`, nonreduced `ZMod 4`, and the zero ring `ZMod 1`; injective multiplication by `3` over the reduced nonperfect `Polynomial (ZMod 3) × ZMod 3` with nonzero zero divisors; nonzero Teichmüller torsion killed by `3` and the coefficientwise kernel criterion over `TrivSqZeroExt (ZMod 3) (ZMod 3)`; the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal product `ZMod 2 × ZMod 2`) |
-| [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
+| [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field, product and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
