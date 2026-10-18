@@ -33,6 +33,9 @@ For example:
 - A finite pairwise comaximal family of **two-sided** ideals in a possibly
   noncommutative ring gives the canonical ring CRT equivalence and a unique
   quotient class, not a unique ring representative.
+- For a commutative ring and a possibly noncommutative algebra, scalar-ideal
+  submodule quotients carry ring and algebra structures with the original
+  additive group and scalar action; the two-sided ideal view also works over semirings.
 - For a semiring module with separately continuous addition and a dense
   subsemiring, span set-closures agree under coefficient continuity at the
   selected generators, without global coefficient continuity.
@@ -42,8 +45,8 @@ These are current mathematical interfaces built on dependency-provided ideals,
 quotients, completions, topologies and perfection, not newly generated API entries
 or assertions of independent constructions of those stock objects.
 
-For the complete current **122-source** map (**54 production including root
-(53 leaves) + 68 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
+For the complete current **126-source** map (**56 production including root
+(55 leaves) + 70 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
 and [root import map](../README.md#imports-and-module-map). See also
 [dependent products and completeness models](Guide.md#dependent-products-and-completeness-models)
 for the two product library leaves and the separate test-only proposition checks/contracts

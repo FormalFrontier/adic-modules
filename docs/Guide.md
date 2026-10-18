@@ -18,7 +18,7 @@ The aggregate `AdicModulesTest.Axioms` imports only `AdicModules`: it imports
 none of the model files and performs no axiom census. Proof checking requires
 a transitive audit of all declarations, including private, generated, test and
 imported declarations. The application guides and complete current module map
-(**54 production sources including root + 68 tests/models/audit imports**, 122 total) follow.
+(**56 production sources including root + 70 tests/models/audit imports**, 126 total) follow.
 The [results reference](Results.md) preserves the expanded mathematical catalogue,
 including completion–tensor alternatives, Hensel statements and
 Frobenius/Teichmüller interfaces. Over any commutative ring of prime characteristic,
@@ -175,6 +175,31 @@ The separately imported [integer `(2)` model](../AdicModulesTest/AdicCompletionQ
 compares the level-one quotient with `ZMod 2` and includes inverse formulas and
 the degree-zero boundary.
 
+## Scalar-ideal quotients of algebras
+
+Import [`AdicModules.RingTheory.Ideal.Quotient.SMulTop`](../AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean)
+or the public root. For `[CommSemiring R]`, `[Semiring A]` and `[Algebra R A]`,
+`Ideal.smulTop J A` views `J • (⊤ : Submodule R A)` as a two-sided ideal of `A`;
+`Ideal.mem_smulTop` characterizes membership. The universes of `R` and `A` are
+independent.
+
+For `[CommRing R]` and `[Ring A]`, the original submodule quotient
+`A ⧸ (J • (⊤ : Submodule R A))` carries ring and `R`-algebra structures with
+its existing quotient relation, additive group and `R`-module action.
+Commutativity of `A` is not required. Use Mathlib's existing
+`Ideal.Quotient.mkₐ R (J.smulTop A)` and its algebra-homomorphism laws.
+`Ideal.Quotient.mkₐ_smulTop_apply`, `Ideal.Quotient.mkₐ_smulTop_toLinearMap`
+and `Ideal.Quotient.coe_mkₐ_smulTop` identify its values, linear map and
+underlying function with the original submodule projection `mkQ`.
+Adic levels use `J = I ^ n`; no finite generation or nontriviality is required.
+These are per-quotient structures, not an algebraic universal property of completion.
+
+The separate [matrix example](../AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean)
+uses `Matrix (Fin 2) (Fin 2) ℤ`, `I = ⊥` and `n = 1`.
+The images of `E₀₁` and `E₁₀` do not commute, and their nonzero commutator
+uses the retained integer scalar action. The bottom-quotient equivalence and
+the projection compatibility identify these classes with their matrix representatives.
+
 ## Restricting scalars in adic completions
 
 Import [`AdicModules.AdicCompletion.RestrictScalars`](../AdicModules/AdicCompletion/RestrictScalars.lean)
@@ -229,6 +254,15 @@ The [ordinary-import client](../AdicModulesTest/AdicCompletion/RestrictScalars.l
 exercises these directions and boundary cases. The 103-display-site native
 `docs/API.md` snapshot predates this module and remains historical; this guide
 and the Lean source describe the current scalar-restriction API.
+
+## Linear maps from an adic completion
+
+Import [`AdicModules.AdicCompletion.LinearMap`](../AdicModules/AdicCompletion/LinearMap.lean)
+for canonical extension, Hausdorff uniqueness and the structured Hom equivalence;
+see the [Results reference](Results.md#linear-maps-from-an-adic-completion) for
+their distinct hypotheses and characteristic laws. Import the
+[integer free-module model](../AdicModulesTest/AdicCompletion/LinearMap.lean)
+separately for the independent nonzero `(2)`-adic example with source `ℕ →₀ ℤ`.
 
 ## Dependent products and completeness models
 
@@ -830,12 +864,12 @@ These examples are not re-exported by `AdicModules`.
 ## Module map
 
 The library module names in the first table have prefix `AdicModules.`.
-The first table lists all 53 production source leaves re-exported by the public
+The first table lists all 55 production source leaves re-exported by the public
 root, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
-comparison. There are **54 production sources including the root and 68
-test/model/audit sources, hence 122 Lean source modules**. These are source-file
+comparison. There are **56 production sources including the root and 70
+test/model/audit sources, hence 126 Lean source modules**. These are source-file
 counts, not
 counts of mathematical models, compiled modules, kernel declarations or audited
 axioms. All four left-ideal
@@ -862,6 +896,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
+| [AdicCompletion.LinearMap](../AdicModules/AdicCompletion/LinearMap.lean) | Canonical extension, Hausdorff uniqueness and the linear Hom equivalence |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
 | [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
 | [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
@@ -887,6 +922,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [RingTheory.Ideal.IsPrincipalPowQuotient](../AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) | Representatives for quotients of powers of a principal ideal |
 | [RingTheory.Ideal.Operations](../AdicModules/RingTheory/Ideal/Operations.lean) | All-exponent semiring left-ideal comaximal powers and independent pairwise power guards, with no two-sidedness requirement |
 | [RingTheory.Ideal.Quotient.Finite](../AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | Finite two-sided ring CRT, inverse representatives, independent powers, common-ring linear equivalence with characteristic API and precision-reduction squares |
+| [RingTheory.Ideal.Quotient.SMulTop](../AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean) | Two-sided scalar-ideal view over semirings; ring and algebra structures on the submodule quotient over rings, with projection compatibility |
 | [Topology.Algebra.AdicTopology](../AdicModules/Topology/Algebra/AdicTopology.lean) | Adic module and algebra topologies |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
 | [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
@@ -930,6 +966,7 @@ by the public root.
 | [AdicCompletion.DependentPi](../AdicModulesTest/AdicCompletion/DependentPi.lean) | Private generic product `Prop` contracts, the nonzero completion element of the constant-one `ℕ → ℤ` family and its comparison image; no universal bijectivity proof |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
 | [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
+| [AdicCompletion.LinearMap](../AdicModulesTest/AdicCompletion/LinearMap.lean) | Independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ` and inverse-Hom client |
 | [AdicCompletion.LocalRing](../AdicModulesTest/AdicCompletion/LocalRing.lean) | Unit detection and locality in the maximal-ideal completion of ℤ localized at `(2)` |
 | [AdicCompletion.PadicInt](../AdicModulesTest/AdicCompletion/PadicInt.lean) | Nonzero integer-completion and p-adic inputs, comparison laws and trivial-residue boundaries |
 | [AdicCompletion.RestrictScalars](../AdicModulesTest/AdicCompletion/RestrictScalars.lean) | Identity and polynomial algebras, both map directions, level zero and bottom/top ideals |
@@ -958,6 +995,7 @@ by the public root.
 | [RingTheory.Ideal.Quotient.FiniteReduction](../AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) | Forward/inverse precision `2` to `1` squares for `[8]`, including mixed zero precision |
 | [RingTheory.Ideal.Quotient.Matrix](../AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) | Two-sided matrix quotient examples |
 | [RingTheory.Ideal.Quotient.LeftIdeal](../AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) | Surjective binary left-module diagonal and nonsurjective pairwise comaximal ternary diagonal |
+| [RingTheory.Ideal.Quotient.SMulTop](../AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean) | Noncommuting integer matrix units and scalar-sensitive commutator in the bottom-ideal quotient at level one |
 | [Topology.Algebra.SubmoduleClosure](../AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) | Discrete, indiscrete and adic integer closures, proposition indices and active predicates |
 | [Topology.Algebra.PadicInt](../AdicModulesTest/Topology/Algebra/PadicInt.lean) | Proper dense integer spans, excluded elements, positive-degree neighborhood suprema and basis boundaries |
 | [Topology.Algebra.PrincipalUnits](../AdicModulesTest/Topology/Algebra/PrincipalUnits.lean) | Principal units in mixed and equal characteristic |
@@ -1004,10 +1042,10 @@ build memory. No verified whole-build process or RAM cap is supplied here.
 Leave space for several gigabytes of dependency sources and artifacts.
 
 The default library targets are `AdicModules` and `AdicModulesTest`, with the
-`AdicModulesTest.+` glob including all 68 current independent test/model/audit
+`AdicModulesTest.+` glob including all 70 current independent test/model/audit
 files. The normal reproduction command is
 `lake build AdicModules AdicModulesTest` (or `lake build` for both default targets).
-This covers the 54 production sources (including the root) and 68 test/model/audit
+This covers the 56 production sources (including the root) and 70 test/model/audit
 sources in the complete current map. The four left-ideal models and five span
 models are source files, not measures of test throughput or proof coverage.
 Private verification fixtures may emit private-module advisories by design.

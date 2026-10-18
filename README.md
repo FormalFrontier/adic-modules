@@ -8,6 +8,25 @@ The library reuses Lean and Mathlib's ideals, modules, topologies and inverse li
 The [results reference](docs/Results.md) retains detailed statements, API names,
 models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
 
+## Using the library
+
+Add a dependency to your project's `lakefile.toml`:
+
+```toml
+[[require]]
+name = "adic-modules"
+git = "https://github.com/FormalFrontier/adic-modules.git"
+rev = "main"
+```
+
+GitHub `main` contains only reviewed releases. Lake resolves it when you first add
+or update the dependency; your project's `lake-manifest.json` records that commit.
+For an explicit version, replace `main` with a full release commit from its history.
+Use the Lean toolchain of the selected release; libraries used together must share
+a Mathlib revision.
+
+Then `import AdicModules`, or choose an individual module from the table below.
+
 ## Headline results
 
 - **Precompleteness and adic completeness.** Precompleteness for arbitrary
@@ -46,6 +65,15 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   scalar restriction; it is not tensor base change. See the
   [coordinate statements](docs/Results.md#headline-results) and
   [scalar-restriction guide](docs/Guide.md#restricting-scalars-in-adic-completions).
+
+- **Linear maps from an adic completion.** Over a commutative ring, any ideal
+  admits canonical extension of linear maps into an adically complete module.
+  For a finitely generated ideal, maps into a Hausdorff module are determined
+  by their restriction to the original module, without target completeness.
+  For a finitely generated ideal and a complete target, restriction is an
+  `R`-linear equivalence of Hom modules.
+  See the [linear-map API](AdicModules/AdicCompletion/LinearMap.lean) and
+  [detailed assumptions, laws and nonzero model](docs/Results.md#linear-maps-from-an-adic-completion).
 
 - **Finite-power completion kernels.** For a commutative ring `R`, an additive
   commutative group module `M` and any `n : ℕ`, finite generation of **only
@@ -215,6 +243,15 @@ models and mathematical credits; the [Guide](docs/Guide.md) develops usage.
   and forward/inverse precision squares use the same data. This is not general
   module CRT for arbitrary left ideals. See [finite quotients](docs/FiniteQuotient.md).
 
+- **Scalar-ideal quotients of algebras.** For a commutative semiring `R` and an
+  `R`-algebra semiring `A`, `J • ⊤` has a two-sided ideal view in `A`.
+  For a commutative ring `R` and a possibly noncommutative `R`-algebra ring `A`,
+  the original submodule quotient `A ⧸ (J • ⊤)` carries ring and `R`-algebra
+  structures retaining its quotient additive group and `R`-module action.
+  The existing quotient algebra map agrees with the submodule projection;
+  adic levels specialize to `J = I ^ n`. See the
+  [quotient API and matrix example](docs/Guide.md#scalar-ideal-quotients-of-algebras).
+
 - **Valuation-integer completeness.** Let `R` be a commutative ring and `K`
   a valued field with an `R`-algebra structure identifying `R` with its valuation
   integers. For **nonzero** `a : R` with **separated** powers of `(a)`,
@@ -265,7 +302,7 @@ Related `AdicModulesTest` modules require separate imports and are not re-export
 that root; some expose named concrete results, while the left-ideal, span and
 fraction-field completeness models keep their calculations private. The [mathematical guide](docs/Guide.md)
 provides detailed hypotheses, formulas, examples and the complete current roster:
-**122 Lean sources = 54 production (root included, 53 leaves) + 68 tests/models/audit imports**.
+**126 Lean sources = 56 production (root included, 55 leaves) + 70 tests/models/audit imports**.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -282,6 +319,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
+| [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
@@ -299,6 +337,7 @@ provides detailed hypotheses, formulas, examples and the complete current roster
 | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (representatives and inverse formulas) | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (nonzero chosen-generator class for `(5)` in `ℤ`) |
 | [RingTheory.Ideal.Operations](AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (independent original calculations; additional private comaximal-powers application) |
 | [RingTheory.Ideal.Quotient.Finite](AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | [RingTheory.Ideal.Quotient.Finite](AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) (integer quotient and boundary calculations), [RingTheory.Ideal.Quotient.FiniteEquivalence](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) (equivalence client), [RingTheory.Ideal.Quotient.FinitePowers](AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) (powers-surjectivity client), [RingTheory.Ideal.Quotient.FiniteInverse](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteInverse.lean) (inverse and representatives client), [RingTheory.Ideal.Quotient.FiniteLinear](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteLinear.lean) (linear definition and integer client), [RingTheory.Ideal.Quotient.FiniteReduction](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) (precision-reduction client), [RingTheory.Ideal.Quotient.Matrix](AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) (two-sided matrix examples), [RingTheory.Ideal.Quotient.LeftIdeal](AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) (left-ideal counterexample) |
+| [RingTheory.Ideal.Quotient.SMulTop](AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean) | [RingTheory.Ideal.Quotient.SMulTop](AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean) (noncommutative integer matrices at the bottom ideal, level one) |
 | [Topology.Algebra.Ideal](AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (independent original calculations; additional private density application in Int) |
 | [Topology.Algebra.Module.AdicTopology](AdicModules/Topology/Algebra/Module/AdicTopology.lean) | [Topology.Algebra.Module.AdicTopology](AdicModulesTest/Topology/Algebra/Module/AdicTopology.lean) (integer-pair projection and quotient descent) |
 | [Topology.Algebra.Submodule](AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |

@@ -267,6 +267,34 @@ mathematical scope and the distinction between ring CRT and arbitrary
 left-ideal module diagonals. These reuse and adaptation credits supplement,
 not replace, the upstream and project author notices above.
 
+## Scalar-ideal quotients and the matrix example
+
+The scalar-ideal quotient construction follows Mathlib's ideal/submodule
+additive-carrier design and its two-sided quotient ring and algebra constructors.
+It reuses `Submodule.smul_top_le_comap_smul_top`, `LinearMap.mulLeft` and
+`LinearMap.mulRight` for multiplication stability, and `Ideal.Quotient.ring`,
+`Ideal.Quotient.algebra` and `Ideal.Quotient.mkₐ` for the quotient structures
+and map, retaining the submodule quotient's additive group, module action and
+`Submodule.mkQ` projection. The ideal and ideal-quotient files credit Kenny Lau,
+Chris Hughes, Mario Carneiro, Anne Baanen and Patrick Massot; the submodule and
+linear-map foundations additionally credit Nathaniel Thomas, Jeremy Avigad,
+Johannes Hölzl, Frédéric Dupuis and Heather Macbeth. The algebra foundations
+credit Kenny Lau and Yury Kudryashov. The submodule-quotient formalization in
+`Mathlib.LinearAlgebra.Quotient.Defs` and `.Basic` credits Johannes Hölzl,
+Mario Carneiro, Kevin Buzzard and Yury Kudryashov.
+
+The integer-matrix example follows Mathlib's matrix-unit multiplication and
+bottom-submodule quotient approach: `Matrix.single_mul_single_same` separates
+`E₀₁ * E₁₀` from `E₁₀ * E₀₁`, and `Submodule.quotEquivOfEqBot` recovers the
+representatives through the same submodule projection. The commutator uses the
+canonical integer scalar action. `Mathlib.Data.Matrix.Basis` credits Jalex Stark,
+Kim Morrison, Eric Wieser, Oliver Nash and Wen Yang; the matrix multiplication
+and algebra files credit Ellen Arlt, Blair Shi, Sean Leather, Mario Carneiro,
+Johan Commelin and Lu-Ming Zhang. These credits include formalization approaches
+followed as well as interfaces reused. Their upstream Apache-2.0 licenses,
+copyright notices and author notices remain in Mathlib; this library claims no
+authorship of that upstream expression.
+
 ## Documentation adapter expression
 
 The bounded Markdown API generator and its data tests adapt Anchor's earlier

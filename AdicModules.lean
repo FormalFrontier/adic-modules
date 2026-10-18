@@ -13,6 +13,7 @@ public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
 public import AdicModules.AdicCompletion.Kernel
+public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.AdicCompletion.LocalRing
 public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.PadicIntTopology
@@ -37,6 +38,7 @@ public import AdicModules.RingTheory.WittVector.Complete
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite
+public import AdicModules.RingTheory.Ideal.Quotient.SMulTop
 public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
@@ -82,6 +84,9 @@ noncommutative ring, the canonical map from the quotient by the intersection
 to the product of the quotients is a ring equivalence. Its inverse recovers a
 unique quotient class from prescribed residues. The canonical map is also
 surjective for independently chosen natural powers, including zeroth powers.
+For an algebra over a commutative ring, scalar-ideal submodule quotients carry ring
+and algebra structures even when the algebra is noncommutative, with the original
+quotient additive group and scalar action.
 For a ring with a compatible additive-group topology and a supplied ideal-power
 neighborhood basis at zero, a left ideal is dense exactly when its supremum with the
 filtration ideal is top. Neither ideal needs to be two-sided, and no multiplication

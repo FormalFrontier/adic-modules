@@ -18,17 +18,25 @@ submodules, surjective images and extensions, including addition of specified ex
 
 For `R = ℤ`, `M = ℤ/4ℤ` and `I = (2)`, the whole module is primary and is killed
 by `I^2`. Its nonzero submodule `2M` illustrates that the submodule conclusion concerns
-annihilation of a real module, not just the zero submodule.
+annihilation of a real module, not just the zero submodule. Tensoring the ambient module
+with the integer unit module, in either order, preserves the exponent two and retains a
+nonzero pure tensor.
+The zero natural-number submodule supplies the exponent-zero boundary.
 
 The proofs use the module-torsion and primary-component APIs of AdicModules and Mathlib,
 together with Mathlib's integer action, finite-module instance and canonical reduction
-homomorphism for `ZMod`.
+homomorphism for `ZMod`. The product applications reuse the ambient `(2)^2`
+annihilation witness for the original infinite family `ℕ → ZMod 4` and its
+restriction to `Fin 2`. An empty product over `ℕ` also uses the uniform API with
+exponent zero, without additive inverses or a nonempty index type.
 
 ## References
 
 * Mathlib's `ZMod` development by Chris Hughes, integer-module development by Nathaniel Thomas
   and collaborators, finite-module development by Johan Commelin, and module-torsion development
   by Pierre-Alexandre Bazin and collaborators supply the formalization interfaces used here.
+* Mathlib's tensor-product development by Kenny Lau, Mario Carneiro and collaborators supplies
+  the canonical tensor product, commutor and unitors.
 -/
 
 set_option warningAsError true
@@ -134,3 +142,62 @@ public theorem ZMod.span_two_isKilledByIdealPower :
   change ZMod.castHom (show 2 ∣ 4 from ⟨2, rfl⟩) (ZMod 2) 1 = 0 at hfOne
   rw [map_one] at hfOne
   exact one_ne_zero hfOne
+
+/-- The original ambient exponent works uniformly over the infinite constant family. -/
+private theorem ZMod.infinite_pi_isKilledByIdealPower :
+    IsKilledByIdealPower ℤ (ℕ → ZMod 4) (Ideal.span {(2 : ℤ)}) :=
+  (Module.isKilledByIdealPower_pi_iff ℤ (fun _ : ℕ ↦ ZMod 4) _).mpr
+    ⟨2, fun _ ↦ ZMod.span_two_isKilledByIdealPower.1⟩
+
+/-- The same family restricted to two coordinates uses the finite-product API. -/
+private theorem ZMod.finite_pi_isKilledByIdealPower :
+    IsKilledByIdealPower ℤ (Fin 2 → ZMod 4) (Ideal.span {(2 : ℤ)}) :=
+  (Module.isKilledByIdealPower_pi_iff_of_finite ℤ (fun _ : Fin 2 ↦ ZMod 4) _).mpr
+    (fun _ ↦ ⟨2, ZMod.span_two_isKilledByIdealPower.1⟩)
+
+/-- Even the unit ideal to the zeroth power kills the empty product of `ℕ`-modules. -/
+private theorem empty_pi_isKilledByIdealPower :
+    IsKilledByIdealPower ℕ (Empty → ℕ) ⊤ :=
+  (Module.isKilledByIdealPower_pi_iff ℕ (fun _ : Empty ↦ ℕ) ⊤).mpr
+    ⟨0, fun i ↦ nomatch i⟩
+
+section TensorProduct
+
+open scoped TensorProduct
+
+private theorem integerTensorProductClient :
+    let I : Ideal ℤ := Ideal.span {(2 : ℤ)}
+    Module.IsTorsionBySet ℤ (ZMod 4 ⊗[ℤ] ℤ) (↑(I ^ 2) : Set ℤ) ∧
+      Module.IsKilledByIdealPower ℤ (ZMod 4 ⊗[ℤ] ℤ) I ∧
+      Module.IsTorsionBySet ℤ (ℤ ⊗[ℤ] ZMod 4) (↑(I ^ 2) : Set ℤ) ∧
+      Module.IsKilledByIdealPower ℤ (ℤ ⊗[ℤ] ZMod 4) I ∧
+      (2 : ZMod 4) ⊗ₜ[ℤ] (1 : ℤ) ≠ 0 := by
+  dsimp only
+  let I : Ideal ℤ := Ideal.span {(2 : ℤ)}
+  have hM : Module.IsTorsionBySet ℤ (ZMod 4) (↑(I ^ 2) : Set ℤ) :=
+    ZMod.span_two_isKilledByIdealPower.1
+  have hBounded : Module.IsKilledByIdealPower ℤ (ZMod 4) I := ⟨2, hM⟩
+  refine ⟨hM.tensorProduct_left, hBounded.tensorProduct_left,
+    hM.tensorProduct_right, hBounded.tensorProduct_right, ?_⟩
+  intro h
+  have hTwo : (2 : ZMod 4) ≠ 0 := ZMod.span_two_isKilledByIdealPower.2.2.2.2.1
+  apply hTwo
+  simpa only [TensorProduct.rid_tmul, one_smul, map_zero] using
+    congrArg (TensorProduct.rid ℤ (ZMod 4)) h
+
+private theorem natBotTensorProductClient :
+    let I : Ideal ℕ := ⊥
+    Module.IsTorsionBySet ℕ ((⊥ : Submodule ℕ ℕ) ⊗[ℕ] ℕ) (↑(I ^ 0) : Set ℕ) ∧
+      Module.IsKilledByIdealPower ℕ ((⊥ : Submodule ℕ ℕ) ⊗[ℕ] ℕ) I ∧
+      Module.IsTorsionBySet ℕ (ℕ ⊗[ℕ] (⊥ : Submodule ℕ ℕ)) (↑(I ^ 0) : Set ℕ) ∧
+      Module.IsKilledByIdealPower ℕ (ℕ ⊗[ℕ] (⊥ : Submodule ℕ ℕ)) I := by
+  dsimp only
+  have hM : Module.IsTorsionBySet ℕ (⊥ : Submodule ℕ ℕ)
+      (↑((⊥ : Ideal ℕ) ^ 0) : Set ℕ) := by
+    intro x a
+    exact Subsingleton.elim _ _
+  have hBounded : Module.IsKilledByIdealPower ℕ (⊥ : Submodule ℕ ℕ) ⊥ := ⟨0, hM⟩
+  exact ⟨hM.tensorProduct_left, hBounded.tensorProduct_left,
+    hM.tensorProduct_right, hBounded.tensorProduct_right⟩
+
+end TensorProduct

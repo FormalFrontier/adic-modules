@@ -5,6 +5,8 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.Algebra.Module.Torsion.PrimaryComponent
+public import Mathlib.Data.Fintype.Order
+public import Mathlib.LinearAlgebra.TensorProduct.Associator
 
 /-!
 # Modules annihilated by a power of an ideal
@@ -12,12 +14,20 @@ public import Mathlib.Algebra.Module.Torsion.PrimaryComponent
 This file develops the elementary API for a module on which one power of a
 fixed ideal acts by zero. The exponent is uniform over the whole module. This
 is stronger than asking separately for every element to be killed by some
-ideal power.
+ideal power. Tensoring with any module preserves the same annihilating set
+and hence the same ideal power.
+
+A product is annihilated by an ideal power exactly when its factors share one
+exponent. For finitely many factors, separate bounds give a common bound. For an
+infinite family, pointwise bounds need not be uniform.
 
 ## References
 
 Mathlib's `Module.IsTorsionBySet`, annihilator and ideal-primary-component APIs
 supply the torsion interfaces used by the finite-module uniform-exponent bridge.
+The product API uses Mathlib's `Module.annihilator_pi` and
+`Module.isTorsionBySet_iff_subset_annihilator`; the finite bound is supplied by
+`Finite.exists_le` from the finite-order development of Peter Nelson and Yaël Dillies.
 The original bounded-torsion implementation and its project-source adaptation
 are credited separately in `docs/CREDITS.md`.
 -/
@@ -78,7 +88,84 @@ theorem IsKilledByIdealPower.of_surjective {N : Type w} [AddCommMonoid N] [Modul
   obtain ⟨x, rfl⟩ := hf y
   simpa only [map_smul, map_zero] using congrArg f (@hn x a)
 
+section TensorProduct
+
+open scoped TensorProduct
+
+variable {N : Type w} [AddCommMonoid N] [Module R N]
+
+/-- Any set of scalars annihilating the left factor annihilates the tensor product. -/
+theorem IsTorsionBySet.tensorProduct_left {s : Set R} (hM : IsTorsionBySet R M s) :
+    IsTorsionBySet R (M ⊗[R] N) s := by
+  intro x a
+  induction x using TensorProduct.inductionOn with
+  | tmul m n =>
+      rw [TensorProduct.smul_tmul', @hM m a, TensorProduct.zero_tmul]
+  | add x y hx hy =>
+      rw [smul_add, hx, hy, add_zero]
+
+/-- Any set of scalars annihilating the right factor annihilates the tensor product. -/
+theorem IsTorsionBySet.tensorProduct_right {s : Set R} (hN : IsTorsionBySet R N s) :
+    IsTorsionBySet R (M ⊗[R] N) s := by
+  have h := hN.tensorProduct_left (N := M)
+  intro x a
+  apply (TensorProduct.comm R M N).injective
+  simpa only [map_smul, map_zero] using @h ((TensorProduct.comm R M N) x) a
+
+/-- If an ideal power annihilates the left factor, that same power annihilates the tensor
+product. -/
+theorem IsKilledByIdealPower.tensorProduct_left {I : Ideal R}
+    (hM : IsKilledByIdealPower R M I) : IsKilledByIdealPower R (M ⊗[R] N) I := by
+  obtain ⟨n, hn⟩ := hM
+  exact ⟨n, hn.tensorProduct_left⟩
+
+/-- If an ideal power annihilates the right factor, that same power annihilates the tensor
+product. -/
+theorem IsKilledByIdealPower.tensorProduct_right {I : Ideal R}
+    (hN : IsKilledByIdealPower R N I) : IsKilledByIdealPower R (M ⊗[R] N) I := by
+  obtain ⟨n, hn⟩ := hN
+  exact ⟨n, hn.tensorProduct_right⟩
+
+end TensorProduct
+
 end AddCommMonoid
+
+section Pi
+
+variable (R : Type u) {ι : Type w} (M : ι → Type v) [CommSemiring R]
+  [∀ i, AddCommMonoid (M i)] [∀ i, Module R (M i)]
+
+/-- A product is killed by a power of `I` exactly when one exponent kills every
+factor. For an infinite index type, separate factor bounds need not be uniform. -/
+theorem isKilledByIdealPower_pi_iff (I : Ideal R) :
+    IsKilledByIdealPower R (Π i, M i) I ↔
+      ∃ n : ℕ, ∀ i, IsTorsionBySet R (M i) (↑(I ^ n) : Set R) := by
+  rw [isKilledByIdealPower_iff_exists_pow_le_annihilator, Module.annihilator_pi]
+  constructor
+  · rintro ⟨n, hn⟩
+    refine ⟨n, fun i ↦ ?_⟩
+    rw [Module.isTorsionBySet_iff_subset_annihilator]
+    exact (le_iInf_iff.mp hn) i
+  · rintro ⟨n, hn⟩
+    refine ⟨n, le_iInf fun i ↦ ?_⟩
+    exact (Module.isTorsionBySet_iff_subset_annihilator R (M i)).mp (hn i)
+
+/-- A finite product is killed by an ideal power exactly when each factor is.
+`Finite.exists_le` gives a common bound, including for the empty index type. -/
+@[simp]
+theorem isKilledByIdealPower_pi_iff_of_finite [_root_.Finite ι] (I : Ideal R) :
+    IsKilledByIdealPower R (Π i, M i) I ↔ ∀ i, IsKilledByIdealPower R (M i) I := by
+  rw [isKilledByIdealPower_pi_iff R M I]
+  constructor
+  · rintro ⟨n, hn⟩ i
+    exact ⟨n, hn i⟩
+  · intro h
+    classical
+    choose n hn using h
+    obtain ⟨m, hm⟩ := Finite.exists_le n
+    exact ⟨m, fun i ↦ isTorsionBySet_ideal_pow_of_le R (M i) I (hm i) (hn i)⟩
+
+end Pi
 
 section Finite
 

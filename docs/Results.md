@@ -255,6 +255,24 @@ These are statements about the current library, not the historical API inventory
   rings; the final premise includes nontriviality of `R ⧸ I`. See the
   [unit detection and local-completion module](../AdicModules/AdicCompletion/LocalRing.lean).
 
+<a id="linear-maps-from-an-adic-completion"></a>
+
+- **Linear maps from an adic completion.**
+  For any ideal `I` of a commutative ring `R` and `R`-modules `M`, `N` with
+  additive commutative group structures, `[IsAdicComplete I N]` gives the
+  canonical extension `AdicCompletion.extend I : (M →ₗ[R] N) →
+  (AdicCompletion I M →ₗ[R] N)`. Its canonical-image, quotient, lift and
+  naturality laws require no finite generation of `I`. If `I.FG`,
+  `AdicCompletion.ext_of` gives uniqueness for a Hausdorff target
+  `[IsHausdorff I N]`, without completeness. With `I.FG` and a complete target,
+  `AdicCompletion.precompOfLinearEquiv I` is an `R`-linear equivalence
+  `(AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N)`, whose forward map is
+  `LinearMap.lcomp R N (AdicCompletion.of I M)` and whose inverse is `extend I`.
+  Ring, source and target universes are independent; no Noetherian, finite-module
+  or projectivity hypothesis is imposed. See the
+  [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean) and its
+  [nonzero integer free-module example](../AdicModulesTest/AdicCompletion/LinearMap.lean).
+
 - **Adic completion of projective modules.**
   For a commutative ring `R`, an additive commutative group `M` with `Module R M`
   and `Module.Projective R M`, and any ideal `I`,
