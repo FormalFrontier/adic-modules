@@ -7,13 +7,14 @@ module
 public import Mathlib.RingTheory.Polynomial.UniversalFactorizationRing
 public import Mathlib.RingTheory.Smooth.AdicCompletion
 public import Mathlib.RingTheory.Henselian
+public import AdicModules.Polynomial.Coprime
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.RingTheory.Etale.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
 import Mathlib.Tactic.Ring
 
 /-!
-# Hensel factor lifting and irreducible reduction
+# Hensel factor lifting, factor uniqueness and irreducible reduction
 
 For a Henselian local ring, a simple root modulo the maximal ideal lifts for every polynomial,
 not only for a monic polynomial. A reciprocal-polynomial substitution reduces to Mathlib's
@@ -33,8 +34,16 @@ to Andrew Yang and to Judith Ludwig and Christian Merten, respectively.
 
 For a proper ideal, monicity preserves degrees on reduction, so the universal ring can be used
 with the degrees of the given factors. Completeness for the top ideal forces the coefficient
-ring to be a subsingleton; this case is treated separately. We do not assert uniqueness of the
-lifts or construct a chosen factorization.
+ring to be a subsingleton; this case is treated separately. The existence construction does
+not choose a canonical factorization.
+
+Separately, two already-existing factorizations have equal ordered factors if their left
+factors are monic, have the same image under a scalar unit-reflecting coefficient map, and
+the images of the first pair are Bézout coprime. The coefficient rings are arbitrary
+commutative rings in independent universes, including zero rings. No right monicity, second
+image equality, locality, Henselianity or completeness is needed for this uniqueness result.
+Its proof uses the one-monic coprimeness criterion from `AdicModules.Polynomial.Coprime`,
+monic divisibility and degree comparison, and monic regularity.
 
 For any commutative ring and maximal ideal, a global monic factor-lifting property implies
 that every monic irreducible polynomial reduces to a positive power of a monic irreducible
@@ -496,3 +505,35 @@ theorem HenselianLocalRing.iff_exists_root
     exact HenselianLocalRing.exists_root
   · intro h
     exact { is_henselian := fun f _ a₀ h₀ h₁ => h f a₀ h₀ h₁ }
+
+
+namespace Polynomial
+
+/-- Two factorizations with monic left factors agree factor by factor if their left factors
+have the same image under a unit-reflecting coefficient map and the images of the first pair
+are coprime. Neither the right factors nor the common product is required to be monic. -/
+theorem Monic.eq_factors_of_isCoprime_map
+    {R : Type*} {S : Type*} [CommRing R] [CommRing S]
+    (φ : R →+* S) [IsLocalHom φ] {g h g' h' : R[X]}
+    (hg : g.Monic) (hg' : g'.Monic) (hprod : g * h = g' * h')
+    (hmap : g.map φ = g'.map φ) (hcoprime : IsCoprime (g.map φ) (h.map φ)) :
+    g = g' ∧ h = h' := by
+  rcases subsingleton_or_nontrivial S with hS | hS
+  · letI := hS
+    have hzero : IsUnit (0 : R) :=
+      IsUnit.of_map φ 0 (isUnit_of_subsingleton _)
+    letI : Subsingleton R := subsingleton_of_zero_eq_one (isUnit_zero_iff.mp hzero)
+    exact ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+  letI := hS
+  have hcross : IsCoprime g' h := (hg'.isCoprime_map_iff (q := h) φ).mp (by
+    rw [← hmap]
+    exact hcoprime)
+  have hdvd : g' ∣ g := hcross.dvd_of_dvd_mul_right ⟨h', hprod⟩
+  have hdegree : g.natDegree = g'.natDegree := by
+    simpa only [hg.natDegree_map, hg'.natDegree_map] using congrArg natDegree hmap
+  have heq : g = g' :=
+    eq_of_monic_of_dvd_of_natDegree_le hg' hg hdvd hdegree.le
+  refine ⟨heq, hg.isRegular.left ?_⟩
+  simpa only [heq] using hprod
+
+end Polynomial

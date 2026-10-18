@@ -153,6 +153,14 @@ Then `import AdicModules`, or choose an individual module from the table below.
   Adic completeness supplies that global property; no equivalence of this
   property with simple-root classes is asserted. See [Hensel details](docs/Results.md#headline-results).
 
+- **Monic factor uniqueness.** Over arbitrary commutative rings, a scalar
+  unit-reflecting ring map `φ` (`IsLocalHom φ`), only the left factors `g,g'`
+  monic, `g*h = g'*h'`, one left-image equality `g.map φ = g'.map φ`, and
+  Bézout coprimeness of `g.map φ` and `h.map φ` imply `g=g' ∧ h=h'`.
+  No completeness or right monicity is required. See
+  [factor uniqueness](AdicModules/Polynomial/Hensel.lean) and its
+  [coprimeness criterion](AdicModules/Polynomial/Coprime.lean).
+
 - **Frobenius limits and Teichmüller maps.** For a field of prime characteristic
   `p`, the inverse-Frobenius limit `Perfection K p` is a field without perfectness
   of `K`; this is not a root-adjoining extension or surjectivity onto `K`.
@@ -351,7 +359,8 @@ leaves and their related modules.
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
 | [BoundedIdealPowerTorsion](AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean) |
-| [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean) |
+| [Polynomial.Coprime](AdicModules/Polynomial/Coprime.lean) | [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (monic coprimeness criterion and factor uniqueness) |
+| [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean), [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (nonlocal power series, zero ring and product-projection boundary) |
 | [Polynomial.Evaluation](AdicModules/Polynomial/Evaluation.lean) | [Polynomial.Evaluation](AdicModulesTest/Polynomial/Evaluation.lean) (derivative application, nonunit 3-adic derivative and zero boundary) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
