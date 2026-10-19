@@ -3,6 +3,7 @@ SPDX-License-Identifier: Apache-2.0
 Authors: Formal Frontier Agents
 -/
 module
+public import AdicModules.RingTheory.WittVector.Frobenius
 
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.Polynomial.Hensel

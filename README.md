@@ -271,6 +271,14 @@ Then `import AdicModules`, or choose an individual module from the table below.
   The domain proof is bound within the left-hand condition; field,
   characteristic and perfectness of `R` are conclusions, not hypotheses.
 
+- **Witt Frobenius and perfect coefficients.** For a prime `p` and a commutative
+  ring `R` with `CharP R p`,
+  [`WittVector.frobenius_bijective_iff`](AdicModules/RingTheory/WittVector/Frobenius.lean)
+  identifies bijectivity of canonical Witt Frobenius with `PerfectRing R p`.
+  No field, domain or reducedness hypothesis is imposed. The
+  [examples](AdicModulesTest/WittVector/Frobenius.lean) contrast the perfect
+  non-domain `ZMod 2 × ZMod 2` with the nonperfect `DualNumber (ZMod 2)`.
+
 - **Completeness of Witt vectors.** For prime `p` and any commutative ring `k`
   of characteristic `p`, `WittVector p k` is Hausdorff and complete for `(p)`.
   Membership in `(p)^n` means that the first `n` coefficients vanish and each
@@ -398,6 +406,7 @@ leaves and their related modules.
 | [RingTheory.WittVector.Complete](AdicModules/RingTheory/WittVector/Complete.lean) | [RingTheory.WittVector.Complete](AdicModulesTest/RingTheory/WittVector/Complete.lean) (prime-field, product and nonperfect polynomial coefficients, independent roots and zero precision; prime-field and nonperfect polynomial coefficients, independent roots and zero precision) |
 | [RingTheory.WittVector.Domain](AdicModules/RingTheory/WittVector/Domain.lean) | [RingTheory.WittVector.Domain](AdicModulesTest/RingTheory/WittVector/Domain.lean) (imperfect polynomial domain, characteristic-zero integers and zero-ring boundary) |
 | [RingTheory.WittVector.Torsion](AdicModules/RingTheory/WittVector/Torsion.lean) | [RingTheory.WittVector.Torsion](AdicModulesTest/RingTheory/WittVector/Torsion.lean) (reduced non-domain product and dual-number integer torsion) |
+| [RingTheory.WittVector.Frobenius](AdicModules/RingTheory/WittVector/Frobenius.lean) | [WittVector.Frobenius](AdicModulesTest/WittVector/Frobenius.lean) (perfect non-domain product and nonperfect dual numbers) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
