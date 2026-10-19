@@ -75,6 +75,17 @@ Rings are commutative; modules are additive commutative groups unless specified 
   pair `(R,I)`, idempotents lift uniquely modulo the mapped ideal in **every given
   module-finite commutative `R`-algebra**, including `R` itself.
 
+- **Henselian-pair criterion via finite algebras.** For any commutative ring
+  `R : Type u` and ideal `I`, `HenselianRing R I` holds if and only if, for
+  **every given** `B : Type (max u v)` with `[CommRing B]`, `[Algebra R B]`
+  and `[Module.Finite R B]`, every idempotent
+  `e0 : B ⧸ I.map (algebraMap R B)` has a unique idempotent lift `e : B`
+  with `Ideal.Quotient.mk (I.map (algebraMap R B)) e = e0`.
+  The lift belongs to the original algebra, with exactly the prescribed quotient
+  image; `u` and `v` are independent. No locality, completeness, finite-free or
+  projective algebra assumption is required. See the
+  [finite-algebra criterion](AdicModules/RingTheory/HenselianCriterion.lean).
+
 <a id="reduced-residue-teichmüller-image"></a>
 
 - **Frobenius limits and Teichmüller maps** ([limits](AdicModules/RingTheory/Perfection.lean),
@@ -208,6 +219,7 @@ Test modules require separate imports and are not re-exported by the root.
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean), [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (nonlocal power series, zero ring and product-projection boundary) |
 | [Polynomial.Evaluation](AdicModules/Polynomial/Evaluation.lean) | [Polynomial.Evaluation](AdicModulesTest/Polynomial/Evaluation.lean) (derivative application, nonunit 3-adic derivative and zero boundary) |
 | [Polynomial.RootUniqueness](AdicModules/Polynomial/RootUniqueness.lean) | [Polynomial.RootUniqueness](AdicModulesTest/Polynomial/RootUniqueness.lean) |
+| [RingTheory.HenselianCriterion](AdicModules/RingTheory/HenselianCriterion.lean) | [RingTheory.HenselianCriterion](AdicModulesTest/RingTheory/HenselianCriterion.lean) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |

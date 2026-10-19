@@ -33,6 +33,7 @@ public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.LinearAlgebra.TensorProduct.Quotient
 public import AdicModules.RingTheory.Idempotents
+public import AdicModules.RingTheory.HenselianCriterion
 public import AdicModules.RingTheory.Perfection
 public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.FrobeniusCore
