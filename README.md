@@ -45,6 +45,16 @@ Then `import AdicModules`, or choose an individual module from the table below.
   the separated quotient and principal-ideal completeness fit the same theory.
   See [completeness results](docs/Results.md#precompleteness-and-adic-completeness).
 
+- **Adic completion of arbitrary products.** For `I.FG` in a commutative ring `R`,
+  `AdicCompletion.piEquivOfFG` is an algebraic `AdicCompletion I R`-linear
+  equivalence between completion of a dependent product and the product of
+  completions, with no finiteness assumption on the index type or modules.
+  The ring, index and module universes are independent, and the original module
+  instances are retained. Its forward map is the canonical `AdicCompletion.pi`,
+  natural in componentwise linear maps for every ideal. Mathlib's finite-product
+  equivalence needs no finite generation; the two agree on their overlap.
+  See [product completion](AdicModules/AdicCompletion/Pi.lean).
+
 - **Congruences and polynomial values.** In a commutative ring, `(q : R) ∈ I`
   and `x ≡ y [SMOD I ^ m]` with **positive `m`** imply
   `x^(q^n) ≡ y^(q^n) [SMOD I^(m+n)]` for every natural `n`.
@@ -418,7 +428,7 @@ leaves and their related modules.
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
-| [AdicCompletion.Pi](AdicModules/AdicCompletion/Pi.lean) (naturality for every ideal) | [AdicCompletion.DependentPi](AdicModulesTest/AdicCompletion/DependentPi.lean) (private generic `Prop` contracts and a nonzero `ℕ → ℤ` model, not a universal bijectivity proof) |
+| [AdicCompletion.Pi](AdicModules/AdicCompletion/Pi.lean) (algebraic arbitrary-product equivalence for `I.FG`; naturality for every ideal) | [AdicCompletionPi](AdicModulesTest/AdicCompletionPi.lean) (full `ℕ → ZMod 4` model for `I = Ideal.span {2}`, a nonzero proper square-zero ideal; empty-product boundary) and [AdicCompletion.DependentPi](AdicModulesTest/AdicCompletion/DependentPi.lean) (private generic `Prop` contracts and a nonzero `ℕ → ℤ` model, not a universal bijectivity proof) |
 | Separate completeness contract/model file | [AdicCompletion.Completeness](AdicModulesTest/AdicCompletion/Completeness.lean) (three proposition `#check`s and completeness/boundary models) |
 | [AdicCompletion.Topology](AdicModules/AdicCompletion/Topology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (evaluation-kernel basis application) |
 | [AdicCompletion.QuotientTorsion](AdicModules/AdicCompletion/QuotientTorsion.lean) | [ScalarTorsionSections](AdicModulesTest/ScalarTorsionSections.lean) |

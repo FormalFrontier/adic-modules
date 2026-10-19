@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.LinearAlgebra.Isomorphisms
 public import Mathlib.LinearAlgebra.Pi
 public import Mathlib.LinearAlgebra.Quotient.Basic
 public import Mathlib.RingTheory.Finiteness.Basic
@@ -14,7 +15,8 @@ public import Mathlib.RingTheory.Ideal.Operations
 
 Action by a finitely generated ideal commutes with arbitrary dependent products
 of submodules. The kernel of coordinatewise reduction by the ideal is therefore
-the ideal action on the product module.
+the ideal action on the product module. Coordinatewise reduction consequently
+identifies the quotient of a product with the product of its quotients.
 -/
 
 set_option warningAsError true
@@ -92,6 +94,46 @@ theorem FG.ker_piMap_mkQ {I : Ideal R} (hI : I.FG)
   simpa only [Submodule.pi_top] using
     (hI.smul_pi (fun j => (⊤ : Submodule R (M j)))).symm
 
+/-- Coordinatewise reduction by a finitely generated ideal identifies the quotient
+of an arbitrary dependent product with the product of the coordinate quotients. -/
+noncomputable def FG.quotientPi {I : Ideal R} (hI : I.FG)
+    {J : Type uJ} (M : J → Type uM)
+    [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)] :
+    ((∀ j, M j) ⧸ (I • (⊤ : Submodule R (∀ j, M j)))) ≃ₗ[R]
+      ∀ j, M j ⧸ (I • (⊤ : Submodule R (M j))) := by
+  classical
+  let f := LinearMap.piMap fun j => (I • (⊤ : Submodule R (M j))).mkQ
+  have hf : Function.Surjective f := by
+    intro x
+    choose y hy using fun j => (I • (⊤ : Submodule R (M j))).mkQ_surjective (x j)
+    exact ⟨y, funext hy⟩
+  exact (Submodule.quotEquivOfEq _ _ (hI.ker_piMap_mkQ M).symm).trans
+    (f.quotKerEquivOfSurjective hf)
+
+@[simp]
+theorem FG.quotientPi_apply_mk {I : Ideal R} (hI : I.FG)
+    {J : Type uJ} (M : J → Type uM)
+    [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)] (x : ∀ j, M j) :
+    hI.quotientPi M (Submodule.Quotient.mk x) =
+      fun j => (Submodule.Quotient.mk (x j) : M j ⧸ (I • (⊤ : Submodule R (M j)))) := by
+  rfl
+
+@[simp]
+theorem FG.quotientPi_mkQ {I : Ideal R} (hI : I.FG)
+    {J : Type uJ} (M : J → Type uM)
+    [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)] (x : ∀ j, M j) :
+    hI.quotientPi M ((I • (⊤ : Submodule R (∀ j, M j))).mkQ x) =
+      fun j => (I • (⊤ : Submodule R (M j))).mkQ (x j) :=
+  hI.quotientPi_apply_mk M x
+
+@[simp]
+theorem FG.quotientPi_comp_mkQ {I : Ideal R} (hI : I.FG)
+    {J : Type uJ} (M : J → Type uM)
+    [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)] :
+    (hI.quotientPi M).toLinearMap.comp (I • (⊤ : Submodule R (∀ j, M j))).mkQ =
+      LinearMap.piMap (fun j => (I • (⊤ : Submodule R (M j))).mkQ) := by
+  ext x j
+  exact congrFun (hI.quotientPi_mkQ M x) j
 
 end Ring
 
