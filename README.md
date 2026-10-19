@@ -163,6 +163,14 @@ Then `import AdicModules`, or choose an individual module from the table below.
   Adic completeness supplies that global property; no equivalence of this
   property with simple-root classes is asserted. See [Hensel details](docs/Results.md#headline-results).
 
+- **Monic factor lifting over Henselian pairs.** For an arbitrary commutative
+  ring `R` and ideal `I` with Mathlib's `HenselianRing R I`, every ordered,
+  prescribed coprime monic factorization of a monic polynomial modulo `I`
+  lifts to monic factors over `R`, with the given product and **both**
+  prescribed reductions. No completeness or locality is needed. See
+  [`HenselianRing.exists_monic_factorization`](AdicModules/Polynomial/Hensel.lean)
+  and its [3-adic and zero-ring examples](AdicModulesTest/Polynomial/HenselianFactorization.lean).
+
 - **Monic factor uniqueness.** Over arbitrary commutative rings, a scalar
   unit-reflecting ring map `φ` (`IsLocalHom φ`), only the left factors `g,g'`
   monic, `g*h = g'*h'`, one left-image equality `g.map φ = g'.map φ`, and
