@@ -178,6 +178,14 @@ Then `import AdicModules`, or choose an individual module from the table below.
   [`HenselianRing.exists_monic_factorization`](AdicModules/Polynomial/Hensel.lean)
   and its [3-adic and zero-ring examples](AdicModulesTest/Polynomial/HenselianFactorization.lean).
 
+- **Idempotent lifting.** For a commutative ring `R`, an ideal `I` and
+  `[HenselianRing R I]`, every idempotent of `R ⧸ I` has a unique
+  idempotent lift in `R`. More generally, for any given module-finite
+  commutative `R`-algebra `B`, every idempotent of
+  `B ⧸ I.map (algebraMap R B)` has a unique idempotent lift in `B`,
+  with exactly the prescribed quotient image. See
+  [idempotents in Henselian pairs](AdicModules/RingTheory/Idempotents.lean).
+
 - **Monic factor uniqueness.** Over arbitrary commutative rings, a scalar
   unit-reflecting ring map `φ` (`IsLocalHom φ`), only the left factors `g,g'`
   monic, `g*h = g'*h'`, one left-image equality `g.map φ = g'.map φ`, and
