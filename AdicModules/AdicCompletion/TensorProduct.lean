@@ -9,6 +9,7 @@ public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 import Mathlib.Algebra.Module.Projective
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.Finiteness.Small
+import Mathlib.RingTheory.TensorProduct.Finite
 
 /-!
 # Adic completion and tensor products
@@ -22,6 +23,13 @@ agrees with Mathlib's Noetherian equivalence when both apply.
 The proof detects coefficients in a free Finsupp module and uses a projective retraction and
 naturality of the canonical comparison. Surjectivity for finite modules is reused from Mathlib.
 No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
+
+Completion preserves finite modules and finite projective modules over the canonical completed
+ring: `Module.Finite R M` gives `Module.Finite (AdicCompletion I R) (AdicCompletion I M)`,
+and projectivity over `R` additionally gives projectivity over `AdicCompletion I R`.
+Finiteness alone does not require projectivity. These instances use Mathlib's coefficientwise
+completed-ring action, the same action as the canonical tensor comparison. The general lemma
+`Module.finitePresentation_of_projective` then gives finite presentation over the completed ring.
 
 ## Implementation notes
 
@@ -38,7 +46,11 @@ common-universe comparison with Mathlib identifies the equivalence obtained by
 Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and Christian Merten,
 supplies the canonical comparison, its naturality, the finite-power comparison, finite-module
 surjectivity, and the Noetherian equivalence. Mathlib's `Algebra/Module/Projective.lean`, by
-Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction. Mathlib's
+Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction, base-change
+projectivity and transport along linear equivalences. Mathlib's
+`RingTheory/TensorProduct/Finite.lean`, by Kim Morrison and Johan Commelin, supplies
+base-change finiteness; `RingTheory/Finiteness/Basic.lean` supplies its transport along surjections.
+Mathlib's
 `LinearAlgebra/DirectSum/Finsupp.lean`, by Johannes Hölzl and Antoine Chambert-Loir, supplies
 the tensor/Finsupp coefficient equivalence. Related finite-projective retraction results are
 in Mathlib's `RingTheory/Finiteness/Projective.lean`, by Johan Commelin.
@@ -107,6 +119,12 @@ private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
 
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
+/-- The completion of a finite module is finite over the completed ring, for any ideal. -/
+instance instModuleFinite [Module.Finite R M] :
+    Module.Finite (AdicCompletion I R) (AdicCompletion I M) :=
+  Module.Finite.of_surjective (ofTensorProduct I M)
+    (ofTensorProduct_surjective_of_finite I M)
+
 /-- For a projective module over a commutative ring, the canonical comparison from tensoring
 with the completed ring to the completed module is injective, for any ideal. -/
 theorem ofTensorProduct_injective_of_projective
@@ -170,6 +188,12 @@ theorem ofTensorProductEquivOfFiniteProjective_symm_of
       (1 : AdicCompletion I R) ⊗ₜ[R] m := by
   apply (ofTensorProductEquivOfFiniteProjective I M).injective
   simp
+
+/-- The completion of a finite projective module is projective over the completed ring,
+for any ideal. -/
+instance instModuleProjective [Module.Finite R M] [Module.Projective R M] :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
+  Module.Projective.of_equiv' (ofTensorProductEquivOfFiniteProjective I M)
 
 /-- For a finite module over a commutative Noetherian ring, the canonical comparison from
 tensoring with the completed ring to the completed module is bijective for every ideal.

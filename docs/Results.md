@@ -497,6 +497,221 @@ These are statements about the current library, not the historical API inventory
   See the [span-comparison guide](Guide.md#closure-of-spans-over-a-dense-subsemiring)
   for real, discrete, mixed, p-adic and indiscrete examples and counterexamples.
 
+## Compactness for a given adic uniformity
+
+- **Compactness for a given adic uniformity.** For a commutative ring `R` with
+  a given `UniformSpace R`, `IsLeftUniformAddGroup R` and `IsAdic I` for the
+  induced topology,
+  `CompactSpace R ↔ CompleteSpace R ∧ ∀ n : ℕ, Finite (R ⧸ I ^ n)`.
+  All natural powers, including `n = 0`, occur. If `I.FG`, this reduces to
+  `CompactSpace R ↔ CompleteSpace R ∧ Finite (R ⧸ I)`.
+  Completeness is uniform completeness for this given uniformity, not algebraic
+  `IsAdicComplete`. No separation axiom or properness of `I` is required.
+  See the [compactness criteria](../AdicModules/Topology/Algebra/AdicCompactness.lean).
+
+
+## Completion functors, products and finite-power quotients
+
+- **Adic completion as a functor.** For any ideal `I` of a commutative ring
+  `R`, `AdicCompletion.functor I` maps `R`-modules to modules over
+  `AdicCompletion I R`, preserving the carrier universe independently of the ring.
+  It is additive and `R`-linear, and its action on module isomorphisms agrees with
+  `AdicCompletion.congr`. The relative `R`-linear API uses
+  `open scoped ModuleCat.Algebra`. Import the
+  [functor module](../AdicModules/AdicCompletion/Functor.lean) directly; its
+  [product-inclusion example](../AdicModulesTest/AdicCompletion/Functor.lean) uses
+  a specified splitting and includes a nonzero integer-completion boundary.
+
+- **Endomorphisms congruent to the identity.** For a module `M` over a
+  commutative ring `R` and any ideal `I`, an endomorphism `f : Module.End R M`
+  is a unit if `IsAdicComplete I M` and
+  `∀ m, f m - m ∈ I • (⊤ : Submodule R M)`. Completeness is required of `M`,
+  not of the endomorphism space. See the
+  [endomorphism criterion](../AdicModules/AdicCompletion/Endomorphism.lean).
+
+- **Adic completion of arbitrary products.** For `I.FG` in a commutative ring `R`,
+  `AdicCompletion.piEquivOfFG` is an algebraic `AdicCompletion I R`-linear
+  equivalence between completion of a dependent product and the product of
+  completions, with no finiteness assumption on the index type or modules.
+  The ring, index and module universes are independent, and the original module
+  instances are retained. Its forward map is the canonical `AdicCompletion.pi`,
+  natural in componentwise linear maps for every ideal. Mathlib's finite-product
+  equivalence needs no finite generation; the two agree on their overlap.
+  See [product completion](../AdicModules/AdicCompletion/Pi.lean).
+
+- **Finite-power completion kernels.** For a commutative ring `R`, an additive
+  commutative group module `M` and any `n : ℕ`, finite generation of **only
+  `I ^ n`** gives `(I ^ n) • ⊤ = (AdicCompletion.eval I M n).ker` in the
+  completed module. Ring and module universes are independent; degree zero is
+  included. No separate `I.FG`, finite-module, Noetherian, completeness or
+  separatedness hypothesis is required. See the [kernel API](../AdicModules/AdicCompletion/Kernel.lean)
+  and [usage](Guide.md#finite-power-completion-kernels).
+
+- **Finite-power quotients of completions.** For a commutative ring `R`, any
+  ideal `I` and any `n : ℕ`, finite generation of **only `I ^ n`** gives the
+  canonical `R`-algebra equivalence
+  `(AdicCompletion I R ⧸ (I.map (algebraMap R (AdicCompletion I R))) ^ n) ≃ₐ[R] R ⧸ I ^ n`.
+  Its forward map is evaluation; its inverse sends `[r]` to the class of
+  `algebraMap R (AdicCompletion I R) r`. Degree zero and trivial rings are
+  included. See the [quotient API](../AdicModules/AdicCompletion/Quotient.lean)
+  and [representative and inverse formulas](Guide.md#finite-power-quotients-of-completions).
+
+## Finite and projective modules over the completed ring
+
+For any ideal `I` of a commutative ring `R` and any additive commutative group
+`M` with `Module R M`, `[Module.Finite R M]` alone gives
+`Module.Finite (AdicCompletion I R) (AdicCompletion I M)` for the canonical
+completed-ring action. With both `[Module.Finite R M]` and
+`[Module.Projective R M]`, completion is projective over that same ring.
+Ring and module universes are independent. No finite-generation hypothesis on
+`I`, Noetherianity, freeness, smallness, flatness, separation or completeness
+of the original module is required. These are typeclass instances, not a
+choice of transported scalars. The generic `Module.finitePresentation_of_projective`
+lemma then gives finite presentation for the finite projective completion;
+it is not a separate completion wrapper or a claim for all finite modules.
+See the [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean)
+and its [canonical rank-two model](../AdicModulesTest/AdicCompletion/TensorProduct.lean).
+The finite-module transfer uses Mathlib’s base-change finiteness by Kim Morrison
+and Johan Commelin and finiteness under surjections; projectivity uses the
+base-change and equivalence APIs credited in that module.
+
+## Henselian lifting and uniqueness
+
+- **Monic factor lifting over Henselian pairs.** For an arbitrary commutative
+  ring `R` and ideal `I` with Mathlib's `HenselianRing R I`, every ordered,
+  prescribed coprime monic factorization of a monic polynomial modulo `I`
+  lifts to monic factors over `R`, with the given product and **both**
+  prescribed reductions. No completeness or locality is needed. See
+  [`HenselianRing.exists_monic_factorization`](../AdicModules/Polynomial/Hensel.lean)
+  and its [3-adic and zero-ring examples](../AdicModulesTest/Polynomial/HenselianFactorization.lean).
+
+- **Idempotent lifting.** For a commutative ring `R`, an ideal `I` and
+  `[HenselianRing R I]`, every idempotent of `R ⧸ I` has a unique
+  idempotent lift in `R`. More generally, for any given module-finite
+  commutative `R`-algebra `B`, every idempotent of
+  `B ⧸ I.map (algebraMap R B)` has a unique idempotent lift in `B`,
+  with exactly the prescribed quotient image. See
+  [idempotents in Henselian pairs](../AdicModules/RingTheory/Idempotents.lean).
+
+- **Monic factor uniqueness.** Over arbitrary commutative rings, a scalar
+  unit-reflecting ring map `φ` (`IsLocalHom φ`), only the left factors `g,g'`
+  monic, `g*h = g'*h'`, one left-image equality `g.map φ = g'.map φ`, and
+  Bézout coprimeness of `g.map φ` and `h.map φ` imply `g=g' ∧ h=h'`.
+  No completeness or right monicity is required. See
+  [factor uniqueness](../AdicModules/Polynomial/Hensel.lean) and its
+  [coprimeness criterion](../AdicModules/Polynomial/Coprime.lean).
+
+- **Simple-root uniqueness.** For a commutative ring `R`, a possibly
+  noncommutative semiring `S` and a scalar unit-reflecting ring map
+  `φ : R →+* S` (`IsLocalHom φ`), two roots `a, b` of any polynomial `f`
+  with `φ a = φ b` and `IsUnit (φ (f.derivative.eval a))` are equal.
+  Ring and semiring universes are independent. See
+  [`Polynomial.IsRoot.eq_of_map_eq`](../AdicModules/Polynomial/RootUniqueness.lean)
+  and its [examples](../AdicModulesTest/Polynomial/RootUniqueness.lean).
+
+## Scalar-ideal quotients of algebras
+
+- **Scalar-ideal quotients of algebras.** For a commutative semiring `R` and an
+  `R`-algebra semiring `A`, `J • ⊤` has a two-sided ideal view in `A`.
+  For a commutative ring `R` and a possibly noncommutative `R`-algebra ring `A`,
+  the original submodule quotient `A ⧸ (J • ⊤)` carries ring and `R`-algebra
+  structures retaining its quotient additive group and `R`-module action.
+  The existing quotient algebra map agrees with the submodule projection;
+  adic levels specialize to `J = I ^ n`. See the
+  [quotient API and matrix example](Guide.md#scalar-ideal-quotients-of-algebras).
+
+## Witt vectors
+
+- **Characteristic zero, units, locality and digit uniqueness.**
+  For `p : ℕ` with `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`
+  and `[CharP R p]`, [`WittVector.charZero`](../AdicModules/RingTheory/WittVector.lean)
+  supplies `CharZero (WittVector p R)`, without field, perfectness, finiteness,
+  domain, reducedness or extra `Nontrivial` assumptions. The same module proves
+  `WittVector.isUnit_iff_isUnit_coeff_zero`: a Witt vector is a unit exactly when
+  its constant coefficient is a unit, with the field specialization
+  `WittVector.isUnit_iff_coeff_zero_ne_zero`. It also proves
+  `WittVector.isLocalRing_iff`: `IsLocalRing (WittVector p R) ↔ IsLocalRing R`,
+  with the same prime-characteristic commutative-ring hypotheses.
+  See the
+  [Witt-vector API and uses](Guide.md#characteristic-zero-of-witt-vectors).
+  The [concrete Witt-vector models](../AdicModulesTest/RingTheory/WittVector.lean)
+  also give the nonzero nonunit `2` over `ZMod 2`, units and nonunits over the
+  local nonfield `PowerSeries (ZMod 2)` with nonsquare `X`, and the nonlocal
+  product `ZMod 2 × ZMod 2`.
+  For a **reduced** commutative coefficient ring of prime characteristic `p`,
+  [`WittVector.teichmuller_expansion_unique`](../AdicModules/RingTheory/WittVector.lean)
+  states that two digit sequences `a, b : ℕ → R` are equal if their partial sums
+  `∑ i ∈ Finset.range (n + 1), teichmuller p (a i) * p^i` and the analogous
+  sums for `b` both agree with the same Witt vector modulo `p^(n+1)` for every
+  `n`. No perfectness, field, completeness or topology assumption is required.
+
+- **Reducedness of Witt vectors.** For any prime `p` and commutative ring
+  `R : Type u`, [`WittVector.isReduced_iff`](../AdicModules/RingTheory/WittVector.lean)
+  states `IsReduced (WittVector p R) ↔ IsReduced R`. No characteristic,
+  nontriviality, domain, perfectness or completeness assumption is required.
+  The clients at prime `2` include the mixed-characteristic reduced ring
+  `ℤ × ZMod 2`, where `2` is a nonzero zero divisor; `ZMod 4`, with a nonzero
+  square-zero Teichmüller lift of `2` and nonreduced Witt ring; and the zero ring
+  `ZMod 1`, whose Witt ring is subsingleton and reduced.
+
+- **Prime-power multiplication in Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
+  and any `k : Type u` with `[CommRing k]` and `[CharP k p]`,
+  [`WittVector.mul_p_pow_eq_zero_iff_coeff_pow_eq_zero`](../AdicModules/RingTheory/WittVector.lean)
+  gives `x * (p : WittVector p k) ^ n = 0 ↔ ∀ i : ℕ, x.coeff i ^ (p ^ n) = 0`
+  for every `x : WittVector p k` and every `n : ℕ`, including zero.
+  [`WittVector.mul_p_eq_zero_iff_coeff_pow_eq_zero`](../AdicModules/RingTheory/WittVector.lean)
+  is its `n = 1` specialization. Moreover,
+  [`WittVector.isRegular_p_iff_isReduced`](../AdicModules/RingTheory/WittVector.lean)
+  gives `IsRegular (p : WittVector p k) ↔ IsReduced k`.
+  The kernel formula needs no reducedness assumption; reducedness is exactly
+  the condition for injectivity of multiplication by `p`, not for characteristic
+  zero. No field, perfectness, domain, finiteness or topology is required.
+  See the [kernel and regularity uses](Guide.md#prime-multiplication-and-reduced-coefficients).
+
+- **Integer torsion in Witt vectors.** For prime `p` and any commutative ring
+  `R : Type u` of characteristic `p`,
+  [`WittVector.isTorsionFree_int_iff_isReduced`](../AdicModules/RingTheory/WittVector/Torsion.lean)
+  states `Module.IsTorsionFree ℤ (WittVector p R) ↔ IsReduced R` for the canonical
+  integer action. Reduced non-domains are included; no perfectness or finiteness
+  is required. See the [criterion and examples](Guide.md#integer-torsion-in-witt-vectors).
+
+- **Ideals and completeness of Witt vectors.** For prime `p` and any commutative
+  ring `k` of characteristic `p`, `WittVector p k` is Hausdorff and complete
+  for `(p)`. Membership in `(p)^n` means that the first `n` coefficients vanish
+  and each remaining coefficient has a `p^n`-th root. For fixed `n`, the roots
+  are independent; no perfectness, reducedness or field hypothesis is needed.
+  The constant-coefficient kernel equals `(p)` exactly when Frobenius on `k`
+  is surjective, and `(p)` is prime exactly when `k` is a domain with
+  surjective Frobenius. Prime-field, product and polynomial examples
+  distinguish these conditions; a zero prefix alone does not suffice over a
+  nonperfect ring. See the
+  [coefficient, ideal and completeness API](../AdicModules/RingTheory/WittVector/Complete.lean)
+  and its [examples](../AdicModulesTest/RingTheory/WittVector/Complete.lean).
+
+- **Domain criterion for Witt vectors.** For `p : ℕ` with `[Fact p.Prime]`
+  and any `R : Type u` with `[CommRing R]`,
+  [`WittVector.isDomain_iff`](../AdicModules/RingTheory/WittVector/Domain.lean)
+  gives `IsDomain (WittVector p R) ↔ IsDomain R ∧ CharP R p`.
+  Domainhood and characteristic `p` of `R` are conclusions, not hypotheses.
+  See the [imperfect polynomial, integer and zero-ring models](../AdicModulesTest/RingTheory/WittVector/Domain.lean).
+
+- **Discrete valuation criterion for Witt vectors.** For `p : ℕ` with
+  `[Fact p.Prime]` and any `R : Type u` with `[CommRing R]`,
+  [`WittVector.isDiscreteValuationRing_iff`](../AdicModules/RingTheory/WittVector/DiscreteValuationRing.lean)
+  equates the existence of `hD : IsDomain (WittVector p R)` satisfying
+  `@IsDiscreteValuationRing (WittVector p R) inferInstance hD` with
+  `IsField R ∧ CharP R p ∧ PerfectRing R p`.
+  The domain proof is bound within the left-hand condition; field,
+  characteristic and perfectness of `R` are conclusions, not hypotheses.
+
+- **Witt Frobenius and perfect coefficients.** For a prime `p` and a commutative
+  ring `R` with `CharP R p`,
+  [`WittVector.frobenius_bijective_iff`](../AdicModules/RingTheory/WittVector/Frobenius.lean)
+  identifies bijectivity of canonical Witt Frobenius with `PerfectRing R p`.
+  No field, domain or reducedness hypothesis is imposed. The
+  [examples](../AdicModulesTest/WittVector/Frobenius.lean) contrast the perfect
+  non-domain `ZMod 2 × ZMod 2` with the nonperfect `DualNumber (ZMod 2)`.
+
 ## Precompleteness and adic completeness
 
 Let `R` be a commutative ring and let `M` and `N` be `R`-modules with additive
@@ -626,7 +841,49 @@ uses `((ZMod 3)((T)))[[X]]` along its nonzero ideal `(X)`, distinguishes the
 images of two and zero, and shows that the constant Laurent monomial `T`
 is outside the image because it has no cube root.
 
+## Imports and build notes
+
+The public root is `AdicModules`. Related `AdicModulesTest` modules require separate
+imports and are not re-exported by that root; some expose named concrete results, while the left-ideal, span and
+fraction-field completeness models keep their calculations private. The [mathematical guide](Guide.md)
+provides detailed hypotheses, formulas and examples. The [README module table](../README.md#imports-and-module-map) lists library
+leaves and their related modules.
+
+Install the Lean version pinned in [`lean-toolchain`](../lean-toolchain) with elan,
+retain [`lake-manifest.json`](../lake-manifest.json) and fetch the matching cache
+successfully before building; do not silently rebuild mathlib if it is unavailable:
+
+```sh
+lake exe cache get
+lake build AdicModules AdicModulesTest
+```
+
+Both libraries are default targets. `AdicModulesTest.+` includes the separate
+example files; there is no `AdicModulesTest.lean` aggregate root. See
+[reproduction and resources](Guide.md#reproduction-and-resources) for build
+options, thread-setting limits and cold-machine caveats, not machine-size guarantees.
+The [historical API snapshot](API.md) and [generation notes](README.md)
+cover 13 leaves, 28 modules and 103 display sites, not the current whole library.
+Use the [results reference](Results.md), [Guide](Guide.md),
+[primary components](PrimaryComponent.md), the [finite-quotient guide](FiniteQuotient.md)
+and current Lean signatures.
+
 ## Credits, references and scope
+
+The endomorphism criterion uses the adic lifting and separation framework in
+Mathlib's [Functoriality.lean](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/AdicCompletion/Functoriality.lean)
+(Judith Ludwig and Christian Merten) and
+[Basic.lean](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/AdicCompletion/Basic.lean)
+(Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang), together with
+Mathlib's [linear-equivalence and unit API](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Algebra/Module/Equiv/Basic.lean).
+
+The Witt-vector unit criteria follow Mathlib's generic unit constructor and
+field criterion in `RingTheory/WittVector/DiscreteValuationRing.lean`, by
+Robert Y. Lewis, Heather Macbeth and Johan Commelin; the constant-coefficient
+surjection is provided by Mathlib's `RingTheory/WittVector/Teichmuller.lean`.
+The locality equivalence combines this surjection and the unit criterion with
+Mathlib's local-ring criteria in `RingTheory/LocalRing/Basic.lean`, by Kenny Lau,
+Chris Hughes and Mario Carneiro.
 
 Developed and reviewed by Formal Frontier AI agents; this is not human peer
 review, source-author endorsement or complete formalization of a selected source.
@@ -698,5 +955,8 @@ together with Mathlib's sequence functors, sections and adic completion. Its
 signed successor proof follows the scalar-transition calculation with the sign
 unit inserted degreewise. The rational nonvanishing argument follows Group
 Theory's rational half-class test.
+
+Ordinary builds and historical API output are not complete transitive
+standard-axiom assurance or stored-proof replay.
 
 For imports and the complete current source map, see the [Guide](Guide.md#module-map).

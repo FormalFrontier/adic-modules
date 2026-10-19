@@ -7,6 +7,7 @@ module
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
 import AdicModules.AdicCompletion.TensorProduct
+import Mathlib.Algebra.Module.FinitePresentation
 import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.RingTheory.Finiteness.Cardinality
@@ -22,6 +23,10 @@ For a finite projective module over a commutative ring, the canonical comparison
 `AdicCompletion.ofTensorProductEquivOfFiniteProjective`. The integer rank-two models below apply
 this bijectivity theorem and exhibit that equivalence with its canonical-map, pure-tensor and
 inverse-generator identities.
+The same rank-two completion is finite and projective over the canonical completed integer
+ring. The generic finite-presentation lemma consumes these instances. The finite-product
+equivalence computes both basis images and arbitrary completed-scalar linear combinations;
+precision-one evaluation detects that the completed scalar ring is nonzero.
 
 Separate integer models use Mathlib's Noetherian comparison, checking both coordinate vectors,
 inverse images of generators and the full equivalence API. Finiteness comes from finite products,
@@ -48,6 +53,9 @@ proof here.
 Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and Christian Merten,
 supplies the canonical comparison, finite-product bijectivity, and the Noetherian equivalence
 used in the integer models.
+Their finite-product coordinates use `RingTheory/AdicCompletion/Functoriality.lean` by the same
+authors. The finite-presentation consequence uses Andrew Yang's
+`Algebra/Module/FinitePresentation.lean`.
 -/
 
 set_option warningAsError true
@@ -109,6 +117,55 @@ private instance intPair_finite : Module.Finite ℤ (Fin 2 → ℤ) :=
 
 private instance intPair_projective : Module.Projective ℤ (Fin 2 → ℤ) :=
   Module.Projective.of_basis (Pi.basisFun ℤ (Fin 2))
+
+local notation "I₂" => Ideal.span ({(2 : ℤ)} : Set ℤ)
+local notation "S₂" => AdicCompletion I₂ ℤ
+local notation "M₂" => (Fin 2 → ℤ)
+local notation "e₂" => AdicCompletion.piEquivFin I₂ 2
+
+/-- Coordinates and tensor inverses in the finite projective rank-two completion,
+with finite presentation supplied by the generic finite-projective lemma. -/
+private theorem intPair_completion_model (a b : S₂) :
+    Module.FinitePresentation S₂ (AdicCompletion I₂ M₂) ∧
+      (e₂ (AdicCompletion.of I₂ M₂ (Pi.single 0 1)) 0,
+        e₂ (AdicCompletion.of I₂ M₂ (Pi.single 0 1)) 1) = (1, 0) ∧
+      (e₂ (AdicCompletion.of I₂ M₂ (Pi.single 1 1)) 0,
+        e₂ (AdicCompletion.of I₂ M₂ (Pi.single 1 1)) 1) = (0, 1) ∧
+      (e₂ (a • AdicCompletion.of I₂ M₂ (Pi.single 0 1) +
+        b • AdicCompletion.of I₂ M₂ (Pi.single 1 1)) 0,
+        e₂ (a • AdicCompletion.of I₂ M₂ (Pi.single 0 1) +
+          b • AdicCompletion.of I₂ M₂ (Pi.single 1 1)) 1) = (a, b) ∧
+      (AdicCompletion.ofTensorProductEquivOfFiniteProjective I₂ M₂).symm
+        (a • AdicCompletion.of I₂ M₂ (Pi.single 0 1) +
+          b • AdicCompletion.of I₂ M₂ (Pi.single 1 1)) =
+        a • ((1 : S₂) ⊗ₜ[ℤ] Pi.single 0 1) + b • ((1 : S₂) ⊗ₜ[ℤ] Pi.single 1 1) ∧
+      (1 : S₂) ≠ 0 := by
+  have hcoord (i : Fin 2) :
+      e₂ (AdicCompletion.of I₂ M₂ (Pi.single i 1)) = Pi.single i (1 : S₂) := by
+    rw [AdicCompletion.piEquivFin_apply]
+    funext j
+    simp only [AdicCompletion.pi, LinearMap.pi_apply, AdicCompletion.map_of,
+      LinearMap.proj_apply]
+    by_cases h : j = i
+    · subst j
+      simp only [Pi.single_eq_same]
+      rfl
+    · simp [h]
+  refine ⟨Module.finitePresentation_of_projective _ _, ?_, ?_, ?_, ?_, ?_⟩
+  · simp [hcoord]
+  · simp [hcoord]
+  · simp [map_add, map_smul, hcoord, smul_eq_mul]
+  · simp
+  · intro h
+    have hquot : Ideal.Quotient.mk I₂ (1 : ℤ) = 0 := by
+      simpa only [map_one, map_zero] using congrArg (AdicCompletion.evalOneₐ I₂) h
+    have hdiv : (2 : ℤ) ∣ 1 :=
+      Ideal.mem_span_singleton.mp (Ideal.Quotient.eq_zero_iff_mem.mp hquot)
+    norm_num at hdiv
+
+example : Module.FinitePresentation (AdicCompletion (⊤ : Ideal ℤ) ℤ)
+    (AdicCompletion (⊤ : Ideal ℤ) M₂) :=
+  Module.finitePresentation_of_projective _ _
 
 private theorem intPair_bijective_of_finite_projective :
     Function.Bijective

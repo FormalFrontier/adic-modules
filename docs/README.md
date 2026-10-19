@@ -30,6 +30,10 @@ For example:
 - Over a commutative ring, the canonical completion–tensor comparison is an
   equivalence for finitely presented modules under finite-free cofinality; finite
   projective modules and finite modules over Noetherian rings have separate comparisons.
+  Independently of projectivity, completion of a finite module is finite over
+  `AdicCompletion I R`. A finite projective module also remains projective over this
+  canonical completed scalar ring, with no restriction on the ideal. The standard
+  `Module.finitePresentation_of_projective` lemma supplies finite presentation.
 - A finite pairwise comaximal family of **two-sided** ideals in a possibly
   noncommutative ring gives the canonical ring CRT equivalence and a unique
   quotient class, not a unique ring representative.
