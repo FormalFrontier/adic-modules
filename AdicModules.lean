@@ -12,6 +12,7 @@ public import AdicModules.Polynomial.RootUniqueness
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
+public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
 public import AdicModules.AdicCompletion.Kernel

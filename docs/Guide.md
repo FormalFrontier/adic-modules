@@ -26,6 +26,33 @@ Witt vectors have characteristic zero. Separately, the
 describes the kernel coefficientwise and makes `p` regular exactly when the
 coefficient ring is reduced.
 
+## Endomorphisms congruent to the identity
+
+Import [`AdicModules.AdicCompletion.Endomorphism`](../AdicModules/AdicCompletion/Endomorphism.lean)
+or the public root. Let `R : Type u` be a commutative ring, `M : Type v` an
+additive commutative group with its `R`-module structure, and `I : Ideal R` any
+ideal. The universes `u` and `v` are independent. For `f : Module.End R M`,
+`Module.End.isUnit_of_sub_mem_smul I f hf` concludes `IsUnit f` from
+`IsAdicComplete I M` and
+`hf : ∀ m, f m - m ∈ I • (⊤ : Submodule R M)`. The congruence is pointwise
+in the original module, not membership in an ideal multiple of the endomorphism
+module. No finite-generation hypothesis or completeness of the endomorphism
+space is needed.
+
+Modulo `I • ⊤`, the map is the identity. Mathlib's
+`surjective_of_mkQ_comp_surjective` therefore gives surjectivity on `M`.
+The difference `f - 1` sends `I ^ n • ⊤` into `I ^ (n + 1) • ⊤`; induction
+puts every kernel element in every ideal power, and Hausdorffness makes it zero.
+Mathlib's `Module.End.isUnit_iff` turns this bijectivity into a unit. The
+conclusion uses the standard unit API, including `h.unit.inv` for `h : IsUnit f`.
+
+The [private shear example](../AdicModulesTest/IdentityCongruence.lean) takes
+`R = ZMod 4`, `I = Ideal.span {(2 : R)}` and the canonical module `M = R × R`.
+The shear `(x, y) ↦ (x + 2 * y, y)` satisfies the criterion, with completeness
+from `I ^ 2 = ⊥`. The file retains separate nonidentity, nonscalarity and
+involution proofs, an involution-based unit witness, and both inverse laws
+independent of the criterion.
+
 ## Characteristic zero of Witt vectors
 
 Import [`AdicModules.RingTheory.WittVector`](../AdicModules/RingTheory/WittVector.lean)
@@ -949,6 +976,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
+| [AdicCompletion.Endomorphism](../AdicModules/AdicCompletion/Endomorphism.lean) | Units from pointwise congruence to the identity on an adically complete module, for arbitrary ideals |
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
@@ -1020,6 +1048,7 @@ by the public root.
 | [AdicCompletion](../AdicModulesTest/AdicCompletion.lean) | Abstract-completion import client and concrete ideal boundary |
 | [AdicCompletion.Completeness](../AdicModulesTest/AdicCompletion/Completeness.lean) | Three proposition `#check`s and separated-quotient completeness/boundary models; no universal proof in this model file |
 | [AdicCompletion.CompletenessTheorems](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) | Suprema, finite spans, Hausdorffification and principal-ideal completeness examples |
+| [IdentityCongruence](../AdicModulesTest/IdentityCongruence.lean) | Private canonical `ZMod 4` shear: independent completeness, congruence, nonidentity, nonscalarity, involution and inverse laws, plus the endomorphism criterion |
 | [AdicCompletionKernel](../AdicModulesTest/AdicCompletionKernel.lean) | Private integer `(2)` degree-one nonzero evaluation, independent kernel and degree-zero calibration, finite-generation recovery and separate fixed-power use |
 | [AdicCompletionQuotient](../AdicModulesTest/AdicCompletionQuotient.lean) | Integer `(2)` completion quotient and `ZMod 2` comparison, inverse representative and quotient-map formulas, and degree-zero boundary |
 | [AdicCompletion.DependentPi](../AdicModulesTest/AdicCompletion/DependentPi.lean) | Private generic product `Prop` contracts, the nonzero completion element of the constant-one `ℕ → ℤ` family and its comparison image; no universal bijectivity proof |

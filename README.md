@@ -45,6 +45,13 @@ Then `import AdicModules`, or choose an individual module from the table below.
   the separated quotient and principal-ideal completeness fit the same theory.
   See [completeness results](docs/Results.md#precompleteness-and-adic-completeness).
 
+- **Endomorphisms congruent to the identity.** For a module `M` over a
+  commutative ring `R` and any ideal `I`, an endomorphism `f : Module.End R M`
+  is a unit if `IsAdicComplete I M` and
+  `∀ m, f m - m ∈ I • (⊤ : Submodule R M)`. Completeness is required of `M`,
+  not of the endomorphism space. See the
+  [endomorphism criterion](AdicModules/AdicCompletion/Endomorphism.lean).
+
 - **Adic completion of arbitrary products.** For `I.FG` in a commutative ring `R`,
   `AdicCompletion.piEquivOfFG` is an algebraic `AdicCompletion I R`-linear
   equivalence between completion of a dependent product and the product of
@@ -429,6 +436,7 @@ leaves and their related modules.
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
+| [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
@@ -500,6 +508,13 @@ source-author endorsement or complete source formalization. License: [Apache-2.0
 and authentic upstream notices. The [detailed credits](docs/Results.md#credits-references-and-scope)
 retain the mathematical bibliography, Mathlib contributor credits and reuse of
 [Group Theory](https://github.com/FormalFrontier/group-theory)'s scalar-torsion interface.
+
+The endomorphism criterion uses the adic lifting and separation framework in
+Mathlib's [Functoriality.lean](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/AdicCompletion/Functoriality.lean)
+(Judith Ludwig and Christian Merten) and
+[Basic.lean](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/RingTheory/AdicCompletion/Basic.lean)
+(Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang), together with
+Mathlib's [linear-equivalence and unit API](https://github.com/leanprover-community/mathlib4/blob/83abb3e776bdefcbc447a1e44d0debe4010039e5/Mathlib/Algebra/Module/Equiv/Basic.lean).
 
 The Witt-vector unit criteria follow Mathlib's generic unit constructor and
 field criterion in `RingTheory/WittVector/DiscreteValuationRing.lean`, by
