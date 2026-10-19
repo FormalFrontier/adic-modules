@@ -161,6 +161,14 @@ Then `import AdicModules`, or choose an individual module from the table below.
   [factor uniqueness](AdicModules/Polynomial/Hensel.lean) and its
   [coprimeness criterion](AdicModules/Polynomial/Coprime.lean).
 
+- **Simple-root uniqueness.** For a commutative ring `R`, a possibly
+  noncommutative semiring `S` and a scalar unit-reflecting ring map
+  `φ : R →+* S` (`IsLocalHom φ`), two roots `a, b` of any polynomial `f`
+  with `φ a = φ b` and `IsUnit (φ (f.derivative.eval a))` are equal.
+  Ring and semiring universes are independent. See
+  [`Polynomial.IsRoot.eq_of_map_eq`](AdicModules/Polynomial/RootUniqueness.lean)
+  and its [examples](AdicModulesTest/Polynomial/RootUniqueness.lean).
+
 - **Frobenius limits and Teichmüller maps.** For a field of prime characteristic
   `p`, the inverse-Frobenius limit `Perfection K p` is a field without perfectness
   of `K`; this is not a root-adjoining extension or surjectivity onto `K`.
@@ -381,6 +389,7 @@ leaves and their related modules.
 | [Polynomial.Coprime](AdicModules/Polynomial/Coprime.lean) | [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (monic coprimeness criterion and factor uniqueness) |
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean), [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (nonlocal power series, zero ring and product-projection boundary) |
 | [Polynomial.Evaluation](AdicModules/Polynomial/Evaluation.lean) | [Polynomial.Evaluation](AdicModulesTest/Polynomial/Evaluation.lean) (derivative application, nonunit 3-adic derivative and zero boundary) |
+| [Polynomial.RootUniqueness](AdicModules/Polynomial/RootUniqueness.lean) | [Polynomial.RootUniqueness](AdicModulesTest/Polynomial/RootUniqueness.lean) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
