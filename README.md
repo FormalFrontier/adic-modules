@@ -6,6 +6,12 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- For an arbitrary dependent family of commutative rings and ideals, the product
+  pair is Henselian if and only if every component pair is Henselian.
+  [`HenselianRing.pi` and `HenselianRing.pi_iff`](AdicModules/RingTheory/HenselianPi.lean)
+  provide the construction instance and characterization, with independent index
+  and ring universes, including empty products and trivial rings.
+
 Rings are commutative; modules are additive commutative groups unless specified otherwise.
 
 - **Completion and completeness** ([functor](AdicModules/AdicCompletion/Functor.lean),

@@ -67,6 +67,8 @@ public import AdicModules.LocalizedQuotientValuationSubring
 public import AdicModules.CompositeValuationSubring
 public import AdicModules.CompletedValuationComposite
 
+public import AdicModules.RingTheory.HenselianPi
+
 /-!
 # Adic modules and valuation-ring completions
 
