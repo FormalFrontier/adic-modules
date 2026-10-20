@@ -20,6 +20,25 @@ Rings are commutative; modules are additive commutative groups unless specified 
   for arbitrary `I,J` implies it for `I ⊔ J`. On an `I`-adically complete module,
   endomorphisms congruent to the identity modulo `I • ⊤` are units
   ([criterion](AdicModules/AdicCompletion/Endomorphism.lean)).
+- **Cofinal ideal powers** ([API](AdicModules/AdicCompletion/ChangeIdeal.lean), [integer
+  model](AdicModulesTest/CofinalAdicCompletion.lean)): for arbitrary ideals and modules,
+  the original-`R`-linear `mapOfPowLE` uses `∃ a : ℕ, I^a ≤ J`, including zero; mutual
+  power containment gives `equivOfCofinal
+  : AdicCompletion I M ≃ₗ[R] AdicCompletion J M`. No finite generation, Noetherianity or
+  completeness is required. Evaluation on every admissible stage pair `I^m ≤ J^n` is the
+  canonical quotient factor, on arbitrary completed inputs, independently of witnesses. The maps
+  preserve `of`, have identity/composition laws and are natural in original `R`-linear maps; the
+  reverse comparison supplies both inverse laws. The inclusion API is `mapOfLE`, `mapOfLE_eval`,
+  `mapOfLE_of`, `mapOfLE_id`, `mapOfLE_comp`, `mapOfLE_natural`; `mapOfPowLE_eq_mapOfLE`
+  identifies every power witness with that map on arbitrary inputs. `powEquiv` requires **`0 <
+  k`**; its forward/inverse every-admissible-stage evaluations, `of` and naturality laws,
+  explicit ideal-equality quotient transport and agreement with cofinal comparison are included.
+  Naturality uses distinct completed-`I` and completed-`J` scalar rings, not a common completed
+  ring. The model keeps the same original `ℤ` self-module and distinct proper nonnilpotent
+  ideals `(2)=span{2}`, `(4)=span{4}`: stage `0` is zero; class `1` is nonzero at stages `1,2`,
+  modulo `(2),(4)` and `(4),(16)` respectively. It gives explicit quotient transport,
+  evaluation, `of`, both inverses, `timesThree` naturality and positive-power agreement, using
+  the original quotient modules throughout.
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
   [maps](AdicModules/AdicCompletion/LinearMap.lean)): `I.FG` gives the canonical
   completed-ring-linear equivalence for arbitrary dependent products. Any ideal admits
@@ -247,6 +266,7 @@ Test modules require separate imports and are not re-exported by the root.
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
+| [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |

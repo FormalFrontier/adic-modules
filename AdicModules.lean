@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 public import AdicModules.RingTheory.WittVector.Frobenius
 
+public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.Polynomial.Hensel
 public import AdicModules.Polynomial.Evaluation
