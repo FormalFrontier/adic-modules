@@ -354,9 +354,9 @@ private lemma scalar_mem_entryIdeal (p a : ℤ) (h : p ∣ a) :
   intro i j
   rw [Matrix.intCast_apply]
   by_cases hij : i = j
-  · rw [if_pos hij]
+  · rw [ite_eq_left hij]
     exact h
-  · rw [if_neg hij]
+  · rw [ite_eq_right hij]
     exact dvd_zero p
 
 private lemma entryIdeal_nonzero_proper (p : ℤ) (hp : p ≠ 0) (hunit : ¬p ∣ 1) :

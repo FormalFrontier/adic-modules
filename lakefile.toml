@@ -1,5 +1,6 @@
 name = "adic-modules"
 version = "0.1.0"
+lintDriver = "batteries/runLinter"
 defaultTargets = ["AdicModules", "AdicModulesTest"]
 
 [leanOptions]
@@ -23,4 +24,4 @@ name = "AdicModules"
 
 [[lean_lib]]
 name = "AdicModulesTest"
-globs = ["AdicModulesTest.+"]
+globs = ["AdicModulesTest", "AdicModulesTest.+"]

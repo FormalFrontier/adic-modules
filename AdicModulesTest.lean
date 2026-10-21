@@ -1,0 +1,100 @@
+/-
+SPDX-License-Identifier: Apache-2.0
+Authors: Formal Frontier Agents
+-/
+module
+
+public import AdicModulesTest.AdicCompletion
+public import AdicModulesTest.AdicCompletion.Completeness
+public import AdicModulesTest.AdicCompletion.CompletenessTheorems
+public import AdicModulesTest.AdicCompletion.DependentPi
+public import AdicModulesTest.AdicCompletion.FiniteNoetherian
+public import AdicModulesTest.AdicCompletion.FinitePresentation
+public import AdicModulesTest.AdicCompletion.Functor
+public import AdicModulesTest.AdicCompletion.LinearMap
+public import AdicModulesTest.AdicCompletion.LocalRing
+public import AdicModulesTest.AdicCompletion.PadicInt
+public import AdicModulesTest.AdicCompletion.RestrictScalars
+public import AdicModulesTest.AdicCompletion.TensorProduct
+public import AdicModulesTest.AdicCompletionKernel
+public import AdicModulesTest.AdicCompletionPi
+public import AdicModulesTest.AdicCompletionQuotient
+public import AdicModulesTest.Algebra.Module.Int
+public import AdicModulesTest.Axioms
+public import AdicModulesTest.BoundedIdealPowerTorsion
+public import AdicModulesTest.CofinalAdicCompletion
+public import AdicModulesTest.CompletedIntegers
+public import AdicModulesTest.CompletedLocalStructure
+public import AdicModulesTest.CompletedValuationComposite
+public import AdicModulesTest.CompositeValuationSubring
+public import AdicModulesTest.Correspondence
+public import AdicModulesTest.FractionFieldCompletenessPadicClient
+public import AdicModulesTest.FractionFieldCompletenessSeriesClient
+public import AdicModulesTest.HenselianPi
+public import AdicModulesTest.HenselianPiInputs
+public import AdicModulesTest.IdentityCongruence
+public import AdicModulesTest.KernelPullback
+public import AdicModulesTest.LinearAlgebra.SModEq.Pow
+public import AdicModulesTest.LinearAlgebra.TensorProduct.Quotient
+public import AdicModulesTest.LocalizedCompletion
+public import AdicModulesTest.LocalizedFiltration
+public import AdicModulesTest.LocalizedQuotientValuationSubring
+public import AdicModulesTest.LocalizedResidueField
+public import AdicModulesTest.LocalizedValuationSubring
+public import AdicModulesTest.Polynomial.Evaluation
+public import AdicModulesTest.Polynomial.FactorizationUniqueness
+public import AdicModulesTest.Polynomial.Hensel
+public import AdicModulesTest.Polynomial.HenselianFactorization
+public import AdicModulesTest.Polynomial.RootUniqueness
+public import AdicModulesTest.PrimaryComponent
+public import AdicModulesTest.PrincipalAdicSpectrum
+public import AdicModulesTest.RingTheory.FrobeniusCore
+public import AdicModulesTest.RingTheory.HenselianCriterion
+public import AdicModulesTest.RingTheory.HenselianTransport
+public import AdicModulesTest.RingTheory.Ideal.IsPrincipalPowQuotient
+public import AdicModulesTest.RingTheory.Ideal.Operations.MatrixNat
+public import AdicModulesTest.RingTheory.Ideal.Quotient.Finite
+public import AdicModulesTest.RingTheory.Ideal.Quotient.FiniteEquivalence
+public import AdicModulesTest.RingTheory.Ideal.Quotient.FiniteInverse
+public import AdicModulesTest.RingTheory.Ideal.Quotient.FiniteLinear
+public import AdicModulesTest.RingTheory.Ideal.Quotient.FinitePowers
+public import AdicModulesTest.RingTheory.Ideal.Quotient.FiniteReduction
+public import AdicModulesTest.RingTheory.Ideal.Quotient.LeftIdeal
+public import AdicModulesTest.RingTheory.Ideal.Quotient.Matrix
+public import AdicModulesTest.RingTheory.Ideal.Quotient.SMulTop
+public import AdicModulesTest.RingTheory.Ideal.ScalarIntersection
+public import AdicModulesTest.RingTheory.Idempotents
+public import AdicModulesTest.RingTheory.Teichmuller
+public import AdicModulesTest.RingTheory.TeichmullerCore
+public import AdicModulesTest.RingTheory.TeichmullerFractionFieldModel
+public import AdicModulesTest.RingTheory.WittVector
+public import AdicModulesTest.RingTheory.WittVector.Complete
+public import AdicModulesTest.RingTheory.WittVector.DiscreteValuationRing
+public import AdicModulesTest.RingTheory.WittVector.Domain
+public import AdicModulesTest.RingTheory.WittVector.Torsion
+public import AdicModulesTest.ScalarTorsionSections
+public import AdicModulesTest.Topology.Algebra.AdicCompactness
+public import AdicModulesTest.Topology.Algebra.Ideal.Boundary
+public import AdicModulesTest.Topology.Algebra.Ideal.Int
+public import AdicModulesTest.Topology.Algebra.Ideal.Matrix
+public import AdicModulesTest.Topology.Algebra.Module.AdicTopology
+public import AdicModulesTest.Topology.Algebra.Module.Span.Boundary
+public import AdicModulesTest.Topology.Algebra.Module.Span.Discrete
+public import AdicModulesTest.Topology.Algebra.Module.Span.Indiscrete
+public import AdicModulesTest.Topology.Algebra.Module.Span.PadicInt
+public import AdicModulesTest.Topology.Algebra.Module.Span.Real
+public import AdicModulesTest.Topology.Algebra.PadicInt
+public import AdicModulesTest.Topology.Algebra.PrincipalUnits
+public import AdicModulesTest.Topology.Algebra.PrincipalUnits.Henselian
+public import AdicModulesTest.Topology.Algebra.SubmoduleClosure
+public import AdicModulesTest.Valuation.Completeness
+public import AdicModulesTest.ValuationPower
+public import AdicModulesTest.ValuationPowerModel
+public import AdicModulesTest.ValuationTopology
+public import AdicModulesTest.WittVector.Frobenius
+
+/-!
+# Adic module tests
+
+This module re-exports the test library.
+-/

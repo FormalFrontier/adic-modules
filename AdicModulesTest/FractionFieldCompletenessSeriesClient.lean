@@ -114,7 +114,7 @@ private theorem single_neg_one_not_in_range :
   have hcoeff := congrArg (fun g : LaurentSeries κ ↦ g.coeff (-1)) hf
   change (f : LaurentSeries κ).coeff (-1) =
     (HahnSeries.single (-1 : ℤ) (1 : κ) : LaurentSeries κ).coeff (-1) at hcoeff
-  rw [PowerSeries.coeff_coe, if_pos (show (-1 : ℤ) < 0 by simp),
+  rw [PowerSeries.coeff_coe, ite_eq_left (show (-1 : ℤ) < 0 by simp),
     HahnSeries.coeff_single_same] at hcoeff
   exact (zero_ne_one : (0 : κ) ≠ 1) hcoeff
 

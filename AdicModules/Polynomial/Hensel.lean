@@ -961,7 +961,7 @@ private theorem exists_spanning_family_mul_errors
       rw [Ideal.smul_top_eq_map]
       exact Ideal.Quotient.eq_zero_iff_mem.mp hzero
     simpa [v] using hmem
-  · simpa only [v, Fin.cons_succ, Fin.succ_ne_zero, if_false] using htail i
+  · simpa only [v, Fin.cons_succ, Fin.succ_ne_zero, ite_false] using htail i
 
 /-- A residue augmentation with principal kernel makes the complementary quotient a
 quotient of the source ring. The augmentation descends through that quotient. -/

@@ -120,8 +120,8 @@ noncomputable def quotientInfRingEquivPiQuotientOfPairwiseSupEqTop :
 
 @[simp]
 theorem quotientInfRingEquivPiQuotientOfPairwiseSupEqTop_toRingHom :
-    (quotientInfRingEquivPiQuotientOfPairwiseSupEqTop I hI).toRingHom =
-      quotientInfToPiQuotient I :=
+    (quotientInfRingEquivPiQuotientOfPairwiseSupEqTop I hI :
+      (R ⧸ ⨅ i, I i) →+* ((i : ι) → R ⧸ I i)) = quotientInfToPiQuotient I :=
   rfl
 
 @[simp]
