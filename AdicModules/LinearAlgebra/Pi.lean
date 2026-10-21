@@ -118,7 +118,6 @@ theorem FG.quotientPi_apply_mk {I : Ideal R} (hI : I.FG)
       fun j => (Submodule.Quotient.mk (x j) : M j ⧸ (I • (⊤ : Submodule R (M j)))) := by
   rfl
 
-@[simp]
 theorem FG.quotientPi_mkQ {I : Ideal R} (hI : I.FG)
     {J : Type uJ} (M : J → Type uM)
     [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)] (x : ∀ j, M j) :

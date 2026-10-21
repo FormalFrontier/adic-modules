@@ -602,7 +602,6 @@ theorem quotientInfLinearEquivPiQuotientOfPairwiseSupEqTop_mk (r : R) :
 
 /-- The linear Chinese remainder equivalence preserves the canonical left action
 of the common base ring. -/
-@[simp]
 theorem quotientInfLinearEquivPiQuotientOfPairwiseSupEqTop_smul
     (r : R) (z : R ⧸ ⨅ i, I i) :
     quotientInfLinearEquivPiQuotientOfPairwiseSupEqTop I hI (r • z) =

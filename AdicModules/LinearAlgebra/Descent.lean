@@ -43,6 +43,7 @@ variable [Module R M] [Module S N] [Module T P]
 variable {σ : R →+* S} {ρ : R →+* T} {τ : S →+* T}
 variable [RingHomSurjective σ] [RingHomCompTriple σ τ ρ]
 
+omit [RingHomSurjective σ] in
 private theorem factorsThrough_of_ker_le_ker (f : M →ₛₗ[σ] N)
     (g : M →ₛₗ[ρ] P) (hker : f.ker ≤ g.ker) : Function.FactorsThrough g f := by
   intro x y hxy

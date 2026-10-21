@@ -189,7 +189,6 @@ theorem teichmullerSectionRingHom_apply (a : κ) :
     teichmullerSectionRingHom p f hf a = teichmullerSection p f hf a := rfl
 
 /-- The ring refinement reduces to the identity. -/
-@[simp]
 theorem teichmullerSectionRingHom_reduction_apply (a : κ) :
     f (teichmullerSectionRingHom p f hf a) = a :=
   teichmullerSection_reduction_apply p f hf a

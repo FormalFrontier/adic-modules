@@ -212,7 +212,6 @@ theorem precompOfLinearEquiv_symm_apply [IsAdicComplete I N] (hI : I.FG)
   rfl
 
 /-- On the canonical image, the inverse Hom equivalence evaluates the original map. -/
-@[simp]
 theorem precompOfLinearEquiv_symm_apply_of [IsAdicComplete I N] (hI : I.FG)
     (f : M →ₗ[R] N) (m : M) :
     (precompOfLinearEquiv I hI).symm f (of I M m) = f m := by

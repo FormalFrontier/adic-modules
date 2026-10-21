@@ -331,7 +331,7 @@ variable {R : Type u} [CommRing R] (I : Ideal R) [HenselianRing R I]
 
 -- Reciprocal substitution makes the equation monic without dividing by its constant term.
 private theorem exists_root_of_constant_mem
-    [Nontrivial R] (b : R) (q : R[X]) (hb : b ∈ I) (hu : IsUnit (q.coeff 0)) :
+    (b : R) (q : R[X]) (hb : b ∈ I) (hu : IsUnit (q.coeff 0)) :
     ∃ c : R, (C b + X * q).IsRoot c ∧ c ∈ I := by
   let : IsLocalHom (Ideal.Quotient.mk I) :=
     isLocalHom_of_le_jacobson_bot I HenselianRing.jac

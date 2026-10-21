@@ -94,18 +94,6 @@ theorem pairwise_sup_eq_top_pow
     (sup_comm _ _).trans (sup_pow_eq_top_of_sup_eq_top (n := n j) (hI hij))
   exact (sup_comm _ _).trans (sup_pow_eq_top_of_sup_eq_top (n := n i) h)
 
-/-- The comaximal-power conclusion when the unpowered ideal is two-sided. -/
-private theorem sup_pow_eq_top_of_isTwoSided_left
-    {R : Type u} [Semiring R] {I J : Ideal R} [I.IsTwoSided] {n : ℕ}
-    (h : I ⊔ J = ⊤) : I ⊔ J ^ n = ⊤ :=
-  sup_pow_eq_top_of_sup_eq_top (J := I) (I := J) (n := n) h
-
-/-- The comaximal-power conclusion when the powered ideal is two-sided. -/
-private theorem sup_pow_eq_top_of_isTwoSided_right
-    {R : Type u} [Semiring R] {I J : Ideal R} [J.IsTwoSided] {n : ℕ}
-    (h : I ⊔ J = ⊤) : I ⊔ J ^ n = ⊤ :=
-  sup_pow_eq_top_of_sup_eq_top (J := I) (I := J) (n := n) h
-
 end Ideal
 
 namespace Submodule

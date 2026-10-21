@@ -173,7 +173,6 @@ theorem equivOfCofinal_apply (I J : Ideal R) (M : Type uM)
     (x : AdicCompletion I M) :
     equivOfCofinal I J M hIJ hJI x = mapOfPowLE I J M hIJ x := rfl
 
-@[simp]
 theorem equivOfCofinal_of (I J : Ideal R) (M : Type uM)
     [AddCommGroup M] [Module R M]
     (hIJ : ∃ a : ℕ, I ^ a ≤ J) (hJI : ∃ b : ℕ, J ^ b ≤ I) (x : M) :
@@ -201,7 +200,6 @@ theorem equivOfCofinal_symm_apply (I J : Ideal R) (M : Type uM)
     (x : AdicCompletion J M) :
     (equivOfCofinal I J M hIJ hJI).symm x = mapOfPowLE J I M hJI x := rfl
 
-@[simp]
 theorem equivOfCofinal_symm_of (I J : Ideal R) (M : Type uM)
     [AddCommGroup M] [Module R M]
     (hIJ : ∃ a : ℕ, I ^ a ≤ J) (hJI : ∃ b : ℕ, J ^ b ≤ I) (x : M) :
@@ -351,12 +349,10 @@ theorem powEquiv_symm_apply (x : AdicCompletion (I ^ k) M) :
       ⟨1, by simpa only [pow_one] using (Ideal.pow_le_self (I := I) (Nat.ne_of_gt hk))⟩ x :=
   rfl
 
-@[simp]
 theorem powEquiv_of (x : M) : powEquiv I M k hk (of I M x) = of (I ^ k) M x := by
   change mapOfPowLE I (I ^ k) M ⟨k, le_rfl⟩ (of I M x) = of (I ^ k) M x
   exact mapOfPowLE_of I (I ^ k) M ⟨k, le_rfl⟩ x
 
-@[simp]
 theorem powEquiv_symm_of (x : M) :
     (powEquiv I M k hk).symm (of (I ^ k) M x) = of I M x := by
   change mapOfPowLE (I ^ k) I M
