@@ -8,9 +8,11 @@ public import AdicModules.RingTheory.HenselianCriterion
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
+public import Mathlib.RingTheory.RingHom.FaithfullyFlat
 import Mathlib.RingTheory.IntegralClosure.Algebra.Basic
 import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+import Mathlib.RingTheory.TensorProduct.IncludeLeftSubRight
 public import Mathlib.RingTheory.Idempotents
 public import Mathlib.RingTheory.Nilpotent.Lemmas
 public import Mathlib.Algebra.GroupWithZero.Basic
@@ -21,7 +23,8 @@ public import Mathlib.Algebra.GroupWithZero.Basic
 An integral homomorphism of commutative rings sends a Henselian pair to the pair
 formed by extending the ideal. In particular, this holds for surjective homomorphisms.
 If every element of a surjection's kernel is nilpotent, the source pair is Henselian
-if and only if its image pair is Henselian.
+if and only if its image pair is Henselian. Extension along an integral faithfully flat
+homomorphism also preserves and reflects the Henselian-pair property.
 
 The integral case uses unique idempotent lifting in finite algebras. Finite subalgebras
 are chosen to contain the coefficients witnessing ideal membership; no
@@ -45,6 +48,8 @@ Henselian-pair formalization by Johan Commelin and ideal-map API by Kenny Lau.
 @[expose] public section
 
 universe u v
+
+open scoped TensorProduct
 
 namespace HenselianRing
 
@@ -156,6 +161,90 @@ theorem map_of_isIntegral {R : Type u} {S : Type v} [CommRing R] [CommRing S]
   refine ⟨e, ⟨he.1, (Ideal.Quotient.eq (I := I.map (algebraMap R B))).mpr he.2⟩, ?_⟩
   intro z hz
   exact hu z ⟨hz.1, (Ideal.Quotient.eq (I := I.map (algebraMap R B))).mp hz.2⟩
+
+/-- A pair is Henselian if and only if its extension along an integral faithfully flat
+ring homomorphism is Henselian. -/
+theorem iff_map_of_isIntegral_of_faithfullyFlat {R : Type u} {S : Type v}
+    [CommRing R] [CommRing S] (I : Ideal R) (f : R →+* S) (hf : f.IsIntegral)
+    (hff : f.FaithfullyFlat) : HenselianRing R I ↔ HenselianRing S (I.map f) := by
+  constructor
+  · intro hR
+    let : HenselianRing R I := hR
+    exact map_of_isIntegral I f hf
+  · intro hS
+    let : Algebra R S := f.toAlgebra
+    have : Algebra.IsIntegral R S := algebraMap_isIntegral_iff.mp hf
+    have : Module.FaithfullyFlat R S := hff
+    let : HenselianRing S (I.map f) := hS
+    apply (iff_existsUnique_isIdempotentElem_map.{u, 0} I).2
+    intro B _ _ _ e0 he0
+    obtain ⟨c, rfl⟩ := Ideal.Quotient.mk_surjective e0
+    have hc : c * c - c ∈ I.map (algebraMap R B) := by
+      rw [isIdempotentElem_iff, ← map_mul, Ideal.Quotient.eq] at he0
+      exact he0
+    let T := B ⊗[R] S
+    let g : B →+* T := algebraMap B T
+    let k : S →+* T := Algebra.TensorProduct.includeRight.toRingHom
+    let J := I.map (algebraMap R B)
+    let K := J.map g
+    have hk : k.IsIntegral := by
+      have hleft : (algebraMap S (S ⊗[R] B)).IsIntegral :=
+        algebraMap_isIntegral_iff.mpr inferInstance
+      have hcomm := (Algebra.TensorProduct.comm R S B).surjective
+      exact RingHom.IsIntegral.trans (algebraMap S (S ⊗[R] B))
+        (Algebra.TensorProduct.comm R S B).toRingHom hleft
+        ((Algebra.TensorProduct.comm R S B).toRingHom.isIntegral_of_surjective hcomm)
+    have hK : (I.map f).map k = K := by
+      dsimp [K, J]
+      rw [Ideal.map_map, Ideal.map_map]
+      congr 1
+      exact Algebra.TensorProduct.includeLeftRingHom_comp_algebraMap.symm
+    have : HenselianRing T K := hK ▸ map_of_isIntegral (I.map f) k hk
+    have hcT : g c * g c - g c ∈ K := by
+      simpa only [map_sub, map_mul] using Ideal.mem_map_of_mem g hc
+    obtain ⟨e, he, hu⟩ : ∃! e : T, IsIdempotentElem e ∧ e - g c ∈ K := by
+      simpa using existsUnique_isIdempotentElem_sub_mem_map K (g c) (by simpa using hcT)
+    -- Compare the two pullbacks of the lifted idempotent.
+    let O := T ⊗[B] T
+    let l : T →+* O := algebraMap T O
+    let r : T →+* O := Algebra.TensorProduct.includeRight.toRingHom
+    have hcomp : l.comp g = r.comp g :=
+      Algebra.TensorProduct.includeLeftRingHom_comp_algebraMap
+    have hKr : K.map r = K.map l := by
+      change (J.map g).map r = (J.map g).map l
+      rw [Ideal.map_map g r, Ideal.map_map g l, hcomp]
+    have hcO : l (g c) * l (g c) - l (g c) ∈ K.map l := by
+      simpa only [map_sub, map_mul] using Ideal.mem_map_of_mem l hcT
+    obtain ⟨a, _, ha⟩ := existsUnique_isIdempotentElem_sub_mem_map K (l (g c)) hcO
+    have hle : l e = a := ha (l e) ⟨he.1.map l, by
+      simpa only [map_sub] using Ideal.mem_map_of_mem l he.2⟩
+    have hre : r e = a := ha (r e) ⟨he.1.map r, by
+      have hm := Ideal.mem_map_of_mem r he.2
+      rw [hKr, map_sub] at hm
+      have hgc : r (g c) = l (g c) := (RingHom.congr_fun hcomp c).symm
+      simpa only [hgc] using hm⟩
+    have heRange : e ∈ Set.range g := by
+      rw [← Algebra.IsEffective.eqLocus_includeLeft_includeRight
+        (Algebra.IsEffective.of_faithfullyFlat B T)]
+      exact hle.trans hre.symm
+    obtain ⟨b, hb⟩ := heRange
+    have hinj : Function.Injective g := FaithfulSMul.algebraMap_injective B T
+    have heb : IsIdempotentElem b := by
+      apply isIdempotentElem_iff.mpr
+      apply hinj
+      simpa only [map_mul, hb] using isIdempotentElem_iff.mp he.1
+    have hbmem : b - c ∈ J := by
+      rw [← Ideal.comap_map_eq_self_of_faithfullyFlat (B := T) J]
+      change g (b - c) ∈ K
+      simpa only [map_sub, hb] using he.2
+    refine ⟨b, ⟨heb, (Ideal.Quotient.eq (I := J)).mpr hbmem⟩, ?_⟩
+    intro z hz
+    apply hinj
+    apply Eq.trans ?_ hb.symm
+    apply hu (g z)
+    refine ⟨hz.1.map g, ?_⟩
+    have hzmem := (Ideal.Quotient.eq (I := J)).mp hz.2
+    simpa only [map_sub] using Ideal.mem_map_of_mem g hzmem
 
 /-- A surjective homomorphism sends a Henselian pair to the pair defined by the image ideal.
 

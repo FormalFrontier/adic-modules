@@ -25,3 +25,6 @@ name = "AdicModules"
 [[lean_lib]]
 name = "AdicModulesTest"
 globs = ["AdicModulesTest", "AdicModulesTest.+"]
+
+[lean_lib.leanOptions]
+weak.linter.privateModule = false

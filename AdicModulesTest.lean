@@ -50,6 +50,7 @@ public import AdicModulesTest.PrimaryComponent
 public import AdicModulesTest.PrincipalAdicSpectrum
 public import AdicModulesTest.RingTheory.FrobeniusCore
 public import AdicModulesTest.RingTheory.HenselianCriterion
+public import AdicModulesTest.RingTheory.HenselianFaithfullyFlat
 public import AdicModulesTest.RingTheory.HenselianTransport
 public import AdicModulesTest.RingTheory.HenselianIntegral
 public import AdicModulesTest.RingTheory.Ideal.IsPrincipalPowQuotient

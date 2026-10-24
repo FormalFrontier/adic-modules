@@ -1,5 +1,5 @@
 {
   "version": 1,
   "mode": "report",
-  "test_libraries": []
+  "test_libraries": ["AdicModulesTest"]
 }

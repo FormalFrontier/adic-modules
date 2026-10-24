@@ -188,6 +188,9 @@ Rings are commutative; modules are additive commutative groups unless specified 
   rings and an integral homomorphism `f : R →+* S`,
   `HenselianRing.map_of_isIntegral` sends a Henselian pair `(R, I)` to
   `(S, I.map f)`, without a finiteness or locality assumption on the target.
+  Integral faithfully flat maps also reflect Henselianity:
+  `HenselianRing.iff_map_of_isIntegral_of_faithfullyFlat` gives
+  `HenselianRing R I ↔ HenselianRing S (I.map f)`.
   Surjective maps are included via `HenselianRing.map_of_surjective`.
   If every element of a surjection's kernel is nilpotent,
   `HenselianRing.iff_map_of_surjective_of_nil_ker` also reflects Henselianity.
