@@ -184,13 +184,15 @@ Rings are commutative; modules are additive commutative groups unless specified 
   Completed integers literally equal the residue-preimage composite of completed localization
   and transported residue factor ([composites](AdicModules/CompletedValuationComposite.lean)).
 
-- **Surjective maps of Henselian pairs.** For independently universed commutative
-  rings and a surjective homomorphism `f : R →+* S`,
-  `HenselianRing.map_of_surjective` sends a Henselian pair `(R, I)` to
-  `(S, I.map f)`. If every element of the kernel is nilpotent,
+- **Integral maps of Henselian pairs.** For independently universed commutative
+  rings and an integral homomorphism `f : R →+* S`,
+  `HenselianRing.map_of_isIntegral` sends a Henselian pair `(R, I)` to
+  `(S, I.map f)`, without a finiteness or locality assumption on the target.
+  Surjective maps are included via `HenselianRing.map_of_surjective`.
+  If every element of a surjection's kernel is nilpotent,
   `HenselianRing.iff_map_of_surjective_of_nil_ker` also reflects Henselianity.
-  The original ideal is arbitrary: it need not contain the kernel, and no
-  uniform nilpotence exponent or Noetherian assumption is required.
+  The original ideal need not contain the kernel, and no uniform nilpotence
+  exponent or Noetherian assumption is required for this reflection.
   See [`HenselianTransport`](AdicModules/RingTheory/HenselianTransport.lean).
 
 ## Using the library

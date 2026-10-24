@@ -7,16 +7,25 @@ module
 public import AdicModules.RingTheory.HenselianCriterion
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
+import Mathlib.RingTheory.IntegralClosure.Algebra.Basic
+import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
+import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 public import Mathlib.RingTheory.Idempotents
 public import Mathlib.RingTheory.Nilpotent.Lemmas
 public import Mathlib.Algebra.GroupWithZero.Basic
 
 /-!
-# Henselian pairs under surjective homomorphisms
+# Henselian pairs under integral and surjective homomorphisms
 
-For a surjective homomorphism of commutative rings, the image of a Henselian pair is
-Henselian. If every element of the kernel is nilpotent, the source pair is Henselian
+An integral homomorphism of commutative rings sends a Henselian pair to the pair
+formed by extending the ideal. In particular, this holds for surjective homomorphisms.
+If every element of a surjection's kernel is nilpotent, the source pair is Henselian
 if and only if its image pair is Henselian.
+
+The integral case uses unique idempotent lifting in finite algebras. Finite subalgebras
+are chosen to contain the coefficients witnessing ideal membership; no
+extension-contraction identity is needed.
 
 The pair predicate is Mathlib's `HenselianRing`. This module uses Mathlib's
 Henselian-pair formalization by Johan Commelin and ideal-map API by Kenny Lau.
@@ -24,6 +33,8 @@ Henselian-pair formalization by Johan Commelin and ideal-map API by Kenny Lau.
 ## References
 
 * The Stacks Project Authors, *The Stacks Project*, Section 15.11, "Henselian pairs":
+  [Lemma 15.11.6 (Tag 09XI)](https://stacks.math.columbia.edu/tag/09XI), the finite-algebra
+  idempotent-lifting criterion;
   [Lemma 15.11.8 (Tag 09XK)](https://stacks.math.columbia.edu/tag/09XK), integral-map
   transport; [Lemma 15.11.9 (Tag 0DYD)](https://stacks.math.columbia.edu/tag/0DYD),
   nested-ideal transitivity; and
@@ -37,6 +48,115 @@ universe u v
 
 namespace HenselianRing
 
+private theorem exists_finite_subalgebra_mem_map {R : Type u} {C : Type v}
+    [CommRing R] [CommRing C] [Algebra R C] [Algebra.IsIntegral R C]
+    (I : Ideal R) (s : Finset C) (x : C) (hx : x ∈ I.map (algebraMap R C)) :
+    ∃ D : Subalgebra R C, Module.Finite R D ∧ (∀ z ∈ s, z ∈ D) ∧
+      ∃ y : D, (y : C) = x ∧ y ∈ I.map (algebraMap R D) := by
+  classical
+  change x ∈ Submodule.span C ((algebraMap R C) '' (I : Set R)) at hx
+  rw [Set.image_eq_range] at hx
+  obtain ⟨f, hf⟩ := Finsupp.mem_span_range_iff_exists_finsupp.mp hx
+  let t := s ∪ f.support.image f
+  let D := Algebra.adjoin R (t : Set C)
+  have hcoeff (i : I) : f i ∈ D := by
+    by_cases hi : i ∈ f.support
+    · exact Algebra.subset_adjoin (Finset.mem_union_right s (Finset.mem_image.mpr ⟨i, hi, rfl⟩))
+    · rw [Finsupp.notMem_support_iff.mp hi]
+      exact D.zero_mem
+  let g (i : I) : D := ⟨f i, hcoeff i⟩
+  let y : D := ∑ i ∈ f.support, g i * algebraMap R D (i : R)
+  refine ⟨D, ?_, ?_, y, ?_, ?_⟩
+  · exact Algebra.finite_adjoin_of_finite_of_isIntegral (Finset.finite_toSet t)
+      (fun z _ => Algebra.IsIntegral.isIntegral z)
+  · intro z hz
+    exact Algebra.subset_adjoin (Finset.mem_union_left _ hz)
+  · change D.val y = x
+    dsimp only [y]
+    simp only [map_sum, map_mul, AlgHom.commutes]
+    exact hf
+  · exact Submodule.sum_mem _ fun i _ =>
+      Ideal.mul_mem_left _ (g i) (Ideal.mem_map_of_mem _ i.property)
+
+private theorem existsUnique_isIdempotentElem_sub_mem_map
+    {R : Type u} {C : Type v} [CommRing R] [CommRing C] [Algebra R C]
+    [Algebra.IsIntegral R C] (I : Ideal R) [HenselianRing R I]
+    (c : C) (hc : c * c - c ∈ I.map (algebraMap R C)) :
+    ∃! e : C, IsIdempotentElem e ∧ e - c ∈ I.map (algebraMap R C) := by
+  classical
+  obtain ⟨D, hD, hDs, y, hy, hymem⟩ :=
+    exists_finite_subalgebra_mem_map I {c} (c * c - c) hc
+  have : Module.Finite R D := hD
+  let cD : D := ⟨c, hDs c (by simp)⟩
+  have hy' : y = cD * cD - cD := Subtype.ext hy
+  have hcD : cD * cD - cD ∈ I.map (algebraMap R D) := by
+    simpa only [hy'] using hymem
+  have hc0D : IsIdempotentElem (Ideal.Quotient.mk (I.map (algebraMap R D)) cD) := by
+    rw [isIdempotentElem_iff, ← map_mul, Ideal.Quotient.eq]
+    exact hcD
+  obtain ⟨eD, heD, _⟩ := HenselianRing.existsUnique_isIdempotentElem_map I hc0D
+  have heDmem : eD - cD ∈ I.map (algebraMap R D) :=
+    (Ideal.Quotient.eq (I := I.map (algebraMap R D))).mp heD.2
+  let e : C := eD
+  have he : IsIdempotentElem e := heD.1.map D.val
+  have hemem : e - c ∈ I.map (algebraMap R C) := by
+    have h := Ideal.mem_map_of_mem D.val.toRingHom heDmem
+    have hcomp : D.val.toRingHom.comp (algebraMap R D) = algebraMap R C := by
+      ext r
+      exact D.val.commutes r
+    rw [Ideal.map_map, hcomp] at h
+    simpa [e, cD] using h
+  refine ⟨e, ⟨he, hemem⟩, ?_⟩
+  intro z hz
+  have hze : z - e ∈ I.map (algebraMap R C) := by
+    simpa only [sub_sub_sub_cancel_right] using
+      (I.map (algebraMap R C)).sub_mem hz.2 hemem
+  obtain ⟨E, hE, hEs, w, hw, hwmem⟩ :=
+    exists_finite_subalgebra_mem_map I {z, e} (z - e) hze
+  have : Module.Finite R E := hE
+  let zE : E := ⟨z, hEs z (by simp)⟩
+  let eE : E := ⟨e, hEs e (by simp)⟩
+  have hw' : w = zE - eE := Subtype.ext hw
+  have hzeE : zE - eE ∈ I.map (algebraMap R E) := by
+    simpa only [hw'] using hwmem
+  have hzE : IsIdempotentElem zE := Subtype.ext hz.1
+  have heE : IsIdempotentElem eE := Subtype.ext he
+  have hze0E : Ideal.Quotient.mk (I.map (algebraMap R E)) zE =
+      Ideal.Quotient.mk (I.map (algebraMap R E)) eE :=
+    (Ideal.Quotient.eq (I := I.map (algebraMap R E))).mpr hzeE
+  obtain ⟨a, _, ha⟩ := HenselianRing.existsUnique_isIdempotentElem_map I
+    (hzE.map (Ideal.Quotient.mk (I.map (algebraMap R E))))
+  have hzA : zE = a := ha zE ⟨hzE, rfl⟩
+  have heA : eE = a := ha eE ⟨heE, hze0E.symm⟩
+  exact congrArg E.val (hzA.trans heA.symm)
+
+/-- An integral homomorphism carries a Henselian pair to the pair defined by the
+extended ideal. See the Stacks Project, Lemma 15.11.8 (Tag 09XK). -/
+theorem map_of_isIntegral {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (I : Ideal R) [HenselianRing R I] (f : R →+* S) (hf : f.IsIntegral) :
+    HenselianRing S (I.map f) := by
+  let : Algebra R S := f.toAlgebra
+  have : Algebra.IsIntegral R S := algebraMap_isIntegral_iff.mp hf
+  apply (HenselianRing.iff_existsUnique_isIdempotentElem_map.{v, 0} (I.map f)).2
+  intro B _ _ _
+  let : Algebra R B := Algebra.compHom B f
+  have : IsScalarTower R S B := IsScalarTower.of_algebraMap_eq' rfl
+  have : Algebra.IsIntegral S B := inferInstance
+  have : Algebra.IsIntegral R B := Algebra.IsIntegral.trans (R := R) (A := S) (B := B)
+  have hI : (I.map f).map (algebraMap S B) = I.map (algebraMap R B) := by
+    rw [Ideal.map_map, IsScalarTower.algebraMap_eq R S B,
+      RingHom.algebraMap_toAlgebra]
+  rw [hI]
+  intro e0 he0
+  obtain ⟨c, rfl⟩ := Ideal.Quotient.mk_surjective e0
+  have hc : c * c - c ∈ I.map (algebraMap R B) := by
+    rw [isIdempotentElem_iff, ← map_mul, Ideal.Quotient.eq] at he0
+    exact he0
+  obtain ⟨e, he, hu⟩ := existsUnique_isIdempotentElem_sub_mem_map I c hc
+  refine ⟨e, ⟨he.1, (Ideal.Quotient.eq (I := I.map (algebraMap R B))).mpr he.2⟩, ?_⟩
+  intro z hz
+  exact hu z ⟨hz.1, (Ideal.Quotient.eq (I := I.map (algebraMap R B))).mp hz.2⟩
+
 /-- A surjective homomorphism sends a Henselian pair to the pair defined by the image ideal.
 
 This is the surjective case of the Stacks Project, Lemma 15.11.8 (Tag 09XK), which
@@ -44,24 +164,9 @@ allows an integral ring homomorphism. -/
 theorem map_of_surjective {R : Type u} {S : Type v} [CommRing R] [CommRing S]
     (I : Ideal R) [HenselianRing R I] (f : R →+* S) (hf : Function.Surjective f) :
     HenselianRing S (I.map f) := by
-  letI : Algebra R S := f.toAlgebra
-  letI : Module.Finite R S :=
-    Module.Finite.of_surjective (Algebra.linearMap R S) (by
-      intro s
-      obtain ⟨r, hr⟩ := hf s
-      refine ⟨r, ?_⟩
-      simpa only [Algebra.linearMap_apply, RingHom.algebraMap_toAlgebra] using hr)
-  apply (HenselianRing.iff_existsUnique_isIdempotentElem_map.{v, 0} (I.map f)).2
-  intro B _ _ _
-  letI : Algebra R B := Algebra.compHom B f
-  letI : IsScalarTower R S B := IsScalarTower.of_algebraMap_eq' rfl
-  letI : Module.Finite R B := Module.Finite.trans S B
-  have hI : (I.map f).map (algebraMap S B) = I.map (algebraMap R B) := by
-    rw [Ideal.map_map, IsScalarTower.algebraMap_eq R S B,
-      RingHom.algebraMap_toAlgebra]
-  rw [hI]
-  intro e0 he0
-  exact HenselianRing.existsUnique_isIdempotentElem_map I he0
+  let : Algebra R S := f.toAlgebra
+  exact map_of_isIntegral I f
+    (algebraMap_isIntegral_iff.mpr (Algebra.isIntegral_of_surjective hf))
 
 /-- A surjective homomorphism with elementwise-nil kernel preserves and reflects the
 Henselian-pair property.
@@ -77,12 +182,12 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
     HenselianRing R I ↔ HenselianRing S (I.map f) := by
   constructor
   · intro hR
-    letI : HenselianRing R I := hR
+    let : HenselianRing R I := hR
     exact map_of_surjective I f hf
   · intro hS
     classical
-    letI : HenselianRing S (I.map f) := hS
-    letI : Algebra R S := f.toAlgebra
+    let : HenselianRing S (I.map f) := hS
+    let : Algebra R S := f.toAlgebra
     apply (HenselianRing.iff_existsUnique_isIdempotentElem_map.{u, 0} I).mpr
     intro B _ _ _ e0 he0
     let J : Ideal B := (RingHom.ker f).map (algebraMap R B)
@@ -110,13 +215,13 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
     let g : S →+* C := f.liftOfSurjective hf ⟨q.comp (algebraMap R B), hfactor⟩
     have hg : g.comp f = q.comp (algebraMap R B) :=
       f.liftOfSurjective_comp hf ⟨q.comp (algebraMap R B), hfactor⟩
-    letI : Algebra S C := g.toAlgebra
-    letI : IsScalarTower R S C := IsScalarTower.of_algebraMap_eq' (by
+    let : Algebra S C := g.toAlgebra
+    let : IsScalarTower R S C := IsScalarTower.of_algebraMap_eq' (by
       change algebraMap R C = g.comp f
       exact (Ideal.Quotient.mk_comp_algebraMap R J).symm.trans hg.symm)
-    letI : Module.Finite R C := Module.Finite.of_surjective
+    let : Module.Finite R C := Module.Finite.of_surjective
       (Ideal.Quotient.mkₐ R J).toLinearMap (Ideal.Quotient.mkₐ_surjective R J)
-    letI : Module.Finite S C := Module.Finite.of_restrictScalars_finite R S C
+    let : Module.Finite S C := Module.Finite.of_restrictScalars_finite R S C
     let IB : Ideal B := I.map (algebraMap R B)
     have himage : (I.map f).map (algebraMap S C) = IB.map q := by
       change (I.map f).map g = (I.map (algebraMap R B)).map q
