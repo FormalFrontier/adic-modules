@@ -38,9 +38,9 @@ theorem Monic.resultant_map_map
     (φ : R →+* S) {p q : R[X]} (hp : p.Monic) :
     resultant (p.map φ) (q.map φ) = φ (resultant p q) := by
   rcases subsingleton_or_nontrivial S with hS | hS
-  · letI := hS
+  · let := hS
     exact Subsingleton.elim _ _
-  letI := hS
+  let := hS
   have hdegree : (q.map φ).natDegree ≤ q.natDegree := natDegree_map_le
   have hcoeff : (p.map φ).coeff p.natDegree = 1 := by
     rw [coeff_map, hp.coeff_natDegree, map_one]

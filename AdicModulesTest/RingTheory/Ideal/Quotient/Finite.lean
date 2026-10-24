@@ -190,9 +190,9 @@ namespace Ideal
   (e : (R ⧸ ⨅ i, I i) ≃+* ((i : ι) → R ⧸ I i))
   (_he : e.toRingHom = Ideal.quotientInfToPiQuotient I),
   e = Ideal.quotientInfRingEquivPiQuotient I
-      (fun i j hij => Ideal.isCoprime_iff_sup_eq.mpr (hSup hij)) ∧
+      (fun _ _ hij => Ideal.isCoprime_iff_sup_eq.mpr (hSup hij)) ∧
   e.symm = (Ideal.quotientInfRingEquivPiQuotient I
-      (fun i j hij => Ideal.isCoprime_iff_sup_eq.mpr (hSup hij))).symm)
+      (fun _ _ hij => Ideal.isCoprime_iff_sup_eq.mpr (hSup hij))).symm)
 
 private theorem pairwise_sup_powers {R : Type u} {ι : Type v} [Semiring R]
     (I : ι → Ideal R) (hI : Pairwise (fun i j => I i ⊔ I j = ⊤)) (n : ι → ℕ) :
@@ -359,7 +359,7 @@ end Integers
 section Boundary
 
 private theorem empty_coprime :
-    Pairwise (fun i j : Fin 0 => IsCoprime (Ideal.span {(2 : ℤ)})
+    Pairwise (fun _ _ : Fin 0 => IsCoprime (Ideal.span {(2 : ℤ)})
       (Ideal.span {(2 : ℤ)})) := by
   intro i
   exact Fin.elim0 i

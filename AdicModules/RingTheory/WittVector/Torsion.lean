@@ -75,11 +75,11 @@ theorem isTorsionFree_int_iff_isReduced
       intro horder
       exact hx (AddMonoid.addOrderOf_eq_one_iff.mp horder)
     obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd horder_ne_one
-    letI : Fact q.Prime := ⟨hq⟩
     have horder : addOrderOf ((addOrderOf x / q) • x) = q :=
       orderOf_pow_orderOf_div (x := Multiplicative.ofAdd x)
         hfin.addOrderOf_pos.ne' hqdvd
-    obtain ⟨hkill, hne⟩ := addOrderOf_eq_prime_iff.mp horder
+    obtain ⟨hkill, hne⟩ :=
+      (addOrderOf_eq_prime_iff (hp := ⟨hq⟩)).mp horder
     exact hne (hprime q hq (by simpa only [smul_zero] using hkill))
 
 end WittVector

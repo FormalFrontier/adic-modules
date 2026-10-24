@@ -99,7 +99,7 @@ private noncomputable def exactLiftDelta
     (Submodule.smul_mono_left (Ideal.pow_le_pow_right (he n))) hy
   have hdiff : f (y - p) ∈ (I ^ e n • ⊤ : Submodule R N) := by
     rw [map_sub]
-    convert Submodule.sub_mem _ (Submodule.add_mem _ hy' hx) hp using 1 <;> abel
+    convert Submodule.sub_mem _ (Submodule.add_mem _ hy' hx) hp using 1 ; abel
   have hmem : f (y - p) ∈ Submodule.map f (I ^ n • ⊤ : Submodule R P) := by
     rw [Submodule.map_smul'', Submodule.map_top]
     exact hcofinal n ⟨⟨y - p, rfl⟩, hdiff⟩

@@ -93,7 +93,7 @@ theorem existsUnique_isIdempotentElem {R : Type u} [CommRing R]
   obtain ⟨e, he, hae⟩ := HenselianRing.is_henselian (R := R) (I := I) p hp a0 h0 h1
   have heq : Ideal.Quotient.mk I e = e0 :=
     ((Ideal.Quotient.mk_eq_mk_iff_sub_mem e a0).mpr hae).trans ha0
-  letI : IsLocalHom (Ideal.Quotient.mk I) :=
+  let : IsLocalHom (Ideal.Quotient.mk I) :=
     isLocalHom_of_le_jacobson_bot I (HenselianRing.jac (R := R) (I := I))
   refine ⟨e, ⟨(hroot e).mp he, heq⟩, ?_⟩
   intro b hb

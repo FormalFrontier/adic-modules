@@ -539,12 +539,12 @@ theorem Monic.eq_factors_of_isCoprime_map
     (hmap : g.map φ = g'.map φ) (hcoprime : IsCoprime (g.map φ) (h.map φ)) :
     g = g' ∧ h = h' := by
   rcases subsingleton_or_nontrivial S with hS | hS
-  · letI := hS
+  · let := hS
     have hzero : IsUnit (0 : R) :=
       IsUnit.of_map φ 0 (isUnit_of_subsingleton _)
-    letI : Subsingleton R := subsingleton_of_zero_eq_one (isUnit_zero_iff.mp hzero)
+    let : Subsingleton R := subsingleton_of_zero_eq_one (isUnit_zero_iff.mp hzero)
     exact ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
-  letI := hS
+  let := hS
   have hcross : IsCoprime g' h := (hg'.isCoprime_map_iff (q := h) φ).mp (by
     rw [← hmap]
     exact hcoprime)
@@ -641,7 +641,7 @@ private theorem residue_quotient_isScalarTower
       (Ideal.Quotient.algebraQuotientOfLEComap
         (Ideal.le_comap_map :
           I ≤ (I.map (algebraMap R B)).comap (algebraMap R B))).toSMul _ := by
-  letI : Algebra (R ⧸ I) (B ⧸ I.map (algebraMap R B)) :=
+  let : Algebra (R ⧸ I) (B ⧸ I.map (algebraMap R B)) :=
     Ideal.Quotient.algebraQuotientOfLEComap Ideal.le_comap_map
   apply IsScalarTower.of_algebraMap_eq
   intro r
@@ -715,8 +715,8 @@ private lemma exists_matrix_represents_map_diagonal
     rw [map_add, Ideal.Quotient.eq_zero_iff_mem.mpr (ha j i), zero_add]
     by_cases hij : i = j
     · subst i
-      by_cases hj : j = 0 <;> simp [Matrix.diagonal_apply, hj]
-    · simp [Matrix.diagonal_apply, hij]
+      by_cases hj : j = 0 <;> simp [hj]
+    · simp [hij]
 
 /-- A scalar monic relation with residue `X * (X - 1) ^ s` lifts the complementary
 idempotent component of an algebra element. -/
@@ -734,9 +734,9 @@ private lemma exists_isIdempotentElem_of_monic_annihilator
   let Bbar := B ⧸ J
   let q : R →+* k := Ideal.Quotient.mk I
   let beta : B →+* Bbar := Ideal.Quotient.mk J
-  letI : Algebra k Bbar :=
+  let : Algebra k Bbar :=
     Ideal.Quotient.algebraQuotientOfLEComap Ideal.le_comap_map
-  letI : IsScalarTower R k Bbar := residue_quotient_isScalarTower I
+  let : IsScalarTower R k Bbar := residue_quotient_isScalarTower I
   have hsquare : (algebraMap k Bbar).comp q = beta.comp (algebraMap R B) := by
     change (algebraMap k Bbar).comp (Ideal.Quotient.mk I) =
       (Ideal.Quotient.mk J).comp (algebraMap R B)
@@ -803,7 +803,7 @@ private lemma exists_isIdempotentElem_of_monic_annihilator
           _ = q (P.derivative.eval 0) :=
             Polynomial.eval_map_apply (p := P.derivative) q 0
           _ = (-1 : k) ^ (s + 1) := hderivzero
-      letI : IsLocalHom q :=
+      let : IsLocalHom q :=
         isLocalHom_of_le_jacobson_bot I (HenselianRing.jac (R := R) (I := I))
       have hunit : IsUnit (Q.eval a) := by
         apply IsUnit.of_map q
@@ -1001,7 +1001,7 @@ private theorem component_augmentation_surjective
   refine ⟨Ideal.Quotient.liftₐ (Ideal.span {1 - e}) (ρ.comp β)
     (fun z hz => RingHom.mem_ker.mp (hkill hz)), ?_, ?_⟩
   · exact Ideal.Quotient.liftₐ_comp _ _ _
-  · letI : Module.Finite R C :=
+  · let : Module.Finite R C :=
       Module.Finite.quotient R (Ideal.span {1 - e} : Ideal B)
     let J : Ideal C := I.map (algebraMap R C)
     have hqη : q.toRingHom.comp (algebraMap R B) = algebraMap R C := by
@@ -1114,11 +1114,11 @@ private theorem augmentation_cotangent_subsingleton_of_localization
     [Algebra U k] [IsScalarTower A U k]
     (d : A) [IsLocalization.Away d U] [Algebra.FormallyUnramified k U] :
     Subsingleton ((RingHom.ker (algebraMap A k)).Cotangent) := by
-  letI : IsScalarTower A k k :=
+  let : IsScalarTower A k k :=
     IsScalarTower.of_algebraMap_smul fun a c => (Algebra.smul_def a c).symm
-  letI : IsScalarTower U k k :=
+  let : IsScalarTower U k k :=
     IsScalarTower.of_algebraMap_smul fun a c => (Algebra.smul_def a c).symm
-  letI : Algebra.FormallyEtale A U :=
+  let : Algebra.FormallyEtale A U :=
     Algebra.FormallyEtale.of_isLocalization (Submonoid.powers d)
   let e : TensorProduct A k (KaehlerDifferential k A) ≃ₗ[k]
       TensorProduct U k (KaehlerDifferential k U) :=
@@ -1126,7 +1126,7 @@ private theorem augmentation_cotangent_subsingleton_of_localization
       A U k k (KaehlerDifferential k A)).symm.trans
       (TensorProduct.AlgebraTensorModule.congr (LinearEquiv.refl k k)
         (KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale k A U))
-  haveI : Subsingleton (TensorProduct A k (KaehlerDifferential k A)) :=
+  have : Subsingleton (TensorProduct A k (KaehlerDifferential k A)) :=
     ⟨fun x y => e.injective (Subsingleton.elim _ _)⟩
   exact ⟨fun x y => augmentation_kerCotangentToTensor_injective (k := k) (A := A)
     (Subsingleton.elim _ _)⟩
@@ -1176,8 +1176,8 @@ private theorem exists_algHom_lift_of_finite_localization
   let A := B ⧸ J
   let β : B →ₐ[R] A := Ideal.Quotient.mkₐ R J
   let η : B →ₐ[R] U₀ := IsScalarTower.toAlgHom R B U₀
-  letI : Algebra k A := Ideal.Quotient.algebraQuotientOfLEComap Ideal.le_comap_map
-  letI : IsScalarTower R k A := residue_quotient_isScalarTower I
+  let : Algebra k A := Ideal.Quotient.algebraQuotientOfLEComap Ideal.le_comap_map
+  let : IsScalarTower R k A := residue_quotient_isScalarTower I
   obtain ⟨ρ, hρ⟩ := residue_quotient_augmentation I (ψ₀.comp η)
   have hρβ (b : B) : ρ (β b) = ψ₀ (algebraMap B U₀ b) := by
     change ((ρ.restrictScalars R).comp β) b = ψ₀ (algebraMap B U₀ b)
@@ -1190,8 +1190,8 @@ private theorem exists_algHom_lift_of_finite_localization
   let Jᵤ : Ideal U₀ := I.map (algebraMap R U₀)
   let UQ := U₀ ⧸ Jᵤ
   let qᵤ : U₀ →ₐ[R] UQ := Ideal.Quotient.mkₐ R Jᵤ
-  letI : Algebra k UQ := Ideal.Quotient.algebraQuotientMapQuotient
-  letI : IsScalarTower R k UQ := Ideal.Quotient.tower_quotient_map_quotient
+  let : Algebra k UQ := Ideal.Quotient.algebraQuotientMapQuotient
+  let : IsScalarTower R k UQ := Ideal.Quotient.tower_quotient_map_quotient
   have hmap : J.map (algebraMap B U₀) = Jᵤ := by
     dsimp only [J, Jᵤ]
     rw [Ideal.map_map, ← IsScalarTower.algebraMap_eq R B U₀]
@@ -1211,13 +1211,13 @@ private theorem exists_algHom_lift_of_finite_localization
     rw [hβb]
     simpa only [aR, qᵤ, η, IsScalarTower.toAlgHom_apply] using
       (Ideal.quotient_map_mkₐ (R₁ := R) (I := J) (J := Jᵤ) η hle (x := b))
-  letI : Algebra A UQ := aK.toRingHom.toAlgebra
-  letI : IsScalarTower k A UQ := by
+  let : Algebra A UQ := aK.toRingHom.toAlgebra
+  let : IsScalarTower k A UQ := by
     apply IsScalarTower.of_algebraMap_eq
     intro c
     rw [RingHom.algebraMap_toAlgebra aK.toRingHom]
     exact (aK.commutes c).symm
-  letI : IsScalarTower R A UQ := by
+  let : IsScalarTower R A UQ := by
     apply IsScalarTower.of_algebraMap_eq
     intro r
     rw [RingHom.algebraMap_toAlgebra aK.toRingHom]
@@ -1236,13 +1236,13 @@ private theorem exists_algHom_lift_of_finite_localization
       ext x
       simp only [RingHom.mem_ker, Ideal.Quotient.eq_zero_iff_mem]
     simpa only [Ideal.Quotient.mkₐ_toRingHom, hkerJ, hkerJᵤ] using le_of_eq hmap.symm
-  letI : IsLocalization.Away (β d) UQ := by
+  let : IsLocalization.Away (β d) UQ := by
     have hloc := IsLocalization.of_surjective (M := Submonoid.powers d) (S := U₀)
       β.toRingHom (Ideal.Quotient.mkₐ_surjective R J)
       qᵤ.toRingHom (Ideal.Quotient.mkₐ_surjective R Jᵤ) hsquare hkbound
     rw [Submonoid.map_powers] at hloc
     exact hloc
-  letI : Algebra.FormallyUnramified k UQ :=
+  let : Algebra.FormallyUnramified k UQ :=
     Algebra.FormallyUnramified.quotient_map (R := R) (B := U₀) I
   have hδ : IsUnit (ρ (β d)) := by
     rw [hρβ]
@@ -1253,14 +1253,14 @@ private theorem exists_algHom_lift_of_finite_localization
     rw [IsLocalization.Away.liftAlgHom_toRingHom]
     exact IsLocalization.Away.lift_comp (S := UQ) (x := β d) (g := ρ.toRingHom) hδ
   -- Both augmentation actions are those of the displayed maps.
-  letI : Algebra A k := ρ.toRingHom.toAlgebra
-  letI : Algebra UQ k := ψ₁.toRingHom.toAlgebra
-  letI : IsScalarTower k A k := by
+  let : Algebra A k := ρ.toRingHom.toAlgebra
+  let : Algebra UQ k := ψ₁.toRingHom.toAlgebra
+  let : IsScalarTower k A k := by
     apply IsScalarTower.of_algebraMap_eq
     intro c
     rw [RingHom.algebraMap_toAlgebra ρ.toRingHom]
     exact (ρ.commutes c).symm
-  letI : IsScalarTower A UQ k := by
+  let : IsScalarTower A UQ k := by
     apply IsScalarTower.of_algebraMap_eq'
     rw [RingHom.algebraMap_toAlgebra ρ.toRingHom,
       RingHom.algebraMap_toAlgebra ψ₁.toRingHom]
@@ -1269,8 +1269,8 @@ private theorem exists_algHom_lift_of_finite_localization
     change Subsingleton (RingHom.ker (algebraMap A k)).Cotangent
     exact augmentation_cotangent_subsingleton_of_localization (k := k) (A := A)
       (U := UQ) (β d)
-  letI : Module.Finite R A := Module.Finite.quotient R (J : Ideal B)
-  letI : Module.Finite k A := Module.Finite.of_restrictScalars_finite R k A
+  let : Module.Finite R A := Module.Finite.quotient R (J : Ideal B)
+  let : Module.Finite k A := Module.Finite.of_restrictScalars_finite R k A
   have hKfg : (RingHom.ker ρ.toRingHom).FG := augmentation_ker_fg ρ
   have hKid : IsIdempotentElem (RingHom.ker ρ.toRingHom) :=
     (Ideal.cotangent_subsingleton_iff _).mp hcot
@@ -1318,7 +1318,7 @@ private theorem exists_algHom_lift_of_finite_localization
     have hqa : IsUnit (algebraMap R k a) := by
       rw [← ψC.commutes a, ha, hψq]
       exact hδ
-    letI : IsLocalHom (Ideal.Quotient.mk I) :=
+    let : IsLocalHom (Ideal.Quotient.mk I) :=
       isLocalHom_of_le_jacobson_bot I (HenselianRing.jac (R := R) (I := I))
     have hau : IsUnit a := IsUnit.of_map (Ideal.Quotient.mk I) a (by
       change IsUnit (algebraMap R (R ⧸ I) a) at hqa
@@ -1334,33 +1334,33 @@ private theorem exists_algHom_lift_of_finite_localization
     dsimp only [μ]
     rw [IsLocalization.Away.liftAlgHom_toRingHom]
     exact IsLocalization.Away.lift_comp (S := U₀) (x := d) (g := q.toRingHom) hdC
-  letI : Algebra U₀ C := μ.toRingHom.toAlgebra
-  letI : IsScalarTower R U₀ C := by
+  let : Algebra U₀ C := μ.toRingHom.toAlgebra
+  let : IsScalarTower R U₀ C := by
     apply IsScalarTower.of_algebraMap_eq'
     rw [RingHom.algebraMap_toAlgebra μ.toRingHom]
     exact μ.comp_algebraMap.symm
-  letI : IsScalarTower B U₀ C := by
+  let : IsScalarTower B U₀ C := by
     apply IsScalarTower.of_algebraMap_eq'
     rw [RingHom.algebraMap_toAlgebra μ.toRingHom]
     exact (hμ.trans hqmap).symm
-  letI : IsScalarTower B C C := by
+  let : IsScalarTower B C C := by
     apply IsScalarTower.of_algebraMap_eq
     intro x
     exact (Algebra.algebraMap_self_apply _).symm
-  letI : IsLocalization.Away e C :=
+  let : IsLocalization.Away e C :=
     IsLocalization.Away.quotient_of_isIdempotentElem heidem
-  letI : IsLocalization.Away (algebraMap B C d) C :=
+  let : IsLocalization.Away (algebraMap B C d) C :=
     IsLocalization.away_of_isUnit_of_bijective C hdC' (by
       constructor
       · intro x y h
         simpa only [Algebra.algebraMap_self_apply] using h
       · intro x
         exact ⟨x, Algebra.algebraMap_self_apply x⟩)
-  letI : IsLocalization.Away (algebraMap B U₀ e) C :=
+  let : IsLocalization.Away (algebraMap B U₀ e) C :=
     IsLocalization.Away.commutes (R := B) U₀ C C d e
-  letI : Algebra.Etale U₀ C :=
+  let : Algebra.Etale U₀ C :=
     Algebra.Etale.of_isLocalizationAway (algebraMap B U₀ e)
-  letI : Algebra.Etale R C := Algebra.Etale.comp R U₀ C
+  let : Algebra.Etale R C := Algebra.Etale.comp R U₀ C
   have hkI : RingHom.ker (algebraMap R C) ≤ I := by
     intro a ha
     apply Ideal.Quotient.eq_zero_iff_mem.mp
@@ -1444,19 +1444,19 @@ theorem exists_monic_factorization
   classical
   cases subsingleton_or_nontrivial R with
   | inl hR =>
-      letI : Subsingleton R := hR
+      let : Subsingleton R := hR
       refine ⟨1, f, monic_one, hf, (one_mul f).symm, ?_, ?_⟩
       · exact Subsingleton.elim _ _
       · exact Subsingleton.elim _ _
   | inr hR =>
-      letI : Nontrivial R := hR
+      let : Nontrivial R := hR
       have hI : I ≠ ⊤ := by
         intro htop
         have hj := HenselianRing.jac (R := R) (I := I)
         rw [htop, top_le_iff, Ideal.jacobson_eq_top_iff] at hj
         exact bot_ne_top hj
       let κ := R ⧸ I
-      letI : Nontrivial κ := Ideal.Quotient.nontrivial_iff.mpr hI
+      let : Nontrivial κ := Ideal.Quotient.nontrivial_iff.mpr hI
       let n := f.natDegree
       let m := g₀.natDegree
       let k := h₀.natDegree
@@ -1475,17 +1475,17 @@ theorem exists_monic_factorization
       let d : B := (Polynomial.UniversalFactorizationRing.factor₁ m k hn p).1.resultant
         (Polynomial.UniversalFactorizationRing.factor₂ m k hn p).1
       -- Keep the existing R- and B-actions on the same universal coprime ring.
-      letI : IsScalarTower R B U := by
+      let : IsScalarTower R B U := by
         apply IsScalarTower.of_algebraMap_eq
         intro r
         exact (Localization.mk_algebraMap (M := Submonoid.powers J) r).symm.trans
           (Localization.mk_one_eq_algebraMap (M := Submonoid.powers J) (algebraMap R B r))
-      letI : IsLocalization.Away J U := inferInstance
+      let : IsLocalization.Away J U := inferInstance
       have hJd : Associated J d := by
         dsimp only [J, d]
         rw [Polynomial.UniversalFactorizationRing.jacobian_resentation]
         exact associated_unit_mul_left _ _ (isUnit_neg_one.pow n)
-      letI : IsLocalization.Away d U := IsLocalization.Away.of_associated hJd
+      let : IsLocalization.Away d U := IsLocalization.Away.of_associated hJd
       have hprod : gpack.1 * hpack.1 = p.1.map (algebraMap R κ) := by
         change g₀ * h₀ = f.map (algebraMap R κ)
         rw [Ideal.Quotient.algebraMap_eq I]

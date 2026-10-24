@@ -110,6 +110,10 @@ Rings are commutative; modules are additive commutative groups unless specified 
   image; `u` and `v` are independent. No locality, completeness, finite-free or
   projective algebra assumption is required. See the
   [finite-algebra criterion](AdicModules/RingTheory/HenselianCriterion.lean).
+- **Radical invariance of Henselian pairs.** For any commutative ring `R` and ideal
+  `I`, `HenselianRing R I ↔ HenselianRing R I.radical`. No uniform nilpotence exponent
+  or finiteness condition on the ring or ideal is needed. See
+  [`HenselianRing.iff_radical`](AdicModules/RingTheory/HenselianRadical.lean).
 
 <a id="reduced-residue-teichmüller-image"></a>
 

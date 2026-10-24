@@ -280,7 +280,7 @@ theorem quotientInfRingEquivPiQuotientOfPairwiseSupEqTop_eq_quotientInfRingEquiv
     {R : Type u} {ι : Type v} [CommRing R] [Finite ι]
     (I : ι → Ideal R) (hI : Pairwise (fun i j => IsCoprime (I i) (I j))) :
     quotientInfRingEquivPiQuotientOfPairwiseSupEqTop I
-        (fun i j hij => isCoprime_iff_sup_eq.mp (hI hij)) =
+        (fun _ _ hij => isCoprime_iff_sup_eq.mp (hI hij)) =
       quotientInfRingEquivPiQuotient I hI := by
   apply RingEquiv.ext
   intro z
@@ -292,7 +292,7 @@ theorem quotientInfRingEquivPiQuotientOfPairwiseSupEqTop_symm_eq_quotientInfRing
     {R : Type u} {ι : Type v} [CommRing R] [Finite ι]
     (I : ι → Ideal R) (hI : Pairwise (fun i j => IsCoprime (I i) (I j))) :
     (quotientInfRingEquivPiQuotientOfPairwiseSupEqTop I
-        (fun i j hij => isCoprime_iff_sup_eq.mp (hI hij))).symm =
+        (fun _ _ hij => isCoprime_iff_sup_eq.mp (hI hij))).symm =
       (quotientInfRingEquivPiQuotient I hI).symm :=
   congrArg RingEquiv.symm
     (quotientInfRingEquivPiQuotientOfPairwiseSupEqTop_eq_quotientInfRingEquivPiQuotient I hI)

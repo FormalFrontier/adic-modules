@@ -179,16 +179,16 @@ variable {R : Type u} [CommRing R] (J : Ideal R)
 
 -- All four comparisons below keep the denominator J • ⊤ fixed.
 private theorem smulTop_self : J.smulTop R = (J • (⊤ : Submodule R R)) := by
-  dsimp only [Ideal.smulTop] <;> rfl
+  dsimp only [Ideal.smulTop]
 
 private theorem ringSmulTop_self :
     ringSmulTop (A := R) J = Ideal.Quotient.ring (J • (⊤ : Submodule R R)) := by
-  dsimp only [ringSmulTop, Ideal.smulTop] <;> rfl
+  dsimp only [ringSmulTop, Ideal.smulTop]
 
 private theorem algebraSmulTop_self :
     algebraSmulTop (A := R) J =
       Ideal.Quotient.algebra R (I := J • (⊤ : Submodule R R)) := by
-  dsimp only [algebraSmulTop, Ideal.smulTop] <;> rfl
+  dsimp only [algebraSmulTop, Ideal.smulTop]
 
 private theorem ringSmulTop_self_toAddCommGroup :
     (ringSmulTop (A := R) J).toAddCommGroup =

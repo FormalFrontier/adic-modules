@@ -52,7 +52,7 @@ private theorem verschiebung_mul_verschiebung_eq_p_mul
 
 private theorem ker_constantCoeff_eq_span_p_of_isDiscreteValuationRing
     {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] [IsDomain R] [CharP R p]
-    [IsDomain (WittVector p R)] [IsDiscreteValuationRing (WittVector p R)] :
+    [IsDiscreteValuationRing (WittVector p R)] :
     RingHom.ker (constantCoeff : WittVector p R →+* R) =
       Ideal.span {(p : WittVector p R)} := by
   let M : Ideal (WittVector p R) := RingHom.ker constantCoeff
@@ -108,7 +108,7 @@ private theorem ker_constantCoeff_eq_span_p_of_isDiscreteValuationRing
 /-- If the Witt vectors form a discrete valuation ring, the coefficient ring is a field. -/
 private theorem isField_of_isDiscreteValuationRing
     {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] [IsDomain R] [CharP R p]
-    [IsDomain (WittVector p R)] [IsDiscreteValuationRing (WittVector p R)] : IsField R := by
+    [IsDiscreteValuationRing (WittVector p R)] : IsField R := by
   let cc : WittVector p R →+* R := constantCoeff
   let M : Ideal (WittVector p R) := RingHom.ker cc
   have hM_prime : M.IsPrime := RingHom.ker_isPrime cc

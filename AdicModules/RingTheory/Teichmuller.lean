@@ -78,7 +78,6 @@ noncomputable def teichmullerRingHom [CharP R p] : Perfection (R ⧸ I) p →+* 
 theorem teichmullerRingHom_apply [CharP R p] (x : Perfection (R ⧸ I) p) :
     teichmullerRingHom p I x = teichmuller₀ p I x := rfl
 
-@[simp]
 theorem mk_teichmullerRingHom [CharP R p] (x : Perfection (R ⧸ I) p) :
     Ideal.Quotient.mk I (teichmullerRingHom p I x) = coeff _ p 0 x :=
   mk_teichmuller₀ x

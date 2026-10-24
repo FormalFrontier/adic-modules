@@ -56,7 +56,7 @@ theorem frobenius_bijective_iff (p : ℕ) (R : Type u)
     exact ⟨⟨(Function.injective_comp_left_iff (α := ℕ)).mp hpost.1,
       (Function.surjective_comp_left_iff (α := ℕ)).mp hpost.2⟩⟩
   · intro hp
-    letI : PerfectRing R p := hp
+    have : PerfectRing R p := hp
     exact WittVector.frobenius_bijective p R
 
 end WittVector

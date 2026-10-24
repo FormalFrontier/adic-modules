@@ -58,6 +58,13 @@ theorem pi_map (f : ∀ j, M j →ₗ[R] N j) (x : AdicCompletion I (∀ j, M j)
 
 variable (M)
 
+/-- The product comparison sends the canonical image of a product to the canonical
+images of its coordinates. -/
+@[simp]
+theorem pi_of (x : ∀ j, M j) :
+    pi I M (of I (∀ j, M j) x) = fun j ↦ of I (M j) (x j) :=
+  rfl
+
 /-- For a finitely generated ideal, adic completion commutes algebraically with
 arbitrary products. -/
 theorem pi_bijective_of_fg (hI : I.FG) : Function.Bijective (pi I M) := by
@@ -141,12 +148,9 @@ theorem map_proj_piEquivOfFG_symm (hI : I.FG)
     congrFun ((piEquivOfFG I M hI).apply_symm_apply x) j
 
 /-- The product equivalence sends the image of a product to the images of its coordinates. -/
-@[simp]
 theorem piEquivOfFG_of (hI : I.FG) (x : ∀ j, M j) :
     piEquivOfFG I M hI (of I (∀ j, M j) x) = fun j ↦ of I (M j) (x j) := by
-  funext j
-  simpa only [piEquivOfFG_apply_apply, LinearMap.proj_apply] using
-    (map_of I (LinearMap.proj j) x)
+  simpa only [piEquivOfFG_apply] using pi_of I M x
 
 /-- The inverse product equivalence respects the canonical maps into completion. -/
 @[simp]

@@ -16,12 +16,13 @@ import Mathlib.RingTheory.WittVector.Compare
 import Mathlib.RingTheory.WittVector.Domain
 
 /-!
-# Characteristic zero, units, locality, reducedness and prime-power multiplication and Teichmüller expansions in Witt vectors
+Characteristic zero, units, locality, reducedness and prime-power multiplication
+and Teichmüller expansions in Witt vectors
+==============================================================================
 
-For a prime `p` and a commutative ring `R` of characteristic `p`, `WittVector p R`
-has characteristic zero. The proof uses Mathlib's comparison with the `p`-adic
-integers over `ZMod p`, followed by injective functoriality for the canonical map
-`ZMod p →+* R`.
+For a prime `p` and a commutative ring `R` of characteristic `p`, `WittVector p R` has
+characteristic zero. The proof uses Mathlib's comparison with the `p`-adic integers over
+`ZMod p`, followed by injective functoriality for the canonical map `ZMod p →+* R`.
 
 No perfectness, field, reducedness or finiteness assumption is needed.
 Nontriviality of `R` follows from `CharP R p` and primality of `p`, so it is not
@@ -54,12 +55,11 @@ Consequently, `p` is a regular element of `WittVector p R` exactly when `R` is
 reduced. This criterion allows reduced rings with zero divisors and does not
 require perfectness.
 
-For reduced coefficient rings of characteristic `p`, `teichmuller_expansion_unique` states uniqueness of
-the digits in two Teichmüller expansions approximating the same Witt vector
-modulo every positive power of `p`. Reducedness makes Frobenius injective, allowing
-digits to be recovered from their iterated `p`-th powers. The statement requires
-neither perfectness nor a topology and does not assert existence of an expansion
-for every Witt vector.
+For reduced coefficient rings of characteristic `p`, `teichmuller_expansion_unique` states
+uniqueness of the digits in two Teichmüller expansions approximating the same Witt vector
+modulo every positive power of `p`. Reducedness makes Frobenius injective, allowing digits
+to be recovered from their iterated `p`-th powers. The statement requires neither perfectness
+nor a topology and does not assert existence of an expansion for every Witt vector.
 
 ## References
 
@@ -108,7 +108,7 @@ zero. This generalizes the characteristic-zero assertion for perfect coefficient
 in Fesenko–Vostokov, I §8, (8.3). -/
 instance charZero (p : ℕ) [Fact p.Prime] (R : Type u) [CommRing R] [CharP R p] :
     CharZero (WittVector p R) := by
-  letI : CharZero (WittVector p (ZMod p)) :=
+  let : CharZero (WittVector p (ZMod p)) :=
     charZero_of_injective_ringHom (f := (equiv p).symm.toRingHom) (equiv p).symm.injective
   exact charZero_of_injective_ringHom
     (f := map (p := p) (ZMod.castHom (dvd_refl p) R))
@@ -142,12 +142,12 @@ theorem isLocalRing_iff {p : ℕ} [Fact p.Prime] {R : Type u}
     IsLocalRing (WittVector p R) ↔ IsLocalRing R := by
   constructor
   · intro h
-    letI := h
-    letI : Nontrivial R := CharP.nontrivial_of_char_ne_one (Fact.out : p.Prime).ne_one
+    let := h
+    let : Nontrivial R := CharP.nontrivial_of_char_ne_one (Fact.out : p.Prime).ne_one
     exact IsLocalRing.of_surjective' (constantCoeff : WittVector p R →+* R)
       (constantCoeff_surjective p)
   · intro h
-    letI := h
+    let := h
     apply IsLocalRing.of_isUnit_or_isUnit_one_sub_self
     intro x
     simp only [isUnit_iff_isUnit_coeff_zero]
@@ -162,7 +162,7 @@ theorem isReduced_iff {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] :
   classical
   constructor
   · intro hW
-    letI : IsReduced (WittVector p R) := hW
+    let : IsReduced (WittVector p R) := hW
     constructor
     intro r hr
     have ht : IsNilpotent (teichmuller p r) := by
@@ -173,15 +173,15 @@ theorem isReduced_iff {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] :
     simpa only [teichmuller_coeff_zero, zero_coeff] using
       congrArg (fun w : WittVector p R => w.coeff 0) hz
   · intro hR
-    letI : IsReduced R := hR
+    let : IsReduced R := hR
     have hfield : ∀ (K : Type u) [Field K], IsReduced (WittVector p K) := by
       intro K hK
       by_cases hp : (p : K) = 0
-      · letI : CharP K p :=
+      · let : CharP K p :=
           (CharP.charP_iff_prime_eq_zero (R := K) (Fact.out : p.Prime)).2 hp
-        letI : IsDomain (WittVector p K) := inferInstance
+        let : IsDomain (WittVector p K) := inferInstance
         infer_instance
-      · letI : Invertible (p : K) := invertibleOfNonzero hp
+      · let : Invertible (p : K) := invertibleOfNonzero hp
         exact isReduced_of_injective (ghostEquiv p K).toRingHom
           (ghostEquiv p K).injective
     constructor
@@ -192,10 +192,10 @@ theorem isReduced_iff {p : ℕ} [Fact p.Prime] {R : Type u} [CommRing R] :
     apply IsNilpotent.eq_zero
     apply nilpotent_iff_mem_prime.mpr
     intro P hP
-    letI : P.IsPrime := hP
+    let : P.IsPrime := hP
     let f : R →+* FractionRing (R ⧸ P) :=
       (algebraMap (R ⧸ P) (FractionRing (R ⧸ P))).comp (Ideal.Quotient.mk P)
-    letI : IsReduced (WittVector p (FractionRing (R ⧸ P))) :=
+    let : IsReduced (WittVector p (FractionRing (R ⧸ P))) :=
       hfield (FractionRing (R ⧸ P))
     have hmap : map (p := p) f x = 0 := (hx.map (map (p := p) f)).eq_zero
     have hcoeff : f (x.coeff n) = 0 := (map_eq_zero_iff f).mp hmap n
@@ -296,7 +296,7 @@ theorem isRegular_p_iff_isReduced :
     simpa only [coeff_mk, zero_coeff] using
       congrArg (fun x : WittVector p k => x.coeff 0) hzero
   · intro hk
-    letI : IsReduced k := hk
+    let : IsReduced k := hk
     have hker (x : WittVector p k) (hx : x * (p : WittVector p k) = 0) : x = 0 := by
       apply WittVector.ext
       intro n

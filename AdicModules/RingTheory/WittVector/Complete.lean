@@ -159,6 +159,7 @@ theorem span_p_isPrime_iff :
     rw [← ker_constantCoeff_eq_span_p_iff_surjective_frobenius.mpr hs]
     exact RingHom.ker_isPrime (constantCoeff : WittVector p k →+* k)
 
+omit [CharP k p] in
 private theorem sub_coeff_eq_of_coeff_eq
     {x y z : WittVector p k} {n : ℕ}
     (h : ∀ i < n + 1, y.coeff i = z.coeff i) :

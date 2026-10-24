@@ -50,15 +50,15 @@ theorem compactSpace_iff (I : Ideal R) (hI : IsAdic I) :
     (H := fun n : ℕ => (I ^ n).toAddSubgroup)
   constructor
   · intro hc
-    letI : CompactSpace R := hc
+    let : CompactSpace R := hc
     refine ⟨complete_of_compact, fun n => ?_⟩
     exact (AddSubgroup.finiteIndex_iff_finite_quotient
       (H := (I ^ n).toAddSubgroup)).1 (htb.1 isCompact_univ.totallyBounded n trivial)
   · rintro ⟨hc, hfinite⟩
-    letI : CompleteSpace R := hc
     apply isCompact_univ_iff.1
     apply isCompact_iff_totallyBounded_isComplete.2
-    refine ⟨htb.2 ?_, isComplete_univ⟩
+    refine ⟨htb.2 ?_,
+      @isComplete_univ R _ hc⟩
     intro n _
     exact (AddSubgroup.finiteIndex_iff_finite_quotient
       (H := (I ^ n).toAddSubgroup)).2 (hfinite n)
@@ -72,8 +72,7 @@ theorem compactSpace_iff_of_fg (I : Ideal R) (hI : IsAdic I) (hfg : I.FG) :
     obtain ⟨hcomplete, hfinite⟩ := (compactSpace_iff I hI).1 hc
     exact ⟨hcomplete, by simpa only [pow_one] using hfinite 1⟩
   · rintro ⟨hcomplete, hfinite⟩
-    letI : Finite (R ⧸ I) := hfinite
     exact (compactSpace_iff I hI).2
-      ⟨hcomplete, fun n => Ideal.finite_quotient_pow hfg n⟩
+      ⟨hcomplete, fun n => @Ideal.finite_quotient_pow R _ I hfg hfinite n⟩
 
 end IsAdic

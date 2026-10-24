@@ -62,7 +62,6 @@ private noncomputable def quotientPowEquivZMod (m n : ℕ) :
       rw [Ideal.span_singleton_pow, Nat.cast_pow])).trans
     (Int.quotientSpanNatEquivZMod (m ^ n))
 
-@[simp]
 private theorem quotientPowEquivZMod_mk (m n : ℕ) (a : ℤ) :
     quotientPowEquivZMod m n (Ideal.Quotient.mk _ a) = (a : ZMod (m ^ n)) := by
   simp [quotientPowEquivZMod]
@@ -172,7 +171,6 @@ theorem padicIntEquiv_of (a : ℤ) :
   simp
 
 /-- The inverse comparison sends an integer cast to its canonical completion image. -/
-@[simp]
 theorem padicIntEquiv_symm_intCast (a : ℤ) :
     (padicIntEquiv p).symm (a : ℤ_[p]) = of (Ideal.span {(p : ℤ)}) ℤ a := by
   apply (padicIntEquiv p).injective

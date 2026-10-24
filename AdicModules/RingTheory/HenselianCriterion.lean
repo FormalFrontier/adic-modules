@@ -152,8 +152,8 @@ private theorem existsUnique_idempotent_of_maxUniverse
     (e0 : A ⧸ I.map (algebraMap R A)) (he0 : IsIdempotentElem e0) :
     ∃! e : A, IsIdempotentElem e ∧
       Ideal.Quotient.mk (I.map (algebraMap R A)) e = e0 := by
-  let e : A ≃ₐ[R] ULift.{v} A := (ULift.algEquiv : ULift.{v} A ≃ₐ[R] A).symm
-  letI finiteULift : Module.Finite R (ULift.{v} A) := Module.Finite.equiv e.toLinearEquiv
+  let e : A ≃ₐ[R] ULift.{v} A :=
+    (ULift.algEquiv : ULift.{v} A ≃ₐ[R] A).symm
   let JA : Ideal A := I.map (algebraMap R A)
   let JU : Ideal (ULift.{v} A) := I.map (algebraMap R (ULift.{v} A))
   have hcomp : ((e : A ≃+* ULift.{v} A) : A →+* ULift.{v} A).comp
@@ -194,7 +194,7 @@ private theorem isUnit_one_sub_mul_of_finite_idempotent_lifts
           Ideal.Quotient.mk (I.map (algebraMap R B)) e = e0)
     {x : R} (hx : x ∈ I) (a : R) : IsUnit (1 - a * x) := by
   let K : Ideal R := Ideal.span ({1 - a * x} : Set R)
-  letI finiteCyclic : Module.Finite R (R ⧸ K) :=
+  have finiteCyclic : Module.Finite R (R ⧸ K) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ R K).toLinearMap (by
       intro z
       obtain ⟨r, hr⟩ := Ideal.Quotient.mkₐ_surjective R K z
@@ -211,14 +211,15 @@ private theorem isUnit_one_sub_mul_of_finite_idempotent_lifts
   have hJtop : J = ⊤ := (Ideal.eq_top_iff_one J).mpr (by
     rw [hone]
     exact J.mul_mem_left _ (Ideal.mem_map_of_mem (algebraMap R (R ⧸ K)) hx))
-  letI residueSubsingleton : Subsingleton ((R ⧸ K) ⧸ J) :=
+  have residueSubsingleton : Subsingleton ((R ⧸ K) ⧸ J) :=
     Ideal.Quotient.subsingleton_iff.mpr hJtop
-  obtain ⟨d, _, huniq⟩ := existsUnique_idempotent_of_maxUniverse.{u, v} I h (R ⧸ K)
-    (0 : (R ⧸ K) ⧸ J) (isIdempotentElem_iff.mpr (zero_mul _))
+  obtain ⟨d, _, huniq⟩ :=
+    @existsUnique_idempotent_of_maxUniverse.{u, v} R _ I h (R ⧸ K) _ _ finiteCyclic
+      (0 : (R ⧸ K) ⧸ J) (isIdempotentElem_iff.mpr (zero_mul _))
   have hz : (0 : R ⧸ K) = d := huniq 0
     ⟨isIdempotentElem_iff.mpr (zero_mul _), by simp only [map_zero]⟩
   have ho : (1 : R ⧸ K) = d := huniq 1
-    ⟨IsIdempotentElem.one, Subsingleton.elim _ _⟩
+    ⟨IsIdempotentElem.one, @Subsingleton.elim _ residueSubsingleton _ _⟩
   have h1K : (1 : R) ∈ K := Ideal.Quotient.eq_zero_iff_mem.mp (by
     simpa only [map_one] using ho.trans hz.symm)
   have hKtop : K = ⊤ := (Ideal.eq_top_iff_one K).mpr h1K
@@ -245,8 +246,10 @@ private theorem isUnit_of_quotient_isUnit_of_le_jacobson
     {R : Type u} [CommRing R] (I : Ideal R)
     (hJac : I ≤ Ideal.jacobson (⊥ : Ideal R)) {r : R}
     (hr : IsUnit (Ideal.Quotient.mk I r)) : IsUnit r := by
-  letI : IsLocalHom (Ideal.Quotient.mk I) := isLocalHom_of_le_jacobson_bot I hJac
-  exact (isUnit_map_iff (Ideal.Quotient.mk I) r).mp hr
+  have localQuotient : IsLocalHom (Ideal.Quotient.mk I) :=
+    isLocalHom_of_le_jacobson_bot I hJac
+  exact (@isUnit_map_iff R (R ⧸ I) (R →+* R ⧸ I) _ _ _ _
+    (Ideal.Quotient.mk I) localQuotient r).mp hr
 
 /-- The finite-algebra lifting property makes the original ideal quotient reflect units. -/
 private theorem isUnit_of_quotient_of_finite_idempotent_lifts
@@ -571,11 +574,12 @@ private theorem exists_root_of_idempotent_adjoinRoot_component
   have hp : IsIdempotentElem p := he.map (Algebra.lmul R B)
   have hp_apply (b : B) : p b = e * b := by
     simp only [p, Algebra.coe_lmul_eq_mul, LinearMap.mul_apply']
-  letI : Module.Finite R B := hf.finite_adjoinRoot
-  letI : Module.Projective R B :=
+  have finiteB : Module.Finite R B := hf.finite_adjoinRoot
+  have projectiveB : Module.Projective R B :=
     Module.Projective.of_basis (AdjoinRoot.powerBasis' hf).basis
-  letI : Module.Finite R E := Module.Finite.range p
-  letI : Module.Projective R E := projective_range_of_idempotent p hp
+  have finiteE : Module.Finite R E := @Module.Finite.range R B B _ _ _ _ _ finiteB p
+  have projectiveE : Module.Projective R E :=
+    @projective_range_of_idempotent R _ B _ _ projectiveB p hp
   have hfix (x : E) : e * (x : B) = (x : B) := by
     rw [← hp_apply]
     exact (LinearMap.IsIdempotentElem.mem_range_iff hp).mp x.property
@@ -614,7 +618,8 @@ private theorem exists_root_of_idempotent_adjoinRoot_component
     rw [hrB]
     exact (I.map (algebraMap R B)).zero_mem
   have hbij : Function.Bijective α :=
-    bijective_of_surjective_mod_ideal_of_kernel_mem I hJac α hmod hker
+    @bijective_of_surjective_mod_ideal_of_kernel_mem R _ E _ _ finiteE projectiveE
+      I hJac α hmod hker
   obtain ⟨a, ha⟩ := hbij.2 (p.rangeRestrict (AdjoinRoot.root f))
   have hae : algebraMap R B a * e = AdjoinRoot.root f * e := by
     calc
@@ -656,17 +661,17 @@ theorem iff_existsUnique_isIdempotentElem_map
             Ideal.Quotient.mk (I.map (algebraMap R B)) e = e0 := by
   constructor
   · intro hR B _ _ _ e0 he0
-    letI : HenselianRing R I := hR
-    exact existsUnique_isIdempotentElem_map I he0
+    exact @existsUnique_isIdempotentElem_map R B _ _ I hR _ _ e0 he0
   · intro h
     have hJac : I ≤ Ideal.jacobson (⊥ : Ideal R) :=
       le_jacobson_of_finite_idempotent_lifts.{u, v} I h
     refine { jac := hJac, is_henselian := ?_ }
     intro f hf a₀ ha hd
-    letI : Module.Finite R (AdjoinRoot f) := hf.finite_adjoinRoot
+    have finiteAdjoinRoot : Module.Finite R (AdjoinRoot f) := hf.finite_adjoinRoot
     obtain ⟨e, he, hres, hscalar, hroot⟩ :=
       exists_idempotent_adjoinRoot_component I f a₀ ha hd
-        (existsUnique_idempotent_of_maxUniverse.{u, v} I h (AdjoinRoot f))
+        (@existsUnique_idempotent_of_maxUniverse.{u, v}
+          R _ I h (AdjoinRoot f) _ _ finiteAdjoinRoot)
     exact exists_root_of_idempotent_adjoinRoot_component I hJac
       f hf a₀ e he hres hscalar hroot
 

@@ -37,13 +37,13 @@ theorem isDomain_iff (p : ℕ) [Fact p.Prime] (R : Type u) [CommRing R] :
     IsDomain (WittVector p R) ↔ IsDomain R ∧ CharP R p := by
   constructor
   · intro hW
-    letI : IsDomain (WittVector p R) := hW
+    let : IsDomain (WittVector p R) := hW
     have hR : (0 : R) ≠ 1 := by
       intro h
-      letI : Subsingleton R := subsingleton_of_zero_eq_one h
+      let : Subsingleton R := subsingleton_of_zero_eq_one h
       exact (zero_ne_one : (0 : WittVector p R) ≠ 1)
         (WittVector.ext fun _ => Subsingleton.elim _ _)
-    letI : Nontrivial R := ⟨⟨0, 1, hR⟩⟩
+    let : Nontrivial R := ⟨⟨0, 1, hR⟩⟩
     have hV : verschiebung (1 : WittVector p R) ≠ 0 := by
       intro h
       apply (one_ne_zero : (1 : R) ≠ 0)
@@ -86,11 +86,11 @@ theorem isDomain_iff (p : ℕ) [Fact p.Prime] (R : Type u) [CommRing R] :
       · right
         simpa only [teichmuller_coeff_zero, zero_coeff] using
           congrArg (fun x : WittVector p R => x.coeff 0) hy
-    letI : NoZeroDivisors R := hNoZeroDivisors
+    let : NoZeroDivisors R := hNoZeroDivisors
     exact ⟨NoZeroDivisors.to_isDomain R, hChar⟩
   · rintro ⟨hR, hChar⟩
-    letI : IsDomain R := hR
-    letI : CharP R p := hChar
+    let : IsDomain R := hR
+    let : CharP R p := hChar
     exact WittVector.instIsDomain
 
 end WittVector
