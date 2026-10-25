@@ -258,4 +258,22 @@ theorem map_henselianRadical_of_surjective_of_henselian_ker
   simpa only [comap_henselianRadical_of_surjective_of_henselian_ker f hf] using
     (map_comap_of_surjective f hf (henselianRadical S))
 
+/-- The inverse image of the Henselian radical under an integral faithfully flat ring
+homomorphism is the Henselian radical of the source. -/
+theorem comap_henselianRadical_of_isIntegral_of_faithfullyFlat
+    {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (f : R →+* S) (hf : f.IsIntegral) (hff : f.FaithfullyFlat) :
+    (Ideal.henselianRadical S).comap f = Ideal.henselianRadical R := by
+  apply le_antisymm
+  · let : HenselianRing S (henselianRadical S) :=
+      HenselianRing.henselianRadical S
+    exact le_henselianRadical _
+      (HenselianRing.comap_of_isIntegral_of_faithfullyFlat
+        (henselianRadical S) f hf hff)
+  · let : HenselianRing R (henselianRadical R) :=
+      HenselianRing.henselianRadical R
+    exact map_le_iff_le_comap.mp
+      (le_henselianRadical _
+        (HenselianRing.map_of_isIntegral (henselianRadical R) f hf))
+
 end Ideal

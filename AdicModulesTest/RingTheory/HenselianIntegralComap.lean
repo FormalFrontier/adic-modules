@@ -161,4 +161,8 @@ private theorem contraction_henselian : HenselianRing R (J.comap f) := by
 #print axioms target_henselian
 #print axioms extension_lt
 
+example : (Ideal.henselianRadical S).comap f = Ideal.henselianRadical R := by
+  exact Ideal.comap_henselianRadical_of_isIntegral_of_faithfullyFlat
+    f diagonal_integral diagonal_faithfullyFlat
+
 end HenselianIntegralComap
