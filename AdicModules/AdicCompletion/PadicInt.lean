@@ -7,6 +7,8 @@ module
 public import Mathlib.Data.ZMod.QuotientRing
 public import Mathlib.NumberTheory.Padics.RingHoms
 public import Mathlib.RingTheory.AdicCompletion.Algebra
+public import AdicModules.AdicCompletion.UniformCompletion
+public import AdicModules.Topology.Algebra.PadicInt
 
 /-!
 # Integer adic completions and p-adic integers
@@ -23,7 +25,10 @@ coordinates for any natural generator, including zero and one. It uses
 The comparison uses the residue-limit universal properties formalized in Mathlib by
 Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang for adic completions, and
 Johan Commelin and Robert Y. Lewis for p-adic integers. Anne Baanen's quotient equivalence supplies
-the finite-level identification. This module concerns algebraic equivalences only.
+the finite-level identification. Separately, `PadicInt.uniformContinuous_intCast_adic`
+and `PadicInt.intCastAdicCLM` give the canonical integer cast its adic source
+uniformity and the original p-adic norm target. These do not identify either completion
+carrier, and leave the original additive and integer-module structures unchanged.
 
 ## References
 
@@ -177,3 +182,70 @@ theorem padicIntEquiv_symm_intCast (a : ℤ) :
   simp
 
 end AdicCompletion
+
+namespace PadicInt
+
+/-- Integer casting is uniformly continuous from the `(p)`-adic module
+uniformity to the existing norm uniformity on the p-adic integers. -/
+theorem uniformContinuous_intCast_adic (p : ℕ) [Fact p.Prime] :
+    @UniformContinuous ℤ ℤ_[p]
+      ((Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ)
+      (inferInstance : UniformSpace ℤ_[p]) (Int.castRingHom ℤ_[p]) := by
+  let I : Ideal ℤ := Ideal.span {(p : ℤ)}
+  let J : Ideal ℤ_[p] := Ideal.span {(p : ℤ_[p])}
+  let : UniformSpace ℤ := I.adicModuleUniformSpace ℤ
+  let : TopologicalSpace ℤ := (I.adicModuleUniformSpace ℤ).toTopologicalSpace
+  let : IsUniformAddGroup ℤ := I.adicModuleUniformSpace_isUniformAddGroup ℤ
+  have hmap : I.map (Int.castRingHom ℤ_[p]) = J := by
+    simp [I, J, Ideal.map_span]
+  exact IsAdic.uniformContinuous_of_map_le
+    (I := I) (J := J)
+    I.adicModuleUniformSpace_self_toTopologicalSpace
+    (isAdic_span_p p) hmap.le
+
+section AdicSource
+
+variable (p : ℕ) [Fact p.Prime]
+
+/-- The usual integer cast, with its original `ℤ`-linear map, is continuous for
+the canonical `(p)`-adic source topology and the target norm topology. -/
+noncomputable def intCastAdicCLM :
+    @ContinuousLinearMap ℤ ℤ _ _ (RingHom.id ℤ) ℤ
+      ((Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ).toTopologicalSpace _
+      ℤ_[p] _ _ _ _ := by
+  letI : UniformSpace ℤ := (Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ
+  letI : TopologicalSpace ℤ :=
+    ((Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ).toTopologicalSpace
+  exact ⟨(Int.castAddHom ℤ_[p]).toIntLinearMap,
+    (uniformContinuous_intCast_adic p).continuous⟩
+
+@[simp]
+theorem intCastAdicCLM_apply (z : ℤ) :
+    intCastAdicCLM p z = (z : ℤ_[p]) := rfl
+
+/-- The underlying linear map is the usual integer-linear cast. -/
+@[simp]
+theorem intCastAdicCLM_toLinearMap :
+    @ContinuousLinearMap.toLinearMap ℤ ℤ _ _ (RingHom.id ℤ) ℤ
+      ((Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ).toTopologicalSpace _
+      ℤ_[p] _ _ _ _ (intCastAdicCLM p) = (Int.castAddHom ℤ_[p]).toIntLinearMap := rfl
+
+end AdicSource
+
+/-- The original integer scalar action is jointly continuous even when the scalar
+ring is given its `(p)`-adic topology, rather than its discrete topology. -/
+theorem continuousSMul_int_adic (p : ℕ) [Fact p.Prime] :
+    @ContinuousSMul ℤ ℤ_[p] (inferInstance : SMul ℤ ℤ_[p])
+      (Ideal.span {(p : ℤ)}).adicTopology (inferInstance : TopologicalSpace ℤ_[p]) := by
+  let : TopologicalSpace ℤ := (Ideal.span {(p : ℤ)}).adicTopology
+  have hcast := @UniformContinuous.continuous ℤ ℤ_[p]
+    ((Ideal.span {(p : ℤ)}).adicModuleUniformSpace ℤ)
+    (inferInstance : UniformSpace ℤ_[p]) (Int.castRingHom ℤ_[p])
+    (uniformContinuous_intCast_adic p)
+  rw [Ideal.adicModuleUniformSpace_self_toTopologicalSpace] at hcast
+  constructor
+  have hmul : Continuous (fun x : ℤ × ℤ_[p] => (x.1 : ℤ_[p]) * x.2) :=
+    (hcast.comp continuous_fst).mul continuous_snd
+  simpa only [zsmul_eq_mul] using hmul
+
+end PadicInt

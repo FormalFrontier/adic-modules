@@ -48,3 +48,22 @@ theorem adicModuleTopology_eq_adicTopology_map
     simpa only [id_eq, smul_top_eq_map, Ideal.map_pow, coe_restrictScalars] using hn
 
 end Ideal
+
+namespace IsAdic
+
+/-- An ideal-preserving ring homomorphism between adic uniform additive groups is
+uniformly continuous for their given uniformities. -/
+theorem uniformContinuous_of_map_le
+    {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    [UniformSpace R] [UniformSpace S] [IsUniformAddGroup R] [IsUniformAddGroup S]
+    {I : Ideal R} {J : Ideal S} (hI : IsAdic I) (hJ : IsAdic J)
+    {f : R →+* S} (hf : I.map f ≤ J) : UniformContinuous f := by
+  apply uniformContinuous_of_continuousAt_zero f
+  rw [hI, hJ]
+  let : WithIdeal R := ⟨I⟩
+  let : WithIdeal S := ⟨J⟩
+  let : UniformSpace R := WithIdeal.instUniformSpace R
+  let : UniformSpace S := WithIdeal.instUniformSpace S
+  exact (WithIdeal.uniformContinuous_of_map_le hf).continuous.continuousAt
+
+end IsAdic
