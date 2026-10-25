@@ -243,4 +243,32 @@ example : HenselianRing (Z2 × Z2) (twoIdeal.prod twoIdeal) :=
     ⟨by simpa only [Ideal.map_fst_prod] using (inferInstance : HenselianRing Z2 twoIdeal),
       by simpa only [Ideal.map_snd_prod] using (inferInstance : HenselianRing Z2 twoIdeal)⟩
 
+/-- A zero Jacobson radical in the coefficient ring gives the same for its polynomial ring. -/
+example {R : Type v} [CommRing R] (h : Ideal.jacobson (⊥ : Ideal R) = ⊥) :
+    Ideal.jacobson (⊥ : Ideal (Polynomial R)) = ⊥ := by
+  rw [Ideal.jacobson_bot_polynomial_eq_radical R]
+  apply le_antisymm
+  · intro p hp
+    apply Ideal.mem_bot.mpr
+    apply Polynomial.ext
+    intro n
+    have hp' : IsNilpotent p := by
+      obtain ⟨k, hk⟩ := Ideal.mem_radical_iff.mp hp
+      exact ⟨k, Ideal.mem_bot.mp hk⟩
+    have hn : p.coeff n ∈ (⊥ : Ideal R).radical := by
+      obtain ⟨k, hk⟩ := Polynomial.isNilpotent_iff.mp hp' n
+      exact Ideal.mem_radical_iff.mpr ⟨k, Ideal.mem_bot.mpr hk⟩
+    simpa only [h, Ideal.mem_bot, Polynomial.coeff_zero] using
+      (Ideal.radical_le_jacobson hn)
+  · exact bot_le
+
+/-- Both radicals of the polynomial ring over the 2-adic integers vanish. -/
+example : Ideal.jacobson (⊥ : Ideal (Polynomial Z2)) = ⊥ ∧
+    Ideal.henselianRadical (Polynomial Z2) = ⊥ := by
+  constructor
+  · exact (Ideal.jacobson_bot_polynomial_eq_radical Z2).trans
+      Ideal.radical_bot_of_isReduced
+  · exact (Ideal.henselianRadical_polynomial Z2).trans
+      Ideal.radical_bot_of_isReduced
+
 end HenselianIdealResearch

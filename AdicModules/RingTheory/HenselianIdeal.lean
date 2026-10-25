@@ -7,6 +7,7 @@ module
 public import AdicModules.RingTheory.HenselianRadical
 public import AdicModules.RingTheory.HenselianTransport
 public import Mathlib.RingTheory.Ideal.Maps
+public import Mathlib.RingTheory.Polynomial.Nilpotent
 
 /-!
 # Suprema of Henselian ideals
@@ -228,6 +229,26 @@ theorem nilradical_le_henselianRadical (R : Type u) [CommRing R] :
   have hbot : HenselianRing R (⊥ : Ideal R) :=
     IsAdicComplete.henselianRing R ⊥
   exact le_henselianRadical _ ((HenselianRing.iff_radical _).mp hbot)
+
+/-- The Jacobson radical of a polynomial ring is its nilradical. -/
+theorem jacobson_bot_polynomial_eq_radical (R : Type u) [CommRing R] :
+    jacobson (⊥ : Ideal (Polynomial R)) = (⊥ : Ideal (Polynomial R)).radical := by
+  apply le_antisymm
+  · intro p hp
+    have hp' : IsUnit (Polynomial.C (1 : R) + Polynomial.X * p) := by
+      simpa only [Polynomial.C_1, mul_comm, add_comm] using
+        (mem_jacobson_bot.mp hp) Polynomial.X
+    obtain ⟨k, hk⟩ := (Polynomial.isUnit_C_add_X_mul_iff.mp hp').2
+    exact mem_radical_iff.mpr ⟨k, mem_bot.mpr hk⟩
+  · exact radical_le_jacobson
+
+/-- The greatest Henselian ideal of a polynomial ring is its nilradical. -/
+theorem henselianRadical_polynomial (R : Type u) [CommRing R] :
+    henselianRadical (Polynomial R) = (⊥ : Ideal (Polynomial R)).radical := by
+  exact le_antisymm
+    ((henselianRadical_le_jacobson (Polynomial R)).trans
+      (jacobson_bot_polynomial_eq_radical R).le)
+    (nilradical_le_henselianRadical (Polynomial R))
 
 /-- A surjection with independently Henselian kernel recovers the greatest
 Henselian ideal by inverse image. The source and target universes are independent.
