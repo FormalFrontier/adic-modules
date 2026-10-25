@@ -184,7 +184,7 @@ Rings are commutative; modules are additive commutative groups unless specified 
   Completed integers literally equal the residue-preimage composite of completed localization
   and transported residue factor ([composites](AdicModules/CompletedValuationComposite.lean)).
 
-- **Integral maps of Henselian pairs.** For independently universed commutative
+- **Transport of Henselian pairs.** For independently universed commutative
   rings and an integral homomorphism `f : R →+* S`,
   `HenselianRing.map_of_isIntegral` sends a Henselian pair `(R, I)` to
   `(S, I.map f)`, without a finiteness or locality assumption on the target.
@@ -192,11 +192,22 @@ Rings are commutative; modules are additive commutative groups unless specified 
   `HenselianRing.iff_map_of_isIntegral_of_faithfullyFlat` gives
   `HenselianRing R I ↔ HenselianRing S (I.map f)`.
   Surjective maps are included via `HenselianRing.map_of_surjective`.
-  If every element of a surjection's kernel is nilpotent,
-  `HenselianRing.iff_map_of_surjective_of_nil_ker` also reflects Henselianity.
-  The original ideal need not contain the kernel, and no uniform nilpotence
-  exponent or Noetherian assumption is required for this reflection.
+  If a surjection's kernel defines a Henselian pair over `R`,
+  `HenselianRing.iff_map_of_surjective_of_henselian_ker` gives the same
+  equivalence for every source ideal, without requiring it to contain the kernel.
+  Elementwise-nil kernels are a special case, retained as
+  `HenselianRing.iff_map_of_surjective_of_nil_ker`; no uniform nilpotence
+  exponent or Noetherian assumption is required.
+  Moreover, every subideal of a Henselian ideal is Henselian
+  (`HenselianRing.of_le`).
   See [`HenselianTransport`](AdicModules/RingTheory/HenselianTransport.lean).
+- The Henselian ideals of any commutative ring are closed under arbitrary suprema,
+  including the empty supremum. Their greatest element `Ideal.henselianRadical R`
+  is radical, contains the nilradical, and lies in the Jacobson radical. An ideal
+  is Henselian exactly when it lies below this greatest ideal. Comap along a
+  surjective ring homomorphism recovers the source's greatest Henselian ideal
+  when the kernel is Henselian.
+  See [`HenselianIdeal`](AdicModules/RingTheory/HenselianIdeal.lean).
 
 ## Using the library
 

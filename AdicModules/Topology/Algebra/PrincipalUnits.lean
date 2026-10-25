@@ -439,7 +439,7 @@ theorem HenselianRing.bijective_pow_principal_units {R : Type u} [CommRing R]
     Function.Bijective
       (fun u : (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker => u ^ n) := by
   classical
-  letI : IsLocalHom (Ideal.Quotient.mk I) :=
+  let : IsLocalHom (Ideal.Quotient.mk I) :=
     isLocalHom_of_le_jacobson_bot I (HenselianRing.jac (R := R) (I := I))
   have hquot (u : (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker) :
       Ideal.Quotient.mk I ((u : Rˣ) : R) = 1 :=

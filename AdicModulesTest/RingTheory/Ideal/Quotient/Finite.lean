@@ -296,9 +296,9 @@ private theorem differences :
 private theorem congruences_172 (i : Fin 3) : (172 : ℤ) - residues i ∈ poweredIdeals i := by
   rw [powered_eq_span, Ideal.mem_span_singleton']
   fin_cases i
-  · exact ⟨43, by simpa [moduli, primes, exponents, residues] using differences.1.symm⟩
-  · exact ⟨19, by simpa [moduli, primes, exponents, residues] using differences.2.1.symm⟩
-  · exact ⟨34, by simpa [moduli, primes, exponents, residues] using differences.2.2.symm⟩
+  · exact ⟨43, by simp [moduli, primes, exponents, residues]⟩
+  · exact ⟨19, by simp [moduli, primes, exponents, residues]⟩
+  · exact ⟨34, by simp [moduli, primes, exponents, residues]⟩
 
 private noncomputable def integerEquiv :
     (ℤ ⧸ ⨅ i, poweredIdeals i) ≃+* ((i : Fin 3) → ℤ ⧸ poweredIdeals i) :=
@@ -407,8 +407,7 @@ private theorem zero_inverse (q : (i : Fin 3) → ℤ ⧸ primeIdeals i ^ 0) (r 
     zeroEquiv.symm q = Ideal.Quotient.mk (⨅ i, primeIdeals i ^ 0) r := by
   apply zeroEquiv.injective
   funext i
-  letI := zero_component i
-  exact Subsingleton.elim _ _
+  exact @Subsingleton.elim _ (zero_component i) _ _
 
 private def mixedExponents : Fin 3 → ℕ := ![0, 2, 1]
 private def mixedIdeals (i : Fin 3) : Ideal ℤ := primeIdeals i ^ mixedExponents i
@@ -464,8 +463,6 @@ private theorem trivial_inverse (q : (_i : Fin 3) → PUnit ⧸ (⊥ : Ideal PUn
       Ideal.Quotient.mk (⨅ _i : Fin 3, (⊥ : Ideal PUnit)) PUnit.unit := by
   apply trivialEquiv.injective
   funext i
-  letI : Subsingleton (PUnit ⧸ (⊥ : Ideal PUnit)) :=
-    Ideal.Quotient.subsingleton_iff.mpr trivial_bottom_eq_top
   exact Subsingleton.elim _ _
 
 private theorem repeated_two_not_comaximal :

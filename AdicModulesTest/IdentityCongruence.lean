@@ -81,7 +81,7 @@ private theorem pointwise_near_identity (m : M) :
 
 /-- Completeness and pointwise congruence also make the shear a unit. -/
 private theorem shear_isUnit_of_sub_mem_smul : IsUnit shear := by
-  letI : IsAdicComplete I M := complete
+  let : IsAdicComplete I M := complete
   exact Module.End.isUnit_of_sub_mem_smul I shear pointwise_near_identity
 
 /-- The shear is its own inverse, independently of completeness. -/

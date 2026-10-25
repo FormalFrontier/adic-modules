@@ -47,7 +47,7 @@ private noncomputable def maximalIdealValuation :
     Valuation (LaurentSeries κ) (WithZero (Multiplicative ℤ)) :=
   (IsDiscreteValuationRing.maximalIdeal (PowerSeries κ)).valuation (LaurentSeries κ)
 
-private noncomputable def maximalIdealValued :
+private noncomputable abbrev maximalIdealValued :
     Valued (LaurentSeries κ) (WithZero (Multiplicative ℤ)) :=
   Valued.mk' (maximalIdealValuation κ)
 
@@ -78,7 +78,7 @@ private theorem maximalIdeal_integers :
   map_le_one f :=
     (IsDiscreteValuationRing.maximalIdeal (PowerSeries κ)).valuation_le_one
       (K := LaurentSeries κ) f
-  exists_of_le_one {z} hz :=
+  exists_of_le_one {_} hz :=
     IsDiscreteValuationRing.exists_lift_of_le_one
       (A := PowerSeries κ) (K := LaurentSeries κ) hz
 

@@ -32,7 +32,7 @@ private theorem product_witt_isTorsionFree_int :
       Module.IsTorsionFree ℤ (WittVector 3 (ZMod 3 × ZMod 3)) := by
   refine ⟨inferInstance, ?_, ?_⟩
   · intro h
-    letI := h
+    have := h
     have hzero : ((1, 0) : ZMod 3 × ZMod 3) * (0, 1) = 0 := by
       ext <;> simp
     rcases mul_eq_zero.mp hzero with hleft | hright
@@ -46,7 +46,7 @@ private theorem dualNumber_witt_has_int_torsion :
       (∃ x : WittVector 3 (TrivSqZeroExt (ZMod 3) (ZMod 3)),
         x.coeff 0 ≠ 0 ∧ (∀ n : ℕ, 0 < n → x.coeff n = 0) ∧ (3 : ℤ) • x = 0) ∧
       ¬ Module.IsTorsionFree ℤ (WittVector 3 (TrivSqZeroExt (ZMod 3) (ZMod 3))) := by
-  letI : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
+  have : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
     charP_of_injective_ringHom
       (f := TrivSqZeroExt.inlHom (ZMod 3) (ZMod 3))
       TrivSqZeroExt.inl_injective 3
@@ -65,7 +65,7 @@ private theorem dualNumber_witt_has_int_torsion :
       _ = 0 := by rw [hε₂, zero_mul]
   have hnotred : ¬ IsReduced (TrivSqZeroExt (ZMod 3) (ZMod 3)) := by
     intro h
-    letI := h
+    have := h
     exact hε (eq_zero_of_pow_eq_zero hε₂)
   let x : WittVector 3 (TrivSqZeroExt (ZMod 3) (ZMod 3)) :=
     WittVector.teichmuller 3 ε

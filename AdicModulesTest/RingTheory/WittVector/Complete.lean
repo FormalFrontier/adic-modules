@@ -144,7 +144,7 @@ private theorem prod_zmod_three_surjective_frobenius_not_isDomain :
   · exact @_root_.surjective_frobenius (ZMod 3 × ZMod 3) 3 _ _
       (_root_.instPerfectRingProd (ZMod 3) 3 (ZMod 3))
   · intro h
-    letI := h
+    have := h
     exact false_of_nontrivial_of_product_domain (ZMod 3) (ZMod 3)
 
 private theorem prod_zmod_three_teichmuller_zero_divisors_mod_span_three :

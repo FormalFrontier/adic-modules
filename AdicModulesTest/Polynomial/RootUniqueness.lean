@@ -68,9 +68,9 @@ private theorem simple_root_uniqueness_mod_four :
       simpa only [map_natCast] using ha
     exact (ZMod.isUnit_natCast_iff_not_dvd_pow
       (p := 2) (d := 2) (a := n) (by decide) (by decide)).mpr hn
-  letI : IsLocalHom q := hq
-  letI : Fact (Nat.Prime 2) := ⟨by decide⟩
-  letI : IsLocalRing (ZMod 4) := RingHom.domain_isLocalRing q
+  let : IsLocalHom q := hq
+  let : Fact (Nat.Prime 2) := ⟨by decide⟩
+  let : IsLocalRing (ZMod 4) := RingHom.domain_isLocalRing q
   -- Application of `Polynomial.IsRoot.eq_of_map_eq` to roots with equal reductions modulo two.
   have hunique : ∀ (g : (ZMod 4)[X]) (a b : ZMod 4),
       g.IsRoot a → g.IsRoot b → q a = q b →
@@ -95,8 +95,8 @@ private theorem simple_root_uniqueness_mod_four :
   have hleading : f.leadingCoeff = 2 := by
     change f.coeff f.natDegree = 2
     rw [hdegree]
-    simp only [f, coeff_add, C_mul_X_pow_eq_monomial, coeff_monomial_same, coeff_X] <;>
-      decide
+    simp only [f, coeff_add, C_mul_X_pow_eq_monomial, coeff_monomial_same, coeff_X]
+    decide
   have hnonmonic : ¬ f.Monic := by
     intro hm
     have hm' : f.leadingCoeff = 1 := hm
@@ -123,7 +123,8 @@ private theorem simple_root_uniqueness_mod_four :
       _ = (2 : ZMod 2) := by decide
       _ = q (2 : ZMod 4) := (map_natCast q 2).symm
   have heval_two : f.eval (2 : ZMod 4) = 2 := by
-    simp only [f, eval_add, eval_C_mul, eval_X_pow, eval_X] <;> decide
+    simp only [f, eval_add, eval_C_mul, eval_X_pow, eval_X]
+    decide
   have hother : ¬ f.IsRoot 2 := by
     change ¬ (f.eval 2 = 0)
     rw [heval_two]

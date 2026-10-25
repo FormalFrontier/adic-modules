@@ -87,7 +87,7 @@ private lemma zmod_eight_henselian_reduction :
       (Ideal.Quotient.mk J) hq e0
       (RingHom.mem_range.mpr (Ideal.Quotient.mk_surjective (I := J) e0)) he0
   have hH4 : HenselianRing (ZMod 4) (I.map f) := by
-    letI : HenselianRing (ZMod 8) I := hH8
+    have : HenselianRing (ZMod 8) I := hH8
     exact HenselianRing.map_of_surjective I f hf
   have hH8' : HenselianRing (ZMod 8) I :=
     (HenselianRing.iff_map_of_surjective_of_nil_ker I f hf hker).mpr hH4

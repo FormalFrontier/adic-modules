@@ -142,16 +142,12 @@ private theorem matrix_smulTop_noncommutative_and_commutator :
 private theorem matrix_smulTop_zero_level (I : Ideal ℤ) :
     (1 : IntMatrix ⧸ (I ^ 0 • (⊤ : Submodule ℤ IntMatrix))) = 0 := by
   have htop : I ^ 0 • (⊤ : Submodule ℤ IntMatrix) = ⊤ := by simp
-  letI : Subsingleton (IntMatrix ⧸ (I ^ 0 • (⊤ : Submodule ℤ IntMatrix))) :=
-    Submodule.Quotient.subsingleton_iff.mpr htop
-  exact Subsingleton.elim _ _
+  exact @Subsingleton.elim _ (Submodule.Quotient.subsingleton_iff.mpr htop) _ _
 
 private theorem matrix_smulTop_top :
     (1 : IntMatrix ⧸ ((⊤ : Ideal ℤ) • (⊤ : Submodule ℤ IntMatrix))) = 0 := by
   have htop : (⊤ : Ideal ℤ) • (⊤ : Submodule ℤ IntMatrix) = ⊤ := by simp
-  letI : Subsingleton (IntMatrix ⧸ ((⊤ : Ideal ℤ) • (⊤ : Submodule ℤ IntMatrix))) :=
-    Submodule.Quotient.subsingleton_iff.mpr htop
-  exact Subsingleton.elim _ _
+  exact @Subsingleton.elim _ (Submodule.Quotient.subsingleton_iff.mpr htop) _ _
 
 universe u v
 

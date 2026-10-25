@@ -35,10 +35,10 @@ lemma fourIdeal_pow (n : ℕ) : fourIdeal ^ n = Ideal.span {(4 : ℤ) ^ n} :=
   Ideal.span_singleton_pow (4 : ℤ) n
 
 lemma two_mem_twoIdeal : (2 : ℤ) ∈ twoIdeal := by
-  simp [twoIdeal, Ideal.mem_span_singleton]
+  simp [twoIdeal]
 
 lemma four_mem_fourIdeal : (4 : ℤ) ∈ fourIdeal := by
-  simp [fourIdeal, Ideal.mem_span_singleton]
+  simp [fourIdeal]
 
 lemma one_not_mem_twoIdeal : (1 : ℤ) ∉ twoIdeal := by
   norm_num [twoIdeal, Ideal.mem_span_singleton]
@@ -72,7 +72,7 @@ lemma twoIdeal_pow_ne_bot (n : ℕ) : twoIdeal ^ n ≠ ⊥ := by
     rw [twoIdeal_pow]
     exact Ideal.subset_span (by simp)
   rw [h] at hm
-  exact (pow_ne_zero n (by norm_num : (2 : ℤ) ≠ 0)) (by simpa using hm)
+  simp at hm
 
 lemma fourIdeal_pow_ne_bot (n : ℕ) : fourIdeal ^ n ≠ ⊥ := by
   intro h
@@ -80,7 +80,7 @@ lemma fourIdeal_pow_ne_bot (n : ℕ) : fourIdeal ^ n ≠ ⊥ := by
     rw [fourIdeal_pow]
     exact Ideal.subset_span (by simp)
   rw [h] at hm
-  exact (pow_ne_zero n (by norm_num : (4 : ℤ) ≠ 0)) (by simpa using hm)
+  simp at hm
 
 lemma twoIdeal_ne_bot : twoIdeal ≠ ⊥ := by
   simpa only [pow_one] using twoIdeal_pow_ne_bot 1
@@ -171,17 +171,13 @@ lemma two_level_zero (q : ℤ ⧸ (twoIdeal ^ 0 • (⊤ : Submodule ℤ ℤ))) 
   have h : (twoIdeal ^ 0 • (⊤ : Submodule ℤ ℤ)) = ⊤ := by
     change (twoIdeal ^ 0 • (⊤ : Ideal ℤ)) = ⊤
     rw [Ideal.smul_eq_mul, Ideal.mul_top, pow_zero, Ideal.one_eq_top]
-  haveI : Subsingleton (ℤ ⧸ (twoIdeal ^ 0 • (⊤ : Submodule ℤ ℤ))) :=
-    Submodule.Quotient.subsingleton_iff.mpr h
-  exact Subsingleton.elim _ _
+  exact @Subsingleton.elim _ (Submodule.Quotient.subsingleton_iff.mpr h) _ _
 
 lemma four_level_zero (q : ℤ ⧸ (fourIdeal ^ 0 • (⊤ : Submodule ℤ ℤ))) : q = 0 := by
   have h : (fourIdeal ^ 0 • (⊤ : Submodule ℤ ℤ)) = ⊤ := by
     change (fourIdeal ^ 0 • (⊤ : Ideal ℤ)) = ⊤
     rw [Ideal.smul_eq_mul, Ideal.mul_top, pow_zero, Ideal.one_eq_top]
-  haveI : Subsingleton (ℤ ⧸ (fourIdeal ^ 0 • (⊤ : Submodule ℤ ℤ))) :=
-    Submodule.Quotient.subsingleton_iff.mpr h
-  exact Subsingleton.elim _ _
+  exact @Subsingleton.elim _ (Submodule.Quotient.subsingleton_iff.mpr h) _ _
 
 /-- The canonical comparison is linear over the original integers. -/
 def completionEquiv : AdicCompletion twoIdeal ℤ ≃ₗ[ℤ] AdicCompletion fourIdeal ℤ :=
@@ -272,7 +268,7 @@ lemma completionEquiv_map (f : ℤ →ₗ[ℤ] ℤ) (x : AdicCompletion twoIdeal
 def timesThree : ℤ →ₗ[ℤ] ℤ := (3 : ℤ) • LinearMap.id
 
 lemma timesThree_apply (z : ℤ) : timesThree z = 3 * z := by
-  simp [timesThree, smul_eq_mul]
+  simp [timesThree]
 
 lemma completionEquiv_timesThree (x : AdicCompletion twoIdeal ℤ) :
     completionEquiv (map twoIdeal timesThree x) =

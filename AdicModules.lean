@@ -37,6 +37,7 @@ public import AdicModules.RingTheory.Idempotents
 public import AdicModules.RingTheory.HenselianCriterion
 public import AdicModules.RingTheory.HenselianRadical
 public import AdicModules.RingTheory.HenselianTransport
+public import AdicModules.RingTheory.HenselianIdeal
 public import AdicModules.RingTheory.Perfection
 public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.FrobeniusCore

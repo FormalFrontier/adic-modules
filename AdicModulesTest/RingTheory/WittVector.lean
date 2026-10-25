@@ -28,7 +28,9 @@ import Mathlib.RingTheory.WittVector.Identities
 import Mathlib.RingTheory.WittVector.Teichmuller
 
 /-!
-# Characteristic casts, units, locality, reducedness and prime multiplication and Teichmüller expansions in Witt vectors
+# Witt vector arithmetic and Teichmüller expansions
+
+Examples cover characteristic casts, units, locality, reducedness and prime multiplication.
 
 Although `3` vanishes in each coefficient ring of the two characteristic-three
 cast examples below, its cast into the Witt
@@ -144,7 +146,7 @@ example : teichmuller 2 (2 : ZMod 4) ≠ 0 ∧
     exact (by decide : (2 : ZMod 4) ≠ 0) hz
   · rw [← map_pow, show (2 : ZMod 4) ^ 2 = 0 by decide, teichmuller_zero]
   · intro hw
-    letI : IsReduced (ZMod 4) := (isReduced_iff (p := 2) (R := ZMod 4)).1 hw
+    have : IsReduced (ZMod 4) := (isReduced_iff (p := 2) (R := ZMod 4)).1 hw
     exact (by decide : (2 : ZMod 4) ≠ 0)
       (eq_zero_of_pow_eq_zero (n := 2) (by decide : (2 : ZMod 4) ^ 2 = 0))
 
@@ -292,7 +294,7 @@ private theorem trivSqZeroExt_zmod_three_teichmuller_torsion :
     teichmuller 3 (TrivSqZeroExt.inr (1 : ZMod 3) : TrivSqZeroExt (ZMod 3) (ZMod 3)) ≠ 0 ∧
       teichmuller 3 (TrivSqZeroExt.inr (1 : ZMod 3) : TrivSqZeroExt (ZMod 3) (ZMod 3)) *
         (3 : WittVector 3 (TrivSqZeroExt (ZMod 3) (ZMod 3))) = 0 := by
-  letI : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
+  have : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
     charP_of_injective_ringHom
       (f := TrivSqZeroExt.inlHom (ZMod 3) (ZMod 3)) TrivSqZeroExt.inl_injective 3
   constructor
@@ -321,7 +323,7 @@ private theorem trivSqZeroExt_zmod_three_teichmuller_coeff_cube_eq_zero :
     ∀ n : ℕ,
       (teichmuller 3
         (TrivSqZeroExt.inr (1 : ZMod 3) : TrivSqZeroExt (ZMod 3) (ZMod 3))).coeff n ^ 3 = 0 := by
-  letI : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
+  have : CharP (TrivSqZeroExt (ZMod 3) (ZMod 3)) 3 :=
     charP_of_injective_ringHom
       (f := TrivSqZeroExt.inlHom (ZMod 3) (ZMod 3)) TrivSqZeroExt.inl_injective 3
   exact (mul_p_eq_zero_iff_coeff_pow_eq_zero
@@ -371,7 +373,7 @@ private theorem adjoinRoot_zmod_three_X_fourth_teichmuller_torsion :
   let t : AdjoinRoot f := AdjoinRoot.root f
   let x : WittVector 3 (AdjoinRoot f) := teichmuller 3 t
   have hf : f.Monic := Polynomial.monic_X_pow 4
-  letI : CharP (AdjoinRoot f) 3 :=
+  have : CharP (AdjoinRoot f) 3 :=
     charP_of_injective_ringHom (f := AdjoinRoot.of f)
       (AdjoinRoot.of.injective_of_monic_of_degree_pos hf (by simp [f])) 3
   have ht_cube : t ^ 3 ≠ 0 := by
@@ -416,7 +418,7 @@ private theorem zmod_four_teichmuller_coeff_cube_zero_mul_three_ne_zero :
       teichmuller 3 (2 : ZMod 4) * (3 : WittVector 3 (ZMod 4)) ≠ 0 := by
   refine ⟨?_, ?_, ?_⟩
   · intro h
-    letI : CharP (ZMod 4) 3 := h
+    have : CharP (ZMod 4) 3 := h
     exact (by decide : (3 : ZMod 4) ≠ 0) (CharP.cast_eq_zero (ZMod 4) 3)
   · intro i
     cases i with

@@ -46,7 +46,7 @@ private theorem zmod_two_prod_zero_divisors :
 
 private theorem zmod_two_prod_not_isDomain : ¬ IsDomain ((ZMod 2) × (ZMod 2)) := by
   intro h
-  letI : IsDomain ((ZMod 2) × (ZMod 2)) := h
+  have : IsDomain ((ZMod 2) × (ZMod 2)) := h
   exact (mul_eq_zero.mp zmod_two_prod_zero_divisors.2.2).elim
     zmod_two_prod_zero_divisors.1 zmod_two_prod_zero_divisors.2.1
 
@@ -97,7 +97,7 @@ private theorem dual_number_teichmuller_eps_ne_zero :
 private theorem dual_number_frobenius_teichmuller_eps :
     WittVector.frobenius
       (WittVector.teichmuller 2 (DualNumber.eps : DualNumber (ZMod 2))) = 0 := by
-  letI : CharP (DualNumber (ZMod 2)) 2 := dual_number_charP
+  have : CharP (DualNumber (ZMod 2)) 2 := dual_number_charP
   apply WittVector.ext
   intro n
   rw [WittVector.coeff_frobenius_charP]
@@ -127,7 +127,7 @@ private theorem zmod_two_prod_frobenius_bijective :
 
 private theorem dual_number_frobenius_not_bijective_of_criterion :
     ¬ Function.Bijective (@WittVector.frobenius 2 (DualNumber (ZMod 2)) _ _) := by
-  letI : CharP (DualNumber (ZMod 2)) 2 := dual_number_charP
+  have : CharP (DualNumber (ZMod 2)) 2 := dual_number_charP
   exact (WittVector.frobenius_bijective_iff 2 (DualNumber (ZMod 2))).not.mpr
     dual_number_not_perfect
 

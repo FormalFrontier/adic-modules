@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.RingTheory.HenselianCriterion
+import AdicModules.RingTheory.HenselianRadical
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
@@ -22,9 +23,10 @@ public import Mathlib.Algebra.GroupWithZero.Basic
 
 An integral homomorphism of commutative rings sends a Henselian pair to the pair
 formed by extending the ideal. In particular, this holds for surjective homomorphisms.
-If every element of a surjection's kernel is nilpotent, the source pair is Henselian
-if and only if its image pair is Henselian. Extension along an integral faithfully flat
-homomorphism also preserves and reflects the Henselian-pair property.
+A subideal of a Henselian ideal is Henselian. A surjection with Henselian kernel
+preserves and reflects the Henselian-pair property for arbitrary ideals; an
+elementwise-nil kernel is a special case. Extension along an integral faithfully
+flat homomorphism also preserves and reflects the Henselian-pair property.
 
 The integral case uses unique idempotent lifting in finite algebras. Finite subalgebras
 are chosen to contain the coefficients witnessing ideal membership; no
@@ -257,17 +259,57 @@ theorem map_of_surjective {R : Type u} {S : Type v} [CommRing R] [CommRing S]
   exact map_of_isIntegral I f
     (algebraMap_isIntegral_iff.mpr (Algebra.isIntegral_of_surjective hf))
 
-/-- A surjective homomorphism with elementwise-nil kernel preserves and reflects the
-Henselian-pair property.
+/-- A subideal of a Henselian ideal is Henselian.
 
-The nil-ideal case of the Stacks Project, Lemma 15.11.9 (Tag 0DYD), with the
-nil-ideal assertion of Lemma 15.11.2 (Tag 0ALI), concerns ideals containing the
-kernel. This statement extends that case to an arbitrary source ideal. Nilness is
-elementwise, with no uniform exponent; the kernel need not be contained in the
-source ideal. -/
-theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
+Containment is essential: every ring is Henselian at the zero ideal, whereas a
+nonzero ring is not Henselian at the unit ideal. -/
+theorem of_le {R : Type u} [CommRing R] {I J : Ideal R} (hIJ : I ≤ J)
+    [HenselianRing R J] : HenselianRing R I := by
+  apply (HenselianRing.iff_existsUnique_isIdempotentElem_map.{u, 0} I).mpr
+  intro B _ _ _ e0 he0
+  let K : Ideal B := I.map (algebraMap R B)
+  let L : Ideal B := J.map (algebraMap R B)
+  have hKL : K ≤ L := Ideal.map_mono hIJ
+  have : HenselianRing B L := map_of_isIntegral J (algebraMap R B)
+    (algebraMap_isIntegral_iff.mpr (inferInstance : Algebra.IsIntegral R B))
+  let C := B ⧸ K
+  let q : B →+* C := Ideal.Quotient.mk K
+  let M : Ideal C := L.map q
+  have : HenselianRing C M := map_of_surjective L q Ideal.Quotient.mk_surjective
+  obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (I := K) e0
+  have hbK : IsIdempotentElem (Ideal.Quotient.mk K b) := by
+    simpa only [hb] using he0
+  have hbL : IsIdempotentElem (Ideal.Quotient.mk L b) := by
+    rw [isIdempotentElem_iff, ← map_mul, Ideal.Quotient.eq] at hbK ⊢
+    exact hKL hbK
+  obtain ⟨e, he, hu⟩ := HenselianRing.existsUnique_isIdempotentElem L hbL
+  have heb : e - b ∈ L := (Ideal.Quotient.eq (I := L)).mp he.2
+  have hqe : Ideal.Quotient.mk M (q e) = Ideal.Quotient.mk M e0 := by
+    rw [← hb]
+    apply (Ideal.Quotient.eq (I := M)).mpr
+    change q e - q b ∈ L.map q
+    rw [← map_sub]
+    exact Ideal.mem_map_of_mem q heb
+  obtain ⟨c, _, hc⟩ := HenselianRing.existsUnique_isIdempotentElem M
+    (he0.map (Ideal.Quotient.mk M))
+  have he0eq : q e = e0 :=
+    (hc (q e) ⟨he.1.map q, hqe⟩).trans (hc e0 ⟨he0, rfl⟩).symm
+  refine ⟨e, ⟨he.1, he0eq⟩, ?_⟩
+  intro z hz
+  apply hu z
+  refine ⟨hz.1, ?_⟩
+  apply (Ideal.Quotient.eq (I := L)).mpr
+  exact hKL ((Ideal.Quotient.eq (I := K)).mp (hz.2.trans hb.symm))
+
+/-- A surjective homomorphism with Henselian kernel preserves and reflects the
+Henselian-pair property for every source ideal, without a containment assumption.
+
+The kernel hypothesis is necessary for an equivalence uniform in the source ideal:
+taking that ideal to be the kernel gives the zero image ideal, at which every ring
+is Henselian. -/
+theorem iff_map_of_surjective_of_henselian_ker {R : Type u} {S : Type v}
     [CommRing R] [CommRing S] (I : Ideal R) (f : R →+* S)
-    (hf : Function.Surjective f) (hker : ∀ x : R, f x = 0 → IsNilpotent x) :
+    (hf : Function.Surjective f) [HenselianRing R (RingHom.ker f)] :
     HenselianRing R I ↔ HenselianRing S (I.map f) := by
   constructor
   · intro hR
@@ -283,17 +325,8 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
     let C := B ⧸ J
     let q : B →+* C := Ideal.Quotient.mk J
     have hq : Function.Surjective q := Ideal.Quotient.mk_surjective
-    have hJ : ∀ b ∈ J, IsNilpotent b := by
-      have hle : J ≤ nilradical B := by
-        apply Ideal.map_le_iff_le_comap.mpr
-        intro r hr
-        exact mem_nilradical.mpr
-          ((hker r (RingHom.mem_ker.mp hr)).map (algebraMap R B))
-      intro b hb
-      exact mem_nilradical.mp (hle hb)
-    have hqnil : ∀ b ∈ RingHom.ker q, IsNilpotent b := by
-      intro b hb
-      exact hJ b (Ideal.Quotient.eq_zero_iff_mem.mp (RingHom.mem_ker.mp hb))
+    have : HenselianRing B J := map_of_isIntegral (RingHom.ker f)
+      (algebraMap R B) (algebraMap_isIntegral_iff.mpr inferInstance)
     -- The quotient action factors the given surjection.
     have hfactor : RingHom.ker f ≤ RingHom.ker (q.comp (algebraMap R B)) := by
       intro r hr
@@ -319,8 +352,12 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
       Ideal.quotientMap (IB.map q) q Ideal.le_comap_map
     have hχmk (b : B) : χ (Ideal.Quotient.mk IB b) =
         Ideal.Quotient.mk (IB.map q) (q b) := Ideal.quotientMap_mk
-    -- Nilness descends through this square even when J is not contained in IB.
-    have hχnil : ∀ x ∈ RingHom.ker χ, IsNilpotent x := by
+    let π : B →+* B ⧸ IB := Ideal.Quotient.mk IB
+    have : HenselianRing (B ⧸ IB) (J.map π) :=
+      map_of_surjective J π Ideal.Quotient.mk_surjective
+    -- The kernel of the quotient-square map is controlled by the image of J;
+    -- this does not require J ≤ IB.
+    have hχker : RingHom.ker χ ≤ J.map π := by
       intro x hx
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective (I := IB) x
       have hz := RingHom.mem_ker.mp hx
@@ -328,9 +365,11 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
       have hqb : q b ∈ IB.map q := Ideal.Quotient.eq_zero_iff_mem.mp hz
       obtain ⟨a, ha, hab⟩ := (Ideal.mem_map_iff_of_surjective q hq).mp hqb
       have hba : b - a ∈ RingHom.ker q := (RingHom.sub_mem_ker_iff q).mpr hab.symm
-      have hnil := (hqnil (b - a) hba).map (Ideal.Quotient.mk IB)
-      have ha0 : Ideal.Quotient.mk IB a = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr ha
-      simpa only [map_sub, ha0, sub_zero] using hnil
+      have hbaJ : b - a ∈ J :=
+        Ideal.Quotient.eq_zero_iff_mem.mp (RingHom.mem_ker.mp hba)
+      have hmem := Ideal.mem_map_of_mem π hbaJ
+      have ha0 : π a = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr ha
+      simpa only [map_sub, ha0, sub_zero] using hmem
     have hliftC : ∀ c0 : C ⧸ (I.map f).map (algebraMap S C),
         IsIdempotentElem c0 → ∃! c : C, IsIdempotentElem c ∧
           Ideal.Quotient.mk ((I.map f).map (algebraMap S C)) c = c0 := by
@@ -338,18 +377,20 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
       exact HenselianRing.existsUnique_isIdempotentElem_map (I.map f) hc0
     rw [himage] at hliftC
     obtain ⟨eC, heC, uniqueC⟩ := hliftC (χ e0) (he0.map χ)
-    obtain ⟨eB, heB, uniqueB⟩ :=
-      existsUnique_isIdempotentElem_eq_of_ker_isNilpotent q hqnil eC
-        (RingHom.mem_range.mpr (hq eC)) heC.1
+    obtain ⟨eB, heB, uniqueB⟩ := HenselianRing.existsUnique_isIdempotentElem J heC.1
     have heBraw : Ideal.Quotient.mk IB eB = e0 := by
-      apply eq_of_isNilpotent_sub_of_isIdempotentElem
-        (heB.1.map (Ideal.Quotient.mk IB)) he0
-      apply hχnil
-      apply (RingHom.sub_mem_ker_iff χ).mpr
-      calc
-        χ (Ideal.Quotient.mk IB eB) = Ideal.Quotient.mk (IB.map q) (q eB) := hχmk eB
-        _ = Ideal.Quotient.mk (IB.map q) eC := congrArg _ heB.2
-        _ = χ e0 := heC.2
+      have hsub : π eB - e0 ∈ J.map π := by
+        apply hχker
+        apply (RingHom.sub_mem_ker_iff χ).mpr
+        calc
+          χ (π eB) = Ideal.Quotient.mk (IB.map q) (q eB) := hχmk eB
+          _ = Ideal.Quotient.mk (IB.map q) eC := congrArg _ heB.2
+          _ = χ e0 := heC.2
+      have hred : Ideal.Quotient.mk (J.map π) (π eB) =
+          Ideal.Quotient.mk (J.map π) e0 := Ideal.Quotient.eq.mpr hsub
+      obtain ⟨a, _, ha⟩ := HenselianRing.existsUnique_isIdempotentElem (J.map π)
+        (he0.map (Ideal.Quotient.mk (J.map π)))
+      exact (ha (π eB) ⟨heB.1.map π, hred⟩).trans (ha e0 ⟨he0, rfl⟩).symm
     refine ⟨eB, ⟨heB.1, heBraw⟩, ?_⟩
     intro e he
     apply uniqueB e
@@ -359,5 +400,32 @@ theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
     calc
       Ideal.Quotient.mk (IB.map q) (q e) = χ (Ideal.Quotient.mk IB e) := (hχmk e).symm
       _ = χ e0 := congrArg χ he.2
+
+/-- A surjective homomorphism with elementwise-nil kernel preserves and reflects the
+Henselian-pair property.
+
+The nil-ideal case of the Stacks Project, Lemma 15.11.9 (Tag 0DYD), with the
+nil-ideal assertion of Lemma 15.11.2 (Tag 0ALI), concerns ideals containing the
+kernel. This statement extends that case to an arbitrary source ideal. Nilness is
+elementwise, with no uniform exponent; the kernel need not be contained in the
+source ideal. -/
+theorem iff_map_of_surjective_of_nil_ker {R : Type u} {S : Type v}
+    [CommRing R] [CommRing S] (I : Ideal R) (f : R →+* S)
+    (hf : Function.Surjective f) (hker : ∀ x : R, f x = 0 → IsNilpotent x) :
+    HenselianRing R I ↔ HenselianRing S (I.map f) := by
+  have hnil : RingHom.ker f ≤ (⊥ : Ideal R).radical := by
+    intro x hx
+    exact mem_nilradical.mpr (hker x (RingHom.mem_ker.mp hx))
+  have hrad : (RingHom.ker f).radical = (⊥ : Ideal R).radical := by
+    apply le_antisymm
+    · exact Ideal.radical_le_radical_iff.mpr hnil
+    · exact Ideal.radical_mono bot_le
+  have hbot : HenselianRing R (⊥ : Ideal R) := by
+    let : IsAdicComplete (⊥ : Ideal R) R := IsAdicComplete.bot R
+    exact IsAdicComplete.henselianRing R ⊥
+  have : HenselianRing R (RingHom.ker f) := (iff_radical _).mpr (by
+    rw [hrad]
+    exact (iff_radical (⊥ : Ideal R)).mp hbot)
+  exact iff_map_of_surjective_of_henselian_ker I f hf
 
 end HenselianRing

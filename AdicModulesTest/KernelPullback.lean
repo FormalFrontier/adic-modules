@@ -66,7 +66,7 @@ private def evenRay : Submodule ℕ (ℤ × ℤ) :=
   Submodule.span ℕ {((2 : ℤ), (0 : ℤ))}
 
 private theorem coneMap_apply (z : ℤ × ℤ) : coneMap z = (3 * z.1, 0) := by
-  simp [coneMap, leftInclusion, tripleFirst, LinearMap.inl_apply, nsmul_eq_mul]
+  simp [coneMap, leftInclusion, tripleFirst, nsmul_eq_mul]
 
 private theorem coneMap_characteristic : characteristicProp coneMap evenRay :=
   Submodule.comap_map_eq_sup_ker coneMap evenRay

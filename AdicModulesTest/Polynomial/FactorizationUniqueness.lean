@@ -25,7 +25,7 @@ private theorem eq_factors_powerSeries_int
     (hprod : g * h = X * (C (PowerSeries.X : PowerSeries ℤ) * X ^ 2 + X - 1))
     (hmap : g.map (PowerSeries.constantCoeff (R := ℤ)) = X) :
     g = X ∧ h = C (PowerSeries.X : PowerSeries ℤ) * X ^ 2 + X - 1 := by
-  letI : IsLocalHom (PowerSeries.constantCoeff (R := ℤ)) :=
+  have : IsLocalHom (PowerSeries.constantCoeff (R := ℤ)) :=
     ⟨fun _ hu => PowerSeries.isUnit_iff_constantCoeff.mpr hu⟩
   have hhmap : h.map (PowerSeries.constantCoeff (R := ℤ)) = X - 1 := by
     apply (monic_X : (X : ℤ[X]).Monic).isRegular.left
@@ -85,6 +85,6 @@ private theorem not_eq_factors_prod_fst :
       (sub_sub_cancel (X : ℤ[X]) 1)
   · intro heq
     have hcoeff := congrArg (fun p : (ℤ × ℤ)[X] => (p.coeff 0).2) heq
-    simpa using hcoeff
+    simp at hcoeff
 
 end Polynomial

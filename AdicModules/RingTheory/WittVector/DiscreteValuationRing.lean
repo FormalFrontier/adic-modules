@@ -184,20 +184,20 @@ theorem isDiscreteValuationRing_iff
       IsField R ∧ CharP R p ∧ PerfectRing R p := by
   constructor
   · rintro ⟨hDomain, hDVR⟩
-    letI : IsDomain (WittVector p R) := hDomain
-    letI : IsDiscreteValuationRing (WittVector p R) := hDVR
+    let : IsDomain (WittVector p R) := hDomain
+    let : IsDiscreteValuationRing (WittVector p R) := hDVR
     obtain ⟨hDomainR, hChar⟩ := (WittVector.isDomain_iff p R).mp hDomain
-    letI : IsDomain R := hDomainR
-    letI : CharP R p := hChar
+    let : IsDomain R := hDomainR
+    let : CharP R p := hChar
     have hKer :=
       ker_constantCoeff_eq_span_p_of_isDiscreteValuationRing (p := p) (R := R)
     exact ⟨isField_of_isDiscreteValuationRing (p := p) (R := R), hChar,
       perfectRing_of_ker_constantCoeff_eq_span_p (p := p) (R := R) hKer⟩
   · rintro ⟨hField, hChar, hPerfect⟩
     -- This adapter extends the given ring and preserves its operations.
-    letI : Field R := hField.toField
-    letI : CharP R p := hChar
-    letI : PerfectRing R p := hPerfect
+    let : Field R := hField.toField
+    let : CharP R p := hChar
+    let : PerfectRing R p := hPerfect
     exact ⟨inferInstance, WittVector.isDiscreteValuationRing⟩
 
 end WittVector

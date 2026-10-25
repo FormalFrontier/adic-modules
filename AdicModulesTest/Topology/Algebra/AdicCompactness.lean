@@ -35,7 +35,7 @@ or global instance is defined here.
 
 private theorem padic_three_power_quotients_finite (n : ℕ) :
     Finite (ℤ_[3] ⧸ (Ideal.span {(3 : ℤ_[3])}) ^ n) := by
-  letI : NeZero (3 ^ n) := ⟨pow_ne_zero n (by decide)⟩
+  let : NeZero (3 ^ n) := ⟨pow_ne_zero n (by decide)⟩
   have hker :
       RingHom.ker (PadicInt.toZModPow (p := 3) n) =
         Ideal.span {(3 : ℤ_[3]) ^ n} := by

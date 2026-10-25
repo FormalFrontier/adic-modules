@@ -208,7 +208,7 @@ private theorem threeAdic_power_lower_bound :
       ((1 : ℚ_[3]) ^ (3 ^ 1 : ℕ) - 4 ^ (3 ^ 1 : ℕ)) := by
   obtain ⟨hchar, hπ, _, _, _, _, hα, hβ, _, hdiff, _⟩ :=
     ValuationPowerModel.canonicalQ3_inputs
-  letI := hchar
+  let := hchar
   have hα' : 0 ≤ Padic.addValuation (1 : ℚ_[3]) := by
     simpa only [_root_.map_one] using hα
   have hβ' : 0 ≤ Padic.addValuation (4 : ℚ_[3]) := by

@@ -96,12 +96,12 @@ private lemma coordinateIdeal_nonzero_of_ne (i j : Fin 3) (hij : i ≠ j) :
     coordinateIdeal i ≠ ⊥ := by
   have hm : Pi.single j (1 : IntMatrix) ∈ coordinateIdeal i := by
     rw [mem_coordinateIdeal]
-    simp [Pi.single_apply, hij, hij.symm]
+    simp [hij]
   intro hbot
   have hz : (Pi.single j (1 : IntMatrix) : MatrixTuple) = 0 := by
     simpa only [hbot, Submodule.mem_bot] using hm
   have hj := congrArg (fun x : MatrixTuple ↦ x j) hz
-  have hone : (1 : IntMatrix) = 0 := by simpa using hj
+  have hone : (1 : IntMatrix) = 0 := by simp at hj
   exact one_ne_zero hone
 
 private theorem coordinateIdeals_nonzero_proper (i : Fin 3) :
@@ -120,7 +120,7 @@ private theorem coordinateIdeals_pairwise_comaximal :
   apply Submodule.mem_sup.mpr
   refine ⟨Pi.single j (1 : IntMatrix), ?_, 1 - Pi.single j (1 : IntMatrix), ?_, ?_⟩
   · rw [mem_coordinateIdeal]
-    simp [Pi.single_apply, hij, hij.symm]
+    simp [hij]
   · rw [mem_coordinateIdeal]
     simp
   · rw [add_comm, sub_add_cancel]
@@ -147,7 +147,7 @@ private lemma coordinateIdeal_mul_self (i : Fin 3) :
     by_cases hji : j = i
     · subst j
       simp [hi]
-    · simp [Pi.single_apply, hji]
+    · simp [hji]
   rw [← hmul]
   exact Ideal.mul_mem_mul hx he
 
@@ -172,7 +172,6 @@ private lemma coordinateEquiv_smul (i : Fin 3) (r : MatrixTuple)
       @SMul.smul MatrixTuple IntMatrix
         (coordinateEval i).toModule.toDistribMulAction.toMulAction.toSMul
         r (coordinateEquiv i q) := by
-  letI := (coordinateEval i).toModule
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective q
   have hmk : r • Ideal.Quotient.mk (coordinateIdeal i) x =
       Ideal.Quotient.mk (coordinateIdeal i) (r * x) := rfl
@@ -228,11 +227,9 @@ private lemma coordinateModelEquiv_smul (r : MatrixTuple)
         (Pi.module (Fin 3) (fun i ↦ MatrixTuple ⧸ coordinateIdeal i)
           MatrixTuple).toDistribMulAction.toMulAction.toSMul
         r (coordinateModelEquiv q) := by
-  letI canonicalModule :
+  let canonicalModule :
       Module MatrixTuple ((i : Fin 3) → MatrixTuple ⧸ coordinateIdeal i) :=
     Pi.module (Fin 3) (fun i ↦ MatrixTuple ⧸ coordinateIdeal i) MatrixTuple
-  letI : SMul MatrixTuple ((i : Fin 3) → MatrixTuple ⧸ coordinateIdeal i) :=
-    canonicalModule.toDistribMulAction.toMulAction.toSMul
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective q
   have hmk : r • Ideal.Quotient.mk (⨅ i, coordinateIdeal i) x =
       Ideal.Quotient.mk (⨅ i, coordinateIdeal i) (r * x) := rfl

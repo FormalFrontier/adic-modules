@@ -109,12 +109,12 @@ private lemma mem_columnSumKernel_iff (X : Mat) :
 private lemma firstProjection_mem : matrixUnit 1 1 ∈ firstColumnKernel := by
   apply (mem_firstColumnKernel_iff _).mpr
   intro r
-  simp [matrixUnit, Matrix.single_apply]
+  simp [matrixUnit]
 
 private lemma secondProjection_mem : matrixUnit 0 0 ∈ secondColumnKernel := by
   apply (mem_secondColumnKernel_iff _).mpr
   intro r
-  simp [matrixUnit, Matrix.single_apply]
+  simp [matrixUnit]
 
 private lemma sumProjection_mem : sumProjection ∈ columnSumKernel := by
   apply (mem_columnSumKernel_iff _).mpr
@@ -275,21 +275,18 @@ private theorem columnSumKernel_idempotent :
 
 private theorem firstColumnKernel_not_twoSided : ¬ firstColumnKernel.IsTwoSided := by
   intro h
-  letI := h
   have hm := firstColumnKernel.mul_mem_right (matrixUnit 1 0) firstProjection_mem
   have h10 := (mem_firstColumnKernel_iff _).mp hm 1
   norm_num [matrixUnits_mul, matrixUnit, Matrix.single_apply] at h10
 
 private theorem secondColumnKernel_not_twoSided : ¬ secondColumnKernel.IsTwoSided := by
   intro h
-  letI := h
   have hm := secondColumnKernel.mul_mem_right (matrixUnit 0 1) secondProjection_mem
   have h01 := (mem_secondColumnKernel_iff _).mp hm 0
   norm_num [matrixUnits_mul, matrixUnit, Matrix.single_apply] at h01
 
 private theorem columnSumKernel_not_twoSided : ¬ columnSumKernel.IsTwoSided := by
   intro h
-  letI := h
   have hm := columnSumKernel.mul_mem_right (matrixUnit 0 0) sumProjection_mem
   have h00 := (mem_columnSumKernel_iff _).mp hm 0
   norm_num [sumProjection, sub_mul, matrixUnits_mul, matrixUnit, Matrix.single_apply] at h00
@@ -369,7 +366,7 @@ private theorem binary_diagonal_surjective :
     (by simpa only [Submodule.ker_mkQ] using first_second_sup)]
   simp only [Submodule.range_mkQ]
   ext z
-  simp [Submodule.mem_prod]
+  simp
 
 private theorem binary_first_isomorphism :
     Nonempty ((Mat ⧸ LinearMap.ker (firstColumnKernel.mkQ.prod secondColumnKernel.mkQ)) ≃ₗ[Mat]

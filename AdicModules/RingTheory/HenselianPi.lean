@@ -85,7 +85,7 @@ theorem pi_iff (I : ∀ i, Ideal (R i)) :
   classical
   constructor
   · intro h i
-    letI : HenselianRing (∀ j, R j) (Ideal.pi I) := h
+    let : HenselianRing (∀ j, R j) (Ideal.pi I) := h
     have himage : (Ideal.pi I).map (Pi.evalRingHom R i) = I i := by
       apply le_antisymm
       · apply (Ideal.map_le_iff_le_comap (f := Pi.evalRingHom R i)).2
@@ -112,7 +112,7 @@ theorem pi_iff (I : ∀ i, Ideal (R i)) :
     simpa only [himage] using
       (HenselianRing.map_of_surjective (Ideal.pi I) (Pi.evalRingHom R i) heval)
   · intro h
-    letI : ∀ i, HenselianRing (R i) (I i) := h
+    let : ∀ i, HenselianRing (R i) (I i) := h
     exact HenselianRing.pi I
 
 end HenselianRing

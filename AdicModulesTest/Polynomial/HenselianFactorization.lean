@@ -30,7 +30,7 @@ private theorem padicInt_three_monic_factorization :
       g.Monic ∧ h.Monic ∧ (X ^ 2 - 4 : (PadicInt 3)[X]) = g * h ∧
         g.map (Ideal.Quotient.mk (Ideal.span {(3 : PadicInt 3)})) = X - 1 ∧
         h.map (Ideal.Quotient.mk (Ideal.span {(3 : PadicInt 3)})) = X + 1 := by
-  letI : HenselianRing (PadicInt 3) (Ideal.span {(3 : PadicInt 3)}) := by
+  have : HenselianRing (PadicInt 3) (Ideal.span {(3 : PadicInt 3)}) := by
     have hmax : IsLocalRing.maximalIdeal (PadicInt 3) =
         Ideal.span {(3 : PadicInt 3)} := by
       simpa only [Nat.cast_ofNat] using (PadicInt.maximalIdeal_eq_span_p (p := 3))
@@ -64,7 +64,7 @@ private theorem zmod_one_monic_factorization :
       g.Monic ∧ h.Monic ∧ (1 : (ZMod 1)[X]) = g * h ∧
         g.map (Ideal.Quotient.mk (⊤ : Ideal (ZMod 1))) = 1 ∧
         h.map (Ideal.Quotient.mk (⊤ : Ideal (ZMod 1))) = 1 := by
-  letI : HenselianRing (ZMod 1) (⊤ : Ideal (ZMod 1)) :=
+  have : HenselianRing (ZMod 1) (⊤ : Ideal (ZMod 1)) :=
     IsAdicComplete.henselianRing (ZMod 1) ⊤
   obtain ⟨g, h, hgm, hhm, _, hgh, hredg, hredh⟩ :=
     Polynomial.exists_monic_factorization_of_isAdicComplete (⊤ : Ideal (ZMod 1))

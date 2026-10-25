@@ -126,7 +126,7 @@ private theorem nine_principal_cube :
     simpa only [← htwo] using hn)
   have hcomplete : IsAdicComplete J (ZMod 9) :=
     { toIsHausdorff := hhaus, toIsPrecomplete := hprec }
-  letI : IsAdicComplete J (ZMod 9) := hcomplete
+  have : IsAdicComplete J (ZMod 9) := hcomplete
   have hhens : HenselianRing (ZMod 9) J := IsAdicComplete.henselianRing _ _
   have hthree : ¬ IsUnit (3 : ZMod 9) := by
     intro h

@@ -53,6 +53,8 @@ public import AdicModulesTest.RingTheory.HenselianCriterion
 public import AdicModulesTest.RingTheory.HenselianFaithfullyFlat
 public import AdicModulesTest.RingTheory.HenselianTransport
 public import AdicModulesTest.RingTheory.HenselianIntegral
+public import AdicModulesTest.RingTheory.HenselianKernel
+public import AdicModulesTest.RingTheory.HenselianIdeal
 public import AdicModulesTest.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModulesTest.RingTheory.Ideal.Operations.MatrixNat
 public import AdicModulesTest.RingTheory.Ideal.Quotient.Finite

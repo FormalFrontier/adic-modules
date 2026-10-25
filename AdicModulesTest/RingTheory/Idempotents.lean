@@ -32,8 +32,8 @@ example :
   have hcomplete : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := by
     simpa [PadicInt.maximalIdeal_eq_span_p (p := 2)] using
       (inferInstance : IsAdicComplete (IsLocalRing.maximalIdeal ℤ_[2]) ℤ_[2])
-  letI : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := hcomplete
-  letI : HenselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])}) :=
+  have : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := hcomplete
+  have : HenselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])}) :=
     IsAdicComplete.henselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])})
   apply HenselianRing.existsUnique_isIdempotentElem (Ideal.span {(2 : ℤ_[2])})
   exact IsIdempotentElem.one.map (Ideal.Quotient.mk (Ideal.span {(2 : ℤ_[2])}))
@@ -51,10 +51,10 @@ example :
   have hcomplete : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := by
     simpa [PadicInt.maximalIdeal_eq_span_p (p := 2)] using
       (inferInstance : IsAdicComplete (IsLocalRing.maximalIdeal ℤ_[2]) ℤ_[2])
-  letI : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := hcomplete
-  letI : HenselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])}) :=
+  have : IsAdicComplete (Ideal.span {(2 : ℤ_[2])}) ℤ_[2] := hcomplete
+  have : HenselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])}) :=
     IsAdicComplete.henselianRing ℤ_[2] (Ideal.span {(2 : ℤ_[2])})
-  letI : Module.Finite ℤ_[2] (ℤ_[2] ⧸ Ideal.span {(2 : ℤ_[2])}) :=
+  have : Module.Finite ℤ_[2] (ℤ_[2] ⧸ Ideal.span {(2 : ℤ_[2])}) :=
     Module.finite_def.mpr <| by
       rw [← Ideal.Quotient.span_singleton_one (Ideal.span {(2 : ℤ_[2])})]
       exact Submodule.fg_span_singleton (1 : ℤ_[2] ⧸ Ideal.span {(2 : ℤ_[2])})
@@ -82,7 +82,7 @@ example :
   have hcomplete : IsAdicComplete (⊤ : Ideal (ZMod 1)) (ZMod 1) := by
     simpa only [hbot_top] using
       (inferInstance : IsAdicComplete (⊥ : Ideal (ZMod 1)) (ZMod 1))
-  letI : IsAdicComplete (⊤ : Ideal (ZMod 1)) (ZMod 1) := hcomplete
+  have : IsAdicComplete (⊤ : Ideal (ZMod 1)) (ZMod 1) := hcomplete
   refine ⟨IsAdicComplete.henselianRing (ZMod 1) (⊤ : Ideal (ZMod 1)), ?_⟩
   refine ⟨0, ⟨IsIdempotentElem.zero, rfl⟩, ?_⟩
   intro e _

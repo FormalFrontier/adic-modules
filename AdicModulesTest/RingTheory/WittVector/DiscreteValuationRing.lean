@@ -46,7 +46,7 @@ private theorem zmod_one_not_discreteValuationRing :
     ¬ IsField (ZMod 1) := by
   constructor
   · rintro ⟨hD, _⟩
-    letI : IsDomain (WittVector 3 (ZMod 1)) := hD
+    have : IsDomain (WittVector 3 (ZMod 1)) := hD
     exact (zero_ne_one : (0 : WittVector 3 (ZMod 1)) ≠ 1)
       (WittVector.ext fun _ ↦ Subsingleton.elim _ _)
   · exact not_isField_of_subsingleton (ZMod 1)
@@ -91,7 +91,7 @@ private theorem zmod_three_prod_not_discreteValuationRing :
     rw [hzero, teichmuller_zero]
   have hnotDomain : ¬ IsDomain (WittVector 3 (ZMod 3 × ZMod 3)) := by
     intro hD
-    letI : IsDomain (WittVector 3 (ZMod 3 × ZMod 3)) := hD
+    have : IsDomain (WittVector 3 (ZMod 3 × ZMod 3)) := hD
     exact (mul_ne_zero hx hy) hxy
   exact ⟨inferInstance, inferInstance, hnotField, hx, hy, hxy, hnotDomain,
     fun ⟨hD, _⟩ ↦ hnotDomain hD⟩
@@ -112,12 +112,12 @@ private theorem zmod_two_characteristic_separation :
       exact ⟨x, hcube x⟩
   have hnotchar : ¬ CharP (ZMod 2) 3 := by
     intro h
-    letI : CharP (ZMod 2) 3 := h
+    have : CharP (ZMod 2) 3 := h
     exact (by decide : (3 : ZMod 2) ≠ 0) (CharP.cast_eq_zero (ZMod 2) 3)
   have hnotdomain : ¬ IsDomain (WittVector 3 (ZMod 2)) := by
     intro h
-    letI : IsDomain (WittVector 3 (ZMod 2)) := h
-    letI : Invertible (3 : ZMod 2) :=
+    have : IsDomain (WittVector 3 (ZMod 2)) := h
+    have : Invertible (3 : ZMod 2) :=
       (invertibleOne : Invertible (1 : ZMod 2)).copy _ (by decide)
     let e := ghostEquiv 3 (ZMod 2)
     let f : ℕ → ZMod 2 := Pi.single 0 1
