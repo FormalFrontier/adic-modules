@@ -17,6 +17,10 @@ public import Mathlib.Algebra.Module.Equiv.Basic
 
 Reduction modulo an ideal acts on endomorphisms of the original module, with
 scalars unchanged. The quotient and its induced maps are Mathlib's constructions.
+Reduction is injective when the ideal annihilates the module, over any ring.
+When scalar multiplications commute on the module, this condition also
+characterizes injectivity, with no finiteness or projectivity assumption.
+In particular, the criterion applies over every commutative ring.
 For projective modules, every endomorphism of the quotient lifts to an
 endomorphism of the original module. For finite projective modules over a
 commutative ring, every quotient automorphism lifts when the ideal is contained
@@ -88,6 +92,20 @@ theorem reduceModIdeal_eq_iff (I : Ideal R) (f g : Module.End R M) :
     intro m
     exact (Submodule.Quotient.eq (I • (⊤ : Submodule R M))).mpr (h m)
 
+/-- Reduction is injective if the ideal annihilates the original module. -/
+theorem reduceModIdeal_injective_of_le_annihilator (I : Ideal R)
+    (hI : I ≤ Module.annihilator R M) :
+    Function.Injective (reduceModIdeal (R := R) (M := M) I) := by
+  have hzero : I • (⊤ : Submodule R M) ≤ ⊥ := by
+    apply Submodule.smul_le.mpr
+    intro a ha m _
+    simpa only [Submodule.mem_bot] using Module.mem_annihilator.mp (hI ha) m
+  intro f g h
+  apply LinearMap.ext
+  intro m
+  have hm := hzero ((reduceModIdeal_eq_iff I f g).mp h m)
+  simpa only [Submodule.mem_bot, sub_eq_zero] using hm
+
 /-- Every endomorphism of an ideal-smul quotient of a projective module lifts to
 an endomorphism of the original module. -/
 theorem reduceModIdeal_surjective [Module.Projective R M] (I : Ideal R) :
@@ -103,12 +121,26 @@ theorem reduceModIdeal_surjective [Module.Projective R M] (I : Ideal R) :
 
 /-- Reduction modulo the zero ideal loses no endomorphisms. -/
 theorem reduceModIdeal_injective_bot :
-    Function.Injective (reduceModIdeal (M := M) (⊥ : Ideal R)) := by
-  intro f g h
-  apply LinearMap.ext
-  intro m
-  have hm := (reduceModIdeal_eq_iff (⊥ : Ideal R) f g).mp h m
-  simpa only [Submodule.bot_smul, Submodule.mem_bot, sub_eq_zero] using hm
+    Function.Injective (reduceModIdeal (M := M) (⊥ : Ideal R)) :=
+  reduceModIdeal_injective_of_le_annihilator ⊥ bot_le
+
+/-- When scalar multiplications commute on the module, reduction is injective
+exactly when the ideal annihilates the original module. No finiteness or
+projectivity is required. In particular, this applies over a commutative ring. -/
+theorem reduceModIdeal_injective_iff [SMulCommClass R R M] (I : Ideal R) :
+    Function.Injective (reduceModIdeal (R := R) (M := M) I) ↔
+      I ≤ Module.annihilator R M := by
+  constructor
+  · intro hinj a ha
+    apply Module.mem_annihilator.mpr
+    intro m
+    have hred : reduceModIdeal I (a • (1 : Module.End R M)) = reduceModIdeal I 0 := by
+      apply (reduceModIdeal_eq_iff I _ _).mpr
+      intro x
+      simpa using (Submodule.smul_mem_smul ha (show x ∈ (⊤ : Submodule R M) by trivial))
+    have hscalar := hinj hred
+    simpa using DFunLike.congr_fun hscalar m
+  · exact reduceModIdeal_injective_of_le_annihilator I
 
 end Ring
 
