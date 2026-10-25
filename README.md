@@ -10,7 +10,10 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   pair is Henselian if and only if every component pair is Henselian.
   [`HenselianRing.pi` and `HenselianRing.pi_iff`](AdicModules/RingTheory/HenselianPi.lean)
   provide the construction instance and characterization, with independent index
-  and ring universes, including empty products and trivial rings.
+  and ring universes, including empty products and trivial rings. For binary
+  products, `HenselianRing.prod` and `HenselianRing.prod_iff` give
+  `HenselianRing (R × S) (I.prod J) ↔ HenselianRing R I ∧ HenselianRing S J`
+  for arbitrary ideals in independently universed commutative rings.
 
 Rings are commutative; modules are additive commutative groups unless specified otherwise.
 
@@ -208,6 +211,11 @@ Rings are commutative; modules are additive commutative groups unless specified 
   surjective ring homomorphism recovers the source's greatest Henselian ideal
   when the kernel is Henselian.
   See [`HenselianIdeal`](AdicModules/RingTheory/HenselianIdeal.lean).
+  The greatest Henselian ideal is componentwise for arbitrary dependent products,
+  including empty products, and for binary products of independently universed rings:
+  `Ideal.henselianRadical (∀ i, R i) = Ideal.pi (fun i => Ideal.henselianRadical (R i))`
+  and `Ideal.henselianRadical (R × S) = (Ideal.henselianRadical R).prod (Ideal.henselianRadical S)`.
+  See [`Ideal.henselianRadical_pi` and `Ideal.henselianRadical_prod`](AdicModules/RingTheory/HenselianPi.lean).
 
 ## Using the library
 

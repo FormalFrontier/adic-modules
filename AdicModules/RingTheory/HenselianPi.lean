@@ -5,10 +5,16 @@ Authors: Formal Frontier Agents
 module
 
 import AdicModules.RingTheory.HenselianTransport
+import Mathlib.Algebra.Ring.Fin
+import Mathlib.Algebra.Ring.ULift
+
+public import AdicModules.RingTheory.HenselianIdeal
 
 public import Mathlib.Algebra.Ring.Pi
+public import Mathlib.Algebra.Ring.Prod
 public import Mathlib.RingTheory.Henselian
 public import Mathlib.RingTheory.Ideal.Basic
+public import Mathlib.RingTheory.Ideal.Prod
 
 /-!
 # Henselian pairs in products
@@ -18,6 +24,16 @@ componentwise product ideal if and only if each component is Henselian at its id
 The index type is arbitrary, including the empty type.
 
 The statements use Mathlib's `HenselianRing` and `Ideal.pi`.
+Binary products allow the two factors to lie in independent universes. The greatest
+Henselian ideal commutes with dependent products and binary products.
+
+## References
+
+The product statements extend `HenselianRing.pi` and `HenselianRing.pi_iff` in this
+module, using Mathlib's `HenselianRing`, `Ideal.pi`, `Ideal.prod` and ring-map APIs.
+The greatest-ideal statements use `Ideal.henselianRadical`, its defining bound
+`Ideal.le_henselianRadical` and `HenselianRing.map_of_surjective` from
+`AdicModules.RingTheory.HenselianIdeal` and `AdicModules.RingTheory.HenselianTransport`.
 -/
 
 @[expose] public section
@@ -116,3 +132,107 @@ theorem pi_iff (I : ∀ i, Ideal (R i)) :
     exact HenselianRing.pi I
 
 end HenselianRing
+
+/-- A binary product of Henselian pairs is Henselian at the product ideal. -/
+instance HenselianRing.prod {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (I : Ideal R) (J : Ideal S) [HenselianRing R I] [HenselianRing S J] :
+    HenselianRing (R × S) (I.prod J) := by
+  -- Lift the factors to a common universe for the dependent-product instance.
+  let eR : ULift.{v} R ≃+* R := ULift.ringEquiv
+  let eS : ULift.{u} S ≃+* S := ULift.ringEquiv
+  have hR : HenselianRing (ULift.{v} R) (I.comap eR) := by
+    simpa only [Ideal.map_coe, Ideal.map_symm] using
+      (HenselianRing.map_of_surjective I (eR.symm : R →+* ULift.{v} R) eR.symm.surjective)
+  have hS : HenselianRing (ULift.{u} S) (J.comap eS) := by
+    simpa only [Ideal.map_coe, Ideal.map_symm] using
+      (HenselianRing.map_of_surjective J (eS.symm : S →+* ULift.{u} S) eS.symm.surjective)
+  let T : Fin 2 → Type (max u v) :=
+    Fin.cases (ULift.{v} R) (fun _ => ULift.{u} S)
+  let : ∀ i, CommRing (T i) := by
+    intro i
+    refine Fin.cases ?_ (fun _ => ?_) i
+    · change CommRing (ULift.{v} R)
+      infer_instance
+    · change CommRing (ULift.{u} S)
+      infer_instance
+  let K : ∀ i, Ideal (T i) := by
+    intro i
+    refine Fin.cases ?_ (fun _ => ?_) i
+    · change Ideal (ULift.{v} R)
+      exact I.comap eR
+    · change Ideal (ULift.{u} S)
+      exact J.comap eS
+  let : ∀ i, HenselianRing (T i) (K i) := by
+    intro i
+    refine Fin.cases ?_ (fun _ => ?_) i
+    · change HenselianRing (ULift.{v} R) (I.comap eR)
+      exact hR
+    · change HenselianRing (ULift.{u} S) (J.comap eS)
+      exact hS
+  let : HenselianRing (∀ i, T i) (Ideal.pi K) := HenselianRing.pi K
+  let e : (∀ i, T i) ≃+* R × S := (RingEquiv.piFinTwo T).trans (by
+    change ULift.{v} R × ULift.{u} S ≃+* R × S
+    exact RingEquiv.prodCongr eR eS)
+  have himage : (Ideal.pi K).map (e : (∀ i, T i) →+* R × S) = I.prod J := by
+    rw [Ideal.map_comap_of_equiv e]
+    ext x
+    change (∀ i, e.symm x i ∈ K i) ↔ x.1 ∈ I ∧ x.2 ∈ J
+    rw [Fin.forall_fin_two]
+    rfl
+  simpa only [himage] using
+    (HenselianRing.map_of_surjective (Ideal.pi K) (e : (∀ i, T i) →+* R × S) e.surjective)
+
+/-- A binary product is Henselian exactly when both factors are Henselian. -/
+theorem HenselianRing.prod_iff {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (I : Ideal R) (J : Ideal S) :
+    HenselianRing (R × S) (I.prod J) ↔ HenselianRing R I ∧ HenselianRing S J := by
+  constructor
+  · intro h
+    let : HenselianRing (R × S) (I.prod J) := h
+    constructor
+    · simpa only [Ideal.map_fst_prod] using
+        (HenselianRing.map_of_surjective (I.prod J) (RingHom.fst R S) Prod.fst_surjective)
+    · simpa only [Ideal.map_snd_prod] using
+        (HenselianRing.map_of_surjective (I.prod J) (RingHom.snd R S) Prod.snd_surjective)
+  · rintro ⟨hR, hS⟩
+    let : HenselianRing R I := hR
+    let : HenselianRing S J := hS
+    exact HenselianRing.prod I J
+
+/-- The greatest Henselian ideal of a dependent product is componentwise. -/
+theorem Ideal.henselianRadical_pi {ι : Type u} (R : ι → Type v) [∀ i, CommRing (R i)] :
+    Ideal.henselianRadical (∀ i, R i) = Ideal.pi (fun i => Ideal.henselianRadical (R i)) := by
+  classical
+  let : ∀ i, HenselianRing (R i) (Ideal.henselianRadical (R i)) :=
+    fun i => HenselianRing.henselianRadical (R i)
+  let : HenselianRing (∀ i, R i) (Ideal.henselianRadical (∀ i, R i)) :=
+    HenselianRing.henselianRadical _
+  apply le_antisymm
+  · intro x hx
+    apply (Ideal.mem_pi _ _).mpr
+    intro i
+    have h := HenselianRing.map_of_surjective
+      (Ideal.henselianRadical (∀ i, R i)) (Pi.evalRingHom R i)
+      (Function.surjective_eval i)
+    exact Ideal.le_henselianRadical _ h (Ideal.mem_map_of_mem (Pi.evalRingHom R i) hx)
+  · exact Ideal.le_henselianRadical _ (HenselianRing.pi _)
+
+/-- The greatest Henselian ideal of a binary product is the product ideal. -/
+theorem Ideal.henselianRadical_prod (R : Type u) (S : Type v) [CommRing R] [CommRing S] :
+    Ideal.henselianRadical (R × S) =
+      (Ideal.henselianRadical R).prod (Ideal.henselianRadical S) := by
+  let : HenselianRing R (Ideal.henselianRadical R) := HenselianRing.henselianRadical R
+  let : HenselianRing S (Ideal.henselianRadical S) := HenselianRing.henselianRadical S
+  let : HenselianRing (R × S) (Ideal.henselianRadical (R × S)) :=
+    HenselianRing.henselianRadical _
+  apply le_antisymm
+  · intro x hx
+    apply (Ideal.mem_prod _ _).mpr
+    constructor
+    · have h := HenselianRing.map_of_surjective
+        (Ideal.henselianRadical (R × S)) (RingHom.fst R S) Prod.fst_surjective
+      exact Ideal.le_henselianRadical _ h (Ideal.mem_map_of_mem (RingHom.fst R S) hx)
+    · have h := HenselianRing.map_of_surjective
+        (Ideal.henselianRadical (R × S)) (RingHom.snd R S) Prod.snd_surjective
+      exact Ideal.le_henselianRadical _ h (Ideal.mem_map_of_mem (RingHom.snd R S) hx)
+  · exact Ideal.le_henselianRadical _ (HenselianRing.prod _ _)
