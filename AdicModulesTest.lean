@@ -59,6 +59,7 @@ public import AdicModulesTest.RingTheory.HenselianIntegral
 public import AdicModulesTest.RingTheory.HenselianIntegralComap
 public import AdicModulesTest.RingTheory.HenselianKernel
 public import AdicModulesTest.RingTheory.HenselianIdeal
+public import AdicModulesTest.RingTheory.HenselianProductCriterion
 public import AdicModulesTest.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModulesTest.RingTheory.Ideal.Operations.MatrixNat
 public import AdicModulesTest.RingTheory.Ideal.Quotient.Finite

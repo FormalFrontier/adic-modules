@@ -248,4 +248,14 @@ theorem comap_henselianRadical_of_surjective_of_henselian_ker
       (le_henselianRadical _
         (HenselianRing.map_of_surjective (henselianRadical R) f hf))
 
+/-- A surjective ring homomorphism with Henselian kernel carries the greatest
+Henselian ideal onto the greatest Henselian ideal of the target. The source and
+target universes are independent. -/
+theorem map_henselianRadical_of_surjective_of_henselian_ker
+    {S : Type v} [CommRing S] (f : R →+* S) (hf : Function.Surjective f)
+    [HenselianRing R (RingHom.ker f)] :
+    (henselianRadical R).map f = henselianRadical S := by
+  simpa only [comap_henselianRadical_of_surjective_of_henselian_ker f hf] using
+    (map_comap_of_surjective f hf (henselianRadical S))
+
 end Ideal

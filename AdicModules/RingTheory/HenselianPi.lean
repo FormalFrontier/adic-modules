@@ -131,6 +131,22 @@ theorem pi_iff (I : ∀ i, Ideal (R i)) :
     let : ∀ i, HenselianRing (R i) (I i) := h
     exact HenselianRing.pi I
 
+/-- Henselianity at an arbitrary ideal of a dependent product is equivalent to
+Henselianity at each coordinate image ideal. -/
+theorem pi_iff_map (K : Ideal (∀ i, R i)) :
+    HenselianRing (∀ i, R i) K ↔
+      ∀ i, HenselianRing (R i) (K.map (Pi.evalRingHom R i)) := by
+  constructor
+  · intro h i
+    let : HenselianRing (∀ i, R i) K := h
+    exact HenselianRing.map_of_surjective K (Pi.evalRingHom R i)
+      (Function.surjective_eval i)
+  · intro h
+    let : ∀ i, HenselianRing (R i) (K.map (Pi.evalRingHom R i)) := h
+    apply HenselianRing.of_le (J := Ideal.pi (fun i => K.map (Pi.evalRingHom R i)))
+    intro x hx
+    exact (Ideal.mem_pi _ _).mpr fun i => Ideal.mem_map_of_mem (Pi.evalRingHom R i) hx
+
 end HenselianRing
 
 /-- A binary product of Henselian pairs is Henselian at the product ideal. -/
@@ -198,6 +214,16 @@ theorem HenselianRing.prod_iff {R : Type u} {S : Type v} [CommRing R] [CommRing 
     let : HenselianRing R I := hR
     let : HenselianRing S J := hS
     exact HenselianRing.prod I J
+
+/-- Henselianity at an arbitrary ideal of a binary product is equivalent to
+Henselianity at its two projection image ideals. -/
+theorem HenselianRing.prod_iff_map {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (K : Ideal (R × S)) :
+    HenselianRing (R × S) K ↔
+      HenselianRing R (K.map (RingHom.fst R S)) ∧
+        HenselianRing S (K.map (RingHom.snd R S)) := by
+  simpa only [← Ideal.ideal_prod_eq K] using
+    (HenselianRing.prod_iff (K.map (RingHom.fst R S)) (K.map (RingHom.snd R S)))
 
 /-- The greatest Henselian ideal of a dependent product is componentwise. -/
 theorem Ideal.henselianRadical_pi {ι : Type u} (R : ι → Type v) [∀ i, CommRing (R i)] :

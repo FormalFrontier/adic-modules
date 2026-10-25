@@ -14,6 +14,9 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   products, `HenselianRing.prod` and `HenselianRing.prod_iff` give
   `HenselianRing (R × S) (I.prod J) ↔ HenselianRing R I ∧ HenselianRing S J`
   for arbitrary ideals in independently universed commutative rings.
+  For an arbitrary ideal in a possibly infinite product, `HenselianRing.pi_iff_map`
+  characterizes Henselianity by its coordinate-image ideals. The binary form
+  `HenselianRing.prod_iff_map` also permits independent universes.
 
 Rings are commutative; modules are additive commutative groups unless specified otherwise.
 

@@ -237,4 +237,10 @@ example : Ideal.henselianRadical (Z2 × Z2) = twoIdeal.prod twoIdeal := by
 #print axioms two_pi_radical_eq
 #print axioms two_prod_radical_eq
 
+/-- The arbitrary-ideal projection criterion recovers the binary 2-adic example. -/
+example : HenselianRing (Z2 × Z2) (twoIdeal.prod twoIdeal) :=
+  (HenselianRing.prod_iff_map (twoIdeal.prod twoIdeal)).mpr
+    ⟨by simpa only [Ideal.map_fst_prod] using (inferInstance : HenselianRing Z2 twoIdeal),
+      by simpa only [Ideal.map_snd_prod] using (inferInstance : HenselianRing Z2 twoIdeal)⟩
+
 end HenselianIdealResearch
