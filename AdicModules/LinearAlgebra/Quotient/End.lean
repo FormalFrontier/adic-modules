@@ -18,7 +18,9 @@ public import Mathlib.Algebra.Module.Equiv.Basic
 Reduction modulo an ideal acts on endomorphisms of the original module, with
 scalars unchanged. The quotient and its induced maps are Mathlib's constructions.
 For projective modules, every endomorphism of the quotient lifts to an
-endomorphism of the original module.
+endomorphism of the original module. For finite projective modules over a
+commutative ring, every quotient automorphism lifts when the ideal is contained
+in the Jacobson radical of the module annihilator.
 For commutative scalars, restriction of scalars identifies this construction with
 Mathlib's `LinearMap.reduceModIdeal`. The finite-module unit-reflection statement
 combines Nakayama's lemma with
@@ -157,6 +159,22 @@ theorem isLocalHom_reduceModIdeal (I : Ideal R)
   exact (Module.End.isUnit_iff f).mpr
     (OrzechProperty.bijective_of_surjective_endomorphism f
       (LinearMap.range_eq_top.mp htop))
+
+/-- Every automorphism of an ideal-smul quotient of a finite projective module
+over a commutative ring lifts to an automorphism of the original module when the
+ideal lies in the Jacobson radical of the module annihilator.
+
+Projectivity lifts the underlying endomorphism; finite-module unit reflection,
+using Nakayama's lemma and Orzech's theorem as above, makes this lift a unit. -/
+theorem unitsMap_reduceModIdeal_surjective [Module.Projective R M] (I : Ideal R)
+    (hI : I ≤ Ideal.jacobson (Module.annihilator R M)) :
+    Function.Surjective (Units.map (reduceModIdeal (M := M) I).toMonoidHom) := by
+  let : IsLocalHom (reduceModIdeal (M := M) I) := isLocalHom_reduceModIdeal I hI
+  intro g
+  obtain ⟨f, hf⟩ := reduceModIdeal_surjective (M := M) I ↑g
+  have hfunit : IsUnit (reduceModIdeal I f) := hf.symm ▸ g.isUnit
+  obtain ⟨u, rfl⟩ := IsLocalHom.map_nonunit f hfunit
+  exact ⟨u, Units.ext hf⟩
 
 end CommRing
 
