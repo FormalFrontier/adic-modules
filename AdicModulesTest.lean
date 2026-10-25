@@ -26,6 +26,7 @@ public import AdicModulesTest.CofinalAdicCompletion
 public import AdicModulesTest.CompletedIntegers
 public import AdicModulesTest.CompletedLocalStructure
 public import AdicModulesTest.CompletedValuationComposite
+public import AdicModulesTest.CompletionFiniteness
 public import AdicModulesTest.CompositeValuationSubring
 public import AdicModulesTest.Correspondence
 public import AdicModulesTest.FractionFieldCompletenessPadicClient
@@ -49,6 +50,7 @@ public import AdicModulesTest.Polynomial.HenselianFactorization
 public import AdicModulesTest.Polynomial.RootUniqueness
 public import AdicModulesTest.PrimaryComponent
 public import AdicModulesTest.PrincipalAdicSpectrum
+public import AdicModulesTest.QuotientPiNaturality
 public import AdicModulesTest.RingTheory.FrobeniusCore
 public import AdicModulesTest.RingTheory.HenselianCriterion
 public import AdicModulesTest.RingTheory.HenselianFaithfullyFlat
