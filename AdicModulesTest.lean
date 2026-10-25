@@ -34,6 +34,7 @@ public import AdicModulesTest.HenselianPi
 public import AdicModulesTest.HenselianPiInputs
 public import AdicModulesTest.IdentityCongruence
 public import AdicModulesTest.KernelPullback
+public import AdicModulesTest.LinearAlgebra.Quotient.End
 public import AdicModulesTest.LinearAlgebra.SModEq.Pow
 public import AdicModulesTest.LinearAlgebra.TensorProduct.Quotient
 public import AdicModulesTest.LocalizedCompletion
