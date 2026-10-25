@@ -203,6 +203,7 @@ Rings are commutative; modules are additive commutative groups unless specified 
   exponent or Noetherian assumption is required.
   Moreover, every subideal of a Henselian ideal is Henselian
   (`HenselianRing.of_le`).
+  Henselian ideals also contract along integral faithfully flat maps.
   See [`HenselianTransport`](AdicModules/RingTheory/HenselianTransport.lean).
 - The Henselian ideals of any commutative ring are closed under arbitrary suprema,
   including the empty supremum. Their greatest element `Ideal.henselianRadical R`

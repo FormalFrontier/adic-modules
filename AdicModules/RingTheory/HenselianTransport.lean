@@ -301,6 +301,15 @@ theorem of_le {R : Type u} [CommRing R] {I J : Ideal R} (hIJ : I ≤ J)
   apply (Ideal.Quotient.eq (I := L)).mpr
   exact hKL ((Ideal.Quotient.eq (I := K)).mp (hz.2.trans hb.symm))
 
+/-- The contraction of a Henselian ideal along an integral faithfully flat ring
+homomorphism is Henselian. -/
+theorem comap_of_isIntegral_of_faithfullyFlat {R : Type u} {S : Type v}
+    [CommRing R] [CommRing S] (J : Ideal S) [HenselianRing S J] (f : R →+* S)
+    (hf : f.IsIntegral) (hff : f.FaithfullyFlat) : HenselianRing R (J.comap f) := by
+  let : HenselianRing S ((J.comap f).map f) :=
+    HenselianRing.of_le (I := (J.comap f).map f) (J := J) Ideal.map_comap_le
+  exact (iff_map_of_isIntegral_of_faithfullyFlat (J.comap f) f hf hff).mpr inferInstance
+
 /-- A surjective homomorphism with Henselian kernel preserves and reflects the
 Henselian-pair property for every source ideal, without a containment assumption.
 
