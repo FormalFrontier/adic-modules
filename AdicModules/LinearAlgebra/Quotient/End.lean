@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.Algebra.Module.Projective
 public import Mathlib.LinearAlgebra.Quotient.Basic
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 public import Mathlib.RingTheory.Ideal.Operations
@@ -16,6 +17,8 @@ public import Mathlib.Algebra.Module.Equiv.Basic
 
 Reduction modulo an ideal acts on endomorphisms of the original module, with
 scalars unchanged. The quotient and its induced maps are Mathlib's constructions.
+For projective modules, every endomorphism of the quotient lifts to an
+endomorphism of the original module.
 For commutative scalars, restriction of scalars identifies this construction with
 Mathlib's `LinearMap.reduceModIdeal`. The finite-module unit-reflection statement
 combines Nakayama's lemma with
@@ -82,6 +85,19 @@ theorem reduceModIdeal_eq_iff (I : Ideal R) (f g : Module.End R M) :
     apply Submodule.quot_hom_ext (I • (⊤ : Submodule R M)) _ _
     intro m
     exact (Submodule.Quotient.eq (I • (⊤ : Submodule R M))).mpr (h m)
+
+/-- Every endomorphism of an ideal-smul quotient of a projective module lifts to
+an endomorphism of the original module. -/
+theorem reduceModIdeal_surjective [Module.Projective R M] (I : Ideal R) :
+    Function.Surjective (reduceModIdeal (R := R) (M := M) I) := by
+  intro g
+  obtain ⟨f, hf⟩ := Module.projective_lifting_property
+    (I • (⊤ : Submodule R M)).mkQ (g.comp (I • (⊤ : Submodule R M)).mkQ)
+    (Submodule.mkQ_surjective _)
+  refine ⟨f, ?_⟩
+  apply Submodule.quot_hom_ext (I • (⊤ : Submodule R M)) _ _
+  intro m
+  exact DFunLike.congr_fun ((reduceModIdeal_comp_mkQ I f).trans hf) m
 
 /-- Reduction modulo the zero ideal loses no endomorphisms. -/
 theorem reduceModIdeal_injective_bot :
