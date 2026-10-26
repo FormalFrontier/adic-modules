@@ -24,7 +24,10 @@ project:
     comaximal-powers and real rational-axis applications. Coprime monic Hensel
     factor lifting over adically complete commutative rings and irreducible
     reduction from a global monic factor-lifting property, with an adically
-    complete corollary, are also included.
+    complete corollary, are also included. Henselian pairs are preserved by
+    nonempty directed ring direct limits with compatible ideals; a canonical
+    stage element belongs to the supremum of image ideals exactly when its
+    image belongs to an ideal at some later stage.
   authors:
     - "Formal Frontier Agents"
   responsible_maintainers:
@@ -37,7 +40,8 @@ sources:
     relationship: "independently-proves"
     note: >-
       Reusable mathematical constructions on Mathlib modules, ideals,
-      inverse limits, valuations, uniform completions and localization, together
+      inverse and direct limits, Henselian pairs, valuations, uniform completions
+      and localization, together
       with cyclic additive groups and canonical integer singleton spans in unital
       rings. No mathematical novelty or source-author endorsement is claimed.
   - title: "Foundations of Rigid Geometry I"
@@ -71,7 +75,56 @@ sources:
       with Mathlib's simple-root Henselian classes or whole-source coverage
       is asserted.
 
+  - title: "The Stacks Project"
+    authors:
+      - "The Stacks Project Authors"
+    id: "https://stacks.math.columbia.edu"
+    type: "reference work"
+    relationship: "background"
+    note: >-
+      Henselian-pair and finite-algebra criteria (Tags 09XI and 04GE),
+      integral transport (09XK), nested ideals (0DYD), nil ideals (0ALI),
+      and Nakayama's lemma (00DV). The etale-point condition in Tag 09XI
+      asserts existence; the library derives uniqueness separately using
+      rigidity of etale sections. No complete formalization of the source
+      is claimed.
+  - title: "Commutative Ring Theory"
+    authors:
+      - "Hideyuki Matsumura"
+    type: "book"
+    location: "Theorem 2.1 (Cayley-Hamilton)"
+    relationship: "background"
+    note: >-
+      Cited by the idempotent-lifting development, which uses Mathlib's
+      finite-module Cayley-Hamilton interface.
+  - title: "Onto endomorphisms are isomorphisms"
+    authors:
+      - "M. Orzech"
+    type: "article"
+    location: "American Mathematical Monthly 78 (1971), 357-362"
+    relationship: "background"
+    note: >-
+      The endomorphism unit-reflection argument uses the theorem through
+      Mathlib's Orzech formalization, together with Nakayama's lemma.
+
 related_formalizations:
+  - id: "https://github.com/FormalFrontier/group-theory"
+    relationship: "builds-on"
+    note: >-
+      The quotient-torsion equivalence supplies the completion-coordinate
+      comparison; the subgroup-basis total-boundedness interface is used
+      in the adic compactness criterion. The exact release is pinned in
+      lake-manifest.json.
+  - id: "https://github.com/FormalFrontier/multivariate-polynomials"
+    relationship: "builds-on"
+    note: >-
+      Strong finite-system Hensel lifting uses
+      MvPolynomial.eval₂_sub_eval₂_sub_sum_pderiv_mem_sq from the released
+      MultivariatePolynomials.Taylor interface. Its resolved dependency
+      graph also includes coherent-modules and algebraic-direct-limits;
+      these are transitive package dependencies, not additional directly
+      imported proof sources here. Exact public releases are pinned in
+      lake-manifest.json.
   - id: "https://github.com/leanprover-community/mathlib4"
     relationship: "builds-on"
     note: >-
@@ -129,6 +182,13 @@ automation:
 
 status:
   scope: >-
+    HenselianRing.directLimit preserves Henselian pairs under nonempty directed
+    systems of commutative rings whose transition homomorphisms map each ideal
+    into the later ideal. The target ideal is the supremum of the canonical
+    image ideals. Ring.DirectLimit.of_mem_iSup_map_iff characterizes eventual
+    ideal membership of a canonical stage element. Index and ring universes
+    are independent; neither transition injectivity or surjectivity, global
+    Noetherianity, properness, nontriviality nor completeness is required.
     Polynomial.exists_monic_factorization_of_isAdicComplete lifts coprime monic
     residue factors with both prescribed reductions over any commutative ring R,
     ideal I and IsAdicComplete I R. It requires no proper-ideal, local-ring,

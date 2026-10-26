@@ -72,6 +72,22 @@ mathematical references, not permission to copy protected expression or claims
 of complete source correspondence. No source PDF, scan, figure or substantial
 source excerpt is bundled.
 
+The Henselian-pair developments cite the Stacks Project Authors,
+*The Stacks Project*: the finite-algebra idempotent and étale-point criteria
+([Tag 09XI](https://stacks.math.columbia.edu/tag/09XI)), integral transport
+([Tag 09XK](https://stacks.math.columbia.edu/tag/09XK)), nested ideals
+([Tag 0DYD](https://stacks.math.columbia.edu/tag/0DYD)), nil ideals
+([Tag 0ALI](https://stacks.math.columbia.edu/tag/0ALI)), and finite algebras over
+Henselian local rings ([Tag 04GE](https://stacks.math.columbia.edu/tag/04GE)).
+The étale-point condition in Tag 09XI asserts existence; this library derives
+uniqueness separately using rigidity of étale sections. The idempotent-lifting
+module also cites Hideyuki Matsumura, *Commutative Ring Theory*, Theorem 2.1
+(Cayley–Hamilton), whose finite-module interface is supplied by Mathlib.
+The endomorphism unit-reflection argument uses Mathlib's formalizations of
+Nakayama's lemma ([Stacks Project, Tag 00DV](https://stacks.math.columbia.edu/tag/00DV))
+and Orzech's theorem: M. Orzech, *Onto endomorphisms are isomorphisms*,
+American Mathematical Monthly 78 (1971), 357–362.
+
 The valuation-integers completeness bridge is motivated by I. Fesenko and
 S. Vostokov, *Local Fields and Their Extensions*, second edition (2002),
 II §1, Corollary 1. It independently assembles Mathlib's valuation-integers,
@@ -235,6 +251,25 @@ Robert Y. Lewis) for `WittVector.ghostEquiv` when `p` is invertible.
 combines the two field cases through fraction fields of prime quotients and
 uses that test to make each coefficient nilpotent, hence zero over a reduced
 coefficient ring. Their author and Apache-2.0 notices remain in Mathlib.
+
+## Other deliverable interfaces
+
+The completion-coordinate comparison reuses the quotient-torsion equivalence
+from [Group Theory](https://github.com/FormalFrontier/group-theory); the adic
+compactness criterion reuses its subgroup-basis total-boundedness theorem.
+
+Strong Hensel lifting for finite polynomial systems reuses
+`MvPolynomial.eval₂_sub_eval₂_sub_sum_pderiv_mem_sq`, the first-order Taylor
+remainder theorem from
+[Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials).
+It is used through the released `MultivariatePolynomials.Taylor` interface,
+not by vendoring its proof text. The resolved package graph also includes
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules) and
+[Algebraic Direct Limits](https://github.com/FormalFrontier/algebraic-direct-limits)
+through Multivariate Polynomials. These are transitive package dependencies,
+not additional directly imported proof sources here. Exact public release pins
+are recorded in [lake-manifest.json](../lake-manifest.json); upstream licensing
+and contributor notices remain in those libraries.
 
 ## Comaximal powers and finite Chinese remainders
 

@@ -6,6 +6,83 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- Over a Henselian pair `(R, I)` with `R` any commutative ring, fix
+  `natDegree g₀ ≤ n`, `natDegree h₀ ≤ m` and
+  `d = Polynomial.resultant g₀ h₀ n m`. If `f - g₀*h₀` has degree `< n+m`
+  and coefficients in `(d²)I`, then `f = g*h` with corrections of degrees
+  `< n`, `< m` and coefficients in `(d)I`.
+  [`Polynomial.exists_factorization_of_resultant_sq_of_natDegree_le`](AdicModules/Polynomial/HenselianFactorization.lean)
+  needs no monicity or regularity. It preserves coefficients at and above the
+  prescribed bounds, not necessarily degrees or leading coefficients below loose
+  bounds. The actual-degree API preserves both individual leading coefficients.
+  [`Polynomial.exists_factorization_of_resultant_sq_map`](AdicModules/Polynomial/HenselianFactorization.lean)
+  transports the problem along any `φ : R →+* S` into a Henselian pair `(S, J)`
+  with `Ideal.map φ I ≤ J`: it retains `n`, `m` and `φ d` even when degrees drop,
+  and requires no Henselian source. It asserts neither target regularity nor
+  equality of product degrees.
+
+- Let `R` be any commutative ring, `I ≤ Ideal.jacobson (⊥ : Ideal R)`,
+  `natDegree g₀ ≤ n`, `natDegree h₀ ≤ m`, and
+  `d = Polynomial.resultant g₀ h₀ n m` a non-zero-divisor. Two factor pairs with
+  the same product are equal if each left correction from `g₀` has degree `< n`,
+  each right correction from `h₀` has degree `< m`, and all four corrections have
+  coefficients in `(d)I`.
+  [`Polynomial.eq_factors_of_regular_resultant`](AdicModules/Polynomial/HenselianFactorization.lean)
+  needs no Henselian hypothesis or squared-error condition. Over a Henselian pair,
+  combining this with the bounded squared-error criterion gives
+  [`Polynomial.existsUnique_factorization_of_resultant_sq_of_natDegree_le`](AdicModules/Polynomial/HenselianFactorization.lean).
+  Uniqueness is among pairs in this correction neighborhood, not among all
+  factorizations with only degree and congruence constraints. The actual-degree
+  existence, unique-existence and equality APIs remain available.
+
+- Over a Henselian pair `(R, I)` with `R` any commutative ring, a finite square
+  polynomial system whose errors at `a` lie in `I` and whose evaluated Jacobian
+  determinant is a unit in `R` has a unique exact root `b` with
+  `∀ i, b i - a i ∈ I`.
+  [`HenselianRing.existsUnique_root_of_isUnit_det_jacobian`](AdicModules/MvPolynomial/Hensel.lean)
+  requires neither locality nor adic completeness; the coefficient and index
+  universes are independent. A coupled system over the 2-adic integers is checked
+  in the [model](AdicModulesTest/MvPolynomial/Hensel.lean).
+
+- For a finite square polynomial system with commutative-semiring coefficients
+  evaluated through a coefficient map into a commutative ring `R`, a regular
+  evaluated Jacobian determinant `d` at `a` makes simultaneous evaluation injective
+  on `{x | ∀ i, x i - a i ∈ Ideal.span {d} * I}` whenever
+  `I ≤ Ideal.jacobson (⊥ : Ideal R)`.
+  [`MvPolynomial.injOn_eval₂_of_mem_nonZeroDivisors_det_jacobian`](AdicModules/MvPolynomial/Jacobian.lean)
+  needs neither a root at `a` nor a Henselian hypothesis. When `d` is a unit,
+  `(d)I = I`, recovering the full `I` neighborhood through the unchanged
+  [`MvPolynomial.injOn_eval_of_isUnit_det_jacobian`](AdicModules/MvPolynomial/Jacobian.lean). The scalar
+  specialization
+  [`Polynomial.injOn_eval₂_of_mem_nonZeroDivisors_derivative`](AdicModules/Polynomial/Evaluation.lean)
+  gives injectivity on `{b | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I}`
+  for an arbitrary target point `a`, a coefficient map `φ`, and a regular evaluated
+  derivative, with semiring coefficients and the same Jacobson condition.
+
+- For a finite square polynomial system over a commutative semiring, evaluated
+  through any coefficient homomorphism into a Henselian pair `(R, I)`, errors in
+  `(d²)I` lift to an exact root with coordinate corrections in `(d)I`, where `d`
+  is the evaluated Jacobian determinant.
+  [`HenselianRing.exists_eval₂_eq_of_sub_mem_det_sq_mul`](AdicModules/MvPolynomial/HenselDeterminant.lean)
+  requires no determinant regularity or source-image restriction on the target
+  values. With regular `d`,
+  [`HenselianRing.existsUnique_eval₂_eq_of_sub_mem_det_sq_mul`](AdicModules/MvPolynomial/HenselDeterminant.lean)
+  gives uniqueness inside the same correction box. Coefficient, target and index
+  universes are independent. For a Henselian ideal `M` with `(d) = M ^ v` and
+  `v ≤ s`, errors in `M ^ (2 * s + 1)` give a root whose coordinate corrections
+  lie in `M ^ (s + 1)` by
+  [`HenselianRing.exists_eval₂_eq_of_sub_mem_pow`](AdicModules/MvPolynomial/HenselDeterminant.lean).
+  With regular `d`,
+  [`HenselianRing.existsUnique_eval₂_eq_of_sub_mem_pow`](AdicModules/MvPolynomial/HenselDeterminant.lean)
+  gives uniqueness in this same ideal-power box.
+
+- If `I` is an ideal of a commutative ring `R`, a self-map `f : M → M` of an
+  `I`-adically complete `R`-module has a unique fixed point in `I • ⊤` when
+  it preserves that submodule and, for its points `x, y`, sends
+  `x - y ∈ I ^ n • ⊤` to `f x - f y ∈ I ^ (n + 1) • ⊤` for every `n : ℕ`.
+  [`IsAdicComplete.existsUnique_fixedPoint`](AdicModules/AdicCompletion/FixedPoint.lean)
+  uses the given module action, with independent ring and module universes.
+
 - For an arbitrary dependent family of commutative rings and ideals, the product
   pair is Henselian if and only if every component pair is Henselian.
   [`HenselianRing.pi` and `HenselianRing.pi_iff`](AdicModules/RingTheory/HenselianPi.lean)
@@ -17,6 +94,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   For an arbitrary ideal in a possibly infinite product, `HenselianRing.pi_iff_map`
   characterizes Henselianity by its coordinate-image ideals. The binary form
   `HenselianRing.prod_iff_map` also permits independent universes.
+
+- For a nonempty directed system of commutative rings and compatible ideals,
+  componentwise Henselianity gives Henselianity of the ring direct limit at the
+  supremum of the canonical image ideals.
+  [`HenselianRing.directLimit`](AdicModules/RingTheory/HenselianDirectLimit.lean)
+  permits noninjective and nonsurjective transition maps, independent index and
+  ring universes, and zero rings. Ideal compatibility requires only containment.
+  The [ideal membership criterion](AdicModules/RingTheory/Ideal/DirectLimit.lean)
+  characterizes membership of a canonical stage element by membership at some
+  later stage; no finite-generation or Noetherian hypothesis is needed.
 
 Rings are commutative; modules are additive commutative groups unless specified otherwise.
 
@@ -116,6 +203,13 @@ Rings are commutative; modules are additive commutative groups unless specified 
   image; `u` and `v` are independent. No locality, completeness, finite-free or
   projective algebra assumption is required. See the
   [finite-algebra criterion](AdicModules/RingTheory/HenselianCriterion.lean).
+- **Unique lifts of specified étale points.** For a Henselian pair `(R, I)`
+  with `R : Type u`, an étale algebra `A : Type v` with its given `R`-action,
+  and independent universes `u, v`, each specified `φ : A →ₐ[R] (R ⧸ I)`
+  lifts uniquely to `ψ : A →ₐ[R] R`, with
+  `(Ideal.Quotient.mkₐ R I).comp ψ = φ`. See
+  [`HenselianRing.existsUnique_algHom_lift_of_etale`](AdicModules/RingTheory/HenselianEtale.lean)
+  and the [quadratic `X² - X + 2` model over `ℤ₂`](AdicModulesTest/RingTheory/HenselianEtale.lean).
 - **Radical invariance of Henselian pairs.** For any commutative ring `R` and ideal
   `I`, `HenselianRing R I ↔ HenselianRing R I.radical`. No uniform nilpotence exponent
   or finiteness condition on the ring or ideal is needed. See
@@ -221,6 +315,19 @@ Rings are commutative; modules are additive commutative groups unless specified 
   and `Ideal.henselianRadical (R × S) = (Ideal.henselianRadical R).prod (Ideal.henselianRadical S)`.
   See [`Ideal.henselianRadical_pi` and `Ideal.henselianRadical_prod`](AdicModules/RingTheory/HenselianPi.lean).
 
+- **Localized coordinate algebras of square systems.**
+  [`MvPolynomial.etale_localizationAway_jacobian`, `residuePoint`, and
+  `residuePoint_apply_X`](AdicModules/RingTheory/Etale/PolynomialSystem.lean)
+  show that the equation quotient localized away from its Jacobian determinant
+  is étale, and give its quotient-ring point and coordinate values when the
+  equations vanish and the evaluated determinant is a unit modulo the
+  coefficient ideal.
+  In [`EtalePolynomialSystem`](AdicModulesTest/EtalePolynomialSystem.lean), the
+  example `X² - X - 2` over `ℤ`, modulo `(2)` at zero, has vanishing residual
+  equation, unit determinant `-1` modulo `(2)`, nontrivial coefficient quotient,
+  and is not affine. The constructed point is over `ℤ ⧸ (2)`; no integer point
+  or Henselian lifting theorem is asserted.
+
 ## Using the library
 
 Add a dependency to your project's `lakefile.toml`:
@@ -238,7 +345,8 @@ For an explicit version, replace `main` with a full release commit from its hist
 Use the Lean toolchain of the selected release; libraries used together must share
 a Mathlib revision.
 
-Then `import AdicModules`, or choose an individual module from the table below.
+Then `import AdicModules` for the root's exports, or import an individual module.
+Some leaves require their own imports; the selected module map below is not exhaustive.
 
 From a [build-checked test module](AdicModulesTest/RingTheory/WittVector/Domain.lean),
 not checked separately as a standalone snippet, this rules out a Witt-vector domain
@@ -275,8 +383,9 @@ Do not silently rebuild Mathlib; see [cache/resource caveats](docs/Guide.md#repr
 <a id="imports-and-module-map"></a>
 ## Contents
 
-The public root is `AdicModules`; narrower leaves and related tests are below.
-Test modules require separate imports and are not re-exported by the root.
+The public root is `AdicModules`; selected leaves and related tests are below.
+Test modules require separate imports and are not re-exported by that root.
+For the full source inventory, see the checked-in source directories and root modules.
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
@@ -286,6 +395,7 @@ Test modules require separate imports and are not re-exported by the root.
 | [Polynomial.Evaluation](AdicModules/Polynomial/Evaluation.lean) | [Polynomial.Evaluation](AdicModulesTest/Polynomial/Evaluation.lean) (derivative application, nonunit 3-adic derivative and zero boundary) |
 | [Polynomial.RootUniqueness](AdicModules/Polynomial/RootUniqueness.lean) | [Polynomial.RootUniqueness](AdicModulesTest/Polynomial/RootUniqueness.lean) |
 | [RingTheory.HenselianCriterion](AdicModules/RingTheory/HenselianCriterion.lean) | [RingTheory.HenselianCriterion](AdicModulesTest/RingTheory/HenselianCriterion.lean) |
+| [RingTheory.HenselianEtale](AdicModules/RingTheory/HenselianEtale.lean) | [RingTheory.HenselianEtale](AdicModulesTest/RingTheory/HenselianEtale.lean) (quadratic `X² - X + 2` étale model over `ℤ₂`) |
 | [RingTheory.Teichmuller](AdicModules/RingTheory/Teichmuller.lean) | [RingTheory.Teichmuller](AdicModulesTest/RingTheory/Teichmuller.lean) (usual normed 3-adic integers and perfect-field power series, with infinite residue fields) |
 | [RingTheory.TeichmullerFractionField](AdicModules/RingTheory/TeichmullerFractionField.lean) | [RingTheory.TeichmullerFractionFieldModel](AdicModulesTest/RingTheory/TeichmullerFractionFieldModel.lean) (usual 3-adics; a power-series fraction field with imperfect infinite residue field) |
 | [RingTheory.Perfection](AdicModules/RingTheory/Perfection.lean) | [RingTheory.TeichmullerCore](AdicModulesTest/RingTheory/TeichmullerCore.lean) (imperfect Laurent-series field, prime-field unit and zero boundaries) |
@@ -359,7 +469,13 @@ Ordinary builds and that output are not full transitive axiom assurance or proof
 - I. Fesenko and S. Vostokov, *Local Fields and Their Extensions*, second edition (2002).
 - K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I* (2017),
   [arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5).
-- [Detailed bibliography and result-specific credits](docs/Results.md#credits-references-and-scope).
+- The Stacks Project Authors, *The Stacks Project*: [Henselian pairs](https://stacks.math.columbia.edu/tag/09XI),
+  [Henselian local rings](https://stacks.math.columbia.edu/tag/04GE) and
+  [Nakayama's lemma](https://stacks.math.columbia.edu/tag/00DV).
+- H. Matsumura, *Commutative Ring Theory*, Theorem 2.1 (Cayley–Hamilton).
+- M. Orzech, *Onto endomorphisms are isomorphisms*, American Mathematical Monthly
+  78 (1971), 357–362.
+- [Detailed bibliography and result-specific credits](docs/CREDITS.md).
 
 <a id="credits-references-and-scope"></a>
 ## Credits and license
@@ -367,7 +483,10 @@ Ordinary builds and that output are not full transitive axiom assurance or proof
 Authors: Formal Frontier Agents. Developed and reviewed by Formal Frontier AI agents;
 not human peer review, source-author endorsement or complete source formalization.
 Reuses [Lean](https://lean-lang.org/), [Mathlib](https://github.com/leanprover-community/mathlib4)
-and [Group Theory](https://github.com/FormalFrontier/group-theory)'s scalar-torsion interface.
+and the scalar-torsion and total-boundedness interfaces from
+[Group Theory](https://github.com/FormalFrontier/group-theory), plus the first-order
+Taylor remainder theorem from
+[Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials).
 [Credits and provenance](docs/CREDITS.md) preserve project/adaptation authorship and
 upstream notices; [detailed credits](docs/Results.md#credits-references-and-scope) include
 the endomorphism and Witt-vector constructions. Licensed under [Apache-2.0](LICENSE).

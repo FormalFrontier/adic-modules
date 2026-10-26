@@ -4,12 +4,14 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModules.MvPolynomial.Jacobian
+public import Mathlib.Algebra.Polynomial.Derivative
 public import Mathlib.Algebra.Polynomial.Div
 public import Mathlib.RingTheory.Ideal.Operations
 public import Mathlib.RingTheory.Jacobson.Ideal
 
 /-!
-# Associated polynomial values at nearby arguments
+# Polynomial evaluation on scaled Jacobson-ideal neighborhoods
 
 If `I` lies in the Jacobson radical and `b - a ∈ (g(a)) I`, then `g(b)` and `g(a)`
 are associated in the coefficient ring. Applying this to `g = f.derivative` gives
@@ -18,6 +20,11 @@ stability of the derivative up to a unit without requiring that derivative to be
 The condition on `I` makes elements of `1 + I` units. Together with polynomial evaluation
 congruence, this avoids cancelling `g(a)` and includes zero values, zero divisors and the
 zero ring. No Henselian or completeness hypothesis is involved.
+
+For semiring coefficients evaluated in a commutative ring through a coefficient map,
+a regular derivative `d` at an arbitrary target point gives injectivity on the
+scaled neighborhood modulo `(d)I`. This specializes the multivariate Jacobian
+criterion via Mathlib's equivalence for polynomials in a unique variable.
 
 ## References
 
@@ -33,9 +40,61 @@ of Kenny Lau, Devon Tuma and Wojciech Nawrocki.
 
 @[expose] public section
 
-universe u
+universe u v w
+
+namespace MvPolynomial
+
+/-- The one-variable equivalence transports the polynomial derivative to the partial
+derivative in the unique variable. -/
+theorem pderiv_uniqueAlgEquiv_symm
+    {C : Type u} [CommSemiring C] {σ : Type w} [Unique σ]
+    (P : Polynomial C) (i : σ) :
+    pderiv i ((uniqueAlgEquiv C σ).symm P) =
+      (uniqueAlgEquiv C σ).symm P.derivative := by
+  classical
+  ext d
+  simp only [coeff_pderiv, coeff_uniqueAlgEquiv_symm, Polynomial.coeff_derivative,
+    Finsupp.add_apply, Unique.eq_default i, Finsupp.single_eq_same]
+
+end MvPolynomial
 
 namespace Polynomial
+
+/-- Evaluation through a coefficient map is injective on the `(d)I` neighborhood of
+an arbitrary target point, where `d` is the evaluated derivative, provided `d` is a
+non-zero-divisor and `I` lies in the target Jacobson radical. No root at the center
+or invertibility of the derivative is required. -/
+theorem injOn_eval₂_of_mem_nonZeroDivisors_derivative
+    {C : Type u} {R : Type v} [CommSemiring C] [CommRing R]
+    (φ : C →+* R) (I : Ideal R) (hI : I ≤ Ideal.jacobson (⊥ : Ideal R))
+    (P : Polynomial C) (a : R)
+    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R) :
+    Set.InjOn (P.eval₂ φ)
+      {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} := by
+  let Q := (MvPolynomial.uniqueAlgEquiv C Unit).symm P
+  let J : Matrix Unit Unit R := Matrix.of fun _ j =>
+    MvPolynomial.eval₂ φ (fun _ => a) (MvPolynomial.pderiv j Q)
+  have hdet : Matrix.det J = P.derivative.eval₂ φ a := by
+    rw [Matrix.det_unique]
+    change MvPolynomial.eval₂ φ (fun _ => a) (MvPolynomial.pderiv () Q) = _
+    dsimp only [Q]
+    rw [MvPolynomial.pderiv_uniqueAlgEquiv_symm,
+      MvPolynomial.eval₂_const_uniqueAlgEquiv_symm]
+  have hinj := MvPolynomial.injOn_eval₂_of_mem_nonZeroDivisors_det_jacobian
+    φ I hI (fun _ : Unit => Q) (fun _ => a)
+    (by change Matrix.det J ∈ nonZeroDivisors R; rwa [hdet])
+  intro b hb c hc hbc
+  have hpoints : (fun _ : Unit => b) = (fun _ : Unit => c) := by
+    apply hinj
+    · intro i
+      change b - a ∈ Ideal.span {Matrix.det J} * I
+      simpa only [Set.mem_ofPred_eq, hdet] using hb
+    · intro i
+      change c - a ∈ Ideal.span {Matrix.det J} * I
+      simpa only [Set.mem_ofPred_eq, hdet] using hc
+    · funext i
+      simpa only [Q, MvPolynomial.eval₂_const_uniqueAlgEquiv_symm] using hbc
+  exact congrFun hpoints ()
 
 variable {R : Type u} [CommRing R]
 

@@ -21,6 +21,11 @@ and Teichmüller images; ideal-power and valuation topologies; finite two-sided
 CRT; and span/closure comparisons.
 For example:
 
+- [Specified étale points over Henselian pairs](../AdicModules/RingTheory/HenselianEtale.lean)
+  lift uniquely with the given algebra action and independently quantified base
+  and algebra universes; see the
+  [quadratic `X² - X + 2` model over `ℤ₂`](../AdicModulesTest/RingTheory/HenselianEtale.lean).
+
 - For any ideal `I` in a commutative ring and any `n : ℕ`, finite generation
   of only `I ^ n` gives the canonical `R`-algebra equivalence between the
   completion modulo the `n`th power of the extended ideal and `R ⧸ I ^ n`.
@@ -49,9 +54,10 @@ These are current mathematical interfaces built on dependency-provided ideals,
 quotients, completions, topologies and perfection, not newly generated API entries
 or assertions of independent constructions of those stock objects.
 
-For the complete current **126-source** map (**56 production including root
-(55 leaves) + 70 tests/models/audit imports**), use the [Guide module map](Guide.md#module-map)
-and [root import map](../README.md#imports-and-module-map). See also
+For selected current modules and their roles, use the [Guide module map](Guide.md#module-map)
+and [README module map](../README.md#imports-and-module-map). These maps are
+nonexhaustive; the checked-in source directories and root modules give the full
+source inventory. See also
 [dependent products and completeness models](Guide.md#dependent-products-and-completeness-models)
 for the two product library leaves and the separate test-only proposition checks/contracts
 and nonzero/boundary models. The

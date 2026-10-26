@@ -7,9 +7,13 @@ public import AdicModules.RingTheory.WittVector.Frobenius
 
 public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.BoundedIdealPowerTorsion
+public import AdicModules.MvPolynomial.Jacobian
+public import AdicModules.MvPolynomial.HenselDeterminant
 public import AdicModules.Polynomial.Hensel
+public import AdicModules.Polynomial.HenselianFactorization
 public import AdicModules.Polynomial.Evaluation
 public import AdicModules.Polynomial.RootUniqueness
+public import AdicModules.Polynomial.ResultantPerturbation
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
@@ -36,9 +40,13 @@ public import AdicModules.LinearAlgebra.Correspondence
 public import AdicModules.LinearAlgebra.TensorProduct.Quotient
 public import AdicModules.RingTheory.Idempotents
 public import AdicModules.RingTheory.HenselianCriterion
+public import AdicModules.RingTheory.HenselianDirectLimit
+public import AdicModules.RingTheory.HenselianEtale
+public import AdicModules.RingTheory.HenselianEtaleCriterion
 public import AdicModules.RingTheory.HenselianRadical
 public import AdicModules.RingTheory.HenselianTransport
 public import AdicModules.RingTheory.HenselianIdeal
+public import AdicModules.RingTheory.HenselianLocality
 public import AdicModules.RingTheory.Perfection
 public import AdicModules.RingTheory.Teichmuller
 public import AdicModules.RingTheory.FrobeniusCore
@@ -47,6 +55,7 @@ public import AdicModules.RingTheory.WittVector
 public import AdicModules.RingTheory.WittVector.Domain
 public import AdicModules.RingTheory.WittVector.Complete
 public import AdicModules.RingTheory.WittVector.Torsion
+public import AdicModules.RingTheory.Ideal.DirectLimit
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.Quotient.Finite

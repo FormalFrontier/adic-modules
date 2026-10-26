@@ -1,7 +1,7 @@
 # Results and API detail
 
 This reference expands the [concise overview](../README.md#headline-results).
-The [Guide](Guide.md) gives usage and the complete current source map;
+The [Guide](Guide.md) gives usage and a selected current module map;
 [CREDITS](CREDITS.md) records project and upstream provenance.
 These are statements about the current library, not the historical API inventory.
 
@@ -577,6 +577,13 @@ base-change and equivalence APIs credited in that module.
 
 ## Henselian lifting and uniqueness
 
+- **Specified étale points.** For a Henselian pair `(R, I)` and an étale
+  `R`-algebra `A` with its given action, `R` and `A` may lie in independent
+  universes. Every specified `φ : A →ₐ[R] (R ⧸ I)` has a unique
+  `R`-algebra lift to `R`, whose reduction is exactly `φ`. See
+  [`HenselianRing.existsUnique_algHom_lift_of_etale`](../AdicModules/RingTheory/HenselianEtale.lean)
+  and the [quadratic `X² - X + 2` model over `ℤ₂`](../AdicModulesTest/RingTheory/HenselianEtale.lean).
+
 - **Monic factor lifting over Henselian pairs.** For an arbitrary commutative
   ring `R` and ideal `I` with Mathlib's `HenselianRing R I`, every ordered,
   prescribed coprime monic factorization of a monic polynomial modulo `I`
@@ -858,8 +865,9 @@ lake exe cache get
 lake build AdicModules AdicModulesTest
 ```
 
-Both libraries are default targets. `AdicModulesTest.+` includes the separate
-example files; there is no `AdicModulesTest.lean` aggregate root. See
+Both libraries are default targets. [`AdicModulesTest.lean`](../AdicModulesTest.lean)
+re-exports many test modules, but not every test file; `AdicModulesTest.+` also
+includes the separate example files. See
 [reproduction and resources](Guide.md#reproduction-and-resources) for build
 options, thread-setting limits and cold-machine caveats, not machine-size guarantees.
 The [historical API snapshot](API.md) and [generation notes](README.md)
@@ -959,4 +967,5 @@ Theory's rational half-class test.
 Ordinary builds and historical API output are not complete transitive
 standard-axiom assurance or stored-proof replay.
 
-For imports and the complete current source map, see the [Guide](Guide.md#module-map).
+For imports and a selected current module map, see the [Guide](Guide.md#module-map).
+The checked-in source directories and root modules give the full source inventory.

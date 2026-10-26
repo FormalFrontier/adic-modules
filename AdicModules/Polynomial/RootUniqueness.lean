@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.RingTheory.Henselian
+import AdicModules.Polynomial.Evaluation
 
 /-!
 # Uniqueness of polynomial roots under unit-reflecting maps
@@ -32,8 +33,17 @@ theorem IsRoot.eq_of_map_eq {R : Type u} {S : Type v} [CommRing R] [Semiring S]
     (hderiv : IsUnit (φ (f.derivative.eval a))) : a = b := by
   change f.eval a = 0 at ha
   change f.eval b = 0 at hb
-  let δ : R := b - a
-  have hδ : φ δ = 0 := by
+  have hd : IsUnit (f.derivative.eval a) := IsUnit.of_map φ _ hderiv
+  have hI : RingHom.ker φ ≤ Ideal.jacobson (⊥ : Ideal R) := by
+    intro x hx
+    apply Ideal.mem_jacobson_bot.mpr
+    intro y
+    apply IsUnit.of_map φ _
+    simpa only [map_add, map_mul, RingHom.mem_ker.mp hx, zero_mul, zero_add, map_one]
+      using (isUnit_one : IsUnit (1 : S))
+  have hspan : Ideal.span {f.derivative.eval a} * RingHom.ker φ = RingHom.ker φ := by
+    rw [Ideal.span_singleton_eq_top.mpr hd, Ideal.top_mul]
+  have hδ : b - a ∈ RingHom.ker φ := by
     change φ (b - a) = 0
     calc
       φ (b - a) = φ (b + -a) := by rw [sub_eq_add_neg]
@@ -41,21 +51,12 @@ theorem IsRoot.eq_of_map_eq {R : Type u} {S : Type v} [CommRing R] [Semiring S]
       _ = φ a + φ (-a) := by rw [hab]
       _ = φ (a + -a) := (map_add φ a (-a)).symm
       _ = 0 := by rw [add_neg_cancel, map_zero]
-  obtain ⟨c, hc⟩ := exists_mul_sq_add_linear_part_eq_eval_add f a δ
-  have hadd : a + δ = b := by
-    dsimp only [δ]
-    ring
-  have hlinear : c * δ ^ 2 + f.derivative.eval a * δ = 0 := by
-    simpa only [ha, hb, hadd, add_zero] using hc
-  have hfactor : δ * (c * δ + f.derivative.eval a) = 0 := by
-    calc
-      δ * (c * δ + f.derivative.eval a) =
-          c * δ ^ 2 + f.derivative.eval a * δ := by ring
-      _ = 0 := hlinear
-  have hunit : IsUnit (c * δ + f.derivative.eval a) := by
-    apply IsUnit.of_map φ _
-    simpa only [map_add, map_mul, hδ, mul_zero, zero_add] using hderiv
-  have hzero : δ = 0 := hunit.mul_left_eq_zero.mp hfactor
-  exact (sub_eq_zero.mp hzero).symm
+  have hinj := injOn_eval₂_of_mem_nonZeroDivisors_derivative
+    (RingHom.id R) (RingHom.ker φ) hI f a
+    (by simpa only [eval₂_id] using hd.mem_nonZeroDivisors)
+  apply hinj
+  · simp only [Set.mem_ofPred_eq, sub_self, Submodule.zero_mem]
+  · simpa only [Set.mem_ofPred_eq, eval₂_id, hspan] using hδ
+  · simp only [eval₂_id, ha, hb]
 
 end Polynomial

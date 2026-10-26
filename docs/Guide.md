@@ -951,8 +951,10 @@ These examples are not re-exported by `AdicModules`.
 
 ## Module map
 
-The library module names in the first table have prefix `AdicModules.`.
-The first table lists production modules, including the completion-exactness and finite-presentation comparisons,
+The tables below are nonexhaustive selections; the checked-in source directories
+and root modules give the full source inventory. The library module names in the
+first table have prefix `AdicModules.`.
+The first table lists selected production modules, including the completion-exactness and finite-presentation comparisons,
 Frobenius/Teichmüller interfaces, comaximal-powers theorems, finite Chinese
 remainder equivalence, left-ideal density criterion and dense-subsemiring span
 comparison. All four left-ideal
@@ -1032,9 +1034,10 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 
 ### Test and audit source roster
 
-All names in this table have prefix `AdicModulesTest.`. These are separate
-files, not imports of an `AdicModulesTest.lean` aggregate root (which does not
-exist). The four left-ideal and five `Span` model files retain original
+All names in this selected table have prefix `AdicModulesTest.`.
+[`AdicModulesTest.lean`](../AdicModulesTest.lean) re-exports many test modules,
+not every test file. The `AdicModulesTest.+` Lake glob also includes the separate
+files. The four left-ideal and five `Span` model files retain original
 calculations independent of the corresponding library proofs, with additional
 private applications in `Int`, `MatrixNat` and `Real`. They are not re-exported
 by the public root.

@@ -43,6 +43,7 @@ public import AdicModulesTest.LocalizedFiltration
 public import AdicModulesTest.LocalizedQuotientValuationSubring
 public import AdicModulesTest.LocalizedResidueField
 public import AdicModulesTest.LocalizedValuationSubring
+public import AdicModulesTest.MvPolynomial.Jacobian
 public import AdicModulesTest.Polynomial.Evaluation
 public import AdicModulesTest.Polynomial.FactorizationUniqueness
 public import AdicModulesTest.Polynomial.Hensel
@@ -53,12 +54,14 @@ public import AdicModulesTest.PrincipalAdicSpectrum
 public import AdicModulesTest.QuotientPiNaturality
 public import AdicModulesTest.RingTheory.FrobeniusCore
 public import AdicModulesTest.RingTheory.HenselianCriterion
+public import AdicModulesTest.RingTheory.HenselianEtale
 public import AdicModulesTest.RingTheory.HenselianFaithfullyFlat
 public import AdicModulesTest.RingTheory.HenselianTransport
 public import AdicModulesTest.RingTheory.HenselianIntegral
 public import AdicModulesTest.RingTheory.HenselianIntegralComap
 public import AdicModulesTest.RingTheory.HenselianKernel
 public import AdicModulesTest.RingTheory.HenselianIdeal
+public import AdicModulesTest.RingTheory.HenselianLocality
 public import AdicModulesTest.RingTheory.HenselianProductCriterion
 public import AdicModulesTest.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModulesTest.RingTheory.Ideal.Operations.MatrixNat
