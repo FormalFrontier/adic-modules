@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModules.LinearAlgebra.Quotient.Coefficients
 public import Mathlib.Algebra.Module.Projective
 public import Mathlib.LinearAlgebra.Quotient.Basic
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
@@ -17,6 +18,11 @@ public import Mathlib.Algebra.Module.Equiv.Basic
 
 Reduction modulo an ideal acts on endomorphisms of the original module, with
 scalars unchanged. The quotient and its induced maps are Mathlib's constructions.
+For nested left ideals, endomorphisms descend canonically between the two quotient
+modules, over the original ring. These reductions intertwine the quotient maps,
+are uniquely characterized by this square, and satisfy identity and composition.
+They are surjective when the original module is projective.
+
 Reduction is injective when the ideal annihilates the module, over any ring.
 When scalar multiplications commute on the module, this condition also
 characterizes injectivity, with no finiteness or projectivity assumption.
@@ -115,6 +121,61 @@ section Ring
 variable {R : Type u} [Ring R]
 variable {M : Type v} [AddCommGroup M] [Module R M]
 
+/-- A linear map between ideal-smul quotients that sends each representative to
+its class in the target has kernel equal to the target ideal acting on the source. -/
+private theorem ker_quotientMap_eq_smul_top (I J : Ideal R)
+    (q : (M ⧸ (I • (⊤ : Submodule R M))) →ₗ[R]
+      (M ⧸ (J • (⊤ : Submodule R M))))
+    (hq : ∀ m : M, q ((I • (⊤ : Submodule R M)).mkQ m) =
+      (J • (⊤ : Submodule R M)).mkQ m) :
+    LinearMap.ker q = J • (⊤ : Submodule R (M ⧸ (I • (⊤ : Submodule R M)))) := by
+  apply le_antisymm
+  · intro x hx
+    obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+    change q ((I • (⊤ : Submodule R M)).mkQ m) = 0 at hx
+    have heq : (J • (⊤ : Submodule R M)).mkQ m =
+        (J • (⊤ : Submodule R M)).mkQ (0 : M) := by
+      rw [map_zero]
+      exact (hq m).symm.trans hx
+    have hm : m ∈ J • (⊤ : Submodule R M) := by
+      simpa only [sub_zero] using
+        (Submodule.Quotient.eq (J • (⊤ : Submodule R M))).mp heq
+    exact (Submodule.smul_top_le_comap_smul_top J
+      (I • (⊤ : Submodule R M)).mkQ) hm
+  · apply Submodule.smul_le.mpr
+    intro a ha x _
+    obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+    change q ((I • (⊤ : Submodule R M)).mkQ (a • m)) = 0
+    rw [hq]
+    have hm : a • m - 0 ∈ J • (⊤ : Submodule R M) := by
+      simpa only [sub_zero] using
+        (Submodule.smul_mem_smul ha (show m ∈ (⊤ : Submodule R M) by trivial))
+    have heq : (J • (⊤ : Submodule R M)).mkQ (a • m) =
+        (J • (⊤ : Submodule R M)).mkQ (0 : M) :=
+      (Submodule.Quotient.eq (J • (⊤ : Submodule R M))).mpr hm
+    simpa only [map_zero] using heq
+
+private theorem smul_top_mono {J I : Ideal R} (hJI : J ≤ I) :
+    J • (⊤ : Submodule R M) ≤ I • (⊤ : Submodule R M) := by
+  apply Submodule.smul_le.mpr
+  intro a ha m _
+  exact Submodule.smul_mem_smul (hJI ha) (by trivial)
+
+private def quotientMapOfLE (I J : Ideal R) (hIJ : I ≤ J) :
+    (M ⧸ (I • (⊤ : Submodule R M))) →ₗ[R]
+      M ⧸ (J • (⊤ : Submodule R M)) :=
+  (I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+    (smul_top_mono hIJ)
+
+private theorem quotientMapOfLE_refl (I : Ideal R) :
+    quotientMapOfLE (M := M) I I le_rfl = LinearMap.id :=
+  Submodule.quot_hom_ext _ _ _ (fun _ => rfl)
+
+private theorem quotientMapOfLE_comp (I J K : Ideal R) (hIJ : I ≤ J) (hJK : J ≤ K) :
+    (quotientMapOfLE (M := M) J K hJK).comp (quotientMapOfLE I J hIJ) =
+      quotientMapOfLE I K (hIJ.trans hJK) :=
+  Submodule.quot_hom_ext _ _ _ (fun _ => rfl)
+
 /-- The endomorphism ring homomorphism induced on the quotient by `I • ⊤`. -/
 def reduceModIdeal (I : Ideal R) :
     Module.End R M →+* Module.End R (M ⧸ (I • (⊤ : Submodule R M))) where
@@ -183,6 +244,194 @@ theorem reduceModIdeal_surjective [Module.Projective R M] (I : Ideal R) :
   intro m
   exact DFunLike.congr_fun ((reduceModIdeal_comp_mkQ I f).trans hf) m
 
+/-- The canonical reduction between endomorphism rings of nested ideal-smul quotients.
+The scalar ring is unchanged; no projectivity or commutation of scalars is required. -/
+def reduceModIdealOfLE (I J : Ideal R) (hIJ : I ≤ J) :
+    Module.End R (M ⧸ (I • (⊤ : Submodule R M))) →+*
+      Module.End R (M ⧸ (J • (⊤ : Submodule R M))) := by
+  let q : (M ⧸ (I • (⊤ : Submodule R M))) →ₗ[R]
+      M ⧸ (J • (⊤ : Submodule R M)) :=
+    (I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+      (by exact smul_top_mono hIJ)
+  let F (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) :
+      Module.End R (M ⧸ (J • (⊤ : Submodule R M))) :=
+    (J • (⊤ : Submodule R M)).liftQ
+      (q.comp (f.comp (I • (⊤ : Submodule R M)).mkQ)) (by
+        intro m hm
+        have hmI : (I • (⊤ : Submodule R M)).mkQ m ∈
+            J • (⊤ : Submodule R (M ⧸ (I • (⊤ : Submodule R M)))) :=
+          Submodule.smul_top_le_comap_smul_top J (I • (⊤ : Submodule R M)).mkQ hm
+        have hfm : f ((I • (⊤ : Submodule R M)).mkQ m) ∈
+            J • (⊤ : Submodule R (M ⧸ (I • (⊤ : Submodule R M)))) :=
+          Submodule.smul_top_le_comap_smul_top J f hmI
+        have hker := ker_quotientMap_eq_smul_top I J q (fun _ => rfl)
+        exact (show f ((I • (⊤ : Submodule R M)).mkQ m) ∈ q.ker from hker.symm ▸ hfm))
+  have hF (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) (m : M) :
+      F f ((J • (⊤ : Submodule R M)).mkQ m) =
+        q (f ((I • (⊤ : Submodule R M)).mkQ m)) := rfl
+  have hFq (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M))))
+      (x : M ⧸ (I • (⊤ : Submodule R M))) : F f (q x) = q (f x) := by
+    obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+    rfl
+  exact
+    { toFun := F
+      map_zero' := by
+        apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+        intro m
+        exact (hF 0 m).trans q.map_zero
+      map_one' := by
+        apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+        intro m
+        rfl
+      map_add' := by
+        intro f g
+        apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+        intro m
+        change F (f + g) ((J • (⊤ : Submodule R M)).mkQ m) =
+          F f ((J • (⊤ : Submodule R M)).mkQ m) +
+            F g ((J • (⊤ : Submodule R M)).mkQ m)
+        rw [hF, hF, hF]
+        exact q.map_add _ _
+      map_mul' := by
+        intro f g
+        apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+        intro m
+        change F (f * g) ((J • (⊤ : Submodule R M)).mkQ m) =
+          F f (F g ((J • (⊤ : Submodule R M)).mkQ m))
+        rw [hF, hF, hFq]
+        rfl }
+
+/-- Nested reduction sends a quotient class to the image of its value under the
+canonical map between the two quotients. -/
+@[simp]
+theorem reduceModIdealOfLE_apply_mk (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) (m : M) :
+    reduceModIdealOfLE I J hIJ f (Submodule.Quotient.mk m) =
+      (I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+        (by exact smul_top_mono hIJ) (f (Submodule.Quotient.mk m)) := rfl
+
+/-- Nested reduction evaluated through the quotient linear map. -/
+theorem reduceModIdealOfLE_apply_mkQ (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) (m : M) :
+    reduceModIdealOfLE I J hIJ f ((J • (⊤ : Submodule R M)).mkQ m) =
+      (I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+        (by exact smul_top_mono hIJ) (f ((I • (⊤ : Submodule R M)).mkQ m)) := rfl
+
+/-- Nested reduction intertwines evaluation with the map between the quotients. -/
+@[simp]
+theorem reduceModIdealOfLE_apply_mapQ (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M))))
+    (x : M ⧸ (I • (⊤ : Submodule R M))) :
+    reduceModIdealOfLE I J hIJ f
+        ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+          (by exact smul_top_mono hIJ) x) =
+      (I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+        (by exact smul_top_mono hIJ) (f x) := by
+  obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+  rfl
+
+/-- The linear-map form of the canonical intertwining square. -/
+theorem reduceModIdealOfLE_comp_mapQ (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) :
+    (reduceModIdealOfLE I J hIJ f).comp
+        ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+          (by exact smul_top_mono hIJ)) =
+      ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+        (by exact smul_top_mono hIJ)).comp f := by
+  apply LinearMap.ext
+  intro x
+  exact reduceModIdealOfLE_apply_mapQ I J hIJ f x
+
+/-- An endomorphism is the nested reduction precisely when it intertwines with
+the canonical map between the two quotients. -/
+theorem reduceModIdealOfLE_eq_iff (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R (M ⧸ (I • (⊤ : Submodule R M))))
+    (g : Module.End R (M ⧸ (J • (⊤ : Submodule R M)))) :
+    g = reduceModIdealOfLE I J hIJ f ↔
+      g.comp ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+          (by exact smul_top_mono hIJ)) =
+        ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+          (by exact smul_top_mono hIJ)).comp f := by
+  constructor
+  · rintro rfl
+    exact reduceModIdealOfLE_comp_mapQ I J hIJ f
+  · intro h
+    apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+    intro m
+    rw [reduceModIdealOfLE_apply_mk]
+    exact DFunLike.congr_fun h ((I • (⊤ : Submodule R M)).mkQ m)
+
+/-- The intertwining square determines nested reduction as a ring homomorphism. -/
+theorem reduceModIdealOfLE_unique (I J : Ideal R) (hIJ : I ≤ J)
+    (φ : Module.End R (M ⧸ (I • (⊤ : Submodule R M))) →+*
+      Module.End R (M ⧸ (J • (⊤ : Submodule R M))))
+    (hφ : ∀ f, (φ f).comp
+        ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+          (by exact smul_top_mono hIJ)) =
+      ((I • (⊤ : Submodule R M)).mapQ (J • (⊤ : Submodule R M)) LinearMap.id
+        (by exact smul_top_mono hIJ)).comp f) :
+    φ = reduceModIdealOfLE I J hIJ := by
+  apply RingHom.ext
+  intro f
+  exact (reduceModIdealOfLE_eq_iff I J hIJ f (φ f)).mpr (hφ f)
+
+/-- Reduction between equal ideals is the identity on the endomorphism ring. -/
+@[simp]
+theorem reduceModIdealOfLE_refl (I : Ideal R) :
+    reduceModIdealOfLE (M := M) I I le_rfl =
+      RingHom.id (Module.End R (M ⧸ (I • (⊤ : Submodule R M)))) := by
+  apply RingHom.ext
+  intro f
+  apply Submodule.quot_hom_ext (I • (⊤ : Submodule R M)) _ _
+  intro m
+  rw [reduceModIdealOfLE_apply_mk]
+  exact DFunLike.congr_fun (quotientMapOfLE_refl (M := M) I)
+    (f ((I • (⊤ : Submodule R M)).mkQ m))
+
+/-- Canonical nested reductions compose along inclusions of left ideals. -/
+theorem reduceModIdealOfLE_comp (I J K : Ideal R) (hIJ : I ≤ J) (hJK : J ≤ K) :
+    (reduceModIdealOfLE (M := M) J K hJK).comp (reduceModIdealOfLE I J hIJ) =
+      reduceModIdealOfLE I K (hIJ.trans hJK) := by
+  apply RingHom.ext
+  intro f
+  apply Submodule.quot_hom_ext (K • (⊤ : Submodule R M)) _ _
+  intro m
+  simp only [RingHom.comp_apply]
+  rw [reduceModIdealOfLE_apply_mk, reduceModIdealOfLE_apply_mk,
+    reduceModIdealOfLE_apply_mk]
+  exact DFunLike.congr_fun (quotientMapOfLE_comp (M := M) I J K hIJ hJK)
+    (f ((I • (⊤ : Submodule R M)).mkQ m))
+
+/-- Nested reduction is compatible with reduction from the original module. -/
+theorem reduceModIdealOfLE_comp_reduceModIdeal (I J : Ideal R) (hIJ : I ≤ J) :
+    (reduceModIdealOfLE (M := M) I J hIJ).comp (reduceModIdeal I) =
+      reduceModIdeal J := by
+  apply RingHom.ext
+  intro f
+  apply Submodule.quot_hom_ext (J • (⊤ : Submodule R M)) _ _
+  intro m
+  simp only [RingHom.comp_apply]
+  rw [reduceModIdealOfLE_apply_mk, reduceModIdeal_apply_mk,
+    reduceModIdeal_apply_mk]
+  rfl
+
+/-- Reducing an original endomorphism in two stages equals its direct reduction. -/
+@[simp]
+theorem reduceModIdealOfLE_apply_reduceModIdeal (I J : Ideal R) (hIJ : I ≤ J)
+    (f : Module.End R M) :
+    reduceModIdealOfLE I J hIJ (reduceModIdeal I f) = reduceModIdeal J f :=
+  DFunLike.congr_fun (reduceModIdealOfLE_comp_reduceModIdeal I J hIJ) f
+
+/-- Nested reduction is surjective when the same original module is projective. -/
+theorem reduceModIdealOfLE_surjective [Module.Projective R M]
+    (I J : Ideal R) (hIJ : I ≤ J) :
+    Function.Surjective (reduceModIdealOfLE (M := M) I J hIJ) := by
+  have h : Function.Surjective
+      ((reduceModIdealOfLE (M := M) I J hIJ).comp (reduceModIdeal I)) := by
+    rw [reduceModIdealOfLE_comp_reduceModIdeal]
+    exact reduceModIdeal_surjective J
+  exact Function.Surjective.of_comp h
+
 /-- Reduction modulo the zero ideal loses no endomorphisms. -/
 theorem reduceModIdeal_injective_bot :
     Function.Injective (reduceModIdeal (M := M) (⊥ : Ideal R)) :=
@@ -205,12 +454,6 @@ theorem reduceModIdeal_injective_iff [SMulCommClass R R M] (I : Ideal R) :
     have hscalar := hinj hred
     simpa using DFunLike.congr_fun hscalar m
   · exact reduceModIdeal_injective_of_le_annihilator I
-
-private theorem smul_top_mono {J I : Ideal R} (hJI : J ≤ I) :
-    J • (⊤ : Submodule R M) ≤ I • (⊤ : Submodule R M) := by
-  apply Submodule.smul_le.mpr
-  intro a ha m _
-  exact Submodule.smul_mem_smul (hJI ha) (by trivial)
 
 private theorem exists_fg_le_of_mem_smul_top (I : Ideal R) {m : M}
     (hm : m ∈ I • (⊤ : Submodule R M)) :
