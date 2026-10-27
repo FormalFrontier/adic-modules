@@ -177,7 +177,14 @@ Rings are commutative; modules are additive commutative groups unless specified 
   any Henselian pair or adically complete ring. Over Henselian pairs, simple residue
   roots lift for arbitrary polynomials. With `d = f.derivative.eval a`, the condition
   `f.eval a ∈ Ideal.span {d^2} * I` gives a root `b` with `b-a ∈ Ideal.span {d} * I`
-  and `Associated (f.eval a) (d * (b-a))`, even for zero or nonunit `d`. At a maximal
+  and `Associated (f.eval a) (d * (b-a))`, even for zero or nonunit `d`.
+  For coefficients in any semiring `C` mapped by `φ : C →+* R` and arbitrary `a t : R`,
+  put `d = P.derivative.eval₂ φ a`. If `P.eval₂ φ a - t ∈ Ideal.span {d^2} * I`, there
+  is a solution of `P.eval₂ φ b = t` satisfying `b-a ∈ Ideal.span {d} * I` and
+  `Associated (P.eval₂ φ a - t) (d * (b-a))`; if `d ∈ nonZeroDivisors R`, it is unique
+  among all solutions in this same neighborhood. See
+  [`HenselianRing.exists_eval₂_eq_of_sub_mem_span_derivative_sq_mul`](AdicModules/Polynomial/Hensel.lean)
+  and `HenselianRing.existsUnique_eval₂_eq_of_sub_mem_span_derivative_sq_mul`. At a maximal
   ideal, **global** coprime monic factor lifting makes monic irreducibles reduce to
   positive powers of monic irreducibles; adic completeness supplies that global property.
   On principal units of a Henselian pair, the `n`-th power map is bijective if `n` is

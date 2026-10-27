@@ -8,6 +8,7 @@ public import Mathlib.RingTheory.Polynomial.UniversalFactorizationRing
 public import Mathlib.RingTheory.Smooth.AdicCompletion
 public import Mathlib.RingTheory.Henselian
 public import AdicModules.Polynomial.Coprime
+import AdicModules.Polynomial.Evaluation
 import Mathlib.Algebra.Module.Submodule.Range
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.LinearAlgebra.Matrix.Charpoly.LinearMap
@@ -49,6 +50,12 @@ reductions. No local-ring, Noetherian, finite-generation or proper-ideal hypothe
 The proof uses Mathlib's universal coprime factorization ring, which is étale, and the lifting
 property of formally smooth algebras over adically complete rings. These constructions are due
 to Andrew Yang and to Judith Ludwig and Christian Merten, respectively.
+
+For a polynomial with coefficients in any semiring mapped to a commutative Henselian pair,
+the small-error root estimate also solves arbitrary target equations. The correction lies
+in the derivative-scaled ideal, and the error is associated to the derivative times the
+correction, without a regularity assumption. A regular derivative makes the solution unique
+in that same correction neighborhood.
 
 ## Implementation notes
 
@@ -113,7 +120,7 @@ in the Jacobson radical. No converse or equivalence is asserted.
 
 @[expose] public section
 
-universe u
+universe u u₁
 
 namespace Polynomial
 
@@ -482,6 +489,57 @@ theorem exists_root_of_eval_mem_span_derivative_sq_mul (f : R[X]) (a : R)
       ring
     rw [herr]
     exact associated_mul_unit_left _ _ hu
+
+
+/-- Small error relative to the square of the derivative gives a solution of an arbitrary
+mapped polynomial equation over a Henselian pair. The error is associated to the derivative
+times the correction; the derivative need not be regular or a unit. This is the mapped-target
+form of `exists_root_of_eval_mem_span_derivative_sq_mul`, generalizing
+Fesenko–Vostokov, II, §1, Corollary 3. -/
+theorem exists_eval₂_eq_of_sub_mem_span_derivative_sq_mul
+    {C : Type u₁} [Semiring C] (φ : C →+* R) (P : C[X]) (a t : R)
+    (h : P.eval₂ φ a - t ∈ Ideal.span {P.derivative.eval₂ φ a ^ 2} * I) :
+    ∃ b : R, b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I ∧ P.eval₂ φ b = t ∧
+      Associated (P.eval₂ φ a - t) (P.derivative.eval₂ φ a * (b - a)) := by
+  let Q : R[X] := P.map φ - Polynomial.C t
+  have heval (x : R) : Q.eval x = P.eval₂ φ x - t := by
+    simp only [Q, eval_sub, eval_C, eval_map]
+  have hderiv : Q.derivative.eval a = P.derivative.eval₂ φ a := by
+    simp only [Q, derivative_sub, derivative_map, derivative_C, sub_zero, eval_map]
+  obtain ⟨b, hb, hba, hassoc⟩ :=
+    exists_root_of_eval_mem_span_derivative_sq_mul I Q a
+      (by simpa only [heval, hderiv] using h)
+  refine ⟨b, ?_, ?_, ?_⟩
+  · simpa only [hderiv] using hba
+  · exact sub_eq_zero.mp ((heval b).symm.trans hb)
+  · simpa only [heval, hderiv] using hassoc
+
+/-- If the derivative is regular, the solution of the mapped polynomial equation furnished
+by the small-error estimate is unique in the same derivative-scaled correction neighborhood.
+Uniqueness concerns all solutions in this neighborhood, not only those satisfying the
+association conclusion of `exists_eval₂_eq_of_sub_mem_span_derivative_sq_mul`. -/
+theorem existsUnique_eval₂_eq_of_sub_mem_span_derivative_sq_mul
+    {C : Type u₁} [Semiring C] (φ : C →+* R) (P : C[X]) (a t : R)
+    (h : P.eval₂ φ a - t ∈ Ideal.span {P.derivative.eval₂ φ a ^ 2} * I)
+    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R) :
+    ∃! b : R, b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I ∧ P.eval₂ φ b = t := by
+  obtain ⟨b, hb, hroot, _⟩ :=
+    exists_eval₂_eq_of_sub_mem_span_derivative_sq_mul I φ P a t h
+  refine ⟨b, ⟨hb, hroot⟩, ?_⟩
+  let Q : R[X] := P.map φ - Polynomial.C t
+  have heval (x : R) : Q.eval x = P.eval₂ φ x - t := by
+    simp only [Q, eval_sub, eval_C, eval_map]
+  have hderiv : Q.derivative.eval a = P.derivative.eval₂ φ a := by
+    simp only [Q, derivative_sub, derivative_map, derivative_C, sub_zero, eval_map]
+  have hinj : Set.InjOn Q.eval
+      {x : R | x - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} := by
+    simpa only [eval₂_id, hderiv] using
+      Polynomial.injOn_eval₂_of_mem_nonZeroDivisors_derivative
+        (RingHom.id R) I (HenselianRing.jac (R := R) (I := I)) Q a
+        (by simpa only [eval₂_id, hderiv] using hd)
+  intro c hc
+  apply hinj hc.1 hb
+  simp only [heval, hc.2, hroot]
 
 end HenselianRing
 
