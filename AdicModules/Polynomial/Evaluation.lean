@@ -22,18 +22,20 @@ congruence, this avoids cancelling `g(a)` and includes zero values, zero divisor
 zero ring. No Henselian or completeness hypothesis is involved.
 
 For semiring coefficients evaluated in a commutative ring through a coefficient map,
-a regular derivative `d` at an arbitrary target point gives injectivity on the
-scaled neighborhood modulo `(d)I`. This specializes the multivariate Jacobian
-criterion via Mathlib's equivalence for polynomials in a unique variable.
+two points in the same `(d)I` neighborhood of an arbitrary target point have value
+difference associated to `d` times their difference, where `d` is the derivative at
+the center. The coefficient semiring need not be commutative. If `d` is regular,
+this gives injectivity on that neighborhood.
 
 ## References
 
 The derivative application is motivated by the small-error Hensel argument in
 I. B. Fesenko and S. V. Vostokov, *Local Fields and Their Extensions*, second edition
-(2002), II, §1, Corollary 3. This module concerns only association of polynomial values,
-not root existence or that whole corollary.
+(2002), II, §1, Corollary 3. This module concerns association of polynomial values
+and differences, and injectivity, not root existence or that whole corollary.
 
-The formulation uses Mathlib's `Polynomial.sub_dvd_eval_sub` (Chris Hughes, Johannes Hölzl,
+The formulation uses Mathlib's `Polynomial.sub_dvd_eval_sub` and
+`Polynomial.X_sub_C_dvd_sub_C_eval` (Chris Hughes, Johannes Hölzl,
 Kim Morrison and Jens Wagemaker's polynomial division API) and the Jacobson radical API
 of Kenny Lau, Devon Tuma and Wojciech Nawrocki.
 -/
@@ -60,41 +62,7 @@ end MvPolynomial
 
 namespace Polynomial
 
-/-- Evaluation through a coefficient map is injective on the `(d)I` neighborhood of
-an arbitrary target point, where `d` is the evaluated derivative, provided `d` is a
-non-zero-divisor and `I` lies in the target Jacobson radical. No root at the center
-or invertibility of the derivative is required. -/
-theorem injOn_eval₂_of_mem_nonZeroDivisors_derivative
-    {C : Type u} {R : Type v} [CommSemiring C] [CommRing R]
-    (φ : C →+* R) (I : Ideal R) (hI : I ≤ Ideal.jacobson (⊥ : Ideal R))
-    (P : Polynomial C) (a : R)
-    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R) :
-    Set.InjOn (P.eval₂ φ)
-      {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} := by
-  let Q := (MvPolynomial.uniqueAlgEquiv C Unit).symm P
-  let J : Matrix Unit Unit R := Matrix.of fun _ j =>
-    MvPolynomial.eval₂ φ (fun _ => a) (MvPolynomial.pderiv j Q)
-  have hdet : Matrix.det J = P.derivative.eval₂ φ a := by
-    rw [Matrix.det_unique]
-    change MvPolynomial.eval₂ φ (fun _ => a) (MvPolynomial.pderiv () Q) = _
-    dsimp only [Q]
-    rw [MvPolynomial.pderiv_uniqueAlgEquiv_symm,
-      MvPolynomial.eval₂_const_uniqueAlgEquiv_symm]
-  have hinj := MvPolynomial.injOn_eval₂_of_mem_nonZeroDivisors_det_jacobian
-    φ I hI (fun _ : Unit => Q) (fun _ => a)
-    (by change Matrix.det J ∈ nonZeroDivisors R; rwa [hdet])
-  intro b hb c hc hbc
-  have hpoints : (fun _ : Unit => b) = (fun _ : Unit => c) := by
-    apply hinj
-    · intro i
-      change b - a ∈ Ideal.span {Matrix.det J} * I
-      simpa only [Set.mem_ofPred_eq, hdet] using hb
-    · intro i
-      change c - a ∈ Ideal.span {Matrix.det J} * I
-      simpa only [Set.mem_ofPred_eq, hdet] using hc
-    · funext i
-      simpa only [Q, MvPolynomial.eval₂_const_uniqueAlgEquiv_symm] using hbc
-  exact congrFun hpoints ()
+section
 
 variable {R : Type u} [CommRing R]
 
@@ -121,5 +89,67 @@ theorem associated_eval_of_sub_mem_span_mul (I : Ideal R)
     simpa only [add_sub_cancel_left] using hI (I.mul_mem_right q hi)
   rw [hmul]
   exact associated_mul_unit_left _ _ hu
+
+end
+
+/-- On the same `(d)I` neighborhood of a target point `a`, the difference of two
+polynomial values is associated to the linearized difference `d * (b - c)`, where
+`d = P.derivative.eval₂ φ a` and `I` lies in the target Jacobson radical.
+
+The coefficient semiring may be noncommutative, and the target points need not lie
+in the coefficient map's image. No root condition or regularity of `d` is required. -/
+theorem associated_eval₂_sub_eval₂_of_sub_mem_span_derivative_mul
+    {C : Type u} {R : Type v} [Semiring C] [CommRing R]
+    (φ : C →+* R) (I : Ideal R) (hI : I ≤ Ideal.jacobson (⊥ : Ideal R))
+    (P : Polynomial C) (a b c : R)
+    (hb : b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I)
+    (hc : c - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I) :
+    Associated (P.eval₂ φ b - P.eval₂ φ c) (P.derivative.eval₂ φ a * (b - c)) := by
+  let Q : R[X] := P.map φ
+  have hderiv (x : R) : Q.derivative.eval x = P.derivative.eval₂ φ x := by
+    simp only [Q, derivative_map, eval_map]
+  have hα := associated_eval_of_sub_mem_span_mul I hI Q.derivative a c
+    (by simpa only [hderiv] using hc)
+  obtain ⟨q, hq⟩ := X_sub_C_dvd_sub_C_eval (p := Q) (a := c)
+  have heval : Q.eval b - Q.eval c = (b - c) * q.eval b := by
+    simpa only [eval_sub, eval_C, eval_mul, eval_X] using congrArg (eval b) hq
+  have hqc : Q.derivative.eval c = q.eval c := by
+    have h := congrArg (fun f : R[X] => f.derivative.eval c) hq
+    simpa only [derivative_sub, derivative_C, derivative_X, sub_zero, derivative_mul,
+      eval_add, eval_mul, eval_one, one_mul, eval_sub,
+      eval_X, eval_C, sub_self, zero_mul, add_zero] using h
+  obtain ⟨rb, hrb, hb_eq⟩ := Ideal.mem_span_singleton_mul.mp hb
+  obtain ⟨rc, hrc, hc_eq⟩ := Ideal.mem_span_singleton_mul.mp hc
+  obtain ⟨t, ht⟩ := hα.dvd
+  have hbox : b - c ∈ Ideal.span {q.eval c} * I := by
+    refine Ideal.mem_span_singleton_mul.mpr
+      ⟨t * (rb - rc), I.mul_mem_left t (I.sub_mem hrb hrc), ?_⟩
+    rw [← hqc, ← mul_assoc, ← ht, hderiv, mul_sub, hb_eq, hc_eq]
+    ring
+  have hassoc : Associated (q.eval b) (Q.derivative.eval a) := by
+    have hqassoc := associated_eval_of_sub_mem_span_mul I hI q c b hbox
+    rw [← hqc] at hqassoc
+    exact hqassoc.trans hα
+  have hmul := Associated.mul_left (b - c) hassoc
+  rw [← heval, hderiv] at hmul
+  simpa only [Q, eval_map, mul_comm] using hmul
+
+/-- Evaluation through a coefficient map is injective on the `(d)I` neighborhood of
+an arbitrary target point, where `d` is the evaluated derivative, provided `d` is a
+non-zero-divisor and `I` lies in the target Jacobson radical. No root at the center
+or invertibility of the derivative is required. -/
+theorem injOn_eval₂_of_mem_nonZeroDivisors_derivative
+    {C : Type u} {R : Type v} [CommSemiring C] [CommRing R]
+    (φ : C →+* R) (I : Ideal R) (hI : I ≤ Ideal.jacobson (⊥ : Ideal R))
+    (P : Polynomial C) (a : R)
+    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R) :
+    Set.InjOn (P.eval₂ φ)
+      {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} := by
+  intro b hb c hc hbc
+  have hassoc := associated_eval₂_sub_eval₂_of_sub_mem_span_derivative_mul
+    φ I hI P a b c hb hc
+  have hz : P.derivative.eval₂ φ a * (b - c) = 0 :=
+    hassoc.eq_zero_iff.mp (sub_eq_zero.mpr hbc)
+  exact sub_eq_zero.mp ((mem_nonZeroDivisors_iff.mp hd).1 _ hz)
 
 end Polynomial

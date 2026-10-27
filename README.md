@@ -59,6 +59,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   for an arbitrary target point `a`, a coefficient map `φ`, and a regular evaluated
   derivative, with semiring coefficients and the same Jacobson condition.
 
+- Let `C` be a semiring, possibly noncommutative, `R` a commutative ring,
+  `φ : C →+* R`, `P : C[X]`, and `I ≤ Ideal.jacobson (⊥ : Ideal R)`.
+  For arbitrary target points `a,b,c`, put `d = P.derivative.eval₂ φ a`.
+  If both `b-a` and `c-a` lie in `Ideal.span {d} * I`, then
+  [`Polynomial.associated_eval₂_sub_eval₂_of_sub_mem_span_derivative_mul`](AdicModules/Polynomial/Evaluation.lean)
+  gives `Associated (P.eval₂ φ b - P.eval₂ φ c) (d * (b-c))` in `R` itself.
+  No regularity or unit condition on `d`, root at the center, Henselian hypothesis
+  or source-image condition on the target points is required. A regular derivative
+  recovers the scalar injectivity result above.
+
 - For a finite square polynomial system over a commutative semiring, evaluated
   through any coefficient homomorphism into a Henselian pair `(R, I)`, errors in
   `(d²)I` lift to an exact root with coordinate corrections in `(d)I`, where `d`
