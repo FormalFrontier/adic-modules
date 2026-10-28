@@ -3,12 +3,16 @@ SPDX-License-Identifier: Apache-2.0
 Authors: Formal Frontier Agents
 -/
 module
+public import AdicModules.LinearAlgebra.Matrix.DeterminantPerturbation
+public import AdicModules.MvPolynomial.JacobianPerturbation
 public import AdicModules.RingTheory.WittVector.Frobenius
 
 public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.MvPolynomial.Jacobian
+public import AdicModules.MvPolynomial.Evaluation
 public import AdicModules.MvPolynomial.HenselDeterminant
+public import AdicModules.MvPolynomial.HenselImage
 public import AdicModules.Polynomial.Hensel
 public import AdicModules.Polynomial.HenselianFactorization
 public import AdicModules.Polynomial.Evaluation

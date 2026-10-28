@@ -11,6 +11,7 @@ public import Mathlib.RingTheory.Jacobson.Ideal
 import Mathlib.LinearAlgebra.Matrix.Nondegenerate
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Ring
+import MultivariatePolynomials.Taylor
 
 /-!
 # Polynomial injectivity on a scaled Jacobson-ideal neighborhood
@@ -43,51 +44,19 @@ private theorem exists_eval_sub_eq_sum
     ∃ d : ι → R, eval b p - eval c p = ∑ j, d j * (b j - c j) ∧
       ∀ j, d j - eval a (pderiv j p) ∈ I := by
   classical
-  have hca (q : MvPolynomial ι R) : eval c q - eval a q ∈ I := by
-    apply Ideal.Quotient.eq.mp
-    simpa only [map_eval, Function.comp_def] using
-      congrArg (fun x : ι → R ⧸ I => eval x (map (Ideal.Quotient.mk I) q))
-        (funext fun i => Ideal.Quotient.eq.mpr (hc i))
-  induction p using MvPolynomial.induction_on with
-  | C r =>
-    refine ⟨0, ?_, ?_⟩
-    · simp
-    · intro j
-      simp
-  | add p q hp hq =>
-    obtain ⟨d, hd, hdj⟩ := hp
-    obtain ⟨e, he, hej⟩ := hq
-    refine ⟨fun j => d j + e j, ?_, ?_⟩
-    · calc
-        eval b (p + q) - eval c (p + q) =
-            (eval b p - eval c p) + (eval b q - eval c q) := by
-          simp only [map_add]
-          ring
-        _ = (∑ j, d j * (b j - c j)) + ∑ j, e j * (b j - c j) := by rw [hd, he]
-        _ = ∑ j, (d j + e j) * (b j - c j) := by
-          simp only [add_mul, Finset.sum_add_distrib]
-    · intro j
-      (convert I.add_mem (hdj j) (hej j) using 1; simp only [map_add]; ring)
-  | mul_X p i hp =>
-    obtain ⟨d, hd, hdj⟩ := hp
-    refine ⟨fun j => b i * d j + if j = i then eval c p else 0, ?_, ?_⟩
-    · calc
-        eval b (p * X i) - eval c (p * X i) =
-            b i * (eval b p - eval c p) + eval c p * (b i - c i) := by
-          simp only [map_mul, eval_X]
-          ring
-        _ = b i * (∑ j, d j * (b j - c j)) + eval c p * (b i - c i) := by rw [hd]
-        _ = ∑ j, (b i * d j + if j = i then eval c p else 0) * (b j - c j) := by
-          simp [add_mul, Finset.sum_add_distrib, Finset.mul_sum, mul_assoc]
-    · intro j
-      by_cases hji : j = i
-      · subst j
-        (convert I.add_mem
-          (I.add_mem (I.mul_mem_right (d i) (hb i)) (I.mul_mem_left (a i) (hdj i)))
-          (hca p) using 1; simp; ring)
-      · (convert I.add_mem (I.mul_mem_right (d j) (hb i))
-          (I.mul_mem_left (a i) (hdj j)) using 1;
-          simp [hji, Ne.symm hji]; ring)
+  obtain ⟨d, hd0, hsum, hd⟩ :=
+    exists_eval₂_sub_eq_sum I (RingHom.id R) a b c p
+      (fun i _ => hb i) (fun i _ => hc i)
+  refine ⟨d, ?_, ?_⟩
+  · calc
+      eval b p - eval c p = p.vars.sum (fun j => d j * (b j - c j)) := by
+        simpa only [eval₂_id] using hsum
+      _ = ∑ j, d j * (b j - c j) := by
+        -- The witness vanishes off p.vars, so its sum extends to all indices.
+        apply Finset.sum_subset (Finset.subset_univ _)
+        intro j _ hj
+        rw [hd0 j hj, zero_mul]
+  · simpa only [eval₂_id] using hd
 
 /-- A square polynomial system, evaluated through a coefficient map into `R`, is
 injective on the coordinatewise `(d)I` neighborhood of `a` if its evaluated

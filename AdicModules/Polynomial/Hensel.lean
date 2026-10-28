@@ -57,6 +57,10 @@ in the derivative-scaled ideal, and the error is associated to the derivative ti
 correction, without a regularity assumption. A regular derivative makes the solution unique
 in that same correction neighborhood.
 
+Evaluation maps the full derivative-scaled neighborhood onto the neighborhood of the value
+scaled by the square of the derivative. This image equality needs no regularity; a regular
+derivative gives a bijection between these same full neighborhoods.
+
 ## Implementation notes
 
 For a proper ideal, monicity preserves degrees on reduction, so the universal ring can be used
@@ -540,6 +544,53 @@ theorem existsUnique_eval₂_eq_of_sub_mem_span_derivative_sq_mul
   intro c hc
   apply hinj hc.1 hb
   simp only [heval, hc.2, hroot]
+
+/-- Over a Henselian pair, polynomial evaluation maps the full `(d)I` neighborhood of `a`
+onto the full `(d²)I` neighborhood of its value, where `d` is the derivative at `a`.
+The coefficient semiring may be noncommutative, and `a` is any target point. No regularity
+or invertibility of the derivative is required. -/
+theorem image_eval₂_eq_setOf_sub_mem_span_derivative_sq_mul
+    {C : Type u₁} [Semiring C] (φ : C →+* R) (P : C[X]) (a : R) :
+    (P.eval₂ φ) '' {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} =
+      {t : R | t - P.eval₂ φ a ∈ Ideal.span {P.derivative.eval₂ φ a ^ 2} * I} := by
+  ext t
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    have hassoc := Polynomial.associated_eval₂_sub_eval₂_of_sub_mem_span_derivative_mul
+      φ I (HenselianRing.jac (R := R) (I := I)) P a b a hb
+      (by simp only [sub_self]; exact Ideal.zero_mem _)
+    obtain ⟨q, hq⟩ := hassoc.dvd'
+    obtain ⟨r, hr, hrb⟩ := Ideal.mem_span_singleton_mul.mp hb
+    refine Ideal.mem_span_singleton_mul.mpr ⟨r * q, I.mul_mem_right q hr, ?_⟩
+    rw [hq, ← hrb]
+    ring
+  · intro ht
+    have herr : P.eval₂ φ a - t ∈ Ideal.span {P.derivative.eval₂ φ a ^ 2} * I := by
+      simpa only [neg_sub] using (Ideal.span {P.derivative.eval₂ φ a ^ 2} * I).neg_mem ht
+    obtain ⟨b, hb, hbt, _⟩ :=
+      exists_eval₂_eq_of_sub_mem_span_derivative_sq_mul I φ P a t herr
+    exact ⟨b, hb, hbt⟩
+
+/-- A regular evaluated derivative makes polynomial evaluation a bijection from the full
+`(d)I` neighborhood of `a` to the full `(d²)I` neighborhood of its value over a Henselian
+pair. The coefficient semiring may be noncommutative; the derivative need not be a unit. -/
+theorem bijOn_eval₂_of_mem_nonZeroDivisors_derivative
+    {C : Type u₁} [Semiring C] (φ : C →+* R) (P : C[X]) (a : R)
+    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R) :
+    Set.BijOn (P.eval₂ φ)
+      {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I}
+      {t : R | t - P.eval₂ φ a ∈ Ideal.span {P.derivative.eval₂ φ a ^ 2} * I} := by
+  let Q : R[X] := P.map φ
+  have hderiv : Q.derivative.eval a = P.derivative.eval₂ φ a := by
+    simp only [Q, derivative_map, eval_map]
+  have hinj : Set.InjOn (P.eval₂ φ)
+      {b : R | b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I} := by
+    simpa only [eval₂_id, hderiv, Q, eval_map] using
+      Polynomial.injOn_eval₂_of_mem_nonZeroDivisors_derivative
+        (RingHom.id R) I (HenselianRing.jac (R := R) (I := I)) Q a
+        (by simpa only [eval₂_id, hderiv] using hd)
+  rw [← image_eval₂_eq_setOf_sub_mem_span_derivative_sq_mul I φ P a]
+  exact hinj.bijOn_image
 
 end HenselianRing
 

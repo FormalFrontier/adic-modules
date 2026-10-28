@@ -63,6 +63,14 @@ additional private application of
 `Submodule.closure_span_eq_of_dense_subsemiring` to the rational axis, identifying
 its proper closure and excluding the second coordinate unit.
 
+The multivariate polynomial value-association theorem and its two-coordinate
+`ZMod 64` example are original Formal Frontier Agent expression. The proof uses
+Mathlib's quotient congruence, support-local evaluation-congruence and multivariate
+evaluation-composition APIs, then applies the library's scalar polynomial
+value-association theorem to `X`; it does not reproduce that theorem's
+Jacobson-radical argument. The example uses stock ideal-radical and Jacobson-radical
+APIs to place the nilpotent generator in the Jacobson radical.
+
 ## Mathematical and upstream references
 
 The mathematical background includes Fujiwara and Kato, *Foundations of Rigid

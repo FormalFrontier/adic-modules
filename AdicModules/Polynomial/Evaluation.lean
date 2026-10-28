@@ -152,4 +152,30 @@ theorem injOn_eval₂_of_mem_nonZeroDivisors_derivative
     hassoc.eq_zero_iff.mp (sub_eq_zero.mpr hbc)
   exact sub_eq_zero.mp ((mem_nonZeroDivisors_iff.mp hd).1 _ hz)
 
+/-- On a derivative-scaled Jacobson neighborhood with regular derivative `d`, congruence
+of polynomial values modulo `(d)J` is equivalent to congruence of the points modulo `J`.
+
+Here `d = P.derivative.eval₂ φ a`, and `J` is arbitrary: no containment in the
+neighborhood ideal `I` is required. -/
+theorem eval₂_sub_eval₂_mem_span_derivative_mul_iff
+    {C : Type u} {R : Type v} [Semiring C] [CommRing R]
+    (φ : C →+* R) (I : Ideal R)
+    (hI : I ≤ Ideal.jacobson (⊥ : Ideal R))
+    (P : Polynomial C) (a b c : R)
+    (hb : b - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I)
+    (hc : c - a ∈ Ideal.span {P.derivative.eval₂ φ a} * I)
+    (hd : P.derivative.eval₂ φ a ∈ nonZeroDivisors R)
+    (J : Ideal R) :
+    P.eval₂ φ b - P.eval₂ φ c ∈
+        Ideal.span {P.derivative.eval₂ φ a} * J ↔
+      b - c ∈ J := by
+  rw [Ideal.mem_iff_of_associated
+    (associated_eval₂_sub_eval₂_of_sub_mem_span_derivative_mul φ I hI P a b c hb hc),
+    Ideal.mem_span_singleton_mul]
+  constructor
+  · rintro ⟨z, hz, hdz⟩
+    exact (mul_cancel_left_mem_nonZeroDivisors hd).mp hdz ▸ hz
+  · intro hbc
+    exact ⟨b - c, hbc, rfl⟩
+
 end Polynomial

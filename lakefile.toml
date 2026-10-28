@@ -26,6 +26,7 @@ rev = "c9a7194c5f24a839a6a62d9a66233c407981fec4"
 
 [[lean_lib]]
 name = "AdicModules"
+globs = ["AdicModules", "AdicModules.+"]
 
 [[lean_lib]]
 name = "AdicModulesTest"

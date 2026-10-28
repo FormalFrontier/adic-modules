@@ -9,7 +9,12 @@ public import Mathlib.Algebra.Polynomial.FieldDivision
 public import Mathlib.RingTheory.Polynomial.Resultant.Basic
 
 /-!
-# Monic coprimeness under coefficient maps
+# Resultants, degree sums, and monic coprimeness
+
+For polynomials over a commutative ring, a degree-sum equality also holds for natural
+degrees when the resultant, indexed by the natural degrees of both seeds, is nonzero.
+Zero seeds are allowed: nonvanishing then forces the other seed to have natural degree
+zero.
 
 For commutative rings in independent universes, the default-index resultant of a monic
 polynomial and an arbitrary polynomial commutes with coefficient mapping. Only the monic
@@ -30,6 +35,39 @@ the result here does not subsume those inputs.
 @[expose] public section
 
 namespace Polynomial
+
+/-- A degree-sum equality gives the corresponding natural-degree sum when the resultant
+at the natural degree indices is nonzero. This allows zero seeds, in which case the other
+seed must have natural degree zero.
+
+The proof combines Mathlib's zero-resultant formulas with
+`Polynomial.natDegree_eq_of_degree_eq_some`. -/
+theorem natDegree_eq_add_of_degree_eq_add_of_resultant_ne_zero
+    {R : Type*} [CommRing R] {f g h : R[X]}
+    (hdeg : f.degree = g.degree + h.degree)
+    (hres : resultant g h g.natDegree h.natDegree ≠ 0) :
+    f.natDegree = g.natDegree + h.natDegree := by
+  classical
+  by_cases hg : g = 0
+  · subst g
+    have hf : f = 0 := degree_eq_bot.mp (by
+      simpa only [degree_zero, WithBot.bot_add] using hdeg)
+    have hh : h.natDegree = 0 := by
+      by_contra hh
+      apply hres
+      simp only [natDegree_zero, resultant_zero_left, pow_zero, mul_one, zero_pow hh]
+    simp only [hf, natDegree_zero, hh, zero_add]
+  by_cases hh : h = 0
+  · subst h
+    have hf : f = 0 := degree_eq_bot.mp (by
+      simpa only [degree_zero, WithBot.add_bot] using hdeg)
+    have hg' : g.natDegree = 0 := by
+      by_contra hg'
+      apply hres
+      simp only [natDegree_zero, resultant_zero_right, pow_zero, mul_one, zero_pow hg']
+    simp only [hf, natDegree_zero, hg', add_zero]
+  apply natDegree_eq_of_degree_eq_some
+  rw [hdeg, degree_eq_natDegree hg, degree_eq_natDegree hh, Nat.cast_add]
 
 /-- For a monic first polynomial, mapping both polynomials commutes with the resultant at
 its default degree indices, even if the second polynomial loses degree. -/

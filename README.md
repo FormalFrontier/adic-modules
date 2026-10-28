@@ -69,6 +69,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   or source-image condition on the target points is required. A regular derivative
   recovers the scalar injectivity result above.
 
+- Let `C` be any semiring, `φ : C →+* R` a homomorphism into a commutative
+  Henselian pair `(R, I)`, `P : C[X]`, `a : R`, and `d = P.derivative.eval₂ φ a`.
+  [`HenselianRing.image_eval₂_eq_setOf_sub_mem_span_derivative_sq_mul`](AdicModules/Polynomial/Hensel.lean)
+  identifies the image of the full set `{b | b-a ∈ Ideal.span {d} * I}` under
+  `P.eval₂ φ` with `{t | t-P.eval₂ φ a ∈ Ideal.span {d^2} * I}`, without
+  regularity. If `d ∈ nonZeroDivisors R`,
+  [`HenselianRing.bijOn_eval₂_of_mem_nonZeroDivisors_derivative`](AdicModules/Polynomial/Hensel.lean)
+  gives a bijection between these same full sets. The coefficient semiring need
+  not be commutative, and the center need not lie in the coefficient map's image.
+
 - For a finite square polynomial system over a commutative semiring, evaluated
   through any coefficient homomorphism into a Henselian pair `(R, I)`, errors in
   `(d²)I` lift to an exact root with coordinate corrections in `(d)I`, where `d`
@@ -85,6 +95,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   With regular `d`,
   [`HenselianRing.existsUnique_eval₂_eq_of_sub_mem_pow`](AdicModules/MvPolynomial/HenselDeterminant.lean)
   gives uniqueness in this same ideal-power box.
+
+- For a finite square polynomial system over a commutative semiring, evaluated
+  through a coefficient homomorphism in a commutative ring, let `F` be evaluation,
+  `A` its Jacobian at `a`, `d = A.det`, and `V(J) = {x | ∀ i, x i ∈ J}`.
+  If an additive subgroup `N` contains `V((d²)I²)`, then
+  [`MvPolynomial.adjugate_neighborhood_add_ker_eq_inter_preimage`](AdicModules/MvPolynomial/HenselDeterminant.lean)
+  gives `P_N + K = B ∩ F ⁻¹' T`, where `P_N` consists of points
+  `p = a + d • A.adjugate.mulVec z` with `z ∈ V(I)` and `A.mulVec (p-a) ∈ N`,
+  `K = V((d)I) ∩ ker A`, `B = {b | b-a ∈ V((d)I)}`, and
+  `T = {t | t-F(a) ∈ N ⊓ V((d²)I)}`. No regularity or Henselian hypothesis is needed.
+  Regular `d` and submodule `N` recover `MvPolynomial.adjugate_neighborhood_eq_inter_preimage`.
+  The evaluation image is `(F '' B) ∩ T`, not necessarily all of `T`; see the
+  [image-cut application](AdicModulesTest/MvPolynomial/AdjugateNeighborhoodPreimage.lean).
 
 - If `I` is an ideal of a commutative ring `R`, a self-map `f : M → M` of an
   `I`-adically complete `R`-module has a unique fixed point in `I • ⊤` when
@@ -183,6 +206,15 @@ Rings are commutative; modules are additive commutative groups unless specified 
   `(q : R) ∈ I` and `x ≡ y [SMOD I^m]`, **`m > 0`**, give precision `I^(m+n)`
   after raising to `q^n`. If `I ≤ Ideal.jacobson ⊥`, displacement in
   `Ideal.span {g.eval a} * I` preserves polynomial values up to association.
+  For an arbitrary variable type `σ`, `[CommSemiring C]`, `[CommRing R]`, a coefficient
+  map `φ : C →+* R`, `P : MvPolynomial σ C` and target points `a b : σ → R`, the theorem
+  [`MvPolynomial.associated_eval₂_of_sub_mem_span_mul`](AdicModules/MvPolynomial/Evaluation.lean)
+  gives `Associated (P.eval₂ φ b) (P.eval₂ φ a)` when `I ≤ Ideal.jacobson ⊥` and
+  each `b i - a i` with `i ∈ P.vars` belongs to `Ideal.span {P.eval₂ φ a} * I`.
+  Coordinates not occurring in `P` are unrestricted. No finiteness, regularity,
+  nonzero-value or target-point image condition is required. The
+  [two-coordinate example over `ZMod 64`](AdicModulesTest/MvPolynomial/Evaluation.lean)
+  uses natural coefficients and distinct nonzero zero-divisor values `4` and `36`.
   Coprime monic residue factors of monic polynomials lift with both reductions over
   any Henselian pair or adically complete ring. Over Henselian pairs, simple residue
   roots lift for arbitrary polynomials. With `d = f.derivative.eval a`, the condition

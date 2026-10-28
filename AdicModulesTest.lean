@@ -4,6 +4,8 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModulesTest.HenselDeterminantImage
+import AdicModulesTest.MvPolynomial.HenselSubmodule
 public import AdicModulesTest.AdicCompletion
 public import AdicModulesTest.AdicCompletion.Completeness
 public import AdicModulesTest.AdicCompletion.CompletenessTheorems
@@ -43,6 +45,9 @@ public import AdicModulesTest.LocalizedFiltration
 public import AdicModulesTest.LocalizedQuotientValuationSubring
 public import AdicModulesTest.LocalizedResidueField
 public import AdicModulesTest.LocalizedValuationSubring
+public import AdicModulesTest.MvPolynomial.ConstrainedRoot
+public import AdicModulesTest.MvPolynomial.Evaluation
+public import AdicModulesTest.MvPolynomial.HenselDeterminant
 public import AdicModulesTest.MvPolynomial.Jacobian
 public import AdicModulesTest.Polynomial.Evaluation
 public import AdicModulesTest.Polynomial.FactorizationUniqueness

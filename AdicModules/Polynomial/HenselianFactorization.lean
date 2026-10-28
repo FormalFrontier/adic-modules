@@ -28,23 +28,24 @@ actual degree nor its leading coefficient is thereby determined. Loose bounds
 need not preserve the initial factor degrees or leading coefficients; specializing
 to their natural degrees preserves both individual leading coefficients.
 
-For an ideal contained in the Jacobson radical, a regular resultant also gives
-uniqueness among pairs with the same product, strict-degree corrections, and
-correction coefficients in the resultant times the ideal. This uniqueness does
-not require a Henselian pair or any bound on the error. Its nominal degree bounds
-fix coefficients at and above those bounds; they preserve the individual leading
-coefficients when specialized to the natural degrees of the initial factors.
-Combining uniqueness with Henselian lifting gives a unique pair of corrected
-polynomials in this neighborhood.
+For an ideal contained in the Jacobson radical, a regular resultant gives
+uniqueness among pairs with the same product when only the pair differences have
+strict degree bounds and the two crossed reference corrections have coefficients
+in the resultant times the ideal. Those reference corrections may have arbitrary
+degree. This uniqueness requires neither a Henselian pair nor an error bound.
+The earlier strict reference-correction neighborhood is a special case; combining
+it with Henselian lifting gives a unique pair of corrected polynomials.
 
 A coefficient-map theorem applies the fixed-bound existence result in a Henselian
 target containing the image of the source ideal. It requires no Henselian source
 and retains both prescribed bounds and the image of the source resultant when
 degrees drop. Regularity does not in general pass to the target.
 
-The proofs use Mathlib's Sylvester map and its adjugate. For uniqueness, two
-cancellations of the regular resultant reduce the assertion to Nakayama's lemma
-for the finitely generated ideal of coefficient differences.
+The proofs use Mathlib's Sylvester map and its adjugate. For uniqueness, a
+single regular-cancellation stage reduces the assertion to Nakayama's lemma for
+the finitely generated ideal of bounded pair-difference coefficients. The
+crossed-congruence reduction and coefficient-ideal argument are due to Formal
+Frontier Agents.
 
 ## Source and generalization
 
@@ -400,82 +401,89 @@ private theorem coeff_adjSylvester_mem {R : Type u} [CommRing R]
   rw [htV] at hV
   exact ⟨hU, hV⟩
 
-private theorem eq_normalized_factors_of_regular_resultant
+/-- Bounded pair differences vanish when their reference Sylvester image is
+controlled by two crossed, possibly unbounded, corrections. -/
+private theorem eq_zero_of_regular_resultant_relation
     {R : Type u} [CommRing R] (I : Ideal R)
     (hI : I ≤ Ideal.jacobson (⊥ : Ideal R)) (n m : ℕ) (g₀ h₀ : R[X])
     (hg₀ : g₀.natDegree ≤ n) (hh₀ : h₀.natDegree ≤ m)
     (hd : resultant g₀ h₀ n m ∈ nonZeroDivisors R)
-    (U V U' V' : R[X])
-    (hU : U.degree < (n : WithBot ℕ)) (hV : V.degree < (m : WithBot ℕ))
-    (hU' : U'.degree < (n : WithBot ℕ)) (hV' : V'.degree < (m : WithBot ℕ))
-    (hVI : ∀ k, V.coeff k ∈ I) (hU'I : ∀ k, U'.coeff k ∈ I)
-    (hprod : (g₀ + C (resultant g₀ h₀ n m) * U) *
-        (h₀ + C (resultant g₀ h₀ n m) * V) =
-      (g₀ + C (resultant g₀ h₀ n m) * U') *
-        (h₀ + C (resultant g₀ h₀ n m) * V')) : U = U' ∧ V = V' := by
+    (u v a b : R[X])
+    (hu : u.degree < (n : WithBot ℕ)) (hv : v.degree < (m : WithBot ℕ))
+    (ha : ∀ k, a.coeff k ∈ Ideal.span {resultant g₀ h₀ n m} * I)
+    (hb : ∀ k, b.coeff k ∈ Ideal.span {resultant g₀ h₀ n m} * I)
+    (hlinear : g₀ * v + h₀ * u + (a * v + b * u) = 0) : u = 0 ∧ v = 0 := by
   classical
   let d := resultant g₀ h₀ n m
-  have hDU : (U - U').degree < (n : WithBot ℕ) :=
-    (degree_sub_le _ _).trans_lt (max_lt hU hU')
-  have hDV : (V - V').degree < (m : WithBot ℕ) :=
-    (degree_sub_le _ _).trans_lt (max_lt hV hV')
   let D : degreeLT R n × degreeLT R m :=
-    (⟨U - U', mem_degreeLT.mpr hDU⟩, ⟨V - V', mem_degreeLT.mpr hDV⟩)
-  let Q := U * V - U' * V'
-  have hQ : Q.degree < (n + m : ℕ) := (degree_sub_le _ _).trans_lt
-    (max_lt (degree_mul_lt_sum hU.le hV) (degree_mul_lt_sum hU'.le hV'))
-  let P : degreeLT R (n + m) := ⟨Q, mem_degreeLT.mpr hQ⟩
-  let A := adjSylvester (m := n) (n := m) g₀ h₀
-  have hexpand : C d * (g₀ * (V - V') + h₀ * (U - U') + C d * Q) = 0 := by
-    calc
-      _ = (g₀ + C d * U) * (h₀ + C d * V) -
-          (g₀ + C d * U') * (h₀ + C d * V') := by dsimp only [Q]; ring
-      _ = 0 := sub_eq_zero.mpr hprod
-  -- First cancel the resultant in the expanded product identity.
-  have hlinear := eq_zero_of_C_mul_eq_zero_of_regular hd hexpand
-  have hSP : sylvesterMap g₀ h₀ hg₀ hh₀ D + d • P = 0 := by
-    apply Subtype.ext
-    change g₀ * (V - V') + h₀ * (U - U') + d • Q = 0
-    simpa only [smul_eq_C_mul] using hlinear
-  have hAS : A (sylvesterMap g₀ h₀ hg₀ hh₀ D) = d • D :=
-    LinearMap.congr_fun (adjSylvester_comp_sylveserMap g₀ h₀ hg₀ hh₀) D
-  -- The adjugate identity introduces one more resultant, which is cancelled next.
-  have hAdj := congrArg A hSP
-  rw [map_add, map_smul, map_zero, hAS, ← smul_add] at hAdj
-  have hdzU := congrArg (fun t : degreeLT R n × degreeLT R m ↦ t.1.val) hAdj
-  have hdzV := congrArg (fun t : degreeLT R n × degreeLT R m ↦ t.2.val) hAdj
-  change d • ((U - U') + (A P).1.val) = 0 at hdzU
-  change d • ((V - V') + (A P).2.val) = 0 at hdzV
-  rw [smul_eq_C_mul] at hdzU hdzV
-  have hzU := eq_zero_of_C_mul_eq_zero_of_regular hd hdzU
-  have hzV := eq_zero_of_C_mul_eq_zero_of_regular hd hdzV
-  -- Only finitely many coefficient differences generate the ideal used in Nakayama.
+    (⟨u, mem_degreeLT.mpr hu⟩, ⟨v, mem_degreeLT.mpr hv⟩)
+  let S := sylvesterMap g₀ h₀ hg₀ hh₀ D
+  let Q := a * v + b * u
+  -- Only bounded pair-difference coefficients generate the finite ideal.
   let c : (Fin n ⊕ Fin m) → R := Sum.elim
-    (fun i ↦ (U - U').coeff i) (fun j ↦ (V - V').coeff j)
+    (fun i ↦ u.coeff i) (fun j ↦ v.coeff j)
   let J : Ideal R := Ideal.span (Set.range c)
-  have hDUJ (k : ℕ) : (U - U').coeff k ∈ J := by
+  have huJ (k : ℕ) : u.coeff k ∈ J := by
     by_cases hk : k < n
     · exact Ideal.subset_span ⟨Sum.inl ⟨k, hk⟩, rfl⟩
-    · rw [coeff_eq_zero_of_degree_lt (hDU.trans_le
+    · rw [coeff_eq_zero_of_degree_lt (hu.trans_le
         (WithBot.coe_le_coe.mpr (Nat.le_of_not_gt hk)))]
       exact J.zero_mem
-  have hDVJ (k : ℕ) : (V - V').coeff k ∈ J := by
+  have hvJ (k : ℕ) : v.coeff k ∈ J := by
     by_cases hk : k < m
     · exact Ideal.subset_span ⟨Sum.inr ⟨k, hk⟩, rfl⟩
-    · rw [coeff_eq_zero_of_degree_lt (hDV.trans_le
+    · rw [coeff_eq_zero_of_degree_lt (hv.trans_le
         (WithBot.coe_le_coe.mpr (Nat.le_of_not_gt hk)))]
       exact J.zero_mem
-  have hQIJ (k : ℕ) : Q.coeff k ∈ I * J := by
-    have heq : Q = V * (U - U') + U' * (V - V') := by dsimp only [Q]; ring
-    rw [heq, coeff_add]
-    exact (I * J).add_mem (coeff_mul_mem_ideal_mul I J hVI hDUJ k)
-      (coeff_mul_mem_ideal_mul I J hU'I hDVJ k)
-  have hDUK (k : ℕ) : (U - U').coeff k ∈ I * J := by
-    rw [eq_neg_of_add_eq_zero_left hzU, coeff_neg]
-    exact (I * J).neg_mem (coeff_adjSylvester_mem (I * J) n m g₀ h₀ P hQIJ k).1
-  have hDVK (k : ℕ) : (V - V').coeff k ∈ I * J := by
-    rw [eq_neg_of_add_eq_zero_left hzV, coeff_neg]
-    exact (I * J).neg_mem (coeff_adjSylvester_mem (I * J) n m g₀ h₀ P hQIJ k).2
+  have hQIJ (k : ℕ) : Q.coeff k ∈ Ideal.span {d} * (I * J) := by
+    have hmem : Q.coeff k ∈ (Ideal.span {d} * I) * J := by
+      dsimp only [Q]
+      rw [coeff_add]
+      exact ((Ideal.span {d} * I) * J).add_mem
+        (coeff_mul_mem_ideal_mul (Ideal.span {d} * I) J ha hvJ k)
+        (coeff_mul_mem_ideal_mul (Ideal.span {d} * I) J hb huJ k)
+    simpa only [mul_assoc] using hmem
+  have hSQ : S.val = -Q := by
+    apply eq_neg_of_add_eq_zero_left
+    change g₀ * v + h₀ * u + (a * v + b * u) = 0
+    exact hlinear
+  have hScoeff (k : ℕ) : S.val.coeff k ∈ Ideal.span {d} * (I * J) := by
+    rw [hSQ, coeff_neg]
+    exact (Ideal.span {d} * (I * J)).neg_mem (hQIJ k)
+  -- Extract from the bounded reference output, not from the unbounded error Q.
+  obtain ⟨q, hq, hqIJ, hSq⟩ := exists_mul_of_coeff_mem_span_singleton_mul
+    (I * J) d (mem_degreeLT.mp S.property) hScoeff
+  let P : degreeLT R (n + m) := ⟨q, mem_degreeLT.mpr hq⟩
+  let A := adjSylvester (m := n) (n := m) g₀ h₀
+  have hSP : sylvesterMap g₀ h₀ hg₀ hh₀ D = d • P := by
+    apply Subtype.ext
+    change S.val = d • q
+    simpa only [smul_eq_C_mul] using hSq
+  have hAS : A (sylvesterMap g₀ h₀ hg₀ hh₀ D) = d • D :=
+    LinearMap.congr_fun (adjSylvester_comp_sylveserMap g₀ h₀ hg₀ hh₀) D
+  have hAdj := congrArg A hSP
+  rw [map_smul, hAS] at hAdj
+  have hdzU := congrArg (fun t : degreeLT R n × degreeLT R m ↦ t.1.val) hAdj
+  have hdzV := congrArg (fun t : degreeLT R n × degreeLT R m ↦ t.2.val) hAdj
+  change d • u = d • (A P).1.val at hdzU
+  change d • v = d • (A P).2.val at hdzV
+  -- The single regular-cancellation stage: d times each coordinate difference is zero.
+  have hzU : u = (A P).1.val := by
+    apply sub_eq_zero.mp
+    apply eq_zero_of_C_mul_eq_zero_of_regular hd
+    rw [mul_sub]
+    exact sub_eq_zero.mpr (by simpa only [smul_eq_C_mul] using hdzU)
+  have hzV : v = (A P).2.val := by
+    apply sub_eq_zero.mp
+    apply eq_zero_of_C_mul_eq_zero_of_regular hd
+    rw [mul_sub]
+    exact sub_eq_zero.mpr (by simpa only [smul_eq_C_mul] using hdzV)
+  have huIJ (k : ℕ) : u.coeff k ∈ I * J := by
+    rw [hzU]
+    exact (coeff_adjSylvester_mem (I * J) n m g₀ h₀ P hqIJ k).1
+  have hvIJ (k : ℕ) : v.coeff k ∈ I * J := by
+    rw [hzV]
+    exact (coeff_adjSylvester_mem (I * J) n m g₀ h₀ P hqIJ k).2
   have hJfg : J.FG := by
     refine ⟨Finset.univ.image c, ?_⟩
     simp only [Finset.coe_image, Finset.coe_univ, Set.image_univ]
@@ -485,17 +493,15 @@ private theorem eq_normalized_factors_of_regular_resultant
     apply Ideal.span_le.mpr
     rintro x ⟨r, rfl⟩
     cases r with
-    | inl i => exact hDUK i
-    | inr j => exact hDVK j
+    | inl i => exact huIJ i
+    | inr j => exact hvIJ j
   have hJzero : J = ⊥ :=
     Submodule.eq_bot_of_le_smul_of_le_jacobson_bot I J hJfg hJle hI
-  have hDUzero : U - U' = 0 := by
-    ext k
-    simpa only [hJzero, Ideal.mem_bot, coeff_zero] using hDUJ k
-  have hDVzero : V - V' = 0 := by
-    ext k
-    simpa only [hJzero, Ideal.mem_bot, coeff_zero] using hDVJ k
-  exact ⟨sub_eq_zero.mp hDUzero, sub_eq_zero.mp hDVzero⟩
+  constructor
+  · ext k
+    simpa only [hJzero, Ideal.mem_bot, coeff_zero] using huJ k
+  · ext k
+    simpa only [hJzero, Ideal.mem_bot, coeff_zero] using hvJ k
 
 /-- A zero of the unit residual in the ideal yields the required factorization.
 The expansion multiplies the residual by the resultant squared; it never cancels it. -/
@@ -556,6 +562,33 @@ private theorem factorization_of_adjugateUnitResidual {R : Type u} [CommRing R]
 
 end
 
+/-- Two factorizations are equal if their pair differences have the prescribed
+strict degree bounds and the two crossed reference corrections have coefficients
+in the resultant times a Jacobson ideal. The reference corrections themselves may
+have arbitrary degree. The resultant uses the fixed nominal bounds `n`, `m`. -/
+theorem eq_factors_of_regular_resultant_of_degree_sub_lt
+    {R : Type u} [CommRing R]
+    (I : Ideal R) (hI : I ≤ (⊥ : Ideal R).jacobson)
+    {n m : ℕ} {g₀ h₀ g h g₂ h₂ : Polynomial R}
+    (hg₀ : g₀.natDegree ≤ n) (hh₀ : h₀.natDegree ≤ m)
+    (hd : g₀.resultant h₀ n m ∈ nonZeroDivisors R)
+    (hprod : g * h = g₂ * h₂)
+    (hgg₂ : (g - g₂).degree < (n : WithBot ℕ))
+    (hhh₂ : (h - h₂).degree < (m : WithBot ℕ))
+    (hg : ∀ k : ℕ,
+      (g - g₀).coeff k ∈ Ideal.span {g₀.resultant h₀ n m} * I)
+    (hh₂ : ∀ k : ℕ,
+      (h₂ - h₀).coeff k ∈ Ideal.span {g₀.resultant h₀ n m} * I) :
+    g = g₂ ∧ h = h₂ := by
+  have hlinear : g₀ * (h - h₂) + h₀ * (g - g₂) +
+      ((g - g₀) * (h - h₂) + (h₂ - h₀) * (g - g₂)) = 0 := by
+    calc
+      _ = g * h - g₂ * h₂ := by ring
+      _ = 0 := sub_eq_zero.mpr hprod
+  obtain ⟨hu, hv⟩ := eq_zero_of_regular_resultant_relation I hI n m g₀ h₀
+    hg₀ hh₀ hd (g - g₂) (h - h₂) (g - g₀) (h₂ - h₀) hgg₂ hhh₂ hg hh₂ hlinear
+  exact ⟨sub_eq_zero.mp hu, sub_eq_zero.mp hv⟩
+
 /-- Two factorizations in the same strict-degree correction neighborhood are equal
 if its controlling resultant is a non-zero-divisor and its ideal is contained in
 the Jacobson radical. The nominal bounds `n` and `m` may exceed the natural degrees
@@ -575,37 +608,15 @@ theorem eq_factors_of_regular_resultant
     (hcoeff' : ∀ k : ℕ, (g' - g₀).coeff k ∈ Ideal.span {resultant g₀ h₀ n m} * I ∧
       (h' - h₀).coeff k ∈ Ideal.span {resultant g₀ h₀ n m} * I) :
     g = g' ∧ h = h' := by
-  let d := resultant g₀ h₀ n m
-  obtain ⟨U, hU, _, hUg⟩ := exists_mul_of_coeff_mem_span_singleton_mul I d hg
-    (fun k ↦ (hcoeff k).1)
-  obtain ⟨V, hV, hVI, hVh⟩ := exists_mul_of_coeff_mem_span_singleton_mul I d hh
-    (fun k ↦ (hcoeff k).2)
-  obtain ⟨U', hU', hU'I, hU'g⟩ := exists_mul_of_coeff_mem_span_singleton_mul I d hg'
-    (fun k ↦ (hcoeff' k).1)
-  obtain ⟨V', hV', _, hV'h⟩ := exists_mul_of_coeff_mem_span_singleton_mul I d hh'
-    (fun k ↦ (hcoeff' k).2)
-  have heg : g = g₀ + C d * U := by
-    calc
-      g = g₀ + (g - g₀) := by ring
-      _ = _ := by rw [hUg]
-  have heh : h = h₀ + C d * V := by
-    calc
-      h = h₀ + (h - h₀) := by ring
-      _ = _ := by rw [hVh]
-  have heg' : g' = g₀ + C d * U' := by
-    calc
-      g' = g₀ + (g' - g₀) := by ring
-      _ = _ := by rw [hU'g]
-  have heh' : h' = h₀ + C d * V' := by
-    calc
-      h' = h₀ + (h' - h₀) := by ring
-      _ = _ := by rw [hV'h]
-  rw [heg, heh, heg', heh'] at hprod
-  obtain ⟨hUU, hVV⟩ := eq_normalized_factors_of_regular_resultant I hI n m g₀ h₀
-    hg₀ hh₀ hd U V U' V' hU hV hU' hV' hVI hU'I hprod
-  constructor
-  · rw [heg, heg', hUU]
-  · rw [heh, heh', hVV]
+  apply eq_factors_of_regular_resultant_of_degree_sub_lt I hI hg₀ hh₀ hd hprod
+  · have heq : g - g' = (g - g₀) - (g' - g₀) := by ring
+    rw [heq]
+    exact (degree_sub_le _ _).trans_lt (max_lt hg hg')
+  · have heq : h - h' = (h - h₀) - (h' - h₀) := by ring
+    rw [heq]
+    exact (degree_sub_le _ _).trans_lt (max_lt hh hh')
+  · exact fun k ↦ (hcoeff k).1
+  · exact fun k ↦ (hcoeff' k).2
 
 /-- Uniqueness in the resultant-controlled fixed-leading-coefficient neighborhood
 at the natural degrees of the initial factors. -/
@@ -840,3 +851,46 @@ theorem exists_factorization_of_resultant_sq_map
 
 
 end Polynomial
+
+/-- A square-resultant error admits a unique ordered factorization over a Henselian target
+among pairs whose corrections satisfy the stated strict-degree bounds and whose correction
+coefficients lie in `Ideal.span {φ (g₀.resultant h₀ n m)} * J`, provided the mapped resultant
+is a non-zero-divisor. The supplied bounds and resultant indices are retained even when the
+coefficient map lowers degrees. -/
+theorem Polynomial.existsUnique_factorization_of_resultant_sq_map
+    {R : Type u} {S : Type v} [CommRing R] [CommRing S]
+    (φ : R →+* S) (I : Ideal R) (J : Ideal S) [HenselianRing S J]
+    (hIJ : Ideal.map φ I ≤ J) {n m : ℕ} {f g₀ h₀ : Polynomial R}
+    (hg₀ : g₀.natDegree ≤ n) (hh₀ : h₀.natDegree ≤ m)
+    (hd : φ (g₀.resultant h₀ n m) ∈ nonZeroDivisors S)
+    (hdegree : (f - g₀ * h₀).degree <
+      (n : WithBot ℕ) + (m : WithBot ℕ))
+    (herror : ∀ k : ℕ, (f - g₀ * h₀).coeff k ∈
+      Ideal.span {(g₀.resultant h₀ n m) ^ 2} * I) :
+    ∃! p : Polynomial S × Polynomial S,
+      f.map φ = p.1 * p.2 ∧
+      (p.1 - g₀.map φ).degree < (n : WithBot ℕ) ∧
+      (p.2 - h₀.map φ).degree < (m : WithBot ℕ) ∧
+      ∀ k : ℕ,
+        (p.1 - g₀.map φ).coeff k ∈
+          Ideal.span {φ (g₀.resultant h₀ n m)} * J ∧
+        (p.2 - h₀.map φ).coeff k ∈
+          Ideal.span {φ (g₀.resultant h₀ n m)} * J := by
+  obtain ⟨G, H, hprod, hG, hH, hcoeff⟩ :=
+    Polynomial.exists_factorization_of_resultant_sq_map φ I J hIJ hg₀ hh₀ hdegree herror
+  refine ⟨(G, H), ⟨hprod, hG, hH, hcoeff⟩, ?_⟩
+  rintro ⟨G', H'⟩ ⟨hprod', hG', hH', hcoeff'⟩
+  have hresultant :
+      (g₀.map φ).resultant (h₀.map φ) n m = φ (g₀.resultant h₀ n m) :=
+    Polynomial.resultant_map_map g₀ h₀ n m φ
+  have hd' : (g₀.map φ).resultant (h₀.map φ) n m ∈ nonZeroDivisors S := by
+    simpa only [hresultant] using hd
+  obtain ⟨hG_eq, hH_eq⟩ :=
+    Polynomial.eq_factors_of_regular_resultant J
+      (HenselianRing.jac (R := S) (I := J))
+      ((Polynomial.natDegree_map_le (f := φ) (p := g₀)).trans hg₀)
+      ((Polynomial.natDegree_map_le (f := φ) (p := h₀)).trans hh₀)
+      hd' (hprod'.symm.trans hprod) hG' hH' hG hH
+      (by simpa only [hresultant] using hcoeff')
+      (by simpa only [hresultant] using hcoeff)
+  exact Prod.ext hG_eq hH_eq

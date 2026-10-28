@@ -8,18 +8,21 @@ module
 public import Mathlib
 
 /-!
-# Coefficients of endomorphisms of a quotient
+# Coefficients of linear maps from a quotient
 
 For a left ideal `I`, `Ideal.moduleSpan I M` is the submodule of finite sums
 of elements `i • m`. No commutativity of the ring or of its action on `M`
-is required. For the quotient by this submodule, commuting scalar actions
-on the quotient suffice for a finite coefficient decomposition of its
-endomorphisms. The projectivity hypothesis is on `M`, not on the quotient.
+is required. Linear maps from the quotient to a module annihilated by `I`
+admit uniform finite coefficient decompositions under finite generation
+of the coefficient ideal, of the range, or of the source quotient.
+Commuting scalar actions are required only on the target. Projectivity
+is required only on the original module `M`, not on either quotient or target.
+The endomorphism results are specializations to the canonical quotient.
 -/
 
 @[expose] public section
 
-universe u v
+universe u v w
 
 namespace Ideal
 
@@ -50,6 +53,17 @@ theorem moduleSpan_le {I : Ideal R} {P : Submodule R N} :
 theorem moduleSpan_mono {I J : Ideal R} (h : I ≤ J) :
     I.moduleSpan N ≤ J.moduleSpan N :=
   moduleSpan_le.2 fun _ ha n => J.smul_mem_moduleSpan (h ha) n
+
+/-- Every linear map to a module annihilated by `I` kills `I M`. -/
+theorem moduleSpan_le_ker_of_annihilated (I : Ideal R)
+    (M : Type w) [AddCommMonoid M] [Module R M]
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (f : M →ₗ[R] N) :
+    I.moduleSpan M ≤ LinearMap.ker f := by
+  apply moduleSpan_le.2
+  intro a ha m
+  change f (a • m) = 0
+  rw [map_smul]
+  exact hN a ha (f m)
 
 /-- Every element of an ideal-generated submodule uses only a finitely
 generated left subideal of the coefficient ideal. -/
@@ -148,21 +162,77 @@ theorem smul_moduleQuotient_eq_zero {a : R} (ha : a ∈ I)
   change a • m ∈ LinearMap.ker (I.moduleSpan M).mkQ
   simpa only [Submodule.ker_mkQ] using I.smul_mem_moduleSpan ha m
 
+variable {N : Type w} [AddCommMonoid N] [Module R N]
+
+/-- Descend to the canonical quotient with the same annihilated target.
+The ring action supplies additive inverses on the target's original carrier. -/
+def descendModuleQuotientTo
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (f : M →ₗ[R] N) :
+    I.ModuleQuotient M →ₗ[R] N := by
+  letI : AddCommGroup N :=
+    { (inferInstance : AddCommMonoid N) with
+      neg := fun n => (-1 : R) • n
+      zsmul := fun z n => (z : R) • n
+      neg_add_cancel := fun n => by
+        simpa only [add_smul, one_smul, zero_smul] using
+          congrArg (fun a : R => a • n) (neg_add_cancel (1 : R))
+      zsmul_zero' := by
+        intro n
+        change ((0 : ℤ) : R) • n = 0
+        simp
+      zsmul_succ' := by
+        intro k n
+        change ((k.succ : ℤ) : R) • n = ((k : ℤ) : R) • n + n
+        simp [add_smul]
+      zsmul_neg' := by
+        intro k n
+        change ((Int.negSucc k : ℤ) : R) • n =
+          (-1 : R) • (((k.succ : ℤ) : R) • n)
+        rw [← mul_smul]
+        congr 1
+        simp }
+  exact (I.moduleSpan M).liftQ f (I.moduleSpan_le_ker_of_annihilated M hN f)
+
+@[simp]
+theorem descendModuleQuotientTo_mk
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (f : M →ₗ[R] N) (m : M) :
+    I.descendModuleQuotientTo M hN f (I.moduleQuotientMk M m) = f m := rfl
+
+@[simp]
+theorem descendModuleQuotientTo_comp_mk
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (f : M →ₗ[R] N) :
+    (I.descendModuleQuotientTo M hN f).comp (I.moduleQuotientMk M) = f := by
+  apply LinearMap.ext
+  intro m
+  rfl
+
+/-- A descended map is characterized by its composite with the projection. -/
+theorem descendModuleQuotientTo_eq_iff
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (f : M →ₗ[R] N)
+    (g : I.ModuleQuotient M →ₗ[R] N) :
+    I.descendModuleQuotientTo M hN f = g ↔ f = g.comp (I.moduleQuotientMk M) := by
+  constructor
+  · intro h
+    simpa only [h] using (I.descendModuleQuotientTo_comp_mk M hN f).symm
+  · intro h
+    apply LinearMap.ext
+    intro q
+    obtain ⟨m, rfl⟩ := I.moduleQuotientMk_surjective M q
+    change f m = g (I.moduleQuotientMk M m)
+    exact LinearMap.congr_fun h m
+
 /-- Every linear map into this quotient kills `I M`, independently of any
 other coefficient ideal. -/
 theorem moduleSpan_le_ker (f : M →ₗ[R] I.ModuleQuotient M) :
-    I.moduleSpan M ≤ LinearMap.ker f := by
-  apply moduleSpan_le.2
-  intro a ha m
-  change f (a • m) = 0
-  rw [map_smul]
-  exact I.smul_moduleQuotient_eq_zero M ha (f m)
+    I.moduleSpan M ≤ LinearMap.ker f :=
+  I.moduleSpan_le_ker_of_annihilated M
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) f
 
 /-- Descend a linear map to the canonical quotient using its annihilation
 by `I`. -/
 def descendModuleQuotient (f : M →ₗ[R] I.ModuleQuotient M) :
     I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M :=
-  (I.moduleSpan M).liftQ f (I.moduleSpan_le_ker M f)
+  I.descendModuleQuotientTo M (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) f
 
 @[simp]
 theorem descendModuleQuotient_mk (f : M →ₗ[R] I.ModuleQuotient M) (m : M) :
@@ -217,7 +287,168 @@ theorem moduleSpan_le_range_coefficientMap (s : Finset R) :
         simpa only [smul_eq_mul, mul_smul, smul_comm r a n] using iha (r • n)
   exact h n
 
+/-- A map in the ideal-generated span of linear maps takes values in the
+ideal-generated submodule of its target. -/
+theorem range_le_moduleSpan_of_mem_moduleSpan
+    {A : Type*} [AddCommMonoid A] [Module R A] {J : Ideal R} {f : A →ₗ[R] N}
+    (hf : f ∈ J.moduleSpan (A →ₗ[R] N)) :
+    LinearMap.range f ≤ J.moduleSpan N := by
+  have h : ∀ x : A, f x ∈ J.moduleSpan N := by
+    induction hf using Submodule.span_induction with
+    | mem g hg =>
+        rcases hg with ⟨a, ha, g, rfl⟩
+        intro x
+        exact J.smul_mem_moduleSpan ha (g x)
+    | zero =>
+        intro x
+        exact (J.moduleSpan N).zero_mem
+    | add g k _ _ ihg ihk =>
+        intro x
+        exact (J.moduleSpan N).add_mem (ihg x) (ihk x)
+    | smul a g _ ihg =>
+        intro x
+        exact (J.moduleSpan N).smul_mem a (ihg x)
+  rintro _ ⟨x, rfl⟩
+  exact h x
+
 end LinearMap
+
+namespace Ideal
+
+variable {R : Type u} [Ring R]
+variable {M : Type v} [AddCommGroup M] [Module R M]
+variable {N : Type w} [AddCommMonoid N] [Module R N] [SMulCommClass R R N]
+variable (I J : Ideal R)
+variable [Module.Projective R M]
+
+/-- Finite generators of `J` give a single family of linear-map coefficients.
+Only the original module `M` is used as a projective lifting source. -/
+theorem exists_linearMap_coefficients_of_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (hJ : J.FG)
+    (f : I.ModuleQuotient M →ₗ[R] N)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    ∃ (s : Finset R) (v : s → (I.ModuleQuotient M →ₗ[R] N)),
+      (∀ a : s, (a : R) ∈ J) ∧ f = ∑ a : s, (a : R) • v a := by
+  classical
+  obtain ⟨s, hs⟩ := hJ
+  let c := LinearMap.coefficientMap (N := N) s
+  have hc : J.moduleSpan N ≤ LinearMap.range c := by
+    rw [← hs]
+    exact LinearMap.moduleSpan_le_range_coefficientMap (N := N) s
+  let fM : M →ₗ[R] LinearMap.range c :=
+    (f.comp (I.moduleQuotientMk M)).codRestrict (LinearMap.range c) (fun m =>
+      hc (hf ⟨I.moduleQuotientMk M m, rfl⟩))
+  have hc_surj : Function.Surjective c.rangeRestrict := by
+    intro n
+    obtain ⟨v, hv⟩ := n.property
+    exact ⟨v, Subtype.ext hv⟩
+  obtain ⟨l, hl⟩ := Module.projective_lifting_property c.rangeRestrict fM hc_surj
+  let v : s → (I.ModuleQuotient M →ₗ[R] N) := fun a =>
+    I.descendModuleQuotientTo M hN ((LinearMap.proj a).comp l)
+  refine ⟨s, v, ?_, ?_⟩
+  · intro a
+    rw [← hs]
+    exact Submodule.subset_span a.property
+  · apply LinearMap.ext
+    intro q
+    obtain ⟨m, rfl⟩ := I.moduleQuotientMk_surjective M q
+    have hm : c (l m) = f (I.moduleQuotientMk M m) :=
+      congrArg (fun z : LinearMap.range c => (z : N))
+        (LinearMap.congr_fun hl m)
+    simpa [c, v] using hm.symm
+
+/-- A finitely generated range has one finite coefficient family in `J`.
+The finite-cover argument needs only a left subideal `J₀ ≤ J`. -/
+theorem exists_linearMap_coefficients_of_range_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    (f : I.ModuleQuotient M →ₗ[R] N) (hfg : (LinearMap.range f).FG)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    ∃ (s : Finset R) (v : s → (I.ModuleQuotient M →ₗ[R] N)),
+      (∀ a : s, (a : R) ∈ J) ∧ f = ∑ a : s, (a : R) • v a := by
+  obtain ⟨J₀, hJ₀, hle, hcover⟩ := exists_fg_subideal_cover hfg hf
+  obtain ⟨s, v, hs, hv⟩ := I.exists_linearMap_coefficients_of_fg J₀ hN hJ₀ f hcover
+  exact ⟨s, v, fun a => hle (hs a), hv⟩
+
+/-- A finitely generated source quotient gives a uniform coefficient family,
+without any finite-generation assumption on the target or on `J`. -/
+theorem exists_linearMap_coefficients_of_finite
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    [Module.Finite R (I.ModuleQuotient M)]
+    (f : I.ModuleQuotient M →ₗ[R] N)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    ∃ (s : Finset R) (v : s → (I.ModuleQuotient M →ₗ[R] N)),
+      (∀ a : s, (a : R) ∈ J) ∧ f = ∑ a : s, (a : R) • v a := by
+  exact I.exists_linearMap_coefficients_of_range_fg J hN f (by simp) hf
+
+/-- Finite generation of the coefficient ideal suffices for membership in
+its submodule of linear maps from the quotient. -/
+theorem linearMap_mem_moduleSpan_of_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (hJ : J.FG)
+    (f : I.ModuleQuotient M →ₗ[R] N)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) := by
+  obtain ⟨s, v, hs, hv⟩ := I.exists_linearMap_coefficients_of_fg J hN hJ f hf
+  rw [hv]
+  exact Submodule.sum_mem _ (fun a _ => J.smul_mem_moduleSpan (hs a) (v a))
+
+/-- Finite generation of the range suffices; neither `J` nor the source
+quotient nor the target need be finitely generated. -/
+theorem linearMap_mem_moduleSpan_of_range_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    (f : I.ModuleQuotient M →ₗ[R] N) (hfg : (LinearMap.range f).FG)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) := by
+  obtain ⟨J₀, hJ₀, hle, hcover⟩ := exists_fg_subideal_cover hfg hf
+  exact moduleSpan_mono hle (I.linearMap_mem_moduleSpan_of_fg J₀ hN hJ₀ f hcover)
+
+/-- Finite generation is required only on the source quotient, not on the
+target or on the coefficient ideal. -/
+theorem linearMap_mem_moduleSpan_of_finite
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    [Module.Finite R (I.ModuleQuotient M)]
+    (f : I.ModuleQuotient M →ₗ[R] N)
+    (hf : LinearMap.range f ≤ J.moduleSpan N) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) := by
+  exact I.linearMap_mem_moduleSpan_of_range_fg J hN f (by simp) hf
+
+/-- For a finitely generated coefficient ideal, ideal-span membership is
+characterized by the range condition. -/
+theorem linearMap_mem_moduleSpan_iff_of_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0) (hJ : J.FG)
+    (f : I.ModuleQuotient M →ₗ[R] N) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) ↔
+      LinearMap.range f ≤ J.moduleSpan N := by
+  constructor
+  · intro hf
+    exact LinearMap.range_le_moduleSpan_of_mem_moduleSpan hf
+  · exact I.linearMap_mem_moduleSpan_of_fg J hN hJ f
+
+/-- For a finitely generated range, ideal-span membership is characterized
+by the range condition, with no containment assumption on `I` and `J`. -/
+theorem linearMap_mem_moduleSpan_iff_of_range_fg
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    (f : I.ModuleQuotient M →ₗ[R] N) (hfg : (LinearMap.range f).FG) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) ↔
+      LinearMap.range f ≤ J.moduleSpan N := by
+  constructor
+  · intro hf
+    exact LinearMap.range_le_moduleSpan_of_mem_moduleSpan hf
+  · exact I.linearMap_mem_moduleSpan_of_range_fg J hN f hfg
+
+/-- For a finitely generated source quotient, ideal-span membership is
+characterized by the range condition. -/
+theorem linearMap_mem_moduleSpan_iff_of_finite
+    (hN : ∀ a ∈ I, ∀ n : N, a • n = 0)
+    [Module.Finite R (I.ModuleQuotient M)]
+    (f : I.ModuleQuotient M →ₗ[R] N) :
+    f ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] N) ↔
+      LinearMap.range f ≤ J.moduleSpan N := by
+  constructor
+  · intro hf
+    exact LinearMap.range_le_moduleSpan_of_mem_moduleSpan hf
+  · exact I.linearMap_mem_moduleSpan_of_finite J hN f
+
+end Ideal
 
 namespace Ideal
 
@@ -233,44 +464,18 @@ theorem exists_endomorphism_coefficients_of_fg (hJ : J.FG)
     (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)
     (hu : LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M)) :
     ∃ (s : Finset R) (v : s → (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)),
-      (∀ a : s, (a : R) ∈ J) ∧ u = ∑ a : s, (a : R) • v a := by
-  classical
-  obtain ⟨s, hs⟩ := hJ
-  let c := LinearMap.coefficientMap (N := I.ModuleQuotient M) s
-  have hc : J.moduleSpan (I.ModuleQuotient M) ≤ LinearMap.range c := by
-    rw [← hs]
-    exact LinearMap.moduleSpan_le_range_coefficientMap (N := I.ModuleQuotient M) s
-  let f : M →ₗ[R] LinearMap.range c :=
-    (u.comp (I.moduleQuotientMk M)).codRestrict (LinearMap.range c) (fun m =>
-      hc (hu ⟨I.moduleQuotientMk M m, rfl⟩))
-  have hc_surj : Function.Surjective c.rangeRestrict := by
-    intro q
-    obtain ⟨v, hv⟩ := q.property
-    exact ⟨v, Subtype.ext hv⟩
-  obtain ⟨l, hl⟩ := Module.projective_lifting_property c.rangeRestrict f hc_surj
-  let v : s → (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) := fun a =>
-    I.descendModuleQuotient M ((LinearMap.proj a).comp l)
-  refine ⟨s, v, ?_, ?_⟩
-  · intro a
-    rw [← hs]
-    exact Submodule.subset_span a.property
-  · apply LinearMap.ext
-    intro q
-    obtain ⟨m, rfl⟩ := I.moduleQuotientMk_surjective M q
-    have hm : c (l m) = u (I.moduleQuotientMk M m) :=
-      congrArg (fun z : LinearMap.range c => (z : I.ModuleQuotient M))
-        (LinearMap.congr_fun hl m)
-    simpa [c, v] using hm.symm
+      (∀ a : s, (a : R) ∈ J) ∧ u = ∑ a : s, (a : R) • v a :=
+  I.exists_linearMap_coefficients_of_fg J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) hJ u hu
 
 /-- The finitely generated coefficient-ideal alternative. No finiteness
 hypothesis on the quotient or on the range is needed. -/
 theorem endomorphism_mem_moduleSpan_of_fg (hJ : J.FG)
     (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)
     (hu : LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M)) :
-    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) := by
-  obtain ⟨s, v, hs, hv⟩ := I.exists_endomorphism_coefficients_of_fg J hJ u hu
-  rw [hv]
-  exact Submodule.sum_mem _ (fun a _ => J.smul_mem_moduleSpan (hs a) (v a))
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_of_fg J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) hJ u hu
 
 omit [Module.Projective R M] [SMulCommClass R R (I.ModuleQuotient M)] in
 /-- Finite generation of the range supplies a finitely generated left
@@ -289,9 +494,9 @@ theorem endomorphism_mem_moduleSpan_of_range_fg
     (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)
     (hfg : (LinearMap.range u).FG)
     (hu : LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M)) :
-    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) := by
-  obtain ⟨J₀, hJ₀, hle, hcover⟩ := I.exists_fg_subideal_cover_range J u hfg hu
-  exact moduleSpan_mono hle (I.endomorphism_mem_moduleSpan_of_fg J₀ hJ₀ u hcover)
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_of_range_fg J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) u hfg hu
 
 /-- The finitely generated quotient alternative, with no finite-generation
 hypothesis on the coefficient ideal. -/
@@ -299,8 +504,115 @@ theorem endomorphism_mem_moduleSpan_of_finite
     [Module.Finite R (I.ModuleQuotient M)]
     (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)
     (hu : LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M)) :
-    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) := by
-  apply I.endomorphism_mem_moduleSpan_of_range_fg J u _ hu
-  simp
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_of_finite J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) u hu
+
+/-- The characteristic range criterion for a finitely generated ideal of
+endomorphism coefficients. -/
+theorem endomorphism_mem_moduleSpan_iff_of_fg (hJ : J.FG)
+    (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) :
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) ↔
+      LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_iff_of_fg J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) hJ u
+
+/-- The characteristic range criterion for endomorphisms of finite range. -/
+theorem endomorphism_mem_moduleSpan_iff_of_range_fg
+    (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M)
+    (hfg : (LinearMap.range u).FG) :
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) ↔
+      LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_iff_of_range_fg J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) u hfg
+
+/-- The characteristic range criterion when the source quotient is finite. -/
+theorem endomorphism_mem_moduleSpan_iff_of_finite
+    [Module.Finite R (I.ModuleQuotient M)]
+    (u : I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) :
+    u ∈ J.moduleSpan (I.ModuleQuotient M →ₗ[R] I.ModuleQuotient M) ↔
+      LinearMap.range u ≤ J.moduleSpan (I.ModuleQuotient M) :=
+  I.linearMap_mem_moduleSpan_iff_of_finite J
+    (fun a ha n => I.smul_moduleQuotient_eq_zero M (a := a) ha n) u
 
 end Ideal
+
+universe uR uA uB uC
+
+/-- Composition carries coefficient spans into the span of a left ideal
+containing the ordered products of postmap and premap coefficients. -/
+theorem LinearMap.comp_mem_moduleSpan
+    {R : Type uR} [Semiring R]
+    {A : Type uA} [AddCommMonoid A] [Module R A]
+    {B : Type uB} [AddCommMonoid B] [Module R B] [SMulCommClass R R B]
+    {C : Type uC} [AddCommMonoid C] [Module R C] [SMulCommClass R R C]
+    {J K L : Ideal R}
+    (hJK : ∀ a ∈ J, ∀ b ∈ K, a * b ∈ L)
+    {g : B →ₗ[R] C} {f : A →ₗ[R] B}
+    (hg : g ∈ J.moduleSpan (B →ₗ[R] C))
+    (hf : f ∈ K.moduleSpan (A →ₗ[R] B)) :
+    g.comp f ∈ L.moduleSpan (A →ₗ[R] C) := by
+  induction hg using Submodule.span_induction with
+  | mem g hg =>
+      rcases hg with ⟨a, ha, g, rfl⟩
+      induction hf using Submodule.span_induction with
+      | mem f hf =>
+          rcases hf with ⟨b, hb, f, rfl⟩
+          have hcomp : (a • g).comp (b • f) = (a * b) • (g.comp f) := by
+            apply LinearMap.ext
+            intro x
+            change a • g (b • f x) = (a * b) • g (f x)
+            rw [map_smul, mul_smul]
+          rw [hcomp]
+          exact L.smul_mem_moduleSpan (hJK a ha b hb) (g.comp f)
+      | zero =>
+          convert (L.moduleSpan (A →ₗ[R] C)).zero_mem using 1
+          apply LinearMap.ext
+          intro x
+          change (a • g) 0 = 0
+          exact map_zero _
+      | add f k _ _ ihf ihk =>
+          convert (L.moduleSpan (A →ₗ[R] C)).add_mem ihf ihk using 1
+          apply LinearMap.ext
+          intro x
+          change (a • g) (f x + k x) = (a • g) (f x) + (a • g) (k x)
+          exact map_add (a • g) (f x) (k x)
+      | smul r f _ ihf =>
+          convert (L.moduleSpan (A →ₗ[R] C)).smul_mem r ihf using 1
+          apply LinearMap.ext
+          intro x
+          change (a • g) (r • f x) = r • ((a • g) (f x))
+          rw [map_smul]
+  | zero =>
+      exact (L.moduleSpan (A →ₗ[R] C)).zero_mem
+  | add g k _ _ ihg ihk =>
+      exact (L.moduleSpan (A →ₗ[R] C)).add_mem ihg ihk
+  | smul r g _ ihg =>
+      exact (L.moduleSpan (A →ₗ[R] C)).smul_mem r ihg
+
+universe uX
+
+/-- Coefficient-span bounds propagate along an already given recurrence of linear maps.
+For the given maps `c n` and `g n` satisfying `c (n + 1) = (g n).comp (c n)`,
+a single initial bound and the ordered postmap-times-premap coefficient containments
+give the bound at every stage. -/
+theorem LinearMap.mem_moduleSpan_of_comp_recurrence
+    {R : Type uR} [Semiring R]
+    {A : Type uA} [AddCommMonoid A] [Module R A]
+    {X : Nat → Type uX}
+    [∀ n, AddCommMonoid (X n)] [∀ n, Module R (X n)]
+    [∀ n, SMulCommClass R R (X n)]
+    {J K : Nat → Ideal R}
+    (hJK : ∀ n, ∀ a ∈ J n, ∀ b ∈ K n, a * b ∈ K (Nat.succ n))
+    (g : ∀ n, X n →ₗ[R] X (Nat.succ n))
+    (c : ∀ n, A →ₗ[R] X n)
+    (hrec : ∀ n, c (Nat.succ n) = (g n).comp (c n))
+    (hg : ∀ n, g n ∈ (J n).moduleSpan (X n →ₗ[R] X (Nat.succ n)))
+    (hc0 : c 0 ∈ (K 0).moduleSpan (A →ₗ[R] X 0)) :
+    ∀ n, c n ∈ (K n).moduleSpan (A →ₗ[R] X n) := by
+  intro n
+  induction n with
+  | zero => exact hc0
+  | succ n ih =>
+      rw [hrec n]
+      exact LinearMap.comp_mem_moduleSpan (hJK n) (hg n) ih
