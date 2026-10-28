@@ -138,3 +138,41 @@ theorem exists_eval₂_eq_of_sub_eq_mulVec
   exact J.add_mem hbci (hc i)
 
 end HenselianRing
+
+@[expose] public section
+
+namespace HenselianRing
+
+universe u₁ v₁ w₁
+
+open Classical in
+/-- A target is attained with coordinate corrections in `J = (det A) I` if and only if its
+value displacement is the Jacobian image of a vector whose coordinates lie in `J`. -/
+theorem exists_eval₂_eq_iff_exists_sub_eq_mulVec
+    {C : Type u₁} [CommSemiring C] {R : Type v₁} [CommRing R]
+    {σ : Type w₁} [Fintype σ] {I : Ideal R} [HenselianRing R I]
+    (φ : C →+* R) (F : σ → MvPolynomial σ C) (a t : σ → R) :
+    let A : Matrix σ σ R := fun i j =>
+      MvPolynomial.eval₂ φ a (MvPolynomial.pderiv j (F i))
+    let J : Ideal R := Ideal.span ({A.det} : Set R) * I
+    (∃ b : σ → R, (∀ i, MvPolynomial.eval₂ φ b (F i) = t i) ∧
+      ∀ i, b i - a i ∈ J) ↔
+    (∃ η : σ → R, (∀ i, η i ∈ J) ∧
+      (fun i => t i - MvPolynomial.eval₂ φ a (F i)) = A.mulVec η) := by
+  dsimp only
+  constructor
+  · rintro ⟨b, hb_eval, hb_box⟩
+    obtain ⟨η, hη, hdisplacement⟩ :=
+      MvPolynomial.exists_eval₂_sub_eq_jacobian_mulVec_of_sub_mem_span_det_mul
+        φ F a I b hb_box
+    refine ⟨η, hη, ?_⟩
+    have hA :
+        Matrix.of (fun i j => MvPolynomial.eval₂ φ a (MvPolynomial.pderiv j (F i))) =
+          (fun i j => MvPolynomial.eval₂ φ a (MvPolynomial.pderiv j (F i))) := by
+      funext i j
+      rfl
+    rw [hA] at hdisplacement
+    simpa only [hb_eval] using hdisplacement
+  · exact HenselianRing.exists_eval₂_eq_of_sub_eq_mulVec φ F a t
+
+end HenselianRing

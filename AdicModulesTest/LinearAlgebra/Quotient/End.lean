@@ -813,6 +813,16 @@ example : upperEight + upperEight ≠ 0 ∧
       (upperEight + upperEight) = 0 :=
   ⟨double_upperEight_ne_zero, nested_double_upper_eq_zero⟩
 
+example : upperEight + upperEight ≠ 0 ∧
+    Module.End.reduceModIdeal idealTwo (upperEight + upperEight) = 0 := by
+  refine ⟨double_upperEight_ne_zero, ?_⟩
+  have hf : upperEight + upperEight ∈ RingHom.ker
+      (Module.End.reduceModIdealOfLE (M := R × R)
+        idealEight idealTwo idealEight_le_idealTwo) := nested_double_upper_eq_zero
+  rw [Module.End.ker_reduceModIdealOfLE_eq_ker_reduceModIdeal
+    (M := R × R) idealEight idealTwo idealEight_le_idealTwo] at hf
+  exact hf
+
 example : ¬ Function.Injective
     (Module.End.reduceModIdealOfLE (M := R × R)
       idealEight idealTwo idealEight_le_idealTwo) := by

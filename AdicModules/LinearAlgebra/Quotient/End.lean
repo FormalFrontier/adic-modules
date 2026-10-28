@@ -432,6 +432,40 @@ theorem reduceModIdealOfLE_surjective [Module.Projective R M]
     exact reduceModIdeal_surjective J
   exact Function.Surjective.of_comp h
 
+/-- For nested left ideals, reducing from `M ⧸ (I • ⊤)` to `M ⧸ (J • ⊤)`
+has the same kernel as reducing endomorphisms of `M ⧸ (I • ⊤)` modulo `J`. -/
+theorem ker_reduceModIdealOfLE_eq_ker_reduceModIdeal
+    (I J : Ideal R) (hIJ : I ≤ J) :
+    RingHom.ker (reduceModIdealOfLE (M := M) I J hIJ) =
+      RingHom.ker (reduceModIdeal (R := R)
+        (M := M ⧸ (I • (⊤ : Submodule R M))) J) := by
+  let q := quotientMapOfLE (M := M) I J hIJ
+  have hq := ker_quotientMap_eq_smul_top I J q (fun _ => rfl)
+  apply Ideal.ext
+  intro f
+  change reduceModIdealOfLE I J hIJ f = 0 ↔
+    reduceModIdeal (M := M ⧸ (I • (⊤ : Submodule R M))) J f = 0
+  have hzero :
+      reduceModIdeal (M := M ⧸ (I • (⊤ : Submodule R M))) J f = 0 ↔
+        ∀ x, f x ∈ J • (⊤ : Submodule R (M ⧸ (I • (⊤ : Submodule R M)))) := by
+    simpa only [map_zero, LinearMap.zero_apply, sub_zero] using
+      (reduceModIdeal_eq_iff J f 0)
+  rw [hzero]
+  constructor
+  · intro hf x
+    have hsquare := (reduceModIdealOfLE_eq_iff I J hIJ f 0).mp hf.symm
+    rw [← hq]
+    change q (f x) = 0
+    exact (DFunLike.congr_fun hsquare x).symm
+  · intro hf
+    apply Eq.symm
+    apply (reduceModIdealOfLE_eq_iff I J hIJ f 0).mpr
+    apply LinearMap.ext
+    intro x
+    change 0 = q (f x)
+    have hx : f x ∈ LinearMap.ker q := hq.symm ▸ hf x
+    exact (show q (f x) = 0 from hx).symm
+
 /-- Reduction modulo the zero ideal loses no endomorphisms. -/
 theorem reduceModIdeal_injective_bot :
     Function.Injective (reduceModIdeal (M := M) (⊥ : Ideal R)) :=
