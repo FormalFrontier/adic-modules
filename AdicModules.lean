@@ -63,6 +63,7 @@ public import AdicModules.RingTheory.WittVector.Torsion
 public import AdicModules.RingTheory.Ideal.DirectLimit
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
 public import AdicModules.RingTheory.Ideal.Operations
+public import AdicModules.RingTheory.Ideal.PowerCompression
 public import AdicModules.RingTheory.Ideal.Quotient.Finite
 public import AdicModules.RingTheory.Ideal.Quotient.SMulTop
 public import AdicModules.Topology.Algebra.Submodule

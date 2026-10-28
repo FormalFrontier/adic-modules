@@ -182,6 +182,14 @@ automation:
 
 status:
   scope: >-
+    For a commutative semiring R with IsBezout R, an arbitrary ideal I,
+    every n : ℕ and x : R, Ideal.mem_pow_iff_exists_pow_dvd gives
+    x ∈ I ^ n iff there is t ∈ I with t ^ n dividing x. IsBezout means that
+    every finitely generated ideal is principal; I itself need not be finitely
+    generated. The criterion includes n = 0 and x = 0, with no ring or domain
+    assumption. Without IsBezout, the same criterion holds when every pair of
+    elements of I has a common divisor in I. Ideal powers also commute with
+    nonempty inclusion-directed suprema of ideals in a commutative semiring.
     HenselianRing.directLimit preserves Henselian pairs under nonempty directed
     systems of commutative rings whose transition homomorphisms map each ideal
     into the later ideal. The target ideal is the supremum of the canonical

@@ -493,3 +493,109 @@ example {R : Type*} [Semiring R] (S T : Ideal R) (I : ℕ → Ideal R)
   exact hclosed x hx y hy
 
 end Ideal
+
+namespace Ideal
+
+/-- At a positive length, a seeded left-associated product is its seed multiplied
+by the left-associated product starting at the top ideal. -/
+theorem leftProd_eq_mul_leftProd_top_of_pos {R : Type*} [Semiring R]
+    (S : Ideal R) (L : ℕ → Ideal R) (n : ℕ) (hn : 0 < n) :
+    leftProd S L n = S * leftProd (⊤ : Ideal R) L n := by
+  have htop (I : Ideal R) : (⊤ : Ideal R) * I = I :=
+    show (⊤ : Ideal R) * I = I from by
+      apply le_antisymm
+      · refine Ideal.mul_le.mpr ?_
+        intro a _ b hb
+        exact I.mul_mem_left a hb
+      · intro x hx
+        have h1 : (1 : R) ∈ (⊤ : Ideal R) := by trivial
+        simpa only [one_mul] using (Ideal.mul_mem_mul h1 hx)
+  have hassoc (I J K : Ideal R) : (I * J) * K = I * (J * K) :=
+    show (I * J) * K = I * (J * K) from by
+      have hspan (U V : Ideal R) :
+          U * V = span {x : R | ∃ a ∈ U, ∃ b ∈ V, a * b = x} := by
+        apply le_antisymm
+        · refine Ideal.mul_le.mpr ?_
+          intro a ha b hb
+          exact subset_span ⟨a, ha, b, hb, rfl⟩
+        · refine span_le.mpr ?_
+          intro x hx
+          obtain ⟨a, ha, b, hb, rfl⟩ := hx
+          exact Ideal.mul_mem_mul ha hb
+      apply le_antisymm
+      · refine Ideal.mul_le.mpr ?_
+        intro x hx z hz
+        rw [hspan I J] at hx
+        induction hx using Submodule.span_induction with
+        | mem x hx =>
+            obtain ⟨i, hi, j, hj, rfl⟩ := hx
+            rw [mul_assoc i j z]
+            exact Ideal.mul_mem_mul hi (Ideal.mul_mem_mul hj hz)
+        | zero =>
+            simpa only [zero_mul] using (Ideal.zero_mem (I * (J * K)))
+        | add x₁ x₂ hx₁ hx₂ ih₁ ih₂ =>
+            rw [add_mul x₁ x₂ z]
+            exact Ideal.add_mem _ ih₁ ih₂
+        | smul a x hx ih =>
+            change (a * x) * z ∈ I * (J * K)
+            rw [mul_assoc a x z]
+            exact Ideal.mul_mem_left _ a ih
+      · refine Ideal.mul_le.mpr ?_
+        intro i hi y hy
+        have h : ∀ a : R, i * (a * y) ∈ (I * J) * K := by
+          rw [hspan J K] at hy
+          induction hy using Submodule.span_induction with
+          | mem y hy =>
+              obtain ⟨j, hj, k, hk, rfl⟩ := hy
+              intro a
+              rw [← mul_assoc a j k, ← mul_assoc i (a * j) k]
+              exact Ideal.mul_mem_mul (Ideal.mul_mem_mul hi (J.mul_mem_left a hj)) hk
+          | zero =>
+              intro a
+              simpa only [mul_zero] using (Ideal.zero_mem ((I * J) * K))
+          | add y₁ y₂ hy₁ hy₂ ih₁ ih₂ =>
+              intro a
+              rw [mul_add a y₁ y₂, mul_add i (a * y₁) (a * y₂)]
+              exact Ideal.add_mem _ (ih₁ a) (ih₂ a)
+          | smul b y hy ih =>
+              intro a
+              change i * (a * (b * y)) ∈ (I * J) * K
+              rw [← mul_assoc a b y]
+              exact ih (a * b)
+        simpa only [one_mul] using h (1 : R)
+  have hsucc (k : ℕ) :
+      leftProd S L (k + 1) = S * leftProd (⊤ : Ideal R) L (k + 1) := by
+    induction k with
+    | zero =>
+        calc
+          leftProd S L (0 + 1) = S * L 0 := by
+            rw [leftProd_succ, leftProd_zero]
+          _ = S * leftProd (⊤ : Ideal R) L (0 + 1) := by
+            rw [leftProd_succ, leftProd_zero, htop]
+    | succ k ih =>
+        calc
+          leftProd S L (k + 1 + 1) = leftProd S L (k + 1) * L (k + 1) :=
+            leftProd_succ S L (k + 1)
+          _ = (S * leftProd (⊤ : Ideal R) L (k + 1)) * L (k + 1) := by
+            rw [ih]
+          _ = S * (leftProd (⊤ : Ideal R) L (k + 1) * L (k + 1)) :=
+            hassoc S (leftProd (⊤ : Ideal R) L (k + 1)) (L (k + 1))
+          _ = S * leftProd (⊤ : Ideal R) L (k + 1 + 1) :=
+            congrArg (fun B : Ideal R => S * B)
+              (leftProd_succ (⊤ : Ideal R) L (k + 1)).symm
+  cases n with
+  | zero => exact (Nat.not_lt_zero 0 hn).elim
+  | succ n => exact hsucc n
+
+/- A computed block of the first two factors determines the seeded product of
+length two for every seed ideal. -/
+example {R : Type*} [Semiring R]
+    (S B : Ideal R) (L : ℕ → Ideal R)
+    (hblock : leftProd (⊤ : Ideal R) L 2 = B) :
+    leftProd S L 2 = S * B := by
+  calc
+    leftProd S L 2 = S * leftProd (⊤ : Ideal R) L 2 :=
+      leftProd_eq_mul_leftProd_top_of_pos S L 2 (by decide)
+    _ = S * B := by rw [hblock]
+
+end Ideal

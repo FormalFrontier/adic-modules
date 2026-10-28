@@ -6,6 +6,17 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- **Ideal-power membership.** For a commutative semiring `R` with
+  `[IsBezout R]`, an arbitrary ideal `I`, `n : ℕ` and `x : R`,
+  [`Ideal.mem_pow_iff_exists_pow_dvd`](AdicModules/RingTheory/Ideal/PowerCompression.lean)
+  gives `x ∈ I ^ n ↔ ∃ t ∈ I, t ^ n ∣ x`.
+  The Bézout condition says every finitely generated ideal is principal, not that
+  `I` is finitely generated. Zero exponents and zero elements are included; no
+  ring or domain assumption is needed. The criterion also holds without the
+  Bézout assumption if any two elements of `I` have a common divisor in `I`.
+  Ideal powers commute with nonempty inclusion-directed suprema over any
+  commutative semiring.
+
 - Over a Henselian pair `(R, I)` with `R` any commutative ring, fix
   `natDegree g₀ ≤ n`, `natDegree h₀ ≤ m` and
   `d = Polynomial.resultant g₀ h₀ n m`. If `f - g₀*h₀` has degree `< n+m`

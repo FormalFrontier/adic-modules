@@ -220,3 +220,14 @@ theorem pi_of_fg {R : Type*} [CommRing R] (I : Ideal R)
     exact (hcomm x).trans hx
 
 end IsAdicComplete
+
+/-- Arbitrary products of adically separated modules are adically separated. -/
+instance IsHausdorff.pi {R : Type*} [CommRing R] (I : Ideal R)
+    {J : Type*} (M : J → Type*) [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)]
+    [∀ j, IsHausdorff I (M j)] : IsHausdorff I (∀ j, M j) := by
+  apply AdicCompletion.of_injective_iff.mp
+  intro x y h
+  funext j
+  apply (AdicCompletion.of_injective_iff.mpr (inferInstance : IsHausdorff I (M j)))
+  have h' := congrArg (AdicCompletion.pi I M) h
+  simpa only [AdicCompletion.pi_of] using congrFun h' j
