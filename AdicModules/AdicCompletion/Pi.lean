@@ -182,3 +182,41 @@ theorem piEquivOfFG_symm_map (hI : I.FG) (f : ∀ j, M j →ₗ[R] N j)
     ← piEquivOfFG_apply I M hI, LinearEquiv.apply_symm_apply]
 
 end AdicCompletion
+
+namespace IsAdicComplete
+
+/-- A product of modules complete for a finitely generated ideal is complete. -/
+theorem pi_of_fg {R : Type*} [CommRing R] (I : Ideal R)
+    {J : Type*} (M : J → Type*)
+    [∀ j, AddCommGroup (M j)] [∀ j, Module R (M j)]
+    (hI : I.FG) [∀ j, IsAdicComplete I (M j)] :
+    IsAdicComplete I (∀ j, M j) := by
+  classical
+  let e := AdicCompletion.piEquivOfFG I M hI
+  let δ : (∀ j, M j) → ∀ j, AdicCompletion I (M j) :=
+    fun x j => AdicCompletion.of I (M j) (x j)
+  have hunit : ∀ j, Function.Bijective (AdicCompletion.of I (M j)) :=
+    fun j => (AdicCompletion.of_bijective_iff (I := I) (M := M j)).mpr inferInstance
+  have hδ : Function.Bijective δ := by
+    constructor
+    · intro x y h
+      funext j
+      exact (hunit j).injective (congrFun h j)
+    · intro y
+      let x : ∀ j, M j := fun j => Classical.choose ((hunit j).surjective (y j))
+      refine ⟨x, funext (fun j => ?_)⟩
+      exact Classical.choose_spec ((hunit j).surjective (y j))
+  have hcomm (x : ∀ j, M j) :
+      e (AdicCompletion.of I (∀ j, M j) x) = δ x :=
+    AdicCompletion.piEquivOfFG_of I M hI x
+  apply (AdicCompletion.of_bijective_iff (I := I) (M := ∀ j, M j)).mp
+  constructor
+  · intro x y h
+    apply hδ.injective
+    exact (hcomm x).symm.trans ((congrArg e h).trans (hcomm y))
+  · intro y
+    obtain ⟨x, hx⟩ := hδ.surjective (e y)
+    refine ⟨x, e.injective ?_⟩
+    exact (hcomm x).trans hx
+
+end IsAdicComplete

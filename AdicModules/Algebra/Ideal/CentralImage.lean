@@ -424,3 +424,72 @@ example (σ : R →+* A) (N : ℕ) (S : Ideal R) (T : Ideal A)
     (leftProd_mono (R := A) N hseedLE hfactorLE)
 
 end Ideal
+
+namespace Ideal
+
+/-- Appending a factor makes the left-associated product a subideal of that factor. -/
+theorem leftProd_succ_le_factor {R : Type*} [Semiring R] (S : Ideal R) (I : ℕ → Ideal R) (n : ℕ) :
+    leftProd S I (n + 1) ≤ I n := by
+  rw [leftProd_succ]
+  refine Ideal.mul_le.mpr ?_
+  intro x _ y hy
+  exact (I n).mul_mem_left x hy
+
+example {R : Type*} {A : Type*} [Semiring R] [Semiring A]
+    (σ : R →+* A) (n : ℕ) (S : Ideal R) (I : ℕ → Ideal R)
+    (K : Ideal A) (hfactor : (I n).map σ ≤ K) :
+    (leftProd S I (n + 1)).map σ ≤ K := by
+  exact (map_leftProd_le σ (n + 1) S I).trans
+    ((leftProd_succ_le_factor (R := A) (S.map σ) (fun k => (I k).map σ) n).trans
+      hfactor)
+
+end Ideal
+
+namespace Ideal
+
+/-- A left-associated product lies in a left ideal containing a used factor
+if that ideal is closed under right multiplication by all later used factors. -/
+theorem leftProd_le_of_factor_le {R : Type*} [Semiring R]
+    {S T : Ideal R} {I : ℕ → Ideal R} {N j : ℕ}
+    (hj : j < N) (hfactor : I j ≤ T)
+    (hclosed : ∀ k, j < k → k < N → ∀ x ∈ T, ∀ y ∈ I k, x * y ∈ T) :
+    leftProd S I N ≤ T := by
+  revert hj hclosed
+  induction N with
+  | zero =>
+      intro hj _
+      exact (Nat.not_lt_zero j hj).elim
+  | succ n ih =>
+      intro hj hclosed
+      rcases Nat.lt_or_eq_of_le (Nat.le_of_lt_succ hj) with hjn | hlast
+      · have hprefix : ∀ k, j < k → k < n → ∀ x ∈ T, ∀ y ∈ I k, x * y ∈ T :=
+          fun k hjk hk => hclosed k hjk (Nat.lt_trans hk (Nat.lt_succ_self n))
+        rw [leftProd_succ]
+        refine Ideal.mul_le.mpr ?_
+        intro x hx y hy
+        exact hclosed n hjn (Nat.lt_succ_self n) x (ih hjn hprefix hx) y hy
+      · subst j
+        exact (leftProd_succ_le_factor S I n).trans hfactor
+
+/-- A left-associated product lies in any two-sided ideal containing one of its
+used factors. -/
+theorem leftProd_le_of_factor_le_of_isTwoSided {R : Type*} [Semiring R]
+    {S T : Ideal R} {I : ℕ → Ideal R} {N j : ℕ} [T.IsTwoSided]
+    (hj : j < N) (hfactor : I j ≤ T) :
+    leftProd S I N ≤ T := by
+  rcases (inferInstance : T.IsTwoSided) with ⟨hright⟩
+  apply leftProd_le_of_factor_le hj hfactor
+  intro k _ _ x hx y _
+  exact hright y hx
+
+example {R : Type*} [Semiring R] (S T : Ideal R) (I : ℕ → Ideal R)
+    (hfactor : I 0 ≤ T)
+    (hclosed : ∀ x ∈ T, ∀ y ∈ I 1, x * y ∈ T) :
+    leftProd S I 2 ≤ T := by
+  refine leftProd_le_of_factor_le (j := 0) (by decide) hfactor ?_
+  intro k hk hkN x hx y hy
+  have hk1 : k = 1 := le_antisymm (Nat.le_of_lt_succ hkN) hk
+  subst k
+  exact hclosed x hx y hy
+
+end Ideal

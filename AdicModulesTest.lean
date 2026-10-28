@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModulesTest.CompleteProduct
 public import AdicModulesTest.HenselDeterminantImage
 import AdicModulesTest.MvPolynomial.HenselSubmodule
 public import AdicModulesTest.AdicCompletion

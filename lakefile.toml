@@ -22,7 +22,7 @@ rev = "b5eb0fb8f71c80d4604c2ea90be67312c185701a"
 [[require]]
 name = "multivariate-polynomials"
 git = "https://github.com/FormalFrontier/multivariate-polynomials.git"
-rev = "c9a7194c5f24a839a6a62d9a66233c407981fec4"
+rev = "5d58abb977f3281238ee5b4f37303a275b1b2426"
 
 [[lean_lib]]
 name = "AdicModules"
