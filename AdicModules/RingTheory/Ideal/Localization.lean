@@ -121,3 +121,100 @@ theorem map_le_jacobson_of_isLocalization
   exact Ideal.le_jacobson
 
 end Ideal
+
+namespace Ideal
+
+variable {R : Type u} [CommRing R] (I J : Ideal R)
+variable {A : Type v} [CommRing A] [Algebra R A]
+
+/-- Contracting the Jacobson radical of an extended ideal from a localization at `1 + I`
+gives the Jacobson radical of its sum with `I`. -/
+theorem comap_jacobson_map_of_isLocalization
+    [IsLocalization ((⊥ : Submonoid (R ⧸ I)).comap (Ideal.Quotient.mk I)) A] :
+    Ideal.comap (algebraMap R A) (Ideal.map (algebraMap R A) J).jacobson =
+      (I ⊔ J).jacobson := by
+  let S : Submonoid R := (⊥ : Submonoid (R ⧸ I)).comap (Ideal.Quotient.mk I)
+  have hden (s : S) : (s : R) - 1 ∈ I := by
+    apply Ideal.Quotient.eq.mp
+    simpa using Submonoid.mem_bot.mp (Submonoid.mem_comap.mp s.property)
+  apply le_antisymm
+  · intro x hx
+    change algebraMap R A x ∈ (Ideal.map (algebraMap R A) J).jacobson at hx
+    rw [mem_jacobson_iff] at hx ⊢
+    intro r
+    obtain ⟨b, hb⟩ := hx (algebraMap R A r)
+    obtain ⟨⟨z, s⟩, hs⟩ := IsLocalization.surj S b
+    have hz : algebraMap R A (z * r * x + z - (s : R)) ∈
+        Ideal.map (algebraMap R A) J := by
+      have heq : algebraMap R A (z * r * x + z - (s : R)) =
+          (b * algebraMap R A r * algebraMap R A x + b - 1) *
+            algebraMap R A (s : R) := by
+        simp only [map_sub, map_add, map_mul]
+        rw [← hs]
+        ring
+      rw [heq]
+      exact (Ideal.map (algebraMap R A) J).mul_mem_right _ hb
+    obtain ⟨t, ht, htJ⟩ :=
+      (IsLocalization.algebraMap_mem_map_algebraMap_iff S A J _).mp hz
+    refine ⟨t * z, ?_⟩
+    have hts : t * (s : R) - 1 ∈ I := hden (⟨t, ht⟩ * s)
+    have heq : t * z * r * x + t * z - 1 =
+        t * (z * r * x + z - (s : R)) + (t * (s : R) - 1) := by ring
+    rw [heq]
+    exact (I ⊔ J).add_mem
+      ((show J ≤ I ⊔ J from le_sup_right) htJ)
+      ((show I ≤ I ⊔ J from le_sup_left) hts)
+  · intro x hx
+    change algebraMap R A x ∈ (Ideal.map (algebraMap R A) J).jacobson
+    rw [mem_jacobson_iff] at hx ⊢
+    intro a
+    obtain ⟨⟨r, s⟩, hs⟩ := IsLocalization.surj S a
+    obtain ⟨z, hz⟩ := hx r
+    have hcert : z * r * x + z * (s : R) - 1 ∈ I ⊔ J := by
+      have hi : z * ((s : R) - 1) ∈ I := I.mul_mem_left z (hden s)
+      have hi' : z * ((s : R) - 1) ∈ I ⊔ J :=
+        (show I ≤ I ⊔ J from le_sup_left) hi
+      convert (I ⊔ J).add_mem hz hi' using 1
+      ring
+    obtain ⟨i, hi, j, hj, hij⟩ := Submodule.mem_sup.mp hcert
+    have hu : IsUnit (algebraMap R A (1 + i)) :=
+      (isUnit_algebraMap_iff_of_isLocalization I (1 + i)).mpr ⟨1, by simpa using hi⟩
+    obtain ⟨c, hc⟩ := hu.exists_left_inv
+    have hij' : z * r * x + z * (s : R) = 1 + i + j := by
+      calc
+        _ = (z * r * x + z * (s : R) - 1) + 1 := by ring
+        _ = (i + j) + 1 := by rw [← hij]
+        _ = _ := by ring
+    have heq : algebraMap R A z * algebraMap R A r * algebraMap R A x +
+        algebraMap R A z * algebraMap R A (s : R) =
+          algebraMap R A (1 + i) + algebraMap R A j := by
+      simpa only [map_add, map_mul] using congrArg (algebraMap R A) hij'
+    refine ⟨c * algebraMap R A z * algebraMap R A (s : R), ?_⟩
+    have hcalc :
+        c * algebraMap R A z * algebraMap R A (s : R) * a * algebraMap R A x +
+            c * algebraMap R A z * algebraMap R A (s : R) - 1 =
+          c * algebraMap R A j := by
+      calc
+        _ = c * (algebraMap R A z * (a * algebraMap R A (s : R)) *
+            algebraMap R A x + algebraMap R A z * algebraMap R A (s : R)) - 1 := by ring
+        _ = c * (algebraMap R A z * algebraMap R A r * algebraMap R A x +
+            algebraMap R A z * algebraMap R A (s : R)) - 1 := by rw [hs]
+        _ = c * (algebraMap R A (1 + i) + algebraMap R A j) - 1 := by rw [heq]
+        _ = (c * algebraMap R A (1 + i) - 1) + c * algebraMap R A j := by ring
+        _ = c * algebraMap R A j := by rw [hc]; ring
+    rw [hcalc]
+    exact (Ideal.map (algebraMap R A) J).mul_mem_left c (Ideal.mem_map_of_mem _ hj)
+
+/-- In a localization at `1 + I`, the Jacobson radical of an extended ideal is the
+extension of the Jacobson radical of its sum with `I`. -/
+theorem jacobson_map_eq_map_of_isLocalization
+    [IsLocalization ((⊥ : Submonoid (R ⧸ I)).comap (Ideal.Quotient.mk I)) A] :
+    (Ideal.map (algebraMap R A) J).jacobson =
+      Ideal.map (algebraMap R A) (I ⊔ J).jacobson := by
+  have h := IsLocalization.map_under
+    ((⊥ : Submonoid (R ⧸ I)).comap (Ideal.Quotient.mk I)) A
+    (Ideal.map (algebraMap R A) J).jacobson
+  rw [Ideal.under_def, comap_jacobson_map_of_isLocalization I J] at h
+  exact h.symm
+
+end Ideal
