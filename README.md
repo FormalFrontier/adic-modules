@@ -20,9 +20,14 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 - **Jacobson radical after localization.** For any ideal `I` of a commutative
   ring `R` and any commutative `R`-algebra `A` that is a localization of `R` at
   the elements equal to `1` modulo `I`,
-  [`Ideal.map_le_jacobson_of_isLocalization`](AdicModules/RingTheory/Ideal/Localization.lean)
-  gives `Ideal.map (algebraMap R A) I ≤ (⊥ : Ideal A).jacobson`.
-  The ring universes are independent, with no further hypotheses on `R`, `A` or `I`.
+  [`Ideal.comap_jacobson_bot_of_isLocalization`](AdicModules/RingTheory/Ideal/Localization.lean)
+  gives `Ideal.comap (algebraMap R A) (⊥ : Ideal A).jacobson = I.jacobson`, and
+  `Ideal.jacobson_bot_eq_map_of_isLocalization` identifies that radical with
+  `Ideal.map (algebraMap R A) I.jacobson`. The criterion
+  `Ideal.isUnit_algebraMap_iff_of_isLocalization` says that `r : R` becomes a unit
+  exactly when `∃ t : R, t * r - 1 ∈ I`. In particular, the extension of `I`
+  lies in the Jacobson radical. The ring universes are independent, with no further
+  hypotheses on `R`, `A` or `I`.
 
 - Over a Henselian pair `(R, I)` with `R` any commutative ring, fix
   `natDegree g₀ ≤ n`, `natDegree h₀ ≤ m` and
