@@ -190,6 +190,10 @@ status:
     assumption. Without IsBezout, the same criterion holds when every pair of
     elements of I has a common divisor in I. Ideal powers also commute with
     nonempty inclusion-directed suprema of ideals in a commutative semiring.
+    Ideal.map_le_jacobson_of_isLocalization sends any ideal I of a commutative
+    ring R into the Jacobson radical of a commutative R-algebra A that is a
+    localization of R at the elements equal to 1 modulo I. The ring universes
+    are independent, with no further hypotheses on R, A or I.
     HenselianRing.directLimit preserves Henselian pairs under nonempty directed
     systems of commutative rings whose transition homomorphisms map each ideal
     into the later ideal. The target ideal is the supremum of the canonical

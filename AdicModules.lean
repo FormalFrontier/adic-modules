@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 public import AdicModules.LinearAlgebra.Matrix.DeterminantPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation
+public import AdicModules.MvPolynomial.JacobianPerturbation.Localization
 public import AdicModules.RingTheory.WittVector.Frobenius
 
 public import AdicModules.AdicCompletion.ChangeIdeal
@@ -62,6 +63,7 @@ public import AdicModules.RingTheory.WittVector.Complete
 public import AdicModules.RingTheory.WittVector.Torsion
 public import AdicModules.RingTheory.Ideal.DirectLimit
 public import AdicModules.RingTheory.Ideal.IsPrincipalPowQuotient
+public import AdicModules.RingTheory.Ideal.Localization
 public import AdicModules.RingTheory.Ideal.Operations
 public import AdicModules.RingTheory.Ideal.PowerCompression
 public import AdicModules.RingTheory.Ideal.Quotient.Finite

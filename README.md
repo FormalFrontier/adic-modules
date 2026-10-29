@@ -17,6 +17,13 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   Ideal powers commute with nonempty inclusion-directed suprema over any
   commutative semiring.
 
+- **Jacobson radical after localization.** For any ideal `I` of a commutative
+  ring `R` and any commutative `R`-algebra `A` that is a localization of `R` at
+  the elements equal to `1` modulo `I`,
+  [`Ideal.map_le_jacobson_of_isLocalization`](AdicModules/RingTheory/Ideal/Localization.lean)
+  gives `Ideal.map (algebraMap R A) I ≤ (⊥ : Ideal A).jacobson`.
+  The ring universes are independent, with no further hypotheses on `R`, `A` or `I`.
+
 - Over a Henselian pair `(R, I)` with `R` any commutative ring, fix
   `natDegree g₀ ≤ n`, `natDegree h₀ ≤ m` and
   `d = Polynomial.resultant g₀ h₀ n m`. If `f - g₀*h₀` has degree `< n+m`
@@ -488,6 +495,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
 | [LinearAlgebra.TensorProduct.Quotient](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | [LinearAlgebra.TensorProduct.Quotient](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (representatives and inverse formulas) | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (nonzero chosen-generator class for `(5)` in `ℤ`) |
+| [RingTheory.Ideal.Localization](AdicModules/RingTheory/Ideal/Localization.lean) | [IdealLocalization](AdicModulesTest/IdealLocalization.lean) (canonical localization specialization) |
 | [RingTheory.Ideal.Operations](AdicModules/RingTheory/Ideal/Operations.lean) | [RingTheory.Ideal.Operations.MatrixNat](AdicModulesTest/RingTheory/Ideal/Operations/MatrixNat.lean) (independent original calculations; additional private comaximal-powers application) |
 | [RingTheory.Ideal.Quotient.Finite](AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | [RingTheory.Ideal.Quotient.Finite](AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) (integer quotient and boundary calculations), [RingTheory.Ideal.Quotient.FiniteEquivalence](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) (equivalence client), [RingTheory.Ideal.Quotient.FinitePowers](AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) (powers-surjectivity client), [RingTheory.Ideal.Quotient.FiniteInverse](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteInverse.lean) (inverse and representatives client), [RingTheory.Ideal.Quotient.FiniteLinear](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteLinear.lean) (linear definition and integer client), [RingTheory.Ideal.Quotient.FiniteReduction](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) (precision-reduction client), [RingTheory.Ideal.Quotient.Matrix](AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) (two-sided matrix examples), [RingTheory.Ideal.Quotient.LeftIdeal](AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) (left-ideal counterexample) |
 | [RingTheory.Ideal.Quotient.SMulTop](AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean) | [RingTheory.Ideal.Quotient.SMulTop](AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean) (noncommutative integer matrices at the bottom ideal, level one) |

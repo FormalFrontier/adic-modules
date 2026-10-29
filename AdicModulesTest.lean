@@ -37,6 +37,8 @@ public import AdicModulesTest.FractionFieldCompletenessPadicClient
 public import AdicModulesTest.FractionFieldCompletenessSeriesClient
 public import AdicModulesTest.HenselianPi
 public import AdicModulesTest.HenselianPiInputs
+public import AdicModulesTest.IdealLocalization
+public import AdicModulesTest.JacobianLocalization
 public import AdicModulesTest.IdentityCongruence
 public import AdicModulesTest.KernelPullback
 public import AdicModulesTest.LinearAlgebra.Quotient.End
