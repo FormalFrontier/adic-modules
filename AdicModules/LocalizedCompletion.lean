@@ -28,8 +28,6 @@ extension and injectivity APIs are combined with the neighborhood basis of
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 open MonoidWithZeroHom MonoidWithZeroHom.ValueGroup₀
 
@@ -82,7 +80,7 @@ private lemma image_power_eq_closedBall
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     algebraMap V K '' (↑((Ideal.span {a}) ^ n) : Set V) =
       {x : K | Valued.v.restrict x ≤ Valued.v.restrict (algebraMap V K (a ^ n))} := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   ext x
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -112,7 +110,7 @@ private lemma image_power_mem_nhds
     {a : V} (ha0 : a ≠ 0) (n : ℕ) :
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     algebraMap V K '' (↑((Ideal.span {a}) ^ n) : Set V) ∈ nhds (0 : K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rw [image_power_eq_closedBall (K := K) a n]
   rw [mem_nhds_iff]
   refine ⟨_, Set.Subset.rfl, Valued.isOpen_closedBall K ?_, ?_⟩
@@ -136,8 +134,8 @@ theorem isUniformInducing_mapToFractionRing
     intro h0
     exact Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : WithIdeal Vₛ := ⟨Ideal.span {algebraMap V Vₛ a}⟩
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : WithIdeal Vₛ := ⟨Ideal.span {algebraMap V Vₛ a}⟩
   let f := Localization.mapToFractionRing K S Vₛ hSnzd
   apply AddMonoidHom.isUniformInducing_of_isInducing
   rw [IsTopologicalAddGroup.isInducing_iff_nhds_zero]
@@ -152,7 +150,7 @@ theorem isUniformInducing_mapToFractionRing
     simp only [id_eq, f]
     rw [preimage_powerImage_mapToFractionRing (K := K) S hSnzd a n]
   · intro U hU
-    letI : Valued V (ValueGroup V K) :=
+    let : Valued V (ValueGroup V K) :=
       Valued.mk' ((valuation V K).comap (algebraMap V K))
     have hVK : IsUniformInducing (algebraMap V K) :=
       isUniformInducing_algebraMap_fractionRing (V := V) (K := K)
@@ -219,10 +217,10 @@ theorem localizedAdicCompletionToFractionFieldCompletion_algebraMap
     intro h0
     exact Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let I : Ideal Vₛ := Ideal.span {algebraMap V Vₛ a}
-  letI : WithIdeal Vₛ := ⟨I⟩
-  letI : WithIdeal (AdicCompletion I Vₛ) :=
+  let : WithIdeal Vₛ := ⟨I⟩
+  let : WithIdeal (AdicCompletion I Vₛ) :=
     ⟨I.map (algebraMap Vₛ (AdicCompletion I Vₛ))⟩
   let hfg : I.FG := Submodule.fg_span_singleton _
   let f : Vₛ →+* UniformSpace.Completion K :=
@@ -249,7 +247,7 @@ theorem localizedAdicCompletionToFractionFieldCompletion_algebraMap_base
         (algebraMap Vₛ (AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ)
           (algebraMap V Vₛ x)) =
       algebraMap K (UniformSpace.Completion K) (algebraMap V K x) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rw [localizedAdicCompletionToFractionFieldCompletion_algebraMap]
   simp
 
@@ -267,15 +265,15 @@ theorem localizedAdicCompletionToFractionFieldCompletion_injective
     intro h0
     exact Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let I : Ideal Vₛ := Ideal.span {algebraMap V Vₛ a}
-  letI : WithIdeal Vₛ := ⟨I⟩
-  letI : WithIdeal (AdicCompletion I Vₛ) :=
+  let : WithIdeal Vₛ := ⟨I⟩
+  let : WithIdeal (AdicCompletion I Vₛ) :=
     ⟨I.map (algebraMap Vₛ (AdicCompletion I Vₛ))⟩
   let hfg : I.FG := Submodule.fg_span_singleton _
   let P := AdicCompletion.abstractCompletion I rfl hfg
-  letI : CompleteSpace (AdicCompletion I Vₛ) := P.complete
-  letI : T0Space (AdicCompletion I Vₛ) := P.separation
+  let : CompleteSpace (AdicCompletion I Vₛ) := P.complete
+  let : T0Space (AdicCompletion I Vₛ) := P.separation
   let f : Vₛ →+* UniformSpace.Completion K :=
     UniformSpace.Completion.coeRingHom.comp
       (Localization.mapToFractionRing K S Vₛ hSnzd).toRingHom
@@ -304,14 +302,14 @@ theorem completionIntegers_mem_range_localizedAdicCompletion
     intro h0
     exact Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let I : Ideal Vₛ := Ideal.span {algebraMap V Vₛ a}
-  letI : WithIdeal Vₛ := ⟨I⟩
-  letI : WithIdeal (AdicCompletion I Vₛ) :=
+  let : WithIdeal Vₛ := ⟨I⟩
+  let : WithIdeal (AdicCompletion I Vₛ) :=
     ⟨I.map (algebraMap Vₛ (AdicCompletion I Vₛ))⟩
   let hfg : I.FG := Submodule.fg_span_singleton _
   let P := AdicCompletion.abstractCompletion I rfl hfg
-  letI : CompleteSpace (AdicCompletion I Vₛ) := P.complete
+  let : CompleteSpace (AdicCompletion I Vₛ) := P.complete
   let f : Vₛ →+* UniformSpace.Completion K :=
     UniformSpace.Completion.coeRingHom.comp
       (Localization.mapToFractionRing K S Vₛ hSnzd).toRingHom
@@ -363,19 +361,19 @@ theorem localizedAdicCompletion_isFractionRing
       localizedAdicCompletionFractionFieldAlgebra (K := K) S ha0 hSrad
     IsFractionRing (AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ)
       (UniformSpace.Completion K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let I : Ideal Vₛ := Ideal.span {algebraMap V Vₛ a}
-  letI : Algebra (AdicCompletion I Vₛ) (UniformSpace.Completion K) :=
+  let : Algebra (AdicCompletion I Vₛ) (UniformSpace.Completion K) :=
     localizedAdicCompletionFractionFieldAlgebra (K := K) S ha0 hSrad
   have hinj : Function.Injective
       (algebraMap (AdicCompletion I Vₛ) (UniformSpace.Completion K)) :=
     localizedAdicCompletionToFractionFieldCompletion_injective
       (Vₛ := Vₛ) (K := K) S ha0 hSrad
-  letI : FaithfulSMul (AdicCompletion I Vₛ) (UniformSpace.Completion K) :=
+  let : FaithfulSMul (AdicCompletion I Vₛ) (UniformSpace.Completion K) :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
   apply IsFractionRing.of_field
   intro z
-  letI : IsFractionRing (CompletionIntegers V K) (UniformSpace.Completion K) :=
+  let : IsFractionRing (CompletionIntegers V K) (UniformSpace.Completion K) :=
     ValuationRing.instIsFractionRingInteger
       (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
   obtain ⟨x, y, _hy, hxy⟩ := IsFractionRing.div_surjective (CompletionIntegers V K) z
@@ -414,7 +412,7 @@ public theorem localizedAdicCompletionToFractionFieldCompletion_eq_completionInt
         (algebraMap V (CompletionIntegers V K) x).val ↔
       z = algebraMap Vₛ (AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ)
         (algebraMap V Vₛ x) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rw [show (algebraMap V (CompletionIntegers V K) x).val =
     algebraMap K (UniformSpace.Completion K) (algebraMap V K x) from
       coe_algebraMap_completionIntegers (V := V) (K := K) x,

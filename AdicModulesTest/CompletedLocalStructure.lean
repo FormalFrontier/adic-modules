@@ -27,7 +27,6 @@ are supplied by Mathlib. The nonzero nonunit criterion is supplied by
 -/
 
 set_option warningAsError true
-set_option linter.style.haveILetI false
 
 noncomputable section
 

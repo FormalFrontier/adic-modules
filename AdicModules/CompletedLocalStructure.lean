@@ -26,8 +26,6 @@ residue-field interfaces.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 
 noncomputable section
@@ -54,10 +52,10 @@ theorem principalAdicCompletion_isValuationRing
     letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
       principalAdicCompletion_isDomain K a ha0
     ValuationRing (AdicCompletion (Ideal.span {a}) V) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
     principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing (CompletionIntegers V K) :=
+  let : ValuationRing (CompletionIntegers V K) :=
     ValuationRing.instValuationRingInteger
       (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
   exact Function.Surjective.valuationRing
@@ -99,8 +97,8 @@ theorem principalAdicCompletionFractionFieldAlgebra_algebraMap_base
     algebraMap (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K)
         (algebraMap V (AdicCompletion (Ideal.span {a}) V) x) =
       algebraMap K (UniformSpace.Completion K) (algebraMap V K x) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Algebra (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Algebra (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) :=
     principalAdicCompletionFractionFieldAlgebra a ha0
   rw [principalAdicCompletionFractionFieldAlgebra_algebraMap,
     principalAdicCompletionRingEquiv_algebraMap]
@@ -114,10 +112,10 @@ theorem principalAdicCompletion_isFractionRing
     letI : Algebra (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) :=
       principalAdicCompletionFractionFieldAlgebra a ha0
     IsFractionRing (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Algebra (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Algebra (AdicCompletion (Ideal.span {a}) V) (UniformSpace.Completion K) :=
     principalAdicCompletionFractionFieldAlgebra a ha0
-  letI : IsFractionRing (CompletionIntegers V K) (UniformSpace.Completion K) :=
+  let : IsFractionRing (CompletionIntegers V K) (UniformSpace.Completion K) :=
     ValuationRing.instIsFractionRingInteger
       (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
   exact IsFractionRing.of_ringEquiv_left
@@ -136,9 +134,9 @@ theorem principalAdicCompletion_maximalIdeal_eq_map
     IsLocalRing.maximalIdeal (AdicCompletion (Ideal.span {a}) V) =
       (IsLocalRing.maximalIdeal V).map
         (algebraMap V (AdicCompletion (Ideal.span {a}) V)) := by
-  letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
+  let : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
     principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing (AdicCompletion (Ideal.span {a}) V) :=
+  let : ValuationRing (AdicCompletion (Ideal.span {a}) V) :=
     principalAdicCompletion_isValuationRing K a ha0
   exact (IsLocalRing.eq_maximalIdeal
     (AdicCompletion.isMaximal_map_of_le (Ideal.span {a})
@@ -157,9 +155,9 @@ theorem principalAdicCompletion_not_isField
       principalAdicCompletion_isValuationRing K a ha0
     ¬ IsField (AdicCompletion (Ideal.span {a}) V) := by
   let A := AdicCompletion (Ideal.span {a}) V
-  letI : IsDomain A := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : IsDomain A := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   have hVK : algebraMap V K a ≠ 0 := by
     simpa using (IsFractionRing.injective V K).ne ha0
   have hK : algebraMap K (UniformSpace.Completion K) (algebraMap V K a) ≠ 0 :=
@@ -193,9 +191,9 @@ theorem principalAdicCompletion_algebraMap_isLocalHom
     letI : ValuationRing (AdicCompletion (Ideal.span {a}) V) :=
       principalAdicCompletion_isValuationRing K a ha0
     IsLocalHom (algebraMap V (AdicCompletion (Ideal.span {a}) V)) := by
-  letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
+  let : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
     principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing (AdicCompletion (Ideal.span {a}) V) :=
+  let : ValuationRing (AdicCompletion (Ideal.span {a}) V) :=
     principalAdicCompletion_isValuationRing K a ha0
   apply ((IsLocalRing.local_hom_TFAE _).out 3 1).mp
   exact le_of_eq (principalAdicCompletion_maximalIdeal_eq_map K a ha0 ha).symm
@@ -216,9 +214,9 @@ theorem principalAdicCompletion_residueFieldMap_bijective
       (algebraMap V (AdicCompletion (Ideal.span {a}) V))) := by
   let I : Ideal V := Ideal.span {a}
   let A := AdicCompletion I V
-  letI : IsDomain A := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
-  letI : IsLocalHom (algebraMap V A) :=
+  let : IsDomain A := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
+  let : IsLocalHom (algebraMap V A) :=
     principalAdicCompletion_algebraMap_isLocalHom K a ha0 ha
   have hmax : IsLocalRing.maximalIdeal A =
       (IsLocalRing.maximalIdeal V).map (algebraMap V A) :=
@@ -251,7 +249,7 @@ include K ha0 ha in
 contains a nonzero nonunit, so its domain structure does not make it a field. -/
 public theorem ValuationRing.exists_ne_zero_not_isUnit_principalAdicCompletion :
     ∃ x : AdicCompletion (Ideal.span {a}) V, x ≠ 0 ∧ ¬ IsUnit x := by
-  letI : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
+  let : IsDomain (AdicCompletion (Ideal.span {a}) V) :=
     ValuationRing.principalAdicCompletion_isDomain K a ha0
   obtain ⟨x, hx0, hxu⟩ := Ring.exists_not_isUnit_of_not_isField
     (ValuationRing.principalAdicCompletion_not_isField K a ha0 ha)

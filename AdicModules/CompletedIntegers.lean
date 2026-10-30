@@ -25,8 +25,6 @@ and its authors are credited in `docs/CREDITS.md`; its proof is not copied here.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 open MonoidWithZeroHom MonoidWithZeroHom.ValueGroup₀
 
@@ -74,13 +72,13 @@ theorem coe_algebraMap_completionIntegers (x : V) :
     ((algebraMap V (CompletionIntegers V K) x : CompletionIntegers V K) :
       UniformSpace.Completion K) =
       algebraMap K (UniformSpace.Completion K) (algebraMap V K x) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rfl
 
 /-- The valuation ring has dense image in the completed valuation integers. -/
 theorem denseRange_algebraMap_completionIntegers :
     DenseRange (algebraMap V (CompletionIntegers V K)) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rw [DenseRange, Subtype.dense_iff]
   have hsubset := UniformSpace.Completion.denseRange_coe.subset_closure_image_preimage_of_isOpen
     (Valued.isOpen_integer (UniformSpace.Completion K))
@@ -101,8 +99,8 @@ theorem isUniformInducing_algebraMap_fractionRing :
     letI : Valued V (ValueGroup V K) :=
       Valued.mk' ((valuation V K).comap (algebraMap V K))
     IsUniformInducing (algebraMap V K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Valued V (ValueGroup V K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued V (ValueGroup V K) :=
     Valued.mk' ((valuation V K).comap (algebraMap V K))
   apply AddMonoidHom.isUniformInducing_of_isInducing
   rw [IsTopologicalAddGroup.isInducing_iff_nhds_zero]
@@ -171,8 +169,8 @@ theorem isOpenEmbedding_algebraMap_fractionRing :
       (Valued.mk' ((valuation V K).comap (algebraMap V K))).toUniformSpace.toTopologicalSpace
       (Valued.mk' (valuation V K)).toUniformSpace.toTopologicalSpace
       (algebraMap V K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Valued V (ValueGroup V K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued V (ValueGroup V K) :=
     Valued.mk' ((valuation V K).comap (algebraMap V K))
   refine ⟨⟨(isUniformInducing_algebraMap_fractionRing (V := V) (K := K)).isInducing,
     IsFractionRing.injective V K⟩, ?_⟩
@@ -187,8 +185,8 @@ theorem isClosedEmbedding_algebraMap_fractionRing :
       (Valued.mk' ((valuation V K).comap (algebraMap V K))).toUniformSpace.toTopologicalSpace
       (Valued.mk' (valuation V K)).toUniformSpace.toTopologicalSpace
       (algebraMap V K) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Valued V (ValueGroup V K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued V (ValueGroup V K) :=
     Valued.mk' ((valuation V K).comap (algebraMap V K))
   refine ⟨⟨(isUniformInducing_algebraMap_fractionRing (V := V) (K := K)).isInducing,
     IsFractionRing.injective V K⟩, ?_⟩
@@ -310,10 +308,10 @@ theorem principalAdicCompletionRingEquiv_algebraMap
     principalAdicCompletionRingEquiv (V := V) (K := K) a ha0
         (algebraMap V (AdicCompletion (Ideal.span {a}) V) x) =
       algebraMap V (CompletionIntegers V K) x := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
-  letI : Valued V (ValueGroup V K) :=
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued V (ValueGroup V K) :=
     Valued.mk' ((valuation V K).comap (algebraMap V K))
-  letI : WithIdeal (AdicCompletion (Ideal.span {a}) V) :=
+  let : WithIdeal (AdicCompletion (Ideal.span {a}) V) :=
     ⟨(Ideal.span {a}).map
       (algebraMap V (AdicCompletion (Ideal.span {a}) V))⟩
   unfold principalAdicCompletionRingEquiv

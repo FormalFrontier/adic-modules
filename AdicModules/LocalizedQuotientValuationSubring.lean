@@ -23,8 +23,6 @@ comap along the inverse of the residue-field equivalence in
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 
 noncomputable section
@@ -105,10 +103,10 @@ theorem mem_localizedAtPrimeQuotientValuationSubring
       e.symm x ∈ (valuation (V ⧸ p) p.ResidueField).valuationSubring := by
   let hDisj :=
     primeCompl_disjoint_radical_span_singleton_of_isHausdorff (a := a) p hp
-  letI : ValuationRing (V ⧸ p) :=
+  let : ValuationRing (V ⧸ p) :=
     Function.Surjective.valuationRing (Ideal.Quotient.mk p)
       Ideal.Quotient.mk_surjective
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let A := localizedAdicCompletionValuationSubring
     (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
   let e : p.ResidueField ≃+* IsLocalRing.ResidueField A :=
@@ -135,11 +133,11 @@ theorem localizedAtPrimeQuotientValuationSubring_algebraMap_mem
       localizedAtPrimeQuotientValuationSubring (K := K) p hp ha0 := by
   let hDisj :=
     primeCompl_disjoint_radical_span_singleton_of_isHausdorff (a := a) p hp
-  letI : ValuationRing (V ⧸ p) :=
+  let : ValuationRing (V ⧸ p) :=
     Function.Surjective.valuationRing (Ideal.Quotient.mk p)
       Ideal.Quotient.mk_surjective
   let B := (valuation (V ⧸ p) p.ResidueField).valuationSubring
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let A := localizedAdicCompletionValuationSubring
     (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
   let e : p.ResidueField ≃+* IsLocalRing.ResidueField A :=

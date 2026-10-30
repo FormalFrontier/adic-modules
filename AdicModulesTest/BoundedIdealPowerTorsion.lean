@@ -145,6 +145,47 @@ public theorem ZMod.span_two_isKilledByIdealPower :
   rw [map_one] at hfOne
   exact one_ne_zero hfOne
 
+/-- Both nonzero ends are killed by `(2)`, but the middle requires exponent two. -/
+private theorem ZMod.span_two_exactClient :
+    let I : Ideal ℤ := Ideal.span {(2 : ℤ)}
+    let N : Submodule ℤ (ZMod 4) := Submodule.span ℤ {(2 : ZMod 4)}
+    Module.IsTorsionBySet ℤ (ZMod 4) (↑(I ^ 2) : Set ℤ) ∧
+      ¬ Module.IsTorsionBySet ℤ (ZMod 4) (↑I : Set ℤ) ∧
+      Nontrivial N ∧ Nontrivial (ZMod 4 ⧸ N) := by
+  dsimp only
+  let I : Ideal ℤ := Ideal.span {(2 : ℤ)}
+  let N : Submodule ℤ (ZMod 4) := Submodule.span ℤ {(2 : ZMod 4)}
+  have hTwoMem : (2 : ZMod 4) ∈ N := ZMod.span_two_isKilledByIdealPower.2.2.2.1
+  have hTwo : (2 : ZMod 4) ≠ 0 := ZMod.span_two_isKilledByIdealPower.2.2.2.2.1
+  have hProper : N ≠ ⊤ := ZMod.span_two_isKilledByIdealPower.2.2.2.2.2
+  have hN : Module.IsTorsionBySet ℤ N (↑(I ^ 1) : Set ℤ) := by
+    dsimp only [I]
+    rw [pow_one, Module.isTorsionBySet_span_singleton_iff]
+    intro x
+    apply Subtype.ext
+    change (2 : ℤ) • (x : ZMod 4) = 0
+    obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.mp x.property
+    rw [← ha, smul_comm (2 : ℤ) a (2 : ZMod 4),
+      show (2 : ℤ) • (2 : ZMod 4) = 0 from by decide, smul_zero]
+  have hQ : Module.IsTorsionBySet ℤ (ZMod 4 ⧸ N) (↑(I ^ 1) : Set ℤ) := by
+    dsimp only [I]
+    rw [pow_one, Module.isTorsionBySet_span_singleton_iff]
+    intro x
+    obtain ⟨y, rfl⟩ := N.mkQ_surjective x
+    rw [← N.mkQ.map_smul (2 : ℤ) y, Submodule.mkQ_apply,
+      Submodule.Quotient.mk_eq_zero]
+    have hy : (2 : ℤ) • y = (y.val : ℤ) • (2 : ZMod 4) := by
+      simp [zsmul_eq_mul, mul_comm]
+    rw [hy]
+    exact N.smul_mem (y.val : ℤ) hTwoMem
+  refine ⟨Module.isTorsionBySet_ideal_pow_of_exact I N.subtype N.mkQ
+    (LinearMap.exact_subtype_mkQ N) hN hQ, ?_,
+    Submodule.nontrivial_span_singleton hTwo, Submodule.Quotient.nontrivial_iff.mpr hProper⟩
+  intro hM
+  apply hTwo
+  simpa [zsmul_eq_mul] using
+    (@hM (1 : ZMod 4) ⟨(2 : ℤ), Ideal.subset_span (Set.mem_singleton _)⟩)
+
 example : Ideal.span {(2 : ℤ)} ≤ (Module.annihilator ℤ (ZMod 4)).radical := by
   have hKilled : Module.IsKilledByIdealPower ℤ (ZMod 4) (Ideal.span {(2 : ℤ)}) :=
     ⟨2, ZMod.span_two_isKilledByIdealPower.1⟩
@@ -203,10 +244,14 @@ private theorem natBotTensorProductClient :
       Module.IsTorsionBySet ℕ (ℕ ⊗[ℕ] (⊥ : Submodule ℕ ℕ)) (↑(I ^ 0) : Set ℕ) ∧
       Module.IsKilledByIdealPower ℕ (ℕ ⊗[ℕ] (⊥ : Submodule ℕ ℕ)) I := by
   dsimp only
-  have hM : Module.IsTorsionBySet ℕ (⊥ : Submodule ℕ ℕ)
+  have hZero : Module.IsTorsionBySet ℕ (⊥ : Submodule ℕ ℕ)
       (↑((⊥ : Ideal ℕ) ^ 0) : Set ℕ) := by
     intro x a
     exact Subsingleton.elim _ _
+  have hM := Module.isTorsionBySet_ideal_pow_of_exact (⊥ : Ideal ℕ)
+    (LinearMap.id : (⊥ : Submodule ℕ ℕ) →ₗ[ℕ] (⊥ : Submodule ℕ ℕ))
+    (0 : (⊥ : Submodule ℕ ℕ) →ₗ[ℕ] (⊥ : Submodule ℕ ℕ))
+    (LinearMap.exact_iff.mpr (by rw [LinearMap.ker_zero, LinearMap.range_id])) hZero hZero
   have hBounded : Module.IsKilledByIdealPower ℕ (⊥ : Submodule ℕ ℕ) ⊥ := ⟨0, hM⟩
   exact ⟨hM.tensorProduct_left, hBounded.tensorProduct_left,
     hM.tensorProduct_right, hBounded.tensorProduct_right⟩

@@ -24,8 +24,6 @@ extensionality.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 
 noncomputable section
@@ -44,7 +42,7 @@ theorem localization_isValuationRing
     (hS : S ≤ nonZeroDivisors V) :
     letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hS
     ValuationRing Vₛ := by
-  letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hS
+  let : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hS
   apply ValuationRing.iff_dvd_total.mpr
   constructor
   intro x y

@@ -24,10 +24,10 @@ The proof detects coefficients in a free Finsupp module and uses a projective re
 naturality of the canonical comparison. Surjectivity for finite modules is reused from Mathlib.
 No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
 
-Completion preserves finite modules and finite projective modules over the canonical completed
-ring: `Module.Finite R M` gives `Module.Finite (AdicCompletion I R) (AdicCompletion I M)`,
-and projectivity over `R` additionally gives projectivity over `AdicCompletion I R`.
-Finiteness alone does not require projectivity. These instances use Mathlib's coefficientwise
+If `M / I M` is finite over `R`, then the raw inverse-limit completion of `M` is finite over
+the canonical completed ring, for any ideal `I`. In particular, completion preserves finite
+modules. Finite projective modules also remain projective over `AdicCompletion I R`.
+Finiteness alone does not require projectivity. These results use Mathlib's coefficientwise
 completed-ring action, the same action as the canonical tensor comparison. The general lemma
 `Module.finitePresentation_of_projective` then gives finite presentation over the completed ring.
 
@@ -35,6 +35,10 @@ completed-ring action, the same action as the canonical tensor comparison. The g
 
 The ring and module universes are independent. Only the agreement with Mathlib's Noetherian
 equivalence uses a common universe, as required by that equivalence.
+
+The finite-first-quotient theorem concerns the raw inverse limit for arbitrary ideals.
+Fujiwara–Kato, Proposition 7.2.16, also asserts intrinsic completion existence for finitely
+generated ideals; no arbitrary-ideal intrinsic completeness assertion is made here.
 
 For a finite module over a commutative Noetherian ring, the same canonical comparison is
 bijective without projectivity. The ring and module universes are independent, and the
@@ -50,6 +54,12 @@ Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction, b
 projectivity and transport along linear equivalences. Mathlib's
 `RingTheory/TensorProduct/Finite.lean`, by Kim Morrison and Johan Commelin, supplies
 base-change finiteness; `RingTheory/Finiteness/Basic.lean` supplies its transport along surjections.
+The finite-first-quotient argument uses `Module.Finite.exists_fin'` from Johan Commelin's
+`RingTheory/Finiteness/Cardinality.lean`, projective lifting of its finite-free source, and
+`map_surjective_of_mkQ_comp_surjective` and `piEquivFin` from Mathlib's
+`RingTheory/AdicCompletion/Functoriality.lean`, by Judith Ludwig and Christian Merten.
+See also K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5,
+Proposition 7.2.16, for the finitely generated ideal intrinsic-completion statement.
 Mathlib's
 `LinearAlgebra/DirectSum/Finsupp.lean`, by Johannes Hölzl and Antoine Chambert-Loir, supplies
 the tensor/Finsupp coefficient equivalence. Related finite-projective retraction results are
@@ -119,11 +129,28 @@ private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
 
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
+/-- If the first adic quotient is finite over the original ring, its raw inverse-limit
+completion is finite over the canonical completed ring, for any ideal. This generalizes the
+finite-generation part of Fujiwara–Kato, Proposition 7.2.16, without asserting intrinsic
+completeness for arbitrary ideals. -/
+theorem moduleFinite_of_finite_quotient
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Module.Finite (AdicCompletion I R) (AdicCompletion I M) := by
+  obtain ⟨n, g, hg⟩ := Module.Finite.exists_fin' R (M ⧸ (I • (⊤ : Submodule R M)))
+  obtain ⟨f, hf⟩ := Module.projective_lifting_property
+    (I • (⊤ : Submodule R M)).mkQ g (Submodule.mkQ_surjective _)
+  have hsurj : Function.Surjective ((I • (⊤ : Submodule R M)).mkQ ∘ₗ f) := by
+    rwa [hf]
+  let e := piEquivFin I n
+  let : Module.Finite (AdicCompletion I R) (AdicCompletion I (Fin n → R)) :=
+    Module.Finite.equiv e.symm
+  exact Module.Finite.of_surjective (map I f)
+    (map_surjective_of_mkQ_comp_surjective hsurj)
+
 /-- The completion of a finite module is finite over the completed ring, for any ideal. -/
 instance instModuleFinite [Module.Finite R M] :
     Module.Finite (AdicCompletion I R) (AdicCompletion I M) :=
-  Module.Finite.of_surjective (ofTensorProduct I M)
-    (ofTensorProduct_surjective_of_finite I M)
+  moduleFinite_of_finite_quotient I M
 
 /-- For a projective module over a commutative ring, the canonical comparison from tensoring
 with the completed ring to the completed module is injective, for any ideal. -/

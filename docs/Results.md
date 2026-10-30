@@ -196,9 +196,20 @@ These are statements about the current library, not the historical API inventory
   module. Over a commutative semiring and additive commutative monoid module, it
   implies `I ≤ (Module.annihilator R M).radical`; this is an equivalence when
   `I.FG`, without a finite-generation assumption on the module.
-  Submodule and surjective-image results work over a commutative semiring
-  and additive commutative monoid; quotient and extension results retain their
-  commutative-ring/additive-group hypotheses. Over a commutative ring, equivalence
+  For an exact pair `f : A →ₗ[R] M`, `g : M →ₗ[R] C` over any semiring,
+  `Module.annihilator_mul_le_of_exact` gives `ann(A) * ann(C) ≤ ann(M)` in that
+  order, including for noncommutative scalars and additive commutative monoid
+  modules. Only `Function.Exact f g` (`ker g = range f`) is needed, not
+  injectivity of `f` or surjectivity of `g`. Over a commutative
+  semiring, `Module.isTorsionBySet_ideal_pow_of_exact` says that whole powers
+  `I ^ a` and `I ^ b` annihilating `A` and `C` give `I ^ (a + b)` annihilating
+  `M`, including zero exponents. `Module.IsKilledByIdealPower.of_exact` gives
+  the uniform-bound consequence. The module actions are unchanged, all four
+  type universes are independent, and no finite-generation or Noetherian
+  hypothesis is needed. Submodule and surjective-image results also work over
+  commutative semirings and additive commutative monoids. Quotient and
+  submodule–quotient extension interfaces retain their commutative-ring and
+  additive-group signatures. Over a commutative ring, equivalence
   with `Ideal.primaryComponent M I = ⊤` requires **`Module.Finite R M`**
   (finite generation). Separately, height-one primary components preserve an exact
   pair over a Dedekind domain when its **source is torsion**, without finiteness,

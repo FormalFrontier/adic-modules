@@ -31,7 +31,6 @@ come from `AdicModules.LocalizedCompletion`.
 -/
 
 set_option warningAsError true
-set_option linter.style.haveILetI false
 
 open scoped Topology
 
@@ -92,7 +91,7 @@ private theorem localizedComparisonSeparatesZeroOne :
       localizedAdicCompletionToFractionFieldCompletion (K := K) S ha0 hS
         (algebraMap Vₛ (AdicCompletion (Ideal.span {algebraMap V Vₛ a}) Vₛ)
           (algebraMap V Vₛ 1)) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   rw [baseMapClient (K := K) S ha0 hS, baseMapClient (K := K) S ha0 hS]
   simp
 
@@ -130,16 +129,16 @@ public theorem powerSeries_unitsLocalizedCompletion_unique_one :
       f 0 ≠ (algebraMap (PowerSeries ℚ)
         (CompletionIntegers (PowerSeries ℚ) (FractionRing (PowerSeries ℚ))) 1).val := by
   intro hUnits hSep f
-  letI : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
+  let : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
   let A := AdicCompletion
     (Ideal.span {algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X})
     (PowerSeries ℚ)
-  letI : IsHausdorff
+  let : IsHausdorff
       (Ideal.span {algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X})
       (PowerSeries ℚ) :=
     isHausdorff_localization_span_singleton
       (IsUnit.submonoid (PowerSeries ℚ)) (PowerSeries ℚ) hUnits
-  letI : IsDomain A := principalAdicCompletion_isDomain (FractionRing (PowerSeries ℚ))
+  let : IsDomain A := principalAdicCompletion_isDomain (FractionRing (PowerSeries ℚ))
     (algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X)
     (by simp)
   have hRep (z : A) :

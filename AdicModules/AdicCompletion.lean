@@ -26,8 +26,6 @@ uniform-completion packaging used here.
 
 open Filter Set
 
-set_option linter.style.haveILetI false
-
 namespace AdicCompletion
 
 universe u
@@ -123,7 +121,7 @@ theorem isUniformInducing_algebraMap
     letI : WithIdeal (AdicCompletion I R) :=
       ⟨I.map (algebraMap R (AdicCompletion I R))⟩
     IsUniformInducing (algebraMap R (AdicCompletion I R)) := by
-  letI : WithIdeal (AdicCompletion I R) :=
+  let : WithIdeal (AdicCompletion I R) :=
     ⟨I.map (algebraMap R (AdicCompletion I R))⟩
   exact (abstractCompletion I hI hfg).isUniformInducing
 
@@ -134,7 +132,7 @@ theorem denseRange_algebraMap
     letI : WithIdeal (AdicCompletion I R) :=
       ⟨I.map (algebraMap R (AdicCompletion I R))⟩
     DenseRange (algebraMap R (AdicCompletion I R)) := by
-  letI : WithIdeal (AdicCompletion I R) :=
+  let : WithIdeal (AdicCompletion I R) :=
     ⟨I.map (algebraMap R (AdicCompletion I R))⟩
   exact (abstractCompletion I hI hfg).dense
 

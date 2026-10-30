@@ -31,7 +31,6 @@ criterion come from `AdicModules.LocalizedValuationSubring` and
 -/
 
 set_option warningAsError true
-set_option linter.style.haveILetI false
 
 open scoped Topology
 
@@ -94,16 +93,16 @@ public theorem powerSeries_unitsLocalizedValuationSubring_zero_ne_one :
       PowerSeries.X (PowerSeries.X_ne_zero (R := ℚ)) hUnits hSep
     (e 0).val ≠ (e 1).val := by
   intro hUnits hSep e
-  letI : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
+  let : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
   let A := AdicCompletion
     (Ideal.span {algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X})
     (PowerSeries ℚ)
-  letI : IsHausdorff
+  let : IsHausdorff
       (Ideal.span {algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X})
       (PowerSeries ℚ) :=
     isHausdorff_localization_span_singleton
       (IsUnit.submonoid (PowerSeries ℚ)) (PowerSeries ℚ) hUnits
-  letI : IsDomain A := principalAdicCompletion_isDomain (FractionRing (PowerSeries ℚ))
+  let : IsDomain A := principalAdicCompletion_isDomain (FractionRing (PowerSeries ℚ))
     (algebraMap (PowerSeries ℚ) (PowerSeries ℚ) PowerSeries.X)
     (by simp)
   intro h

@@ -213,9 +213,15 @@ Rings are commutative; modules are additive commutative groups unless specified 
   completed-ring-linear comparison is injective for projective modules; it is an
   equivalence for finite projective modules, finite modules over Noetherian rings,
   or finitely presented modules with **finite-free induced/intrinsic cofinality**
-  (supplied by Artin–Rees over Noetherian rings). Any finite module completes to a
-  finite module over the **same canonical completed ring**; finite projective modules
-  remain projective there, so the generic finite-projective finite-presentation lemma applies.
+  (supplied by Artin–Rees over Noetherian rings).
+  `AdicCompletion.moduleFinite_of_finite_quotient` gives a finite module over the
+  **canonical completed ring** whenever `M / I M` is finite over the original ring,
+  for arbitrary `I`; no finiteness or projectivity of `M` is needed. This concerns
+  the raw inverse limit, not intrinsic completeness for arbitrary ideals.
+  The [integer-rational product](AdicModulesTest/CompletionFiniteness.lean) has finite
+  nonzero first quotient and completion although the original module is not finite.
+  In particular, finite modules remain finite; finite projective modules remain
+  projective there, so the generic finite-projective finite-presentation lemma applies.
 - **Coordinates and scalar restriction** ([coordinates](AdicModules/AdicCompletion/QuotientTorsion.lean),
   [restriction](AdicModules/AdicCompletion/RestrictScalars.lean)): for an additive commutative group `V`, subgroup
   `L` and integer `ℓ` acting bijectively on `V`, compatible `ℓ^n`-kernel sections on
@@ -339,8 +345,15 @@ Rings are commutative; modules are additive commutative groups unless specified 
   Over a commutative semiring with an additive commutative monoid module, uniform
   annihilation implies `I ≤ (Module.annihilator R M).radical`. For a finitely generated
   ideal `I` this is an equivalence, with no finite-generation assumption on the module.
-  Submodule/image laws also hold for commutative semirings and additive commutative monoids;
-  quotient/extension laws retain ring/group hypotheses. Over Dedekind domains, height-one
+  For additive commutative monoid modules and an exact pair `A →ₗ[R] M →ₗ[R] C`
+  over any semiring, including noncommutative scalars,
+  `Module.annihilator_mul_le_of_exact` gives the ordered annihilator bound
+  `ann(A) * ann(C) ≤ ann(M)`. Over a commutative semiring, whole powers `I ^ a`
+  and `I ^ b` annihilating the ends give `I ^ (a + b)` annihilating `M`, including
+  zero exponents; neither injectivity of the first map nor surjectivity of the
+  second is required. Submodule/image laws also have commutative-semiring/monoid
+  scope; quotient and quotient-extension interfaces retain their ring/group
+  signatures. Over Dedekind domains, height-one
   primary components preserve exact pairs with torsion **source**; abelian groups use
   restricted `p`-primary maps. In a `NonAssocRing`, a top integer singleton span forces
   surjective integer casts. Semilinear kernel pullbacks give `comap f (map f N) = N ⊔ ker f`

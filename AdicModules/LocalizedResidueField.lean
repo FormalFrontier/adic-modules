@@ -23,8 +23,6 @@ these canonical maps.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 open scoped Topology
 
 noncomputable section
@@ -118,10 +116,10 @@ theorem localizedAdicCompletionResidueFieldEquiv_residue
     intro h0
     exact Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
-  letI : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
-  letI : Algebra Vₛ K := (Localization.mapToFractionRing K S Vₛ hSnzd).toAlgebra
-  letI : IsFractionRing Vₛ K :=
+  let : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
+  let : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
+  let : Algebra Vₛ K := (Localization.mapToFractionRing K S Vₛ hSnzd).toAlgebra
+  let : IsFractionRing Vₛ K :=
     IsFractionRing.isFractionRing_of_isDomain_of_isLocalization S Vₛ K
   let I : Ideal Vₛ := Ideal.span {algebraMap V Vₛ a}
   have ha0' : algebraMap V Vₛ a ≠ 0 := by
@@ -133,14 +131,14 @@ theorem localizedAdicCompletionResidueFieldEquiv_residue
     rcases haunit with ⟨m, hmS, ham⟩
     exact (Set.disjoint_left.1 hSrad hmS)
       (Ideal.le_radical ((Ideal.mem_span_singleton).2 ham))
-  letI : IsHausdorff I Vₛ := isHausdorff_localization_span_singleton S Vₛ hSrad
+  let : IsHausdorff I Vₛ := isHausdorff_localization_span_singleton S Vₛ hSrad
   let C := AdicCompletion I Vₛ
-  letI : IsDomain C := principalAdicCompletion_isDomain K (algebraMap V Vₛ a) ha0'
-  letI : ValuationRing C :=
+  let : IsDomain C := principalAdicCompletion_isDomain K (algebraMap V Vₛ a) ha0'
+  let : ValuationRing C :=
     principalAdicCompletion_isValuationRing K (algebraMap V Vₛ a) ha0'
-  letI : IsLocalHom (algebraMap Vₛ C) :=
+  let : IsLocalHom (algebraMap Vₛ C) :=
     principalAdicCompletion_algebraMap_isLocalHom K (algebraMap V Vₛ a) ha0' ha
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   simp only [localizedAdicCompletionResidueFieldEquiv, RingEquiv.trans_apply,
     IsLocalRing.ResidueField.mapEquiv_apply, RingEquiv.ofBijective_apply,
     IsLocalRing.ResidueField.map_residue]
@@ -178,9 +176,9 @@ public theorem localizedAdicCompletionResidueFieldEquiv_eq_iff (x y : Vₛ) :
   have hS0 : (0 : V) ∉ S := fun h0 ↦
     Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
-  letI : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
+  let : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   change localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
       (IsLocalRing.residue Vₛ x) =
     localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad

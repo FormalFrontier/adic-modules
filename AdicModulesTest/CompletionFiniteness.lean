@@ -25,36 +25,24 @@ product can be finitely generated even when the original module is not.
 
 ## Limitations
 
-The finite-generation implication below is a proposition describing raw algebraic
-adic completion for arbitrary ideals. It is not proved here. In particular, it
-asserts neither intrinsic completeness nor existence of a completion in a stronger
-sense; finite generation of the ideal can be needed for such existence results.
-The integer-rational product supplies a nonzero example with nonfinite original
-module, using the canonical action of the completed ring.
+The finite-first-quotient theorem describes raw algebraic adic completion for
+arbitrary ideals. It asserts neither intrinsic completeness nor existence of a
+completion in a stronger sense; finite generation of the ideal can be needed for
+such existence results. The integer-rational product applies this theorem to a
+nonzero example with nonfinite original module, using the canonical action of
+the completed ring.
 
 ## References
 
-The quotient and completion constructions are Mathlib's. The completed-ring-linear
-finite-free tensor comparison is provided by
-`AdicModules.AdicCompletion.TensorProduct`.
+The quotient and completion constructions are Mathlib's. The finite-first-quotient
+theorem is provided by `AdicModules.AdicCompletion.TensorProduct`.
 -/
 
 @[expose] public section
 
-universe u v
-
 open scoped Pointwise
 
 namespace AdicCompletion
-
-/-- The finite-generation implication for raw algebraic adic completion, with the
-canonical completed-ring action and no finite-generation assumption on the ideal.
-This proposition does not assert intrinsic completeness. -/
-private def completionFiniteOfFiniteQuotient : Prop :=
-  ∀ {R : Type u} [CommRing R] (I : Ideal R)
-    {N : Type v} [AddCommGroup N] [Module R N]
-    [Module.Finite R (N ⧸ (I • ⊤ : Submodule R N))],
-    Module.Finite (AdicCompletion I R) (AdicCompletion I N)
 
 private def ratDenominatorSubmodule (D : ℕ) : Submodule ℤ ℚ :=
   ({ carrier := {q | q.den ∣ D}
@@ -162,13 +150,8 @@ private lemma integer_rational_product_completion_finite :
     Module.Finite
       (AdicCompletion (Ideal.span ({(2 : ℤ)} : Set ℤ)) ℤ)
       (AdicCompletion (Ideal.span ({(2 : ℤ)} : Set ℤ)) (ℤ × ℚ)) := by
-  let I : Ideal ℤ := Ideal.span ({(2 : ℤ)} : Set ℤ)
-  let e := AdicCompletion.ofTensorProductEquivOfFiniteProjective I ℤ
-  -- The finite-free tensor source is finite over the canonical completed ring.
-  refine Module.Finite.of_surjective
-    ((AdicCompletion.map I (LinearMap.inl ℤ ℤ ℚ)).comp e.toLinearMap) ?_
-  exact (AdicCompletion.map_surjective_of_mkQ_comp_surjective
-    (I := I) integer_rational_product_mod_two_inl_surjective).comp e.surjective
+  let := integer_rational_product_quotient_finite
+  exact moduleFinite_of_finite_quotient _ (ℤ × ℚ)
 
 private lemma integer_rational_product_completion_nontrivial :
     Nontrivial

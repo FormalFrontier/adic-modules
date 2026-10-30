@@ -31,8 +31,6 @@ algebra APIs; value groups use `Valuation.IsEquiv.orderMonoidIso`.
 
 @[expose] public section
 
-set_option linter.style.haveILetI false
-
 noncomputable section
 
 open scoped Topology
@@ -48,7 +46,7 @@ variable {V : Type u} {K : Type v} [CommRing V] [IsDomain V]
 the original valuation ring. -/
 lemma completionIntegers_exists_associated_algebraMap (z : CompletionIntegers V K) :
     ∃ x : V, Associated (algebraMap V (CompletionIntegers V K) x) z := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   obtain ⟨k, hk⟩ := Valued.exists_coe_eq_v (K := K) (z : UniformSpace.Completion K)
   have hkint : valuation V K k ≤ 1 := by
     change Valued.v k ≤ 1
@@ -129,17 +127,17 @@ theorem principalAdicCompletion_faithfullyFlat
       principalAdicCompletion_isValuationRing K a ha0
     Module.FaithfullyFlat V (AdicCompletion (Ideal.span {a}) V) := by
   let A := AdicCompletion (Ideal.span {a}) V
-  letI : IsDomain A := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
-  letI : Module.IsTorsionFree V A :=
+  let : IsDomain A := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
+  let : Module.IsTorsionFree V A :=
     Module.isTorsionFree_iff_algebraMap_injective.mpr (by
       change Function.Injective (AdicCompletion.of (Ideal.span {a}) V)
       exact AdicCompletion.of_injective _ _)
-  letI : Module.Flat V A := by
+  let : Module.Flat V A := by
     rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout,
       ← Submodule.isTorsionFree_iff_torsion_eq_bot]
     infer_instance
-  letI : IsLocalHom (algebraMap V A) :=
+  let : IsLocalHom (algebraMap V A) :=
     principalAdicCompletion_algebraMap_isLocalHom K a ha0 ha
   exact Module.FaithfullyFlat.of_flat_of_isLocalHom
 
@@ -159,14 +157,14 @@ theorem principalAdicCompletion_extensionValuation_isEquiv
       principalAdicCompletion_isFractionRing a ha0
     (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K)).IsEquiv
       (valuation A (UniformSpace.Completion K)) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let A := AdicCompletion (Ideal.span {a}) V
   let e := principalAdicCompletionRingEquiv (V := V) (K := K) a ha0
-  letI : IsDomain A := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
-  letI : Algebra A (UniformSpace.Completion K) :=
+  let : IsDomain A := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing A := principalAdicCompletion_isValuationRing K a ha0
+  let : Algebra A (UniformSpace.Completion K) :=
     principalAdicCompletionFractionFieldAlgebra a ha0
-  letI : IsFractionRing A (UniformSpace.Completion K) :=
+  let : IsFractionRing A (UniformSpace.Completion K) :=
     principalAdicCompletion_isFractionRing a ha0
   rw [Valuation.isEquiv_iff_val_le_one]
   intro x

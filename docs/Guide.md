@@ -158,16 +158,42 @@ Here only `I.FG` is required: the module need not be finitely generated, and no
 additive inverses are assumed.
 
 The [bounded-torsion module](../AdicModules/BoundedIdealPowerTorsion.lean)
-provides monotonicity, submodule, surjection, quotient and extension lemmas.
-Submodule and surjective-image results work over a commutative semiring and an
-additive commutative monoid with a module structure. Quotient and extension
-results retain their commutative-ring/additive-group hypotheses. The
-finite-module primary-component comparison is over a commutative ring;
+provides monotonicity, submodule, surjection, quotient and exact-map extension
+lemmas. Let `R` be a semiring, possibly noncommutative, and let `A`, `M`, `C`
+be additive commutative monoids with their given `R`-module structures. For
+`f : A →ₗ[R] M`, `g : M →ₗ[R] C` and `hfg : Function.Exact f g`,
+`Module.annihilator_mul_le_of_exact hfg` gives
+`Module.annihilator R A * Module.annihilator R C ≤ Module.annihilator R M`,
+with the factors in this order. Exactness means `ker g = range f`; neither
+injectivity of `f` nor surjectivity of `g` is required. The scalar and three
+module universes are independent.
+
+For a commutative semiring, this yields two interfaces:
+
+- `Module.isTorsionBySet_ideal_pow_of_exact I f g hfg hA hC`: if `hA` says the
+  whole ideal `I ^ a` annihilates `A` and `hC` says the whole ideal `I ^ b`
+  annihilates `C`, then the whole ideal `I ^ (a + b)` annihilates `M`.
+- `Module.IsKilledByIdealPower.of_exact`: from uniform bounds
+  `hA : Module.IsKilledByIdealPower R A I` and
+  `hC : Module.IsKilledByIdealPower R C I`, use `hA.of_exact f g hfg hC`.
+  The ideal `I` is implicit; the bound on `A` is the first explicit argument.
+
+These results need no finite generation, Noetherianity or additive inverses.
+All natural exponents, including zero, are allowed. Submodule and
+surjective-image results likewise work over commutative semirings and additive
+commutative monoids. Quotient interfaces retain their commutative-ring and
+additive-group hypotheses. In particular,
+`Module.isTorsionBySet_ideal_pow_extension I N hN hQ` and
+`Module.IsKilledByIdealPower.extension I N hN hQ` retain their signatures
+and are derived by specializing to `N.subtype`, `N.mkQ` and
+`LinearMap.exact_subtype_mkQ N`, with the same exponent sum.
+The finite-module primary-component comparison remains over a commutative ring;
 `Module.Finite` means finite generation, not a finite underlying set.
-For a submodule killed by `I ^ n` and quotient killed by `I ^ m`, the explicit
-extension lemma uses exponent `n + m`. The
-[ordinary-import client](../AdicModulesTest/BoundedIdealPowerTorsion.lean)
-shows both the specified-exponent and existential-bounded interfaces.
+
+For the integer action on `M = ZMod 4`, take `I = Ideal.span {(2 : ℤ)}` and
+`N = Submodule.span ℤ {(2 : ZMod 4)}`. The submodule is nonzero and proper,
+and the quotient is nonzero. Both `N` and `M ⧸ N` are annihilated by `I`, but
+`2 • 1 = 2 ≠ 0` in `M`: the middle module is annihilated by `I ^ 2`, not by `I`.
 
 The [primary-component module](../AdicModules/PrimaryComponent.lean) instead
 works with element-dependent ideal powers. For an exact pair of modules over a

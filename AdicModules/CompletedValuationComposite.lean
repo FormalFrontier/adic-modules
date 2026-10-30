@@ -29,8 +29,6 @@ open scoped Topology
 
 noncomputable section
 
-set_option linter.style.haveILetI false
-
 universe u v
 
 namespace ValuationRing
@@ -45,17 +43,17 @@ theorem completionIntegers_algebraMap_isLocalHom
     [IsHausdorff (Ideal.span {a}) V] :
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     IsLocalHom (algebraMap V (CompletionIntegers V K)) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let D := AdicCompletion (Ideal.span {a}) V
-  letI : IsDomain D := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing D := principalAdicCompletion_isValuationRing K a ha0
-  letI : ValuationRing (CompletionIntegers V K) :=
+  let : IsDomain D := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing D := principalAdicCompletion_isValuationRing K a ha0
+  let : ValuationRing (CompletionIntegers V K) :=
     ValuationRing.instValuationRingInteger
       (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
   let e := principalAdicCompletionRingEquiv (V := V) (K := K) a ha0
-  letI : IsLocalHom e.toRingHom :=
+  let : IsLocalHom e.toRingHom :=
     { map_nonunit := (isLocalHom_equiv e).map_nonunit }
-  letI : IsLocalHom (algebraMap V D) :=
+  let : IsLocalHom (algebraMap V D) :=
     principalAdicCompletion_algebraMap_isLocalHom K a ha0 ha
   have hcomp : IsLocalHom (e.toRingHom.comp (algebraMap V D)) :=
     RingHom.isLocalHom_comp _ _
@@ -81,19 +79,19 @@ theorem completionIntegers_residueFieldMap_bijective
       completionIntegers_algebraMap_isLocalHom a ha0 ha
     Function.Bijective (IsLocalRing.ResidueField.map
       (algebraMap V (CompletionIntegers V K))) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let D := AdicCompletion (Ideal.span {a}) V
-  letI : IsDomain D := principalAdicCompletion_isDomain K a ha0
-  letI : ValuationRing D := principalAdicCompletion_isValuationRing K a ha0
-  letI : ValuationRing (CompletionIntegers V K) :=
+  let : IsDomain D := principalAdicCompletion_isDomain K a ha0
+  let : ValuationRing D := principalAdicCompletion_isValuationRing K a ha0
+  let : ValuationRing (CompletionIntegers V K) :=
     ValuationRing.instValuationRingInteger
       (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
   let e := principalAdicCompletionRingEquiv (V := V) (K := K) a ha0
-  letI : IsLocalHom e.toRingHom :=
+  let : IsLocalHom e.toRingHom :=
     { map_nonunit := (isLocalHom_equiv e).map_nonunit }
-  letI : IsLocalHom (algebraMap V D) :=
+  let : IsLocalHom (algebraMap V D) :=
     principalAdicCompletion_algebraMap_isLocalHom K a ha0 ha
-  letI : IsLocalHom (algebraMap V (CompletionIntegers V K)) :=
+  let : IsLocalHom (algebraMap V (CompletionIntegers V K)) :=
     completionIntegers_algebraMap_isLocalHom a ha0 ha
   have heq : e.toRingHom.comp (algebraMap V D) =
       algebraMap V (CompletionIntegers V K) := by
@@ -143,7 +141,7 @@ theorem completionIntegers_le_localizedAtPrime
     let A := localizedAdicCompletionValuationSubring
       (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
     C ≤ A := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let C := (Valued.v : Valuation (UniformSpace.Completion K)
     (ValueGroup V K)).valuationSubring
   let hDisj :=
@@ -184,7 +182,7 @@ theorem completionIntegersValuationSubring_eq_localizedAtPrime_composite
       (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
     let W := localizedAtPrimeQuotientValuationSubring (K := K) p hp ha0
     C = A.composite W := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let C := (Valued.v : Valuation (UniformSpace.Completion K)
     (ValueGroup V K)).valuationSubring
   let hDisj :=
@@ -198,7 +196,7 @@ theorem completionIntegersValuationSubring_eq_localizedAtPrime_composite
   let eA := localizedAdicCompletionValuationSubringEquiv
     (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
   change C = A.composite W
-  letI : ValuationRing (V ⧸ p) :=
+  let : ValuationRing (V ⧸ p) :=
     Function.Surjective.valuationRing (Ideal.Quotient.mk p)
       Ideal.Quotient.mk_surjective
   have haMax : a ∈ IsLocalRing.maximalIdeal V := by
@@ -300,10 +298,10 @@ theorem completionIntegersValuationSubring_eq_localizedAtPrime_composite
     simpa only [sub_add_cancel] using hadd
   apply le_antisymm
   · intro x hxC
-    letI : ValuationRing (CompletionIntegers V K) :=
+    let : ValuationRing (CompletionIntegers V K) :=
       ValuationRing.instValuationRingInteger
         (Valued.v : Valuation (UniformSpace.Completion K) (ValueGroup V K))
-    letI : IsLocalHom (algebraMap V (CompletionIntegers V K)) :=
+    let : IsLocalHom (algebraMap V (CompletionIntegers V K)) :=
       completionIntegers_algebraMap_isLocalHom a ha0 haMax
     let z : CompletionIntegers V K := ⟨x, hxC⟩
     obtain ⟨y, hy⟩ :=
@@ -355,7 +353,7 @@ noncomputable instance completionIntegersLocalizedPrime_isPrime
     {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V] :
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     (completionIntegersLocalizedPrime (K := K) p hp ha0).IsPrime := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   unfold completionIntegersLocalizedPrime
   infer_instance
 
@@ -373,7 +371,7 @@ theorem completionIntegers_ofPrime_localizedPrime
     let A := localizedAdicCompletionValuationSubring
       (Vₛ := Localization.AtPrime p) (K := K) p.primeCompl ha0 hDisj
     C.ofPrime (completionIntegersLocalizedPrime (K := K) p hp ha0) = A := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let C := (Valued.v : Valuation (UniformSpace.Completion K)
     (ValueGroup V K)).valuationSubring
   let hDisj :=
@@ -438,7 +436,7 @@ theorem completionIntegersCompositeResidue_surjective
     {a : V} (ha0 : a ≠ 0) [IsHausdorff (Ideal.span {a}) V] :
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     Function.Surjective (completionIntegersCompositeResidue (K := K) p hp ha0) := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let C := (Valued.v : Valuation (UniformSpace.Completion K)
     (ValueGroup V K)).valuationSubring
   let hDisj :=
@@ -474,7 +472,7 @@ theorem ker_completionIntegersCompositeResidue
     letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
     RingHom.ker (completionIntegersCompositeResidue (K := K) p hp ha0) =
       completionIntegersLocalizedPrime (K := K) p hp ha0 := by
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   let C := (Valued.v : Valuation (UniformSpace.Completion K)
     (ValueGroup V K)).valuationSubring
   let hDisj :=

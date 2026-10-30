@@ -31,7 +31,6 @@ realization.
 -/
 
 set_option warningAsError true
-set_option linter.style.haveILetI false
 
 open scoped Topology
 
@@ -97,9 +96,9 @@ private theorem residueComparisonSeparatesOneZero :
   have hS0 : (0 : V) ∉ S := fun h0 ↦
     Set.disjoint_left.1 hSrad h0 (Ideal.zero_mem _)
   let hSnzd : S ≤ nonZeroDivisors V := le_nonZeroDivisors_of_noZeroDivisors hS0
-  letI : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
-  letI : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
-  letI : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
+  let : IsDomain Vₛ := IsLocalization.isDomain_of_le_nonZeroDivisors Vₛ hSnzd
+  let : ValuationRing Vₛ := localization_isValuationRing (Vₛ := Vₛ) S hSnzd
+  let : Valued K (ValueGroup V K) := Valued.mk' (valuation V K)
   change localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
       (IsLocalRing.residue Vₛ 1) ≠
     localizedAdicCompletionResidueFieldEquiv (Vₛ := Vₛ) (K := K) S ha0 hSrad
@@ -150,7 +149,7 @@ public theorem powerSeries_unitsLocalizedResidueField_X_eq_zero_one_ne_zero :
       e (@IsLocalRing.residue (PowerSeries ℚ) _ hLocal 1) ≠
         e (@IsLocalRing.residue (PowerSeries ℚ) _ hLocal 0) := by
   intro hUnits hSep hS0 hSnzd hDomain hValuation hLocal e
-  letI : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
+  let : IsHausdorff (Ideal.span {PowerSeries.X}) (PowerSeries ℚ) := hSep
   have hX : PowerSeries.X ∈ @IsLocalRing.maximalIdeal (PowerSeries ℚ) _ hLocal := by
     rw [PowerSeries.maximalIdeal_eq_span_X (k := ℚ)]
     exact Ideal.subset_span (Set.mem_singleton PowerSeries.X)

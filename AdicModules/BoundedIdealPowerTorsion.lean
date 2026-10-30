@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import Mathlib.Algebra.Exact.Basic
 public import Mathlib.Algebra.Module.Torsion.PrimaryComponent
 public import Mathlib.Data.Fintype.Order
 public import Mathlib.LinearAlgebra.TensorProduct.Associator
@@ -18,6 +19,11 @@ is stronger than asking separately for every element to be killed by some
 ideal power. Tensoring with any module preserves the same annihilating set
 and hence the same ideal power.
 
+For an exact pair of linear maps `A → M → C`, the ordered product of the
+annihilators of `A` and `C` lies in the annihilator of `M`. Thus if `I ^ a`
+annihilates `A` and `I ^ b` annihilates `C`, then `I ^ (a + b)` annihilates `M`.
+In particular, annihilation by an ideal power is preserved under extensions.
+
 For a finitely generated ideal, this condition is equivalent to containment in
 the radical of the annihilator. The forward implication needs no finite generation.
 
@@ -29,6 +35,8 @@ infinite family, pointwise bounds need not be uniform.
 
 Mathlib's `Module.IsTorsionBySet`, annihilator and ideal-primary-component APIs
 supply the torsion interfaces used by the finite-module uniform-exponent bridge.
+Mathlib's `Function.Exact` and `LinearMap.exact_subtype_mkQ` supply the exactness
+interfaces for the annihilator-product bound and its submodule-quotient specialization.
 Mathlib's finitely generated ideal and radical APIs supply the uniform
 ideal-power containment used by the annihilator criterion.
 The product API uses Mathlib's `Module.annihilator_pi` and
@@ -40,9 +48,29 @@ are credited separately in `docs/CREDITS.md`.
 
 @[expose] public section
 
-universe u v w
+universe u v w uR uA uM uC
 
 namespace Module
+
+/-- For an exact pair of linear maps, the ordered product of the annihilators of the
+end modules is contained in the annihilator of the middle module. -/
+theorem annihilator_mul_le_of_exact
+    {R : Type uR} {A : Type uA} {M : Type uM} {C : Type uC}
+    [Semiring R]
+    [AddCommMonoid A] [Module R A]
+    [AddCommMonoid M] [Module R M]
+    [AddCommMonoid C] [Module R C]
+    {f : A →ₗ[R] M} {g : M →ₗ[R] C}
+    (hfg : Function.Exact f g) :
+    Module.annihilator R A * Module.annihilator R C ≤ Module.annihilator R M := by
+  rw [Ideal.mul_le]
+  intro r hr s hs
+  rw [Module.mem_annihilator]
+  intro x
+  have hsx : g (s • x) = 0 := by
+    rw [map_smul, Module.mem_annihilator.mp hs (g x)]
+  obtain ⟨y, hy⟩ := (hfg (s • x)).mp hsx
+  rw [mul_smul, ← hy, ← f.map_smul, Module.mem_annihilator.mp hr y, map_zero]
 
 section AddCommMonoid
 
@@ -157,6 +185,45 @@ end TensorProduct
 
 end AddCommMonoid
 
+/-- If `I ^ a` annihilates the first module of an exact pair and `I ^ b` annihilates
+the last module, then `I ^ (a + b)` annihilates the middle module. -/
+theorem isTorsionBySet_ideal_pow_of_exact
+    {R : Type uR} {A : Type uA} {M : Type uM} {C : Type uC}
+    [CommSemiring R]
+    [AddCommMonoid A] [Module R A]
+    [AddCommMonoid M] [Module R M]
+    [AddCommMonoid C] [Module R C]
+    (I : Ideal R) (f : A →ₗ[R] M) (g : M →ₗ[R] C)
+    (hfg : Function.Exact f g) {a b : ℕ}
+    (hA : Module.IsTorsionBySet R A (↑(I ^ a) : Set R))
+    (hC : Module.IsTorsionBySet R C (↑(I ^ b) : Set R)) :
+    Module.IsTorsionBySet R M (↑(I ^ (a + b)) : Set R) := by
+  have hA' : I ^ a ≤ Module.annihilator R A :=
+    (Module.isTorsionBySet_iff_subset_annihilator R A).mp hA
+  have hC' : I ^ b ≤ Module.annihilator R C :=
+    (Module.isTorsionBySet_iff_subset_annihilator R C).mp hC
+  rw [Module.isTorsionBySet_iff_subset_annihilator]
+  change I ^ (a + b) ≤ Module.annihilator R M
+  rw [pow_add]
+  exact (Ideal.mul_mono hA' hC').trans (annihilator_mul_le_of_exact hfg)
+
+/-- If both end modules of an exact pair are annihilated by powers of `I`, then
+so is the middle module. -/
+theorem IsKilledByIdealPower.of_exact
+    {R : Type uR} {A : Type uA} {M : Type uM} {C : Type uC}
+    [CommSemiring R]
+    [AddCommMonoid A] [Module R A]
+    [AddCommMonoid M] [Module R M]
+    [AddCommMonoid C] [Module R C]
+    {I : Ideal R} (hA : Module.IsKilledByIdealPower R A I)
+    (f : A →ₗ[R] M) (g : M →ₗ[R] C)
+    (hfg : Function.Exact f g)
+    (hC : Module.IsKilledByIdealPower R C I) :
+    Module.IsKilledByIdealPower R M I := by
+  obtain ⟨a, ha⟩ := hA
+  obtain ⟨b, hb⟩ := hC
+  exact ⟨a + b, isTorsionBySet_ideal_pow_of_exact I f g hfg ha hb⟩
+
 section Pi
 
 variable (R : Type u) {ι : Type w} (M : ι → Type v) [CommSemiring R]
@@ -246,30 +313,16 @@ then `I ^ (n + m)` annihilates the whole module. -/
 theorem isTorsionBySet_ideal_pow_extension (I : Ideal R) (N : Submodule R M) {n m : ℕ}
     (hN : Module.IsTorsionBySet R N (↑(I ^ n) : Set R))
     (hQ : Module.IsTorsionBySet R (M ⧸ N) (↑(I ^ m) : Set R)) :
-    Module.IsTorsionBySet R M (↑(I ^ (n + m)) : Set R) := by
-  rw [Module.isTorsionBySet_iff_subset_annihilator] at hN hQ ⊢
-  change I ^ n ≤ Module.annihilator R N at hN
-  change I ^ m ≤ Module.annihilator R (M ⧸ N) at hQ
-  change I ^ (n + m) ≤ Module.annihilator R M
-  rw [pow_add, Ideal.mul_le]
-  intro a ha b hb
-  rw [Module.mem_annihilator]
-  intro x
-  have hbx : b • x ∈ N := by
-    rw [← Submodule.Quotient.mk_eq_zero]
-    simpa only [Submodule.Quotient.mk_smul] using
-      (Module.mem_annihilator.mp (hQ hb) (Submodule.Quotient.mk x))
-  rw [mul_smul]
-  exact Subtype.ext_iff.mp (Module.mem_annihilator.mp (hN ha) ⟨b • x, hbx⟩)
+    Module.IsTorsionBySet R M (↑(I ^ (n + m)) : Set R) :=
+  isTorsionBySet_ideal_pow_of_exact I N.subtype N.mkQ
+    (LinearMap.exact_subtype_mkQ N) hN hQ
 
 /-- An extension of modules annihilated by powers `I ^ n` and `I ^ m` is
 annihilated by `I ^ (n + m)`. -/
 theorem IsKilledByIdealPower.extension (I : Ideal R) (N : Submodule R M)
     (hN : IsKilledByIdealPower R N I) (hQ : IsKilledByIdealPower R (M ⧸ N) I) :
-    IsKilledByIdealPower R M I := by
-  obtain ⟨n, hn⟩ := hN
-  obtain ⟨m, hm⟩ := hQ
-  exact ⟨n + m, isTorsionBySet_ideal_pow_extension I N hn hm⟩
+    IsKilledByIdealPower R M I :=
+  hN.of_exact N.subtype N.mkQ (LinearMap.exact_subtype_mkQ N) hQ
 
 end AddCommGroup
 
