@@ -301,6 +301,25 @@ These are statements about the current library, not the historical API inventory
   [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean) and its
   [nonzero integer free-module example](../AdicModulesTest/AdicCompletion/LinearMap.lean).
 
+- **Fibres and submodules under completed scalars.**
+  Let `R` be a commutative ring, `I` a finitely generated ideal, and
+  `S = AdicCompletion I R`. An additive commutative monoid `P` has given
+  `R`- and `S`-module structures with `IsScalarTower R S P`. For an original
+  `R`-linear map `F : P →ₗ[R] T` to an additive commutative group `R`-module
+  with `IsHausdorff I T`,
+  `LinearMap.map_smul_eq_map_smul_of_eq_adicCompletion` gives
+  `F p = F q → F (a • p) = F (a • q)` for every `a : S`.
+  The target has no required `S`-action and need not be complete.
+  If `P` is an additive commutative group and `N : Submodule R P` has
+  `IsHausdorff I (P ⧸ N)` for its original `R`-quotient, then
+  `Submodule.span_adicCompletion_restrictScalars_eq` gives
+  `(Submodule.span S (N : Set P)).restrictScalars R = N`.
+  The quotient separation hypothesis does not assume an `S`-action on the
+  quotient. Source separation, completeness, finite generation and projectivity
+  are unnecessary; ring, source and target universes are independent.
+  Both results use the given actions and the canonical completed scalar ring.
+  See the [fibre and submodule API](../AdicModules/AdicCompletion/Submodule.lean).
+
 - **Adic completion of projective modules.**
   For a commutative ring `R`, an additive commutative group `M` with `Module R M`
   and `Module.Projective R M`, and any ideal `I`,

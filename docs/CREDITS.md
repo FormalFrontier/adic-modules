@@ -279,6 +279,21 @@ not additional directly imported proof sources here. Exact public release pins
 are recorded in [lake-manifest.json](../lake-manifest.json); upstream licensing
 and contributor notices remain in those libraries.
 
+## Fibres and submodules under completed scalars
+
+The fibre-stability and separated-quotient span results reuse Formal Frontier's
+`AdicCompletion.ext_of` uniqueness theorem and Mathlib's existing completed ring,
+`LinearMap.smulRight`, quotient projection and span induction. The completion
+formalizations credit Kenny Lau, Judith Ludwig, Christian Merten and Jiedong
+Jiang. The scalar-orbit provider in `Mathlib.Algebra.Module.LinearMap.End`
+credits Nathaniel Thomas, Jeremy Avigad, Johannes Hölzl, Mario Carneiro,
+Anne Baanen, Frédéric Dupuis and Heather Macbeth. The quotient and span
+formalizations credit Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury
+Kudryashov, with Frédéric Dupuis and Heather Macbeth additionally credited for
+span. Their upstream Apache-2.0 author, copyright and license notices remain in
+Mathlib. These results assemble those APIs without copying their proofs or
+introducing new scalar actions.
+
 ## Comaximal powers and finite Chinese remainders
 
 The comaximal-powers development uses Mathlib's left-ideal and power APIs in

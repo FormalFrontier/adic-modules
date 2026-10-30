@@ -264,6 +264,13 @@ Rings are commutative; modules are additive commutative groups unless specified 
   Finite generation of **only `I^n`** gives evaluation kernel `(I^n) • ⊤` and
   `C / (I.map (algebraMap R C))^n ≃ₐ[R] R / I^n`, for `C = AdicCompletion I R`,
   including zero precision ([kernels](AdicModules/AdicCompletion/Kernel.lean), [quotients](AdicModules/AdicCompletion/Quotient.lean)).
+- **Fibres under completed scalars** ([API](AdicModules/AdicCompletion/Submodule.lean)):
+  for `I.FG`, an `R`-linear map from an additive commutative monoid with given
+  compatible `R`- and `AdicCompletion I R`-actions to an `I`-Hausdorff
+  `R`-module has fibres stable under completed scalars. The target needs no
+  completed-ring action or completeness. An original `R`-submodule with
+  `I`-Hausdorff original quotient therefore equals its completed-ring span
+  restricted to `R`. No source separation, completeness or finiteness is assumed.
 - **Tensor comparisons and finiteness** ([tensor](AdicModules/AdicCompletion/TensorProduct.lean),
   [finite presentation](AdicModules/AdicCompletion/FinitePresentation.lean)): the canonical
   completed-ring-linear comparison is injective for projective modules; it is an
