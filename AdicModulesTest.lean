@@ -17,6 +17,7 @@ public import AdicModulesTest.AdicCompletion.FiniteNoetherian
 public import AdicModulesTest.AdicCompletion.FinitePresentation
 public import AdicModulesTest.AdicCompletion.Functor
 public import AdicModulesTest.AdicCompletion.Hom
+public import AdicModulesTest.AdicCompletion.HomProjective
 public import AdicModulesTest.AdicCompletion.LinearMap
 public import AdicModulesTest.AdicCompletion.LocalRing
 public import AdicModulesTest.AdicCompletion.PadicInt

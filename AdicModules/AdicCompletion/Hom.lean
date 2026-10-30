@@ -18,22 +18,29 @@ action of the completed ring. Its quotient-coordinate law describes its value on
 all completed inputs, not just on the images of original maps.
 
 For a finite projective source, `homEquivOfFiniteProjective` makes this comparison
-a linear equivalence. The target module is arbitrary. Independently, maps from
-the completion of a finite module to any module over the completed ring agree if
-they agree on the original module.
+a linear equivalence for every ideal. For a finitely generated ideal,
+`homEquivOfProjective` does so for any projective original source, without a
+finiteness assumption on that source. The target module is arbitrary in both
+cases. Independently, maps from the completion of a finite module to any module
+over the completed ring agree if they agree on the original module.
 
 ## Implementation and references
 
 Reduction uses Mathlib's `LinearMap.reduceModIdeal`, factored once using
 `Submodule.liftQ`; compatible evaluations use `AdicCompletion.lift`. The finite-free
-case uses the existing finite-product and `LinearEquiv.piRing` equivalences; the
-general case uses a finite-free projective splitting. No completeness assumption
-on the raw inverse limit and no finite generation assumption on the ideal is used.
+case uses the existing finite-product and `LinearEquiv.piRing` equivalences,
+then a finite-free projective splitting; this argument needs no finite generation
+of the ideal. For a finitely generated ideal, the arbitrary-free case uses
+`Finsupp.llift` and `piEquivOfFG`. Its basis evaluations determine a map by the
+finite-support formula on original vectors and Hausdorff uniqueness on the
+completion. The projective free-cover splitting reduces every projective source
+to that case. Neither equivalence assumes completeness of the original target.
 
 We reuse Mathlib's completion formalizations by Kenny Lau, Judith Ludwig,
 Christian Merten and Jiedong Jiang, the quotient formalizations by Johannes Hölzl,
-Mario Carneiro, Kevin Buzzard and Yury Kudryashov, and the Pi linear algebra API
-by these authors and Eric Wieser.
+Mario Carneiro, Kevin Buzzard and Yury Kudryashov, the Finsupp linear-map
+formalization by Johannes Hölzl, and the Pi linear algebra API by these authors
+and Eric Wieser.
 The projective splitting is due to Johan Commelin, building on the projective-module
 formalization by Kevin Buzzard and Antoine Labelle. The finite-free Hom retract
 approach also follows the Formal Frontier Projective Modules library; the product
@@ -255,6 +262,121 @@ theorem hom_ext_of_finite [Module.Finite R M]
 
 end Ext
 
+section Retract
+
+variable (N : Type w) [AddCommGroup N] [Module R N]
+
+private theorem homComparison_bijective_of_retract
+    (V : Type z) [AddCommGroup V] [Module R V]
+    (i : M →ₗ[R] V) (r : V →ₗ[R] M) (hri : r.comp i = LinearMap.id)
+    (hV : Function.Bijective (homComparison I V N)) :
+    Function.Bijective (homComparison I M N) := by
+  let a := map I (LinearMap.lcomp R N r)
+  let b := map I (LinearMap.lcomp R N i)
+  let c := LinearMap.lcomp (AdicCompletion I R) (AdicCompletion I N) (map I r)
+  let d := LinearMap.lcomp (AdicCompletion I R) (AdicCompletion I N) (map I i)
+  have hpre : LinearMap.lcomp R N i ∘ₗ LinearMap.lcomp R N r = LinearMap.id := by
+    apply LinearMap.ext
+    intro f
+    apply LinearMap.ext
+    intro m
+    change f (r (i m)) = f m
+    exact congrArg f (LinearMap.congr_fun hri m)
+  have hba : b ∘ₗ a = LinearMap.id := by
+    dsimp only [a, b]
+    rw [map_comp, hpre, map_id]
+  have hdc : d ∘ₗ c = LinearMap.id := by
+    apply LinearMap.ext
+    intro y
+    apply LinearMap.ext
+    intro x
+    change y (map I r (map I i x)) = y x
+    simp only [map_comp_apply, hri, map_id, LinearMap.id_apply]
+  have hκa (F : AdicCompletion I (M →ₗ[R] N)) :
+      homComparison I V N (a F) = c (homComparison I M N F) :=
+    homComparison_precomp I M N r F
+  have hκb (F : AdicCompletion I (V →ₗ[R] N)) :
+      homComparison I M N (b F) = d (homComparison I V N F) :=
+    homComparison_precomp I V N i F
+  constructor
+  · intro x y hxy
+    have hax : a x = a y := by
+      apply hV.injective
+      calc
+        homComparison I V N (a x) = c (homComparison I M N x) := hκa x
+        _ = c (homComparison I M N y) := congrArg c hxy
+        _ = homComparison I V N (a y) := (hκa y).symm
+    calc
+      x = b (a x) := (LinearMap.congr_fun hba x).symm
+      _ = b (a y) := congrArg b hax
+      _ = y := LinearMap.congr_fun hba y
+  · intro y
+    obtain ⟨z, hz⟩ := hV.surjective (c y)
+    refine ⟨b z, ?_⟩
+    calc
+      homComparison I M N (b z) = d (homComparison I V N z) := hκb z
+      _ = d (c y) := congrArg d hz
+      _ = y := LinearMap.congr_fun hdc y
+
+end Retract
+
+section Free
+
+variable (N : Type w) [AddCommGroup N] [Module R N]
+
+private theorem homComparison_bijective_finsupp (ι : Type t) (hI : I.FG) :
+    Function.Bijective (homComparison I (ι →₀ R) N) := by
+  classical
+  let C : AdicCompletion I ((ι →₀ R) →ₗ[R] N) ≃ₗ[AdicCompletion I R]
+      (ι → AdicCompletion I N) :=
+    (congr I (Finsupp.llift N R R ι).symm).trans
+      (piEquivOfFG I (fun _ : ι => N) hI)
+  let ρ : (AdicCompletion I (ι →₀ R) →ₗ[AdicCompletion I R] AdicCompletion I N) →
+      (ι → AdicCompletion I N) :=
+    fun G j ↦ G (of I (ι →₀ R) (Finsupp.single j 1))
+  -- The restriction of G to each original vector is a finite sum, even when
+  -- the family of its values on the basis has infinite support.
+  have hfinite
+      (G : AdicCompletion I (ι →₀ R) →ₗ[AdicCompletion I R] AdicCompletion I N)
+      (m : ι →₀ R) :
+      G (of I (ι →₀ R) m) = m.sum (fun j r ↦ r • ρ G j) := by
+    let g : (ι →₀ R) →ₗ[R] AdicCompletion I N :=
+      (G.restrictScalars R).comp (of I (ι →₀ R))
+    have hg := congrArg (fun f : (ι →₀ R) →ₗ[R] AdicCompletion I N ↦ f m)
+      ((Finsupp.llift (AdicCompletion I N) R R ι).apply_symm_apply g)
+    simpa only [Finsupp.llift_apply, Finsupp.lift_apply, Finsupp.llift_symm_apply,
+      g, LinearMap.comp_apply, LinearMap.restrictScalars_apply, ρ] using hg.symm
+  have hρ : Function.Injective ρ := by
+    intro G H hGH
+    apply LinearMap.restrictScalars_injective R
+    apply ext_of I hI
+    intro m
+    change G (of I (ι →₀ R) m) = H (of I (ι →₀ R) m)
+    rw [hfinite G m, hfinite H m, hGH]
+  -- These coordinates agree for every completed Hom input, by functoriality;
+  -- no spanning assertion about the images of original maps is used.
+  have hcoord (F : AdicCompletion I ((ι →₀ R) →ₗ[R] N)) (j : ι) :
+      C F j = map I (LinearMap.applyₗ (R := R) (M₂ := N) (Finsupp.single j 1)) F := by
+    change piEquivOfFG I (fun _ : ι => N) hI
+      (congr I (Finsupp.llift N R R ι).symm F) j = _
+    rw [piEquivOfFG_apply_apply, congr_apply, map_comp_apply]
+    rfl
+  have hρκ (F : AdicCompletion I ((ι →₀ R) →ₗ[R] N)) :
+      ρ (homComparison I (ι →₀ R) N F) = C F := by
+    funext j
+    exact (homComparison_apply_of I (ι →₀ R) N F (Finsupp.single j 1)).trans
+      (hcoord F j).symm
+  constructor
+  · intro F G hFG
+    apply C.injective
+    rw [← hρκ F, ← hρκ G, hFG]
+  · intro G
+    obtain ⟨F, hF⟩ := C.surjective (ρ G)
+    refine ⟨F, hρ ?_⟩
+    exact (hρκ F).trans hF
+
+end Free
+
 section FiniteProjective
 
 variable (N : Type w) [AddCommGroup N] [Module R N]
@@ -333,55 +455,9 @@ private theorem homComparison_bijective : Function.Bijective (homComparison I M 
   obtain ⟨n, r, i, _, _, hri⟩ :=
     Module.Finite.exists_comp_eq_id_of_projective R M
   obtain ⟨E, hEV⟩ := homComparison_finiteFree I N n
-  let a := map I (LinearMap.lcomp R N r)
-  let b := map I (LinearMap.lcomp R N i)
-  let c := LinearMap.lcomp (AdicCompletion I R) (AdicCompletion I N) (map I r)
-  let d := LinearMap.lcomp (AdicCompletion I R) (AdicCompletion I N) (map I i)
-  have hpre : LinearMap.lcomp R N i ∘ₗ LinearMap.lcomp R N r = LinearMap.id := by
-    apply LinearMap.ext
-    intro f
-    apply LinearMap.ext
-    intro m
-    change f (r (i m)) = f m
-    exact congrArg f (LinearMap.congr_fun hri m)
-  have hba : b ∘ₗ a = LinearMap.id := by
-    dsimp only [a, b]
-    rw [map_comp, hpre, map_id]
-  have hdc : d ∘ₗ c = LinearMap.id := by
-    apply LinearMap.ext
-    intro y
-    apply LinearMap.ext
-    intro x
-    change y (map I r (map I i x)) = y x
-    simp only [map_comp_apply, hri, map_id, LinearMap.id_apply]
-  have hκa (F : AdicCompletion I (M →ₗ[R] N)) :
-      homComparison I (Fin n → R) N (a F) = c (homComparison I M N F) :=
-    homComparison_precomp I M N r F
-  have hκb (F : AdicCompletion I ((Fin n → R) →ₗ[R] N)) :
-      homComparison I M N (b F) = d (homComparison I (Fin n → R) N F) :=
-    homComparison_precomp I (Fin n → R) N i F
-  constructor
-  · intro x y hxy
-    have hax : a x = a y := by
-      apply E.injective
-      calc
-        E (a x) = homComparison I (Fin n → R) N (a x) := LinearMap.congr_fun hEV _
-        _ = c (homComparison I M N x) := hκa x
-        _ = c (homComparison I M N y) := congrArg c hxy
-        _ = homComparison I (Fin n → R) N (a y) := (hκa y).symm
-        _ = E (a y) := (LinearMap.congr_fun hEV _).symm
-    calc
-      x = b (a x) := (LinearMap.congr_fun hba x).symm
-      _ = b (a y) := congrArg b hax
-      _ = y := LinearMap.congr_fun hba y
-  · intro y
-    let z := E.symm (c y)
-    refine ⟨b z, ?_⟩
-    calc
-      homComparison I M N (b z) = d (homComparison I (Fin n → R) N z) := hκb z
-      _ = d (E z) := congrArg d (LinearMap.congr_fun hEV z).symm
-      _ = d (c y) := congrArg d (E.apply_symm_apply (c y))
-      _ = y := LinearMap.congr_fun hdc y
+  apply homComparison_bijective_of_retract I M N (Fin n → R) i r hri
+  rw [← hEV]
+  exact E.bijective
 
 /-- Completion of the original Hom module agrees with Hom over the completed ring
 when the original source is finite projective. The target module and the ideal are
@@ -433,5 +509,76 @@ theorem homEquivOfFiniteProjective_postcomp
   homComparison_postcomp I M N h F
 
 end FiniteProjective
+
+section Projective
+
+variable (N : Type w) [AddCommGroup N] [Module R N]
+variable [Module.Projective R M]
+
+private theorem homComparison_bijective_of_projective (hI : I.FG) :
+    Function.Bijective (homComparison I M N) := by
+  obtain ⟨i, hri⟩ := (Module.projective_def' (R := R) (P := M)).mp inferInstance
+  exact homComparison_bijective_of_retract I M N (M →₀ R) i
+    (Finsupp.linearCombination R id) hri
+    (homComparison_bijective_finsupp I N M hI)
+
+/-- Completion of the original Hom module agrees with Hom over the completed ring
+for a finitely generated ideal and a projective original source. The target module
+is arbitrary. The forward map is the canonical `homComparison`, independent of the
+free splitting used to prove bijectivity. -/
+def homEquivOfProjective (hI : I.FG) :
+    AdicCompletion I (M →ₗ[R] N) ≃ₗ[AdicCompletion I R]
+      (AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I N) :=
+  LinearEquiv.ofBijective (homComparison I M N) (by
+    exact homComparison_bijective_of_projective I M N hI)
+
+/-- The forward linear map of the projective Hom equivalence is canonical evaluation. -/
+@[simp]
+theorem homEquivOfProjective_toLinearMap (hI : I.FG) :
+    (homEquivOfProjective I M N hI).toLinearMap = homComparison I M N :=
+  rfl
+
+/-- Applying the projective Hom equivalence is canonical completed evaluation. -/
+@[simp]
+theorem homEquivOfProjective_apply (hI : I.FG) (F : AdicCompletion I (M →ₗ[R] N)) :
+    homEquivOfProjective I M N hI F = homComparison I M N F :=
+  rfl
+
+/-- The inverse Hom equivalence sends a completed original map to its canonical
+image in the completion of Hom. -/
+@[simp]
+theorem homEquivOfProjective_symm_map (hI : I.FG) (f : M →ₗ[R] N) :
+    (homEquivOfProjective I M N hI).symm (map I f) = of I (M →ₗ[R] N) f := by
+  apply (homEquivOfProjective I M N hI).injective
+  simp only [LinearEquiv.apply_symm_apply, homEquivOfProjective_apply, homComparison_of]
+
+/-- The Hom equivalence is contravariantly natural in maps between projective
+original sources. -/
+theorem homEquivOfProjective_precomp (hI : I.FG)
+    {L : Type t} [AddCommGroup L] [Module R L] [Module.Projective R L]
+    (g : L →ₗ[R] M) (F : AdicCompletion I (M →ₗ[R] N)) :
+    homEquivOfProjective I L N hI (map I (LinearMap.lcomp R N g) F) =
+      (homEquivOfProjective I M N hI F).comp (map I g) :=
+  homComparison_precomp I M N g F
+
+/-- The Hom equivalence is covariantly natural in arbitrary original target maps.
+Only the source is required to be projective. -/
+theorem homEquivOfProjective_postcomp (hI : I.FG)
+    {P : Type z} [AddCommGroup P] [Module R P]
+    (h : N →ₗ[R] P) (F : AdicCompletion I (M →ₗ[R] N)) :
+    homEquivOfProjective I M P hI (map I (LinearMap.compRight R h) F) =
+      (map I h).comp (homEquivOfProjective I M N hI F) :=
+  homComparison_postcomp I M N h F
+
+/-- For finite projective sources, the finitely generated ideal equivalence agrees
+with the finite-projective equivalence defined for every ideal. -/
+theorem homEquivOfProjective_eq_homEquivOfFiniteProjective
+    [Module.Finite R M] (hI : I.FG) :
+    homEquivOfProjective I M N hI = homEquivOfFiniteProjective I M N := by
+  apply LinearEquiv.ext
+  intro F
+  simp only [homEquivOfProjective_apply, homEquivOfFiniteProjective_apply]
+
+end Projective
 
 end AdicCompletion

@@ -221,11 +221,17 @@ Rings are commutative; modules are additive commutative groups unless specified 
   for every ideal `I` of a commutative ring `R`, canonical evaluation gives a map
   from the completion of `M →ₗ[R] N` to completed-ring-linear maps between the
   completions of `M` and `N`, linear over the completed ring in both arguments.
-  It is an equivalence when the original source `M` is finite projective;
-  the target `N` is arbitrary. No finite generation of `I`, Noetherianity, or
-  target finiteness or completeness is required. The comparison is natural in
-  arbitrary original source and target maps. Maps from the completion of a finite
-  module to any completed-ring module are determined by the original module.
+  It is an equivalence when the original source `M` is finite projective, for
+  every ideal `I`. If `I` is finitely generated, the equivalence holds for any
+  projective original source, without a finiteness assumption on `M`. In both
+  cases the target `N` is arbitrary: no finiteness, projectivity, flatness,
+  completeness or separatedness of `N`, or Noetherianity of `R`, is required.
+  The comparison is natural in arbitrary original source and target maps. For
+  finitely generated `I` and `M = ℕ →₀ R`, any family of completed target
+  coefficients gives a map on the completed free module; its inverse Hom image
+  recovers every coefficient.
+  Maps from the completion of a finite module to any completed-ring module are
+  determined by the original module.
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
   [maps](AdicModules/AdicCompletion/LinearMap.lean)): `I.FG` gives the canonical
   completed-ring-linear equivalence for arbitrary dependent products. Any ideal admits
@@ -539,7 +545,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
-| [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target through the completed-Hom equivalence) |
+| [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
