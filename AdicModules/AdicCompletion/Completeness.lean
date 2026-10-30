@@ -2,9 +2,17 @@
 SPDX-License-Identifier: Apache-2.0
 Authors: Formal Frontier Agents
 -/
+/-
+The diagonal completeness argument is adapted from Mathlib:
+Copyright (c) 2026 Bingyu Xia. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Bingyu Xia
+-/
 module
 
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
+
+import AdicModules.AdicCompletion.Kernel
 import Mathlib.Algebra.Module.Submodule.Pointwise
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Choose
@@ -13,6 +21,10 @@ set_option warningAsError true
 
 /-!
 # Adic completeness and sums of ideals
+
+Finite generation of a positive power of `I` makes `AdicCompletion I M` intrinsically
+`I`-adically complete for its original `R`-module structure. The all-stage evaluation-kernel
+identity turns the compatible diagonal family of a Cauchy sequence into an intrinsic limit.
 
 Precompleteness for two arbitrary ideals implies precompleteness for their sum.
 The proof splits successive differences of an even subsequence into two sequences
@@ -41,11 +53,41 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
 * Mathlib's adic completeness API by Kenny Lau, Judith Ludwig, Christian Merten
   and Jiedong Jiang, and its submodule congruence API by Kenny Lau, provide
   the predicates and zero-submodule congruence criterion used here.
+* Bingyu Xia's `AdicCompletion.isAdicComplete` in Mathlib's
+  `RingTheory/AdicCompletion/Completeness.lean` supplies the diagonal completeness argument;
+  here finite generation of one positive ideal power replaces `I.FG`.
 -/
 
 @[expose] public section
 
 universe u v
+
+namespace AdicCompletion
+
+/-- The adic completion is complete for its ideal-power filtration if a positive power of the
+ideal is finitely generated. This generalizes Mathlib's `AdicCompletion.isAdicComplete`,
+following Bingyu Xia's diagonal completeness argument. -/
+theorem isAdicComplete_of_fg_pow
+    {R : Type u} [CommRing R] {I : Ideal R}
+    {M : Type v} [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) :
+    IsAdicComplete I (AdicCompletion I M) := by
+  refine { toIsHausdorff := inferInstance, toIsPrecomplete := ⟨?_⟩ }
+  intro x hx
+  let L : AdicCompletion I M := {
+    val k := (x k).val k
+    property {a b} hab := by
+      rw [transitionMap_comp_eval_apply]
+      have hmem := pow_smul_top_le_ker_eval (M := M) I a (SModEq.sub_mem.mp (hx hab))
+      rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at hmem
+      exact hmem.symm
+  }
+  refine ⟨L, fun k => ?_⟩
+  rw [SModEq.sub_mem, pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI k,
+    LinearMap.mem_ker, map_sub, sub_eq_zero]
+  rfl
+
+end AdicCompletion
 
 variable {R : Type u} [CommRing R] {M : Type v} [AddCommGroup M] [Module R M]
 

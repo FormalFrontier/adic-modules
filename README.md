@@ -44,6 +44,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   No finiteness, Noetherianity, separation, completeness or original
   completed-ring action is required.
 
+- **Intrinsic completeness from one finitely generated positive power.** For any
+  commutative ring `R`, ideal `I` and original `R`-module `M`, a given `n > 0`
+  with `(I ^ n).FG` identifies `(I ^ k) • ⊤` in the same `AdicCompletion I M`
+  with the kernel of evaluation at every `k`, including zero, and makes that completion
+  intrinsically `I`-adically complete for its original `R`-action. The ring and module
+  universes are independent; no `I.FG` or Noetherian hypothesis, and no finiteness,
+  projectivity, separatedness or completeness of `M` is required. See the
+  [kernel identity](AdicModules/AdicCompletion/Kernel.lean) and
+  [completeness theorem](AdicModules/AdicCompletion/Completeness.lean).
+
 - **Automatic completed-scalar linearity.** Let `I` be an ideal of a commutative
   ring `R`, let `0 < n` with `(I ^ n).FG`, and set `S = AdicCompletion I R`. For original modules
   `P` and `T` with given `R`- and `S`-actions and scalar towers `R → S → P,T`,

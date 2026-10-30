@@ -23,6 +23,10 @@ single power `I ^ n` identifies the kernel of `AdicCompletion.eval I M n` with
 `(I ^ n) • ⊤` in `Submodule R (AdicCompletion I M)`. The exponent may be zero, and the ring
 and module may lie in independent universes.
 
+Finite generation of one positive power additionally gives this equality at every degree,
+without assuming `I.FG`. The proof lifts a higher coordinate to the original module and
+applies the fixed-stage equality to the residual.
+
 For any ideal, completion of the kernel of an original split surjection is canonically
 isomorphic to the kernel of the completed map, linearly over the completed ring. The forward
 map is completion of the original kernel inclusion, and the inverse is completion of the
@@ -251,5 +255,38 @@ theorem kerEquivOfRightInverse_symm_toLinearMap
   rfl
 
 end SplitSurjection
+
+/-- A finitely generated positive ideal power identifies every ideal-power submodule of the
+completion with the kernel of its evaluation map. -/
+theorem pow_smul_top_eq_ker_eval_of_fg_pos_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) :
+    (I ^ k) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (AdicCompletion.eval I M k).ker := by
+  refine le_antisymm (pow_smul_top_le_ker_eval ..) ?_
+  intro z hz
+  -- Work at a higher finitely generated power, not at the possibly non-finitely generated `I ^ k`.
+  let m := n * (k + 1)
+  have hkm : k ≤ m :=
+    (Nat.le_succ k).trans (Nat.le_mul_of_pos_left (k + 1) hn)
+  have hfg : (I ^ m).FG := by
+    simpa only [m, pow_mul] using (Ideal.FG.pow (n := k + 1) hI)
+  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective
+    (I ^ m • (⊤ : Submodule R M)) (eval I M m z)
+  have hak : Submodule.mkQ (I ^ k • (⊤ : Submodule R M)) a = 0 := by
+    calc
+      _ = transitionMap I M hkm (Submodule.mkQ (I ^ m • (⊤ : Submodule R M)) a) :=
+        (Submodule.factor_mk (Submodule.pow_smul_top_le I M hkm) a).symm
+      _ = transitionMap I M hkm (eval I M m z) := by rw [ha]
+      _ = eval I M k z := transitionMap_comp_eval_apply I M hkm z
+      _ = 0 := LinearMap.mem_ker.mp hz
+  have hamem : a ∈ I ^ k • (⊤ : Submodule R M) :=
+    (Submodule.Quotient.mk_eq_zero _).mp hak
+  have hoa : of I M a ∈ I ^ k • (⊤ : Submodule R (AdicCompletion I M)) :=
+    (Submodule.smul_top_le_comap_smul_top (I ^ k) (of I M)) hamem
+  have hres : z - of I M a ∈ I ^ m • (⊤ : Submodule R (AdicCompletion I M)) := by
+    rw [pow_smul_top_eq_ker_eval_of_fg_pow hfg, LinearMap.mem_ker,
+      map_sub, eval_of, ha, sub_self]
+  have hresk := Submodule.pow_smul_top_le I (AdicCompletion I M) hkm hres
+  simpa only [sub_add_cancel] using Submodule.add_mem _ hresk hoa
 
 end AdicCompletion

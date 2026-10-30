@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+import AdicModules.AdicCompletion.Completeness
 import AdicModules.AdicCompletion.Kernel
 import Mathlib.Data.ZMod.QuotientRing
 import Mathlib.RingTheory.AdicCompletion.Completeness
@@ -22,9 +23,10 @@ characteristic two. No characteristic is assigned here to the completion. At
 degree zero, for the same inputs, the evaluation kernel is the whole module and
 the ideal quotient has characteristic one.
 
-The separate recovery client uses the fixed-degree headline and `Ideal.FG.pow`
-to recover exactly the old `I.FG` statement. It is not part of the independent
-closed-model argument.
+The separate recovery clients use the fixed-degree headline with `Ideal.FG.pow`
+for the old kernel statement, and the positive-power completeness headline at
+`n = 1`, with `pow_one`, for the old intrinsic completeness statement. Both recover
+exactly the old `I.FG` hypothesis and are separate from the independent closed-model argument.
 
 ## References
 
@@ -43,6 +45,13 @@ private theorem kernel_of_fg
     {M : Type v} [AddCommGroup M] [Module R M] {n : ℕ} (h : I.FG) :
     I ^ n • ⊤ = (AdicCompletion.eval I M n).ker :=
   AdicCompletion.pow_smul_top_eq_ker_eval_of_fg_pow (Ideal.FG.pow (n := n) h)
+
+private theorem complete_of_fg
+    {R : Type u} [CommRing R] {I : Ideal R}
+    {M : Type v} [AddCommGroup M] [Module R M]
+    (h : I.FG) : IsAdicComplete I (AdicCompletion I M) :=
+  AdicCompletion.isAdicComplete_of_fg_pow (I := I) (M := M) (n := 1) Nat.zero_lt_one
+    (by simpa only [pow_one] using h)
 
 private theorem integerTwo_kernel_and_nonzero_eval :
     (Ideal.span ({(2 : ℤ)} : Set ℤ)) ^ 1 •
