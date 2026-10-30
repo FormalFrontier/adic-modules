@@ -86,6 +86,24 @@ theorem isTwoSided_map_of_commute (σ : R →+* A) (I : Ideal R)
   intro r hr
   exact (hcomm r hr _).eq
 
+/-- Extension along a surjective semiring homomorphism preserves the ordered
+product of two left ideals, without any two-sidedness assumptions. -/
+theorem map_mul_of_surjective (σ : R →+* A) (hσ : Function.Surjective σ)
+    (I J : Ideal R) :
+    (I * J).map σ = I.map σ * J.map σ := by
+  apply le_antisymm
+  · refine Ideal.map_le_iff_le_comap.mpr (Ideal.mul_le.mpr ?_)
+    intro i hi j hj
+    change σ (i * j) ∈ I.map σ * J.map σ
+    rw [σ.map_mul]
+    exact Ideal.mul_mem_mul (Ideal.mem_map_of_mem σ hi) (Ideal.mem_map_of_mem σ hj)
+  · refine Ideal.mul_le.mpr ?_
+    intro x hx y hy
+    obtain ⟨i, hi, rfl⟩ := (Ideal.mem_map_iff_of_surjective σ hσ).mp hx
+    obtain ⟨j, hj, rfl⟩ := (Ideal.mem_map_iff_of_surjective σ hσ).mp hy
+    rw [← σ.map_mul]
+    exact Ideal.mem_map_of_mem σ (Ideal.mul_mem_mul hi hj)
+
 /-- Extension preserves ordered products of left ideals when the extension of
 its first factor is two-sided. -/
 theorem map_mul_of_isTwoSided (σ : R →+* A) (I J : Ideal R)
@@ -348,6 +366,17 @@ theorem map_leftProd_le (σ : R →+* A) (N : ℕ) (S : Ideal R) (I : ℕ → Id
       rw [σ.map_mul]
       exact Ideal.mul_mem_mul (ih (Ideal.mem_map_of_mem σ hx))
         (Ideal.mem_map_of_mem σ hy)
+
+/-- Extension along a surjective semiring homomorphism preserves every finite
+left-associated product, starting from the mapped seed also at length zero.
+Neither the seed nor the factors need be two-sided. -/
+theorem map_leftProd_of_surjective (σ : R →+* A) (hσ : Function.Surjective σ)
+    (seed : Ideal R) (L : ℕ → Ideal R) (N : ℕ) :
+    (leftProd seed L N).map σ = leftProd (seed.map σ) (fun k => (L k).map σ) N := by
+  induction N with
+  | zero => rfl
+  | succ n ih =>
+      rw [leftProd_succ, leftProd_succ, map_mul_of_surjective σ hσ, ih]
 
 /-- Extension preserves a finite left-associated product with independently
 specified target seed and factors. Only source prefixes strictly below the length

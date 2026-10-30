@@ -27,6 +27,7 @@ public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
+public import AdicModules.AdicCompletion.Hom
 public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.AdicCompletion.LocalRing
