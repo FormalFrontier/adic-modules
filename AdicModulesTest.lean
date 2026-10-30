@@ -15,6 +15,7 @@ public import AdicModulesTest.AdicCompletion.CompletenessTheorems
 public import AdicModulesTest.AdicCompletion.DependentPi
 public import AdicModulesTest.AdicCompletion.FiniteNoetherian
 public import AdicModulesTest.AdicCompletion.FinitePresentation
+public import AdicModulesTest.AdicCompletion.Flat
 public import AdicModulesTest.AdicCompletion.Functor
 public import AdicModulesTest.AdicCompletion.Hom
 public import AdicModulesTest.AdicCompletion.HomProjective

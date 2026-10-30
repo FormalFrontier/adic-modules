@@ -18,6 +18,14 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   original modules is required. See the
   [surjectivity criteria](AdicModules/AdicCompletion/Surjectivity.lean).
 
+- **Completion with a flat last module.** For any ideal `I` of a commutative
+  ring `R`, an exact pair `M → N → P` with surjective second map remains
+  exact at the middle after completion if the original `P` is flat over `R`.
+  [`AdicCompletion.map_exact_of_flat`](AdicModules/AdicCompletion/Flat.lean)
+  does not require the first map to be injective, either of the first two
+  modules to be flat, or any finiteness, Noetherianity, separation or
+  completeness assumption. No original completed-ring actions are required.
+
 - **Automatic completed-scalar linearity.** Let `I` be a finitely generated ideal
   of a commutative ring `R`, and set `S = AdicCompletion I R`. For original modules
   `P` and `T` with given `R`- and `S`-actions and scalar towers `R → S → P,T`,
@@ -34,6 +42,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   finiteness or projectivity, and the source of the upgraded map need not be
   Hausdorff. Finite generation of `I` is sufficient through completion-map uniqueness.
 
+- **Faithfulness and injectivity reflection under completion.** For any ideal `I`
+  of a commutative ring `R` and additive commutative group `R`-modules `M, N`,
+  with independent universes, Mathlib's canonical `AdicCompletion.map` distinguishes
+  `R`-linear maps whenever the original target `N` is `I`-Hausdorff. Its values
+  are linear over `AdicCompletion I R`. When the original source `M` is
+  `I`-Hausdorff, injectivity of a completed map implies injectivity of the original
+  map, without separation of `N`. For given maps `f : M →ₗ[R] N` and
+  `r : N →ₗ[R] M`, if `N` is `I`-Hausdorff, a completed right-inverse identity
+  implies `f.comp r = LinearMap.id` with the same given `r`; `M` need not be
+  Hausdorff. No finite generation of `I`, `M` or `N`, Noetherianity, Jacobson
+  condition, flatness, projectivity or completeness is required. See the
+  [linear-map API](AdicModules/AdicCompletion/LinearMap.lean).
+
 - **Comaximal completion decomposition.** For any commutative ring `R`, any
   `R`-module `M`, and a finite selection `s` of pairwise comaximal ideals `I i`,
   [`AdicCompletion.equivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainder.lean)
@@ -49,10 +70,17 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   [`AdicCompletion.algEquivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainderAlgebra.lean)
   upgrades this same linear equivalence to an `R`-algebra equivalence, with
   scalar restriction over any commutative ring `S` and `S`-algebra `R`.
+  For arbitrary `M`,
+  [`AdicCompletion.semilinearEquivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainderSemilinear.lean)
+  is semilinear over this completed coefficient-ring equivalence, using the
+  canonical completed-module action on the source and pointwise factor actions
+  on the target, with exactly the same forward and inverse module maps.
   The inverse coordinate units form
   [complete orthogonal idempotents](AdicModules/AdicCompletion/ChineseRemainderIdempotents.lean)
-  in the completed ring and give Mathlib's corner decomposition. The integer
-  selector is neither 0 nor 1, has residues 3 modulo 6 and 9 modulo 36, and is
+  in the completed ring and give Mathlib's corner decomposition. Acting on any
+  completed module, a selector's range over the completed coefficient ring
+  consists exactly of the vectors whose other selected coordinates vanish. The
+  integer selector is neither 0 nor 1, has residues 3 modulo 6 and 9 modulo 36, and is
   not the diagonal image of 3.
 
 - **Ideal-power membership.** For a commutative semiring `R` with
@@ -599,6 +627,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
+| [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |

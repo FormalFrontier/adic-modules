@@ -8,19 +8,24 @@ public import AdicModules.AdicCompletion.ChangeIdeal
 public import Mathlib.RingTheory.AdicCompletion.Algebra
 
 /-!
-# Algebra maps induced by inclusions of ideals
+# Algebra maps and scalar compatibility for inclusions of ideals
 
 The inclusion-induced linear map between completions of a commutative ring is an
 algebra homomorphism. Its quotient evaluations are the canonical factor maps.
+The corresponding maps on module completions respect the completed scalar actions
+through this algebra homomorphism.
+
 The construction bundles the existing linear map, using Mathlib's algebra
-structures and quotient evaluation maps throughout.
+structures and quotient evaluation maps throughout. The completed module actions
+are those formalized by Judith Ludwig and Christian Merten in Mathlib's
+adic-completion algebra API.
 -/
 
 @[expose] public section
 
 noncomputable section
 
-universe u
+universe u v
 
 namespace AdicCompletion
 
@@ -79,6 +84,31 @@ theorem mapOfLEₐ_eval (hJK : J ≤ K) (n : ℕ) (x : AdicCompletion J A) :
       Submodule.factor (Submodule.smul_mono_left (Ideal.pow_right_mono hJK n))
         (eval J A n x) :=
   mapOfLE_eval A hJK n x
+
+/-- The inclusion-induced module map respects the completed scalar actions through
+the inclusion-induced algebra homomorphism. -/
+theorem mapOfLE_smul {R : Type u} [CommRing R] (M : Type v)
+    [AddCommGroup M] [Module R M] {I₁ I₂ : Ideal R} (h : I₁ ≤ I₂)
+    (a : AdicCompletion I₁ R) (x : AdicCompletion I₁ M) :
+    mapOfLE M h (a • x) = mapOfLEₐ R h a • mapOfLE M h x := by
+  apply AdicCompletion.ext
+  intro n
+  change eval I₂ M n (mapOfLE M h (a • x)) =
+    eval I₂ M n (mapOfLEₐ R h a • mapOfLE M h x)
+  rw [mapOfLE_eval]
+  change Submodule.factor (Submodule.smul_mono_left (Ideal.pow_right_mono h n))
+      ((a • x).val n) = (mapOfLEₐ R h a • mapOfLE M h x).val n
+  rw [smul_eval, smul_eval]
+  change Submodule.factor (Submodule.smul_mono_left (Ideal.pow_right_mono h n))
+      (eval I₁ R n a • eval I₁ M n x) =
+    eval I₂ R n (mapOfLEₐ R h a) • eval I₂ M n (mapOfLE M h x)
+  rw [mapOfLEₐ_eval, mapOfLE_eval]
+  obtain ⟨r, hr⟩ := Submodule.Quotient.mk_surjective
+    (I₁ ^ n • ⊤ : Submodule R R) (eval I₁ R n a)
+  obtain ⟨m, hm⟩ := Submodule.Quotient.mk_surjective
+    (I₁ ^ n • ⊤ : Submodule R M) (eval I₁ M n x)
+  rw [← hr, ← hm]
+  rfl
 
 /-- Changing an ideal to itself gives the identity algebra homomorphism. -/
 @[simp]

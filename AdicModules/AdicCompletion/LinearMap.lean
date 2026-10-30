@@ -10,7 +10,16 @@ public import Mathlib.RingTheory.AdicCompletion.Functoriality
 import Mathlib.RingTheory.AdicCompletion.Completeness
 
 /-!
-# Linear maps and completed scalars
+# Linear maps and adic completion
+
+For any ideal `I` of a commutative ring `R` and additive commutative group
+`R`-modules, completion distinguishes linear maps to an `I`-Hausdorff original
+target and reflects injectivity from an `I`-Hausdorff original source. A completed
+right-inverse identity for two given original maps implies their right-inverse
+identity on an `I`-Hausdorff original target, with the same right inverse. The
+opposite endpoint need not be Hausdorff, and no finite generation or completeness
+is required. These laws use Mathlib's canonical completion, `of`, `map`, and the
+Hausdorff injectivity criterion for `of`.
 
 `AdicCompletion.extend` sends an `R`-linear map to an adically complete module to its
 canonical extension. It uses Mathlib's completed map, restricts its scalars from
@@ -63,6 +72,45 @@ namespace AdicCompletion
 variable {R : Type u} [CommRing R] (I : Ideal R)
 variable {M : Type v} [AddCommGroup M] [Module R M]
 variable {N : Type w} [AddCommGroup N] [Module R N]
+
+/-- Completion distinguishes original linear maps to an I-Hausdorff target. -/
+theorem map_injective_of_isHausdorff [IsHausdorff I N] :
+    Function.Injective
+      (AdicCompletion.map (R := R) (I := I) (M := M) (N := N) :
+        (M →ₗ[R] N) →
+          (AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I N)) := by
+  intro f g hfg
+  apply LinearMap.ext
+  intro x
+  apply AdicCompletion.of_injective (R := R) (I := I) (M := N)
+  simpa only [AdicCompletion.map_of] using
+    DFunLike.congr_fun hfg (AdicCompletion.of (R := R) (I := I) (M := M) x)
+
+/-- An injective completed map has an injective original map when its source is I-Hausdorff. -/
+theorem injective_of_map_injective [IsHausdorff I M] (f : M →ₗ[R] N)
+    (hf : Function.Injective
+      (AdicCompletion.map (R := R) (I := I) (M := M) (N := N) f)) :
+    Function.Injective f := by
+  intro x y hxy
+  apply AdicCompletion.of_injective (R := R) (I := I) (M := M)
+  apply hf
+  simpa only [AdicCompletion.map_of] using
+    congrArg (AdicCompletion.of (R := R) (I := I) (M := N)) hxy
+
+/-- A completed right-inverse identity reflects the identity for the given original maps. -/
+theorem comp_eq_id_of_map_comp_eq_id [IsHausdorff I N]
+    (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (hfr :
+      (AdicCompletion.map (R := R) (I := I) (M := M) (N := N) f).comp
+        (AdicCompletion.map (R := R) (I := I) (M := N) (N := M) r) =
+      LinearMap.id (R := AdicCompletion I R) (M := AdicCompletion I N)) :
+    f.comp r = LinearMap.id (R := R) (M := N) := by
+  apply AdicCompletion.map_injective_of_isHausdorff
+    (R := R) (I := I) (M := N) (N := N)
+  rw [← AdicCompletion.map_comp (R := R) (I := I)
+      (M := N) (N := M) (P := N) (f := r) (g := f),
+    AdicCompletion.map_id (R := R) (I := I) (M := N)]
+  exact hfr
 
 /-- Extend a linear map to an adically complete target using the completed map.
 The completed-ring-linear inner map is explicitly restricted to `R`-scalars. -/

@@ -12,6 +12,7 @@ public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.AdicCompletion.ChangeIdealAlgebra
 public import AdicModules.AdicCompletion.ChineseRemainder
 public import AdicModules.AdicCompletion.ChineseRemainderAlgebra
+public import AdicModules.AdicCompletion.ChineseRemainderSemilinear
 public import AdicModules.AdicCompletion.ChineseRemainderIdempotents
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.MvPolynomial.Jacobian
@@ -30,6 +31,7 @@ public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
+public import AdicModules.AdicCompletion.Flat
 public import AdicModules.AdicCompletion.Hom
 public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LinearMap

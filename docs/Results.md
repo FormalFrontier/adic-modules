@@ -358,6 +358,21 @@ These are statements about the current library, not the historical API inventory
   [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean) and the
   [lifted residue-module model](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean).
 
+- **Middle exactness with a flat last module.**
+  For an arbitrary ideal `I` of a commutative ring `R`, let `f : M →ₗ[R] N`
+  and `g : N →ₗ[R] P` be an exact pair of original modules with `g` surjective
+  and the original `P` flat over `R`. Then `AdicCompletion.map_exact_of_flat`
+  gives exactness of the same induced maps at the completed middle module.
+  The first map need not be injective. Neither of the first two original
+  modules needs flatness; no finiteness, projectivity, separation, completeness,
+  Noetherianity or finite generation of `I` is assumed. The original modules
+  need no completed-ring actions, and all carrier universes are independent.
+  Flatness gives equality of the induced and intrinsic range filtrations at
+  every ideal power, so the range-cofinality criterion applies with the same
+  index. This is distinct from the finite-middle Noetherian criterion, whose
+  hypotheses are incomparable. See the [flat-target module](../AdicModules/AdicCompletion/Flat.lean)
+  and its [canonical quotient application](../AdicModulesTest/AdicCompletion/Flat.lean).
+
 - **Naturality of quotient–tensor comparison.**
   For any commutative ring `R`, ideals `I ≤ J`, additive commutative groups
   `M`, `N` with `R`-module structures and any `R`-linear map `f : M →ₗ[R] N`,

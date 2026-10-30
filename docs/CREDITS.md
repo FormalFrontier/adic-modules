@@ -271,6 +271,15 @@ combines the two field cases through fraction fields of prime quotients and
 uses that test to make each coefficient nilpotent, hence zero over a reduced
 coefficient ring. Their author and Apache-2.0 notices remain in Mathlib.
 
+The flat-last-module completion theorem reuses
+`LinearMap.ker_inf_smul_top_eq_smul_of_flat`, formalized by Nailin Guan in
+Mathlib's `RingTheory/Smooth/Quotient.lean`, together with the library's
+range-cofinality exactness theorem. The latter follows the adic Cauchy-sequence
+argument of Judith Ludwig and Christian Merten. Flatness is transported along
+Mathlib's original linear quotient equivalence; the kernel-intersection proof
+is used through its existing API, not copied. Upstream author, copyright and
+Apache-2.0 notices remain in Mathlib.
+
 ## Other deliverable interfaces
 
 The completion-coordinate comparison reuses the quotient-torsion equivalence
