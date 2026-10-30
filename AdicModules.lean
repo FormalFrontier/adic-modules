@@ -33,6 +33,7 @@ public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
 public import AdicModules.AdicCompletion.Flat
 public import AdicModules.AdicCompletion.Hom
+public import AdicModules.AdicCompletion.Idempotents
 public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.AdicCompletion.LocalRing

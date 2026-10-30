@@ -433,6 +433,17 @@ Rings are commutative; modules are additive commutative groups unless specified 
   a residue unit. For `I`-adically complete rings, prime `p` with `(p : R) ∈ I` gives canonical
   `ℤ_[p]`-powers that are jointly continuous for an `I`-adic topology
   ([principal units](AdicModules/Topology/Algebra/PrincipalUnits.lean)).
+- **Idempotents of raw completions.** For every ideal `I` of a commutative ring `R`,
+  [`AdicCompletion.idempotentsEquiv`](AdicModules/AdicCompletion/Idempotents.lean)
+  is an order isomorphism between the Boolean algebras of idempotents in
+  `AdicCompletion I R` and in `R ⧸ I ^ 1`. Its forward map is first evaluation,
+  and its inverse is the unique compatible idempotent lift. The order is
+  `e ≤ f` iff `e * f = e`, not an order on the ring. The prime spectra of these
+  two rings are preconnected simultaneously, including the empty-spectrum cases.
+  No finite-generation, Noetherianity, locality, properness or completeness
+  hypothesis is needed. Agreement with original-ring idempotents does not mean
+  that every completed idempotent comes from an original idempotent.
+
 - **Uniqueness and idempotents** ([factors](AdicModules/Polynomial/Hensel.lean),
   [roots](AdicModules/Polynomial/RootUniqueness.lean), [idempotents](AdicModules/RingTheory/Idempotents.lean)):
   for a unit-reflecting ring map, `g*h = g'*h'`, monic `g,g'`, equal left-factor images
@@ -677,6 +688,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.Surjectivity](AdicModules/AdicCompletion/Surjectivity.lean) (surjectivity and original splittings with finite original cokernel) | — |
+| [AdicCompletion.Idempotents](AdicModules/AdicCompletion/Idempotents.lean) (first-evaluation order isomorphism on idempotents and preconnected-spectrum transfer for arbitrary ideals) | — |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
