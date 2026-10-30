@@ -75,6 +75,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   condition, flatness, projectivity or completeness is required. See the
   [linear-map API](AdicModules/AdicCompletion/LinearMap.lean).
 
+- **Kernels of split surjections.** For any ideal `I` of a commutative ring `R`
+  and an original `R`-linear map `f : M → N` with a given original right inverse,
+  [`AdicCompletion.kerEquivOfRightInverse`](AdicModules/AdicCompletion/Kernel.lean)
+  identifies completion of `ker f` with the kernel of the completed map,
+  linearly over `AdicCompletion I R`. Its forward map is completion of the
+  original kernel inclusion; its inverse is completion of the original split
+  projector restricted to the completed kernel. If `ker f / I (ker f)` is finite
+  over `R`, the [finite-kernel consumer](AdicModules/AdicCompletion/TensorProduct.lean)
+  makes that completed kernel finite over the completed ring. These
+  raw inverse-limit results require no finite generation of `I`, finiteness of
+  the original modules, Noetherianity, projectivity, flatness, separatedness or
+  completeness. The ring and both modules have independent universes.
+
 - **Comaximal completion decomposition.** For any commutative ring `R`, any
   `R`-module `M`, and a finite selection `s` of pairwise comaximal ideals `I i`,
   [`AdicCompletion.equivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainder.lean)
@@ -648,7 +661,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
-| [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
+| [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels and finite-power evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |

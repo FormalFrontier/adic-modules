@@ -12,13 +12,30 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.Completeness
 
+import Mathlib.Algebra.Exact.Basic
+import Mathlib.Algebra.Module.Submodule.Equiv
+
 /-!
-# Kernels of adic reduction under finite generation of a power
+# Kernels under adic completion and reduction
 
 For an ideal `I` of a commutative ring `R` and an `R`-module `M`, finite generation of the
 single power `I ^ n` identifies the kernel of `AdicCompletion.eval I M n` with
 `(I ^ n) • ⊤` in `Submodule R (AdicCompletion I M)`. The exponent may be zero, and the ring
 and module may lie in independent universes.
+
+For any ideal, completion of the kernel of an original split surjection is canonically
+isomorphic to the kernel of the completed map, linearly over the completed ring. The forward
+map is completion of the original kernel inclusion, and the inverse is completion of the
+original split projector restricted to the completed kernel.
+No finiteness of the original modules, finite generation of the ideal, Noetherianity,
+projectivity, flatness, separatedness or completeness is required.
+
+## Implementation notes
+
+The split-kernel comparison uses the canonical completed-ring actions and the raw inverse-limit
+completion, without an action of the completed ring on either original module. It transports
+original split identities, rather than assuming exactness of completion for arbitrary maps.
+The ring and the two original modules may lie in independent universes.
 
 ## References
 
@@ -26,6 +43,13 @@ Bingyu Xia's `AdicCompletion.pow_smul_top_eq_ker_eval` in Mathlib's
 `RingTheory/AdicCompletion/Completeness.lean` assumes `I.FG`. The proof here adapts its
 finite-linear-combination argument to use finite generation only of `I ^ n`: completion
 preserves the surjection onto `I ^ n • ⊤`, and finite direct sums commute with completion.
+
+The split-kernel comparison reuses Mathlib's completion formalizations by Kenny Lau, Judith
+Ludwig, Christian Merten and Jiedong Jiang, the exact-sequence splitting formalization by
+Antoine Chambert-Loir, and the submodule-equivalence API by Johannes Hölzl, Mario Carneiro,
+Kevin Buzzard, Yury Kudryashov, Frédéric Dupuis and Heather Macbeth. Its original-projector
+approach also follows the Projective Modules and Stable Range formalizations by Formal
+Frontier Agents, including Prism and Iris.
 -/
 
 @[expose] public section
@@ -94,5 +118,138 @@ theorem pow_smul_top_eq_ker_eval_of_fg_pow {n : ℕ} (h : (I ^ n).FG) :
     simp
   rcases map_surjective I this x with ⟨x, rfl⟩
   exact ⟨x, by rw [← LinearMap.comp_apply, map_comp, LinearMap.subtype_comp_codRestrict]⟩
+
+section SplitSurjection
+
+universe w
+
+variable {N : Type w} [AddCommGroup N] [Module R N]
+
+/-- Completing the original split identities gives a left inverse to the completed kernel
+inclusion and identifies its range with the completed-map kernel. -/
+private theorem map_ker_subtype_leftInverse_range
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id) :
+    let E0 : M ≃ₗ[R] (LinearMap.ker f × N) :=
+      ((LinearMap.exact_subtype_ker_map f).splitSurjectiveEquiv
+        (Submodule.injective_subtype (LinearMap.ker f)) ⟨r, h⟩).1
+    let P : M →ₗ[R] LinearMap.ker f :=
+      (LinearMap.fst R (LinearMap.ker f) N).comp E0.toLinearMap
+    Function.LeftInverse (map I P) (map I (LinearMap.ker f).subtype) ∧
+      LinearMap.range (map I (LinearMap.ker f).subtype) = LinearMap.ker (map I f) := by
+  let e := (LinearMap.exact_subtype_ker_map f).splitSurjectiveEquiv
+    (Submodule.injective_subtype (LinearMap.ker f)) ⟨r, h⟩
+  let E0 : M ≃ₗ[R] (LinearMap.ker f × N) := e.1
+  let P : M →ₗ[R] LinearMap.ker f :=
+    (LinearMap.fst R (LinearMap.ker f) N).comp E0.toLinearMap
+  change Function.LeftInverse (map I P) (map I (LinearMap.ker f).subtype) ∧ _
+  -- This splitting has inverse `(k, n) ↦ ↑k + r n`.
+  have hinv : E0.symm.toLinearMap =
+      (LinearMap.ker f).subtype.comp (LinearMap.fst R (LinearMap.ker f) N) +
+        r.comp (LinearMap.snd R (LinearMap.ker f) N) := rfl
+  have hP : (LinearMap.ker f).subtype.comp P = LinearMap.id - r.comp f := by
+    apply LinearMap.ext
+    intro x
+    change (P x : M) = x - r (f x)
+    apply eq_sub_iff_add_eq.mpr
+    have hsecond : f x = (E0 x).2 := LinearMap.congr_fun e.2.2 x
+    calc
+      (P x : M) + r (f x) = E0.symm (E0 x) := by
+        rw [hsecond]
+        exact (LinearMap.congr_fun hinv (E0 x)).symm
+      _ = x := E0.symm_apply_apply x
+  have hPi : P.comp (LinearMap.ker f).subtype = LinearMap.id := by
+    apply LinearMap.ext
+    intro k
+    apply Subtype.ext
+    change (P (k : M) : M) = (k : M)
+    have hk := LinearMap.congr_fun hP (k : M)
+    change (P (k : M) : M) = (k : M) - r (f (k : M)) at hk
+    simpa only [LinearMap.map_coe_ker, _root_.map_zero, sub_zero] using hk
+  have hQJ : (map I P).comp (map I (LinearMap.ker f).subtype) = LinearMap.id := by
+    rw [map_comp, hPi, map_id]
+  have hJQ : (map I (LinearMap.ker f).subtype).comp (map I P) =
+      LinearMap.id - (map I r).comp (map I f) := by
+    rw [map_comp, hP, _root_.map_sub, map_id, ← map_comp]
+  have hFJ : (map I f).comp (map I (LinearMap.ker f).subtype) = 0 := by
+    rw [map_comp, LinearMap.comp_ker_subtype, map_zero]
+  refine ⟨fun x ↦ LinearMap.congr_fun hQJ x, le_antisymm ?_ ?_⟩
+  · rintro _ ⟨x, rfl⟩
+    exact LinearMap.mem_ker.mpr (LinearMap.congr_fun hFJ x)
+  · intro z hz
+    refine ⟨map I P z, ?_⟩
+    simpa only [LinearMap.comp_apply, LinearMap.sub_apply, LinearMap.id_apply,
+      LinearMap.mem_ker.mp hz, _root_.map_zero, sub_zero] using LinearMap.congr_fun hJQ z
+
+/-- Completion identifies the original kernel of a split surjection with the kernel of the
+completed map, over the completed ring. The forward map is the completion of the original
+kernel inclusion; the supplied original section constructs its inverse. -/
+noncomputable def kerEquivOfRightInverse
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id) :
+    AdicCompletion I (LinearMap.ker f) ≃ₗ[AdicCompletion I R]
+      LinearMap.ker (map I f) :=
+  let E0 : M ≃ₗ[R] (LinearMap.ker f × N) :=
+    ((LinearMap.exact_subtype_ker_map f).splitSurjectiveEquiv
+      (Submodule.injective_subtype (LinearMap.ker f)) ⟨r, h⟩).1
+  let P : M →ₗ[R] LinearMap.ker f :=
+    (LinearMap.fst R (LinearMap.ker f) N).comp E0.toLinearMap
+  (LinearEquiv.ofLeftInverse (f := map I (LinearMap.ker f).subtype) (g := map I P) (by
+    exact (map_ker_subtype_leftInverse_range I f r h).1)).trans
+    (LinearEquiv.ofEq _ _ (by
+      exact (map_ker_subtype_leftInverse_range I f r h).2))
+
+/-- The split-kernel equivalence has the completed original kernel inclusion as its whole
+underlying map into the completed source. -/
+theorem subtype_comp_kerEquivOfRightInverse
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id) :
+    (LinearMap.ker (map I f)).subtype.comp
+      (kerEquivOfRightInverse I f r h).toLinearMap =
+    map I (LinearMap.ker f).subtype := by
+  apply LinearMap.ext
+  intro z
+  rfl
+
+/-- Coercing the split-kernel equivalence to the completed source gives the completed original
+kernel inclusion. -/
+@[simp]
+theorem coe_kerEquivOfRightInverse_apply
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id)
+    (z : AdicCompletion I (LinearMap.ker f)) :
+    ((kerEquivOfRightInverse I f r h z : LinearMap.ker (map I f)) :
+      AdicCompletion I M) = map I (LinearMap.ker f).subtype z :=
+  LinearMap.congr_fun (subtype_comp_kerEquivOfRightInverse I f r h) z
+
+/-- On an original kernel element, the split-kernel equivalence agrees with the canonical
+map from the original source into its completion. -/
+theorem coe_kerEquivOfRightInverse_of
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id) (k : LinearMap.ker f) :
+    ((kerEquivOfRightInverse I f r h (of I (LinearMap.ker f) k) :
+      LinearMap.ker (map I f)) : AdicCompletion I M) = of I M (k : M) := by
+  rw [coe_kerEquivOfRightInverse_apply, map_of]
+  rfl
+
+/-- The inverse split-kernel equivalence is completion of the original split projector,
+restricted to the completed-map kernel. The projector is the first coordinate of Mathlib's
+original splitting equivalence. -/
+theorem kerEquivOfRightInverse_symm_toLinearMap
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id) :
+    let E0 : M ≃ₗ[R] (LinearMap.ker f × N) :=
+      ((LinearMap.exact_subtype_ker_map f).splitSurjectiveEquiv
+        (Submodule.injective_subtype (LinearMap.ker f)) ⟨r, h⟩).1
+    let P : M →ₗ[R] LinearMap.ker f :=
+      (LinearMap.fst R (LinearMap.ker f) N).comp E0.toLinearMap
+    (kerEquivOfRightInverse I f r h).symm.toLinearMap =
+      (map I P).comp (LinearMap.ker (map I f)).subtype := by
+  dsimp only
+  apply LinearMap.ext
+  intro z
+  rfl
+
+end SplitSurjection
 
 end AdicCompletion

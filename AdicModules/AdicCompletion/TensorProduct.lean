@@ -6,6 +6,7 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
+import AdicModules.AdicCompletion.Kernel
 import AdicModules.AdicCompletion.Pi
 import Mathlib.Algebra.Module.Projective
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
@@ -36,6 +37,11 @@ base change and the canonical equivalence. These results use Mathlib's coefficie
 completed-ring action, without an action of the completed ring on original `M`.
 `AdicModules.AdicCompletion.FinitePresentation` consumes completed finiteness and projectivity
 in one explicit finite-presentation theorem via `Module.finitePresentation_of_projective`.
+
+For an original split surjection, finiteness of the intrinsic original kernel's first adic
+quotient makes the completed-map kernel finite over the same completed ring. The consumer
+`moduleFinite_ker_map_of_rightInverse_of_finite_quotient` transports completion finiteness
+through the canonical split-kernel comparison from `AdicModules.AdicCompletion.Kernel`.
 
 ## Implementation notes
 
@@ -86,7 +92,7 @@ set_option warningAsError true
 
 noncomputable section
 
-universe uR uM uσ uι
+universe uR uM uN uσ uι
 
 open TensorProduct
 
@@ -226,6 +232,24 @@ theorem moduleFinite_of_finite_quotient
     Module.Finite.equiv e.symm
   exact Module.Finite.of_surjective (map I f)
     (map_surjective_of_mkQ_comp_surjective hsurj)
+
+section SplitKernel
+
+variable {M : Type uM} [AddCommGroup M] [Module R M]
+variable {N : Type uN} [AddCommGroup N] [Module R N]
+
+/-- If the original kernel's first adic quotient is finite over the original ring, the kernel
+of the completed split surjection is finite over the completed ring, for any ideal. -/
+theorem moduleFinite_ker_map_of_rightInverse_of_finite_quotient
+    (I : Ideal R) (f : M →ₗ[R] N) (r : N →ₗ[R] M)
+    (h : f.comp r = LinearMap.id)
+    [Module.Finite R ((LinearMap.ker f) ⧸
+      (I • (⊤ : Submodule R (LinearMap.ker f))))] :
+    Module.Finite (AdicCompletion I R) (LinearMap.ker (map I f)) := by
+  let := moduleFinite_of_finite_quotient I (LinearMap.ker f)
+  exact Module.Finite.equiv (kerEquivOfRightInverse I f r h)
+
+end SplitKernel
 
 /-- The completion of a finite module is finite over the completed ring, for any ideal. -/
 instance instModuleFinite [Module.Finite R M] :
