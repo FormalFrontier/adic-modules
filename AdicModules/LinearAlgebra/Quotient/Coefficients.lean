@@ -24,6 +24,39 @@ The endomorphism results are specializations to the canonical quotient.
 
 universe u v w
 
+/-- A finitely generated submodule of the span of scalar multiples from a set
+is contained in the corresponding span for one finite subset of that set. -/
+theorem Submodule.exists_finset_scalar_support_of_fg
+    {R : Type*} [Semiring R]
+    {N : Type*} [AddCommMonoid N] [Module R N]
+    {S : Set R} {P : Submodule R N}
+    (hP : P.FG)
+    (hPS : P ≤ Submodule.span R {z : N | ∃ a ∈ S, ∃ n : N, a • n = z}) :
+    ∃ F : Finset R, (↑F : Set R) ⊆ S ∧
+      P ≤ Submodule.span R
+        {z : N | ∃ a ∈ (↑F : Set R), ∃ n : N, a • n = z} := by
+  classical
+  obtain ⟨t, ht⟩ := hP
+  have htS : (↑t : Set N) ⊆
+      Submodule.span R {z : N | ∃ a ∈ S, ∃ n : N, a • n = z} := by
+    intro x hx
+    apply hPS
+    rw [← ht]
+    exact Submodule.subset_span hx
+  obtain ⟨T, hTS, htT⟩ := Submodule.subset_span_finite_of_subset_span htS
+  choose coeff hcoeff term hterm using fun z : T => hTS z.property
+  let F : Finset R := T.attach.image coeff
+  refine ⟨F, ?_, ?_⟩
+  · intro a ha
+    obtain ⟨z, _, rfl⟩ := Finset.mem_image.mp ha
+    exact hcoeff z
+  · rw [← ht]
+    refine le_trans (Submodule.span_le.2 htT) (Submodule.span_le.2 ?_)
+    intro z hz
+    let zT : T := ⟨z, hz⟩
+    exact Submodule.subset_span
+      ⟨coeff zT, Finset.mem_image.mpr ⟨zT, Finset.mem_attach _ _, rfl⟩, term zT, hterm zT⟩
+
 namespace Ideal
 
 variable {R : Type u} [Semiring R]
@@ -50,6 +83,15 @@ theorem moduleSpan_le {I : Ideal R} {P : Submodule R N} :
     rintro _ ⟨a, ha, n, rfl⟩
     exact h a ha n
 
+/-- The scalar span of a left ideal is its action on the whole module. -/
+theorem moduleSpan_eq_smul_top (I : Ideal R) (N : Type v)
+    [AddCommMonoid N] [Module R N] :
+    I.moduleSpan N = I • (⊤ : Submodule R N) := by
+  apply eq_of_forall_ge_iff
+  intro P
+  rw [moduleSpan_le, Submodule.smul_le]
+  simp only [Submodule.mem_top, forall_const]
+
 theorem moduleSpan_mono {I J : Ideal R} (h : I ≤ J) :
     I.moduleSpan N ≤ J.moduleSpan N :=
   moduleSpan_le.2 fun _ ha n => J.smul_mem_moduleSpan (h ha) n
@@ -65,75 +107,28 @@ theorem moduleSpan_le_ker_of_annihilated (I : Ideal R)
   rw [map_smul]
   exact hN a ha (f m)
 
-/-- Every element of an ideal-generated submodule uses only a finitely
-generated left subideal of the coefficient ideal. -/
-theorem exists_fg_subideal_of_mem_moduleSpan {J : Ideal R} {x : N}
-    (hx : x ∈ J.moduleSpan N) :
-    ∃ J₀ : Ideal R, J₀.FG ∧ J₀ ≤ J ∧ x ∈ J₀.moduleSpan N := by
-  classical
-  induction hx using Submodule.span_induction with
-  | mem x hx =>
-      rcases hx with ⟨a, ha, n, rfl⟩
-      refine ⟨Submodule.span R ({a} : Set R), ?_, ?_, ?_⟩
-      · exact ⟨{a}, by simp⟩
-      · exact Submodule.span_le.2 (by simpa using ha)
-      · exact smul_mem_moduleSpan _ (Submodule.subset_span (by simp)) n
-  | zero =>
-      exact ⟨⊥, ⟨∅, by simp⟩, bot_le, (moduleSpan (⊥ : Ideal R) N).zero_mem⟩
-  | add x y _ _ ihx ihy =>
-      rcases ihx with ⟨J₁, hfg₁, hle₁, hx⟩
-      rcases ihy with ⟨J₂, hfg₂, hle₂, hy⟩
-      refine ⟨J₁ ⊔ J₂, ?_, sup_le hle₁ hle₂, ?_⟩
-      · obtain ⟨s, hs⟩ := hfg₁
-        obtain ⟨t, ht⟩ := hfg₂
-        refine ⟨s ∪ t, ?_⟩
-        change Submodule.span R (↑(s ∪ t) : Set R) = _
-        change Submodule.span R (↑s : Set R) = J₁ at hs
-        change Submodule.span R (↑t : Set R) = J₂ at ht
-        rw [Finset.coe_union, Submodule.span_union, hs, ht]
-      · exact (moduleSpan (J₁ ⊔ J₂) N).add_mem
-          (moduleSpan_mono le_sup_left hx) (moduleSpan_mono le_sup_right hy)
-  | smul a x _ ihx =>
-      rcases ihx with ⟨J₀, hfg, hle, hx⟩
-      exact ⟨J₀, hfg, hle, (moduleSpan J₀ N).smul_mem a hx⟩
-
 /-- A finitely generated submodule contained in `J N` is contained in `J₀ N`
 for some finitely generated left ideal `J₀ ≤ J`. -/
 theorem exists_fg_subideal_cover {J : Ideal R} {P : Submodule R N}
     (hP : P.FG) (hPJ : P ≤ J.moduleSpan N) :
     ∃ J₀ : Ideal R, J₀.FG ∧ J₀ ≤ J ∧ P ≤ J₀.moduleSpan N := by
   classical
-  have finite_cover (s : Finset N) (hs : ∀ x ∈ s, x ∈ J.moduleSpan N) :
-      ∃ J₀ : Ideal R, J₀.FG ∧ J₀ ≤ J ∧ ∀ x ∈ s, x ∈ J₀.moduleSpan N := by
-    induction s using Finset.induction_on with
-    | empty =>
-        exact ⟨⊥, ⟨∅, by simp⟩, bot_le, by simp⟩
-    | @insert x s hxs ih =>
-        obtain ⟨J₁, hfg₁, hle₁, hx⟩ :=
-          exists_fg_subideal_of_mem_moduleSpan (hs x (Finset.mem_insert_self x s))
-        obtain ⟨J₂, hfg₂, hle₂, hcover⟩ :=
-          ih (fun y hy => hs y (Finset.mem_insert_of_mem hy))
-        refine ⟨J₁ ⊔ J₂, ?_, sup_le hle₁ hle₂, ?_⟩
-        · obtain ⟨t₁, ht₁⟩ := hfg₁
-          obtain ⟨t₂, ht₂⟩ := hfg₂
-          refine ⟨t₁ ∪ t₂, ?_⟩
-          change Submodule.span R (↑(t₁ ∪ t₂) : Set R) = _
-          change Submodule.span R (↑t₁ : Set R) = J₁ at ht₁
-          change Submodule.span R (↑t₂ : Set R) = J₂ at ht₂
-          rw [Finset.coe_union, Submodule.span_union, ht₁, ht₂]
-        · intro y hy
-          rcases Finset.mem_insert.1 hy with rfl | hy
-          · exact moduleSpan_mono le_sup_left hx
-          · exact moduleSpan_mono le_sup_right (hcover y hy)
-  obtain ⟨s, hs⟩ := hP
-  obtain ⟨J₀, hfg, hle, hcover⟩ := finite_cover s (by
-    intro x hx
-    apply hPJ
-    rw [← hs]
-    exact Submodule.subset_span hx)
-  refine ⟨J₀, hfg, hle, ?_⟩
-  rw [← hs]
-  exact Submodule.span_le.2 hcover
+  obtain ⟨F, hFJ, hPF⟩ :=
+    Submodule.exists_finset_scalar_support_of_fg (S := (J : Set R)) hP hPJ
+  refine ⟨Submodule.span R (↑F : Set R), ⟨F, rfl⟩, Submodule.span_le.2 hFJ, ?_⟩
+  refine le_trans hPF (Submodule.span_le.2 ?_)
+  rintro _ ⟨a, ha, n, rfl⟩
+  exact smul_mem_moduleSpan _ (Submodule.subset_span ha) n
+
+/-- Every element of an ideal-generated submodule uses only a finitely
+generated left subideal of the coefficient ideal. -/
+theorem exists_fg_subideal_of_mem_moduleSpan {J : Ideal R} {x : N}
+    (hx : x ∈ J.moduleSpan N) :
+    ∃ J₀ : Ideal R, J₀.FG ∧ J₀ ≤ J ∧ x ∈ J₀.moduleSpan N := by
+  obtain ⟨J₀, hfg, hle, hcover⟩ :=
+    exists_fg_subideal_cover (P := Submodule.span R ({x} : Set N))
+      (Submodule.fg_span_singleton x) (Submodule.span_le.2 (by simpa using hx))
+  exact ⟨J₀, hfg, hle, hcover (Submodule.mem_span_singleton_self x)⟩
 
 end Ideal
 

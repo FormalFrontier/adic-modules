@@ -1,3 +1,8 @@
+/-
+SPDX-License-Identifier: Apache-2.0
+Authors: Formal Frontier Agents
+Contributors: Bobbin
+-/
 module
 
 public import AdicModules.AdicCompletion.Pi

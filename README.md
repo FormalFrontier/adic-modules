@@ -161,6 +161,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   characterizes membership of a canonical stage element by membership at some
   later stage; no finite-generation or Noetherian hypothesis is needed.
 
+- **Nested quotient endomorphism kernels.** Let `R` be any ring, `M` a
+  projective left `R`-module, `I ≤ J` left ideals, and
+  `Q = M ⧸ (I • (⊤ : Submodule R M))`. Assume scalar multiplications by `R`
+  commute on `Q`, and either `J` is finitely generated as a left ideal or `Q`
+  is finitely generated as an `R`-module. The canonical reduction
+  [`Module.End.reduceModIdealOfLE`](AdicModules/LinearAlgebra/Quotient/End.lean)
+  `End_R(Q) → End_R(M ⧸ (J • ⊤))` has kernel the endomorphism ideal generated
+  by `j • 1` for `j ∈ J`. Equivalently, the reduction of `f : End_R(Q)` is zero
+  if and only if `f ∈ J • (⊤ : Submodule R (Module.End R Q))`.
+  No projectivity of `Q`, scalar commutation or finite generation of `M`,
+  two-sidedness of the ideals, or finiteness of the underlying set of `Q` is required.
+
 Rings are commutative; modules are additive commutative groups unless specified otherwise.
 
 - **Completion and completeness** ([functor](AdicModules/AdicCompletion/Functor.lean),
@@ -497,6 +509,8 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) (finite-projective comparison and non-finite countable Finsupp injectivity) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Pi](AdicModules/LinearAlgebra/Pi.lean) (finitely generated ideal action on dependent products and coordinatewise reduction kernel) | See the `AdicCompletion.DependentPi` models above |
+| [LinearAlgebra.Quotient.Coefficients](AdicModules/LinearAlgebra/Quotient/Coefficients.lean) | — |
+| [LinearAlgebra.Quotient.End](AdicModules/LinearAlgebra/Quotient/End.lean) | [LinearAlgebra.Quotient.End](AdicModulesTest/LinearAlgebra/Quotient/End.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |
 | [LinearAlgebra.TensorProduct.Quotient](AdicModules/LinearAlgebra/TensorProduct/Quotient.lean) | [LinearAlgebra.TensorProduct.Quotient](AdicModulesTest/LinearAlgebra/TensorProduct/Quotient.lean) |
 | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModules/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (representatives and inverse formulas) | [RingTheory.Ideal.IsPrincipalPowQuotient](AdicModulesTest/RingTheory/Ideal/IsPrincipalPowQuotient.lean) (nonzero chosen-generator class for `(5)` in `ℤ`) |
