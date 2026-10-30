@@ -6,6 +6,12 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- **Noetherianity from the first adic quotient.** If `I` is a finitely generated
+  ideal, `R` is `I`-adically complete, and `R / I` is Noetherian, then `R` is
+  Noetherian. Under the same finite-generation and quotient hypotheses, the
+  `I`-adic completion is Noetherian without assuming that `R` itself is complete
+  or Noetherian. See the [Noetherian criterion](AdicModules/Noetherian.lean).
+
 - **Adic separation of quotients.** For any ideal `I` and submodule `N` of an
   `R`-module over a commutative ring, `M / N` is `I`-Hausdorff exactly when
   `⨅ n, N ⊔ I ^ n • ⊤ = N`. Membership is detected by congruence to `N` at
@@ -343,6 +349,16 @@ Rings are commutative; modules are additive commutative groups unless specified 
   This needs neither finiteness of `M` nor finite generation of `I`.
   Maps from the completion of a finite module to any completed-ring module are
   determined by the original module.
+- **Products from a finitely generated positive power** ([comparison and completeness](AdicModules/AdicCompletion/Pi.lean)):
+  for any commutative ring, ideal `I`, dependent family of modules and given `n > 0`
+  with `(I ^ n).FG`, `AdicCompletion.piEquivOfFGPow` makes the canonical product
+  comparison an equivalence over `AdicCompletion I R`. No finiteness, flatness,
+  separation, completeness or completed-ring action on the original modules is needed;
+  the ring, index and module universes are independent. The equivalence is independent
+  of the positive-power witness and agrees with the finitely generated ideal and
+  finite-index comparisons. If all factors are intrinsically `I`-adically complete,
+  `IsAdicComplete.pi_of_fg_pow` gives intrinsic completeness of their product.
+  The proof uses cofinal multiples of `n`, not quotient comparison at every precision.
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
   [maps](AdicModules/AdicCompletion/LinearMap.lean)): `I.FG` gives the canonical
   completed-ring-linear equivalence for arbitrary dependent products. Any ideal admits

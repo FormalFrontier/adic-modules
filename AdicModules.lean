@@ -3,6 +3,8 @@ SPDX-License-Identifier: Apache-2.0
 Authors: Formal Frontier Agents
 -/
 module
+
+public import AdicModules.Noetherian
 public import AdicModules.LinearAlgebra.Matrix.DeterminantPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation.Localization
