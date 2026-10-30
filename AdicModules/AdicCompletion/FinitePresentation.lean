@@ -12,10 +12,17 @@ import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.Filtration
 
 /-!
-# Adic completion of finitely presented modules
+# Finite presentation and adic completion
 
-Let `R` be a commutative ring and `I` any ideal. Suppose that, for every finitely generated
-submodule `K` of a finite power of `R`, the induced `I`-adic filtration on `K` is cofinal with
+For any ideal `I` of a commutative ring `R`, an original projective module `M` with
+`Module.Finite R (M ⧸ (I • ⊤))` has finitely presented raw completion over the canonical
+completed ring. This uses finite-first-quotient completion finiteness, the canonical tensor
+comparison for projective modules, and stock finite-plus-projective finite presentation.
+It requires no finite-free cofinality, original-module finiteness or finite generation of `I`.
+
+A separate comparison concerns finitely presented original modules. Let `R` be a commutative
+ring and `I` any ideal. Suppose that, for every finitely generated submodule `K` of a finite
+power of `R`, the induced `I`-adic filtration on `K` is cofinal with
 its intrinsic `I`-adic filtration. For a finitely presented `R`-module `M`, the canonical map
 `AdicCompletion I R ⊗[R] M →ₗ[AdicCompletion I R] AdicCompletion I M` is then bijective.
 
@@ -48,6 +55,8 @@ exactness theorem follows their Cauchy-sequence approach in
 `Mathlib.RingTheory.AdicCompletion.Exactness`. Finite presentations and tensor surjectivity
 are reused from Mathlib. The Noetherian bridge uses Mathlib's Artin–Rees lemma
 `Ideal.exists_pow_inf_eq_pow_smul` and `Module.finitePresentation_of_finite`.
+The completed-module finite-presentation theorem uses Andrew Yang's formalization
+`Module.finitePresentation_of_projective` in `Mathlib.Algebra.Module.FinitePresentation`.
 -/
 
 @[expose] public section
@@ -59,6 +68,17 @@ universe uR uM
 open TensorProduct
 
 namespace AdicCompletion
+
+/-- An original projective module with finite first adic quotient has finitely presented
+completion over the canonical completed ring, for any ideal. No cofinality assumption on
+finite free submodules is needed for this conclusion. -/
+theorem moduleFinitePresentation_of_finite_quotient_of_projective
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) := by
+  let := moduleFinite_of_finite_quotient I M
+  exact Module.finitePresentation_of_projective (AdicCompletion I R) (AdicCompletion I M)
 
 section FinitePresentation
 

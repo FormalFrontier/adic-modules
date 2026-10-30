@@ -289,9 +289,12 @@ Rings are commutative; modules are additive commutative groups unless specified 
   restricted to `R`. No source separation, completeness or finiteness is assumed.
 - **Tensor comparisons and finiteness** ([tensor](AdicModules/AdicCompletion/TensorProduct.lean),
   [finite presentation](AdicModules/AdicCompletion/FinitePresentation.lean)): the canonical
-  completed-ring-linear comparison is injective for projective modules; it is an
-  equivalence for finite projective modules, finite modules over Noetherian rings,
-  or finitely presented modules with **finite-free induced/intrinsic cofinality**
+  completed-ring-linear comparison is surjective whenever the **original first quotient**
+  `M / I M` is finite over `R`, without original projectivity or finiteness. It is injective
+  for original projective modules, so `ofTensorProductEquivOfFiniteQuotientProjective`
+  gives the same canonical equivalence when both premises hold. Finite-original projective
+  names remain specializations. Separate equivalences cover finite modules over Noetherian
+  rings, or finitely presented modules with **finite-free induced/intrinsic cofinality**
   (supplied by Artin–Rees over Noetherian rings).
   `AdicCompletion.moduleFinite_of_finite_quotient` gives a finite module over the
   **canonical completed ring** whenever `M / I M` is finite over the original ring,
@@ -302,8 +305,11 @@ Rings are commutative; modules are additive commutative groups unless specified 
   raw completion over the completed ring. Empty finite families are included.
   The [integer-rational product](AdicModulesTest/CompletionFiniteness.lean) has finite
   nonzero first quotient and completion although the original module is not finite.
-  In particular, finite modules remain finite; finite projective modules remain
-  projective there, so the generic finite-projective finite-presentation lemma applies.
+  With original projectivity and finite `M / I M`, the completion is projective over the
+  completed ring; `moduleFinitePresentation_of_finite_quotient_of_projective` then gives
+  finite presentation over that same ring. These results assume no action of the completed
+  ring on original `M`, Noetherianity, finite generation of `I`, completeness or separation.
+  In particular, finite modules remain finite and finite projective modules remain projective.
 - **Coordinates and scalar restriction** ([coordinates](AdicModules/AdicCompletion/QuotientTorsion.lean),
   [restriction](AdicModules/AdicCompletion/RestrictScalars.lean)): for an additive commutative group `V`, subgroup
   `L` and integer `ℓ` acting bijectively on `V`, compatible `ℓ^n`-kernel sections on

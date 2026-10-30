@@ -96,6 +96,17 @@ Nakayama's lemma ([Stacks Project, Tag 00DV](https://stacks.math.columbia.edu/ta
 and Orzech's theorem: M. Orzech, *Onto endomorphisms are isomorphisms*,
 American Mathematical Monthly 78 (1971), 357–362.
 
+The finite-first-quotient tensor comparison reuses this library's chosen-original-lifts
+spanning theorem and Mathlib's canonical completed-ring action and tensor comparison
+(Judith Ludwig and Christian Merten). Finite quotient generators use Johan Commelin's
+finiteness API; the chosen-family argument uses Johannes Hölzl's finite linear-combination
+API. Completed projectivity uses Kevin Buzzard and Antoine Labelle's projective base-change
+and equivalence transport. The explicit completed-module finite-presentation theorem uses
+Andrew Yang's `Module.finitePresentation_of_projective`. These are arbitrary-ideal raw
+inverse-limit results, not the whole intrinsic-completion assertion of Fujiwara–Kato,
+Proposition 7.2.16, which has a finitely generated ideal setting. The comparison and
+finite-original Mathlib surjectivity declarations, author notices and licenses are preserved.
+
 The valuation-integers completeness bridge is motivated by I. Fesenko and
 S. Vostokov, *Local Fields and Their Extensions*, second edition (2002),
 II §1, Corollary 1. It independently assembles Mathlib's valuation-integers,

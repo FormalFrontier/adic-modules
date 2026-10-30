@@ -16,24 +16,26 @@ import Mathlib.RingTheory.TensorProduct.Finite
 /-!
 # Adic completion and tensor products
 
-For a projective module over a commutative ring, the canonical comparison from tensoring with
-the completed ring to the completed module is injective, for any ideal. If the module is also
-finite, the comparison is bijective. The resulting equivalence is linear over the completed
-ring, sends pure tensors to scalar multiples of the canonical map into the completion, and
-agrees with Mathlib's Noetherian equivalence when both apply.
+For any ideal `I` of a commutative ring `R`, finiteness of the original first quotient
+`M / I M` makes the canonical completed-ring-linear comparison from tensoring with
+`AdicCompletion I R` to `AdicCompletion I M` surjective. No projectivity or finiteness of
+original `M` is required. If original `M` is projective, the comparison is also injective,
+hence an equivalence. It sends pure tensors to scalar multiples of canonical module elements
+and agrees with Mathlib's finite-Noetherian equivalence where both apply. The finite-original
+projective API is retained as a specialization.
 
-The proof detects coefficients in a free Finsupp module and uses a projective retraction and
-naturality of the canonical comparison. Surjectivity for finite modules is reused from Mathlib.
-No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
+Injectivity detects coefficients in a free Finsupp module and uses a projective retraction
+and naturality. For surjectivity, choose finite quotient generators and original lifts.
+The chosen-family spanning theorem below makes those same completed lifts span the raw
+completion; each lies in the range of the canonical comparison. No Noetherian hypothesis
+on the ring or finite-generation hypothesis on the ideal is needed.
 
-If `M / I M` is finite over `R`, then the raw inverse-limit completion of `M` is finite over
-the canonical completed ring, for any ideal `I`. In particular, completion preserves finite
-modules. Finite projective modules also remain projective over `AdicCompletion I R`.
-Finiteness alone does not require projectivity. More precisely, any specified finite family
-spanning `M / I M` has its completed original images spanning the completion over the completed
-ring. These results use Mathlib's coefficientwise completed-ring action, the same action as
-the canonical tensor comparison. The general lemma
-`Module.finitePresentation_of_projective` then gives finite presentation over the completed ring.
+Finiteness of `M / I M` also gives finiteness of the raw completion over the canonical
+completed ring. With original projectivity, the completion is projective over that ring by
+base change and the canonical equivalence. These results use Mathlib's coefficientwise
+completed-ring action, without an action of the completed ring on original `M`.
+`AdicModules.AdicCompletion.FinitePresentation` consumes completed finiteness and projectivity
+in one explicit finite-presentation theorem via `Module.finitePresentation_of_projective`.
 
 ## Implementation notes
 
@@ -58,8 +60,10 @@ Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction, b
 projectivity and transport along linear equivalences. Mathlib's
 `RingTheory/TensorProduct/Finite.lean`, by Kim Morrison and Johan Commelin, supplies
 base-change finiteness; `RingTheory/Finiteness/Basic.lean` supplies its transport along surjections.
-The finite-first-quotient argument uses `Module.Finite.exists_fin'` from Johan Commelin's
-`RingTheory/Finiteness/Cardinality.lean`, projective lifting of its finite-free source, and
+The tensor surjectivity argument uses `Module.Finite.exists_fin` from Johan Commelin's
+`RingTheory/Finiteness/Defs.lean`, quotient representatives, and this library's chosen-lifts
+spanning refinement. The completion-finiteness argument uses `Module.Finite.exists_fin'` from
+his `RingTheory/Finiteness/Cardinality.lean`, projective lifting of its finite-free source, and
 `map_surjective_of_mkQ_comp_surjective` and `piEquivFin` from Mathlib's
 `RingTheory/AdicCompletion/Functoriality.lean`, by Judith Ludwig and Christian Merten.
 The chosen-family refinement uses the finite linear-combination API from Johannes Hölzl's
@@ -186,6 +190,25 @@ theorem span_range_eq_top_of_span_mkQ_eq_top
   rw [← hg]
   exact (map_surjective_of_mkQ_comp_surjective hsurj).comp e.symm.surjective
 
+/-- Finiteness of the original first adic quotient makes the canonical completed-ring-linear
+tensor comparison surjective, for any ideal and without projectivity of the original module. -/
+theorem ofTensorProduct_surjective_of_finite_quotient
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Function.Surjective (ofTensorProduct I M) := by
+  classical
+  obtain ⟨n, q, hq⟩ :=
+    Module.Finite.exists_fin (R := R) (M := M ⧸ (I • (⊤ : Submodule R M)))
+  choose v hv using fun i : Fin n =>
+    Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) (q i)
+  have hspan := span_range_eq_top_of_span_mkQ_eq_top I v (by simpa only [hv] using hq)
+  apply LinearMap.range_eq_top.mp
+  apply top_unique
+  rw [← hspan]
+  apply Submodule.span_le.mpr
+  rintro _ ⟨i, rfl⟩
+  exact ⟨(1 : AdicCompletion I R) ⊗ₜ[R] v i, by
+    simp only [ofTensorProduct_tmul, one_smul]⟩
+
 /-- If the first adic quotient is finite over the original ring, its raw inverse-limit
 completion is finite over the canonical completed ring, for any ideal. This generalizes the
 finite-generation part of Fujiwara–Kato, Proposition 7.2.16, without asserting intrinsic
@@ -231,29 +254,76 @@ theorem ofTensorProduct_injective_of_projective
     _ = ofTensorProduct I (M →₀ R) (g.baseChange (AdicCompletion I R) y) :=
       LinearMap.congr_fun (ofTensorProduct_naturality I g) y
 
+/-- For an original projective module finite modulo the ideal, the canonical tensor
+comparison is bijective: projectivity gives injectivity and the finite first quotient gives
+surjectivity. -/
+theorem ofTensorProduct_bijective_of_finite_quotient_of_projective
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    Function.Bijective (ofTensorProduct I M) :=
+  ⟨ofTensorProduct_injective_of_projective I M,
+    ofTensorProduct_surjective_of_finite_quotient I M⟩
+
+/-- The canonical tensor comparison as a completed-ring-linear equivalence for an original
+projective module whose first adic quotient is finite. -/
+noncomputable def ofTensorProductEquivOfFiniteQuotientProjective
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
+  LinearEquiv.ofBijective (ofTensorProduct I M)
+    (ofTensorProduct_bijective_of_finite_quotient_of_projective I M)
+
+/-- The finite-quotient projective equivalence has the canonical comparison as its linear map. -/
+@[simp]
+theorem coe_ofTensorProductEquivOfFiniteQuotientProjective
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    (ofTensorProductEquivOfFiniteQuotientProjective I M).toLinearMap = ofTensorProduct I M :=
+  rfl
+
+/-- The finite-quotient projective equivalence sends a pure tensor to the corresponding
+scalar multiple in the completed module. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjective_apply
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M]
+    (a : AdicCompletion I R) (m : M) :
+    ofTensorProductEquivOfFiniteQuotientProjective I M (a ⊗ₜ[R] m) = a • of I M m :=
+  ofTensorProduct_tmul I M a m
+
+/-- The inverse finite-quotient projective equivalence sends a canonical module element to
+its tensor with one. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjective_symm_of
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] (m : M) :
+    (ofTensorProductEquivOfFiniteQuotientProjective I M).symm (of I M m) =
+      (1 : AdicCompletion I R) ⊗ₜ[R] m := by
+  apply (ofTensorProductEquivOfFiniteQuotientProjective I M).injective
+  simp
+
+/-- An original projective module finite modulo the ideal has projective completion over the
+completed ring, for any ideal. -/
+instance instModuleProjectiveOfFiniteQuotient
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
+  Module.Projective.of_equiv' (ofTensorProductEquivOfFiniteQuotientProjective I M)
+
 /-- For a finite projective module, tensoring with the completed ring gives its adic completion.
-The canonical comparison is bijective over an arbitrary commutative ring and for any ideal,
-by projective injectivity and finite-module surjectivity. -/
+This is the finite-original specialization of the finite-first-quotient comparison. -/
 theorem ofTensorProduct_bijective_of_finite_of_projective
     [Module.Finite R M] [Module.Projective R M] :
     Function.Bijective (ofTensorProduct I M) :=
-  ⟨ofTensorProduct_injective_of_projective I M,
-    ofTensorProduct_surjective_of_finite I M⟩
+  ofTensorProduct_bijective_of_finite_quotient_of_projective I M
 
 /-- The canonical tensor comparison as an equivalence over the completed ring for a finite
-projective module. -/
+projective module, specializing the finite-first-quotient equivalence. -/
 noncomputable def ofTensorProductEquivOfFiniteProjective
     [Module.Finite R M] [Module.Projective R M] :
     AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
-  LinearEquiv.ofBijective (ofTensorProduct I M)
-    (ofTensorProduct_bijective_of_finite_of_projective I M)
+  ofTensorProductEquivOfFiniteQuotientProjective I M
 
 /-- The finite-projective equivalence has the canonical tensor comparison as its linear map. -/
 @[simp]
 theorem coe_ofTensorProductEquivOfFiniteProjective
     [Module.Finite R M] [Module.Projective R M] :
     (ofTensorProductEquivOfFiniteProjective I M).toLinearMap = ofTensorProduct I M :=
-  rfl
+  coe_ofTensorProductEquivOfFiniteQuotientProjective I M
 
 /-- The finite-projective equivalence sends a pure tensor to the corresponding scalar multiple
 in the completed module. -/
@@ -261,7 +331,7 @@ in the completed module. -/
 theorem ofTensorProductEquivOfFiniteProjective_apply
     [Module.Finite R M] [Module.Projective R M] (a : AdicCompletion I R) (m : M) :
     ofTensorProductEquivOfFiniteProjective I M (a ⊗ₜ[R] m) = a • of I M m :=
-  ofTensorProduct_tmul I M a m
+  ofTensorProductEquivOfFiniteQuotientProjective_apply I M a m
 
 /-- The inverse finite-projective equivalence sends a canonical module element to its tensor
 with one. -/
@@ -269,15 +339,17 @@ with one. -/
 theorem ofTensorProductEquivOfFiniteProjective_symm_of
     [Module.Finite R M] [Module.Projective R M] (m : M) :
     (ofTensorProductEquivOfFiniteProjective I M).symm (of I M m) =
-      (1 : AdicCompletion I R) ⊗ₜ[R] m := by
-  apply (ofTensorProductEquivOfFiniteProjective I M).injective
-  simp
+      (1 : AdicCompletion I R) ⊗ₜ[R] m :=
+  ofTensorProductEquivOfFiniteQuotientProjective_symm_of I M m
 
-/-- The completion of a finite projective module is projective over the completed ring,
-for any ideal. -/
-instance instModuleProjective [Module.Finite R M] [Module.Projective R M] :
+-- Keep the old definition reducible for explicit callers, without a second instance.
+set_option linter.defProp false in
+/-- The finite-original specialization of completed projectivity. Instance search uses the
+more general `instModuleProjectiveOfFiniteQuotient`. -/
+@[instance_reducible]
+noncomputable def instModuleProjective [Module.Finite R M] [Module.Projective R M] :
     Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
-  Module.Projective.of_equiv' (ofTensorProductEquivOfFiniteProjective I M)
+  instModuleProjectiveOfFiniteQuotient I M
 
 /-- For a finite module over a commutative Noetherian ring, the canonical comparison from
 tensoring with the completed ring to the completed module is bijective for every ideal.
@@ -300,13 +372,21 @@ section Noetherian
 variable {R : Type uR} [CommRing R] (I : Ideal R)
 variable (M : Type uR) [AddCommGroup M] [Module R M]
 
+/-- On the finite-original Noetherian overlap, the finite-quotient projective equivalence
+agrees with Mathlib's finite-module Noetherian equivalence through their canonical maps. -/
+theorem ofTensorProductEquivOfFiniteQuotientProjective_eq_ofFiniteNoetherian
+    [Module.Finite R M] [Module.Projective R M] [IsNoetherianRing R] :
+    ofTensorProductEquivOfFiniteQuotientProjective I M =
+      ofTensorProductEquivOfFiniteNoetherian I M := by
+  ext x
+  rfl
+
 /-- When the ring is Noetherian, the finite-projective equivalence agrees with Mathlib's
 finite-module Noetherian equivalence: both have the same canonical underlying map. -/
 theorem ofTensorProductEquivOfFiniteProjective_eq_ofFiniteNoetherian
     [Module.Finite R M] [Module.Projective R M] [IsNoetherianRing R] :
-    ofTensorProductEquivOfFiniteProjective I M = ofTensorProductEquivOfFiniteNoetherian I M := by
-  ext x
-  rfl
+    ofTensorProductEquivOfFiniteProjective I M = ofTensorProductEquivOfFiniteNoetherian I M :=
+  ofTensorProductEquivOfFiniteQuotientProjective_eq_ofFiniteNoetherian I M
 
 /-- Mathlib's finite-Noetherian equivalence is the equivalence obtained from the canonical
 completed-ring-linear comparison and its bijectivity. -/

@@ -326,19 +326,23 @@ These are statements about the current library, not the historical API inventory
   `AdicCompletion.ofTensorProduct_injective_of_projective I M` proves injectivity
   of Mathlib's canonical **`AdicCompletion I R`-linear** comparison
   `AdicCompletion I R ⊗[R] M →ₗ[AdicCompletion I R] AdicCompletion I M`.
-  No finiteness assumption on `M` is needed for injectivity. With the additional
-  hypothesis `Module.Finite R M`,
-  `AdicCompletion.ofTensorProduct_bijective_of_finite_of_projective I M` proves
-  bijectivity, and `AdicCompletion.ofTensorProductEquivOfFiniteProjective I M`
+  No finiteness assumption on `M` is needed for injectivity. Independently,
+  `AdicCompletion.ofTensorProduct_surjective_of_finite_quotient I M` gives surjectivity
+  from `Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))`, without projectivity.
+  Adding that original-first-quotient finiteness to original projectivity,
+  `AdicCompletion.ofTensorProduct_bijective_of_finite_quotient_of_projective I M` proves
+  bijectivity, and `AdicCompletion.ofTensorProductEquivOfFiniteQuotientProjective I M`
   gives an **`AdicCompletion I R`-linear** equivalence
   `AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M`.
   Its underlying linear map is `AdicCompletion.ofTensorProduct I M`; its
   characteristic lemmas give `a ⊗ₜ m ↦ a • AdicCompletion.of I M m` and
   `AdicCompletion.of I M m ↦ 1 ⊗ₜ m` for the inverse. Ring and module universes
   are independent; no Noetherian or finitely generated ideal hypothesis is needed.
-  The separate `ofTensorProductEquivOfFiniteProjective_eq_ofFiniteNoetherian`
-  lemma identifies it with Mathlib's Noetherian equivalence where both apply:
-  over a Noetherian ring, with the ring and module in the same universe.
+  The finite-original `ofTensorProductEquivOfFiniteProjective` and its characteristic laws
+  remain exact specializations through stock quotient finiteness.
+  `ofTensorProductEquivOfFiniteQuotientProjective_eq_ofFiniteNoetherian` identifies the
+  generalized equivalence with Mathlib's Noetherian equivalence on the finite-original
+  overlap, with the ring and module in the same universe.
   The [integer models](../AdicModulesTest/AdicCompletion/TensorProduct.lean) retain
   the finite rank-two canonical-map, pure-tensor and inverse identities and the
   rank-zero boundary. They also include a projective, non-finite countable Finsupp
@@ -606,21 +610,32 @@ completeness condition on the target. See the
 raw inverse limit, not intrinsic completeness for arbitrary ideals.
 
 For any ideal `I` of a commutative ring `R` and any additive commutative group
-`M` with `Module R M`, `[Module.Finite R M]` alone gives
-`Module.Finite (AdicCompletion I R) (AdicCompletion I M)` for the canonical
-completed-ring action. With both `[Module.Finite R M]` and
-`[Module.Projective R M]`, completion is projective over that same ring.
-Ring and module universes are independent. No finite-generation hypothesis on
-`I`, Noetherianity, freeness, smallness, flatness, separation or completeness
-of the original module is required. These are typeclass instances, not a
-choice of transported scalars. The generic `Module.finitePresentation_of_projective`
-lemma then gives finite presentation for the finite projective completion;
-it is not a separate completion wrapper or a claim for all finite modules.
+`M` with its given `Module R M`, finite generation of the **original quotient**
+`M ⧸ (I • (⊤ : Submodule R M))` over `R` gives completion finiteness over
+`AdicCompletion I R` by `moduleFinite_of_finite_quotient`. It also gives surjectivity
+of the same canonical tensor comparison: the completed original lifts above lie in its
+completed-ring-linear range. No original projectivity is needed for these two conclusions.
+With original `[Module.Projective R M]`, `instModuleProjectiveOfFiniteQuotient` makes
+the completion projective over that same ring. This is the single registered completed
+projectivity instance; the old finite-original `instModuleProjective` constant remains
+an explicit specialization. The existing finite-original finiteness instance is unchanged.
+
+The explicit theorem `moduleFinitePresentation_of_finite_quotient_of_projective` in the
+[finite-presentation module](../AdicModules/AdicCompletion/FinitePresentation.lean) consumes
+this completion finiteness and projectivity with `Module.finitePresentation_of_projective`.
+It adds no global finite-presentation instance and needs no finite-free cofinality premise.
+Ring and module universes are independent. No finite-generation hypothesis on `I`,
+Noetherianity, original-module finiteness, freeness, smallness, flatness, separation or
+completeness is required, and original `M` receives no completed-ring action.
 See the [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean)
-and its [canonical rank-two model](../AdicModulesTest/AdicCompletion/TensorProduct.lean).
-The finite-module transfer uses Mathlib’s base-change finiteness by Kim Morrison
-and Johan Commelin and finiteness under surjections; projectivity uses the
-base-change and equivalence APIs credited in that module.
+and its existing [finite-original clients](../AdicModulesTest/AdicCompletion/TensorProduct.lean).
+The projectivity argument reuses Mathlib's base-change and equivalence APIs; the explicit
+finite-presentation consumer uses Andrew Yang's formalization in
+`Mathlib.Algebra.Module.FinitePresentation`.
+
+These conclusions do not weaken the completed-Hom hypotheses: the all-ideal comparison
+still requires a finite **original** projective source, while its arbitrary-projective
+arm still requires `I.FG`. Completion finiteness or projectivity is not a substitute.
 
 ## Henselian lifting and uniqueness
 

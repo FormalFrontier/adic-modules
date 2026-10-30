@@ -389,8 +389,9 @@ equivalence for the original module retains separatedness. The binary contract
 differs from Fujiwara–Kato, Exercise 0.7.4. Concrete inputs include a nonzero proper 2-adic
 ideal and nonzero separated quotient, singleton principal/generated-ideal
 completeness, and bottom/top/empty-generator boundaries.
-For projective completion–tensor injectivity and the finite equivalence
-alternatives, see the [results reference](Results.md#headline-results).
+For projective completion–tensor injectivity, finite-first-quotient surjectivity and the
+canonical equivalence for original projective modules finite modulo the ideal, see the
+[results reference](Results.md#headline-results).
 
 ## Integer singleton spans in unital rings
 
@@ -1014,7 +1015,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
 | [AdicCompletion.Endomorphism](../AdicModules/AdicCompletion/Endomorphism.lean) | Units from pointwise congruence to the identity on an adically complete module, for arbitrary ideals |
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
-| [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Canonical completion–tensor equivalence for finitely presented modules under finite-free cofinality |
+| [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Completed finite presentation for projective modules finite modulo the ideal; canonical tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
 | [AdicCompletion.LinearMap](../AdicModules/AdicCompletion/LinearMap.lean) | Canonical extension, Hausdorff uniqueness and the linear Hom equivalence |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
@@ -1024,7 +1025,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion.Quotient](../AdicModules/AdicCompletion/Quotient.lean) | Canonical algebra equivalence between the completion modulo an extended ideal power and the original ring modulo that power, assuming only finite generation of the selected power |
 | [AdicCompletion.QuotientTorsion](../AdicModules/AdicCompletion/QuotientTorsion.lean) | Scalar-power torsion sections and subgroup adic completion with signed coordinates |
 | [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
-| [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Completion-ring-linear projective injectivity, finite-projective equivalence and finite-Noetherian comparison |
+| [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Finite-first-quotient tensor surjectivity, original-projective injectivity and canonical equivalence, completed projectivity and finite-Noetherian comparison |
 | [AdicCompletion.Topology](../AdicModules/AdicCompletion/Topology.lean) | Evaluation neighborhoods in an adic completion |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
 | [LinearAlgebra.Descent](../AdicModules/LinearAlgebra/Descent.lean) | Descent along surjective semilinear maps with additive-monoid targets |
