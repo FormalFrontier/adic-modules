@@ -6,6 +6,7 @@ module
 
 public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.AdicCompletion.Pi
+public import AdicModules.AdicCompletion.TensorProduct
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 public import Mathlib.RingTheory.Finiteness.Projective
 
@@ -22,7 +23,9 @@ a linear equivalence for every ideal. For a finitely generated ideal,
 `homEquivOfProjective` does so for any projective original source, without a
 finiteness assumption on that source. The target module is arbitrary in both
 cases. Independently, maps from the completion of a finite module to any module
-over the completed ring agree if they agree on the original module.
+over the completed ring agree if they agree on the original module. More generally,
+a specified finite family spanning the first quotient determines such maps by
+agreement on its completed original lifts, even when the original module is not finite.
 
 ## Implementation and references
 
@@ -40,7 +43,9 @@ We reuse Mathlib's completion formalizations by Kenny Lau, Judith Ludwig,
 Christian Merten and Jiedong Jiang, the quotient formalizations by Johannes Hölzl,
 Mario Carneiro, Kevin Buzzard and Yury Kudryashov, the Finsupp linear-map
 formalization by Johannes Hölzl, and the Pi linear algebra API by these authors
-and Eric Wieser.
+and Eric Wieser. Chosen-family extensionality uses Mathlib's linear-map span
+extensionality, by Johannes Hölzl, Mario Carneiro, Kevin Buzzard, Yury Kudryashov,
+Frédéric Dupuis and Heather Macbeth.
 The projective splitting is due to Johan Commelin, building on the projective-module
 formalization by Kevin Buzzard and Antoine Labelle. The finite-free Hom retract
 approach also follows the Formal Frontier Projective Modules library; the product
@@ -51,7 +56,7 @@ and linear-map completion APIs are from Formal Frontier Adic Modules.
 
 noncomputable section
 
-universe u v w t z
+universe u v w t z uR uM uι uT
 
 namespace AdicCompletion
 
@@ -245,6 +250,24 @@ end Naturality
 end Comparison
 
 section Ext
+
+/-- Completed-ring-linear maps out of the raw completion are determined by
+specified original lifts of a finite spanning family in the first quotient. -/
+theorem hom_ext_of_span_mkQ_eq_top
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {ι : Type uι} [Finite ι] (v : ι → M)
+    (hv : Submodule.span R
+      (Set.range (fun i : ι =>
+        (I • (⊤ : Submodule R M)).mkQ (v i))) = ⊤)
+    {T : Type uT} [AddCommMonoid T]
+    [Module (AdicCompletion I R) T]
+    (F G : AdicCompletion I M →ₗ[AdicCompletion I R] T)
+    (h : ∀ i : ι,
+      F (AdicCompletion.of I M (v i)) =
+        G (AdicCompletion.of I M (v i))) :
+    F = G :=
+  LinearMap.ext_on_range (span_range_eq_top_of_span_mkQ_eq_top I v hv) h
 
 variable {P : Type z} [AddCommMonoid P] [Module (AdicCompletion I R) P]
 

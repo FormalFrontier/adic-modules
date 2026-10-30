@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-import AdicModules.AdicCompletion.ChineseRemainder
+import AdicModules.AdicCompletion.ChineseRemainderIdempotents
 import Mathlib.Tactic.NormNum.IsCoprime
 
 /-!
@@ -13,6 +13,9 @@ import Mathlib.Tactic.NormNum.IsCoprime
 The diagonal image of 3 is not the completed pair (1, 0). That pair instead has
 inverse residues 3 modulo 6 and 9 modulo 36. Thus its first-power residue does
 not describe its higher-precision data.
+
+The inverse pair is the completed coordinate idempotent for the (2) factor.
+It is neither zero nor one, and it is not the completed integer 3.
 -/
 
 noncomputable section
@@ -93,3 +96,58 @@ private theorem inverse_pair_stages :
     apply (residue_eq_iff i.1 2 _ 9).mpr
     rcases i with ⟨b, hb⟩
     cases b <;> norm_num
+
+private def selector : AdicCompletion productIdeal ℤ :=
+  comaximalIdempotent ℤ ideals Finset.univ comaximal ⟨false, Finset.mem_univ _⟩
+
+/-- The multiplicative selector is the same inverse pair whose two residues
+were computed above, using the algebra equivalence's underlying linear map. -/
+private theorem selector_eq_inverse_pair : selector = decomposition.symm pair := by
+  apply decomposition.injective
+  rw [LinearEquiv.apply_symm_apply]
+  change equivPiOfPairwiseSupEqTop ℤ ideals Finset.univ comaximal selector = pair
+  rw [← algEquivPiOfPairwiseSupEqTop_toLinearEquiv]
+  change algEquivPiOfPairwiseSupEqTop ℤ ideals Finset.univ comaximal selector = pair
+  funext i
+  rw [algEquivPiOfPairwiseSupEqTop_apply]
+  rcases i with ⟨b, hb⟩
+  cases b
+  · change mapOfLEₐ ℤ _ selector = 1
+    exact mapOfLEₐ_comaximalIdempotent_same ℤ ideals Finset.univ comaximal
+      ⟨false, Finset.mem_univ _⟩
+  · change mapOfLEₐ ℤ _ selector = 0
+    exact mapOfLEₐ_comaximalIdempotent_of_ne ℤ ideals Finset.univ comaximal
+      ⟨false, Finset.mem_univ _⟩ ⟨true, Finset.mem_univ _⟩ (by decide)
+
+/-- The completed selector is a genuine nonendpoint idempotent, not the
+completed integer 3. Its residues are 3 modulo 6 and 9 modulo 36, as computed
+for the inverse pair above. Its endpoints are distinguished in the first
+quotients of the (2) and (3) factors, without extra completion hypotheses. -/
+private theorem selector_isIdempotent_nonendpoint :
+    IsIdempotentElem selector ∧ selector ≠ 0 ∧ selector ≠ 1 ∧
+      selector ≠ of productIdeal ℤ 3 ∧
+      (eval productIdeal ℤ 1 selector = Submodule.Quotient.mk 3 ∧
+        eval productIdeal ℤ 2 selector = Submodule.Quotient.mk 9) := by
+  refine ⟨(completeOrthogonalIdempotents_comaximalIdempotent
+    ℤ ideals Finset.univ comaximal).idem ⟨false, Finset.mem_univ _⟩, ?_, ?_, ?_, ?_⟩
+  · intro hzero
+    have hcomponent := mapOfLEₐ_comaximalIdempotent_same
+      ℤ ideals Finset.univ comaximal ⟨false, Finset.mem_univ _⟩
+    change mapOfLEₐ ℤ _ selector = 1 at hcomponent
+    rw [hzero, _root_.map_zero] at hcomponent
+    have hres := congrArg (eval (ideals false) ℤ 1) hcomponent
+    have hbad : ¬ (2 : ℤ) ^ 1 ∣ 0 - 1 := by norm_num
+    exact hbad ((residue_eq_iff false 1 0 1).mp hres)
+  · intro hone
+    have hcomponent := mapOfLEₐ_comaximalIdempotent_of_ne
+      ℤ ideals Finset.univ comaximal
+      ⟨false, Finset.mem_univ _⟩ ⟨true, Finset.mem_univ _⟩ (by decide)
+    change mapOfLEₐ ℤ _ selector = 0 at hcomponent
+    rw [hone, map_one] at hcomponent
+    have hres := congrArg (eval (ideals true) ℤ 1) hcomponent
+    have hbad : ¬ (3 : ℤ) ^ 1 ∣ 1 - 0 := by norm_num
+    exact hbad ((residue_eq_iff true 1 1 0).mp hres)
+  · intro hthree
+    apply completed_three_ne_pair
+    rw [← hthree, selector_eq_inverse_pair, LinearEquiv.apply_symm_apply]
+  · simpa only [selector_eq_inverse_pair] using inverse_pair_stages

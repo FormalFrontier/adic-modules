@@ -6,7 +6,9 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
+import AdicModules.AdicCompletion.Pi
 import Mathlib.Algebra.Module.Projective
+import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.Finiteness.Small
 import Mathlib.RingTheory.TensorProduct.Finite
@@ -27,8 +29,10 @@ No Noetherian hypothesis on the ring or finite-generation hypothesis on the idea
 If `M / I M` is finite over `R`, then the raw inverse-limit completion of `M` is finite over
 the canonical completed ring, for any ideal `I`. In particular, completion preserves finite
 modules. Finite projective modules also remain projective over `AdicCompletion I R`.
-Finiteness alone does not require projectivity. These results use Mathlib's coefficientwise
-completed-ring action, the same action as the canonical tensor comparison. The general lemma
+Finiteness alone does not require projectivity. More precisely, any specified finite family
+spanning `M / I M` has its completed original images spanning the completion over the completed
+ring. These results use Mathlib's coefficientwise completed-ring action, the same action as
+the canonical tensor comparison. The general lemma
 `Module.finitePresentation_of_projective` then gives finite presentation over the completed ring.
 
 ## Implementation notes
@@ -58,6 +62,9 @@ The finite-first-quotient argument uses `Module.Finite.exists_fin'` from Johan C
 `RingTheory/Finiteness/Cardinality.lean`, projective lifting of its finite-free source, and
 `map_surjective_of_mkQ_comp_surjective` and `piEquivFin` from Mathlib's
 `RingTheory/AdicCompletion/Functoriality.lean`, by Judith Ludwig and Christian Merten.
+The chosen-family refinement uses the finite linear-combination API from Johannes Hölzl's
+`LinearAlgebra/Finsupp/LinearCombination.lean` and the finite-product linear map equivalence
+from Mathlib's `LinearAlgebra/Pi.lean`.
 See also K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5,
 Proposition 7.2.16, for the finitely generated ideal intrinsic-completion statement.
 Mathlib's
@@ -75,7 +82,7 @@ set_option warningAsError true
 
 noncomputable section
 
-universe uR uM uσ
+universe uR uM uσ uι
 
 open TensorProduct
 
@@ -128,6 +135,56 @@ private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
     finsuppScalarRight_apply_eq_map_ofTensorProduct I σ y b, hxy]
 
 variable (M : Type uM) [AddCommGroup M] [Module R M]
+
+/-- A finite family spanning the first adic quotient has completed images
+spanning the raw completion over the canonical completed ring. -/
+theorem span_range_eq_top_of_span_mkQ_eq_top
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {ι : Type uι} [Finite ι] (v : ι → M)
+    (hv : Submodule.span R
+      (Set.range (fun i : ι =>
+        (I • (⊤ : Submodule R M)).mkQ (v i))) = ⊤) :
+    Submodule.span (AdicCompletion I R)
+      (Set.range (fun i : ι => AdicCompletion.of I M (v i))) = ⊤ := by
+  classical
+  let := Fintype.ofFinite ι
+  let f := Fintype.linearCombination R v
+  have hq : (I • (⊤ : Submodule R M)).mkQ ∘ₗ f =
+      Fintype.linearCombination R (fun i => (I • (⊤ : Submodule R M)).mkQ (v i)) := by
+    apply LinearMap.ext
+    intro x
+    simp only [LinearMap.comp_apply, f, Fintype.linearCombination_apply, map_sum, map_smul]
+  have hsurj : Function.Surjective ((I • (⊤ : Submodule R M)).mkQ ∘ₗ f) := by
+    rw [hq]
+    exact (span_range_eq_top_iff_surjective_fintypeLinearCombination R _).mp hv
+  let e := piEquivOfFintype I (fun _ : ι => R)
+  let g := (map I f).comp e.symm.toLinearMap
+  have hone : of I R 1 = (1 : AdicCompletion I R) := by
+    simpa only [algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply] using
+      (map_one (algebraMap R (AdicCompletion I R)))
+  -- The finite-product comparison respects the same original basis vectors.
+  have he (i : ι) : e.symm (Pi.single i 1) = of I (ι → R) (Pi.single i 1) := by
+    apply e.injective
+    rw [LinearEquiv.apply_symm_apply]
+    change Pi.single i 1 = piEquivOfFintype I (fun _ : ι => R)
+      (of I (ι → R) (Pi.single i 1))
+    rw [piEquivOfFintype_apply, pi_of]
+    funext j
+    by_cases hij : i = j <;> simp [hij, hone]
+  have hg : g = Fintype.linearCombination (AdicCompletion I R)
+      (fun i : ι => of I M (v i)) := by
+    apply (LinearEquiv.piRing (AdicCompletion I R) (AdicCompletion I M) ι
+      (AdicCompletion I R)).injective
+    funext i
+    change map I f (e.symm (Pi.single i 1)) =
+      Fintype.linearCombination (AdicCompletion I R) (fun i : ι => of I M (v i))
+        (Pi.single i 1)
+    rw [he, map_of]
+    simp only [f, Fintype.linearCombination_apply_single, one_smul]
+  apply (span_range_eq_top_iff_surjective_fintypeLinearCombination (AdicCompletion I R) _).mpr
+  rw [← hg]
+  exact (map_surjective_of_mkQ_comp_surjective hsurj).comp e.symm.surjective
 
 /-- If the first adic quotient is finite over the original ring, its raw inverse-limit
 completion is finite over the canonical completed ring, for any ideal. This generalizes the

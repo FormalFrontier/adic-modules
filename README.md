@@ -17,7 +17,15 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   selections, singleton selections and precision zero are included. The
   [integer model](AdicModulesTest/AdicCompletion/ChineseRemainder.lean) distinguishes
   the diagonal image of 3 from the completed pair `(1, 0)` for the ideals `(2)`
-  and `(3)`.
+  and `(3)`. For `M = R`,
+  [`AdicCompletion.algEquivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainderAlgebra.lean)
+  upgrades this same linear equivalence to an `R`-algebra equivalence, with
+  scalar restriction over any commutative ring `S` and `S`-algebra `R`.
+  The inverse coordinate units form
+  [complete orthogonal idempotents](AdicModules/AdicCompletion/ChineseRemainderIdempotents.lean)
+  in the completed ring and give Mathlib's corner decomposition. The integer
+  selector is neither 0 nor 1, has residues 3 modulo 6 and 9 modulo 36, and is
+  not the diagonal image of 3.
 
 - **Ideal-power membership.** For a commutative semiring `R` with
   `[IsBezout R]`, an arbitrary ideal `I`, `n : ℕ` and `x : R`,
@@ -230,6 +238,10 @@ Rings are commutative; modules are additive commutative groups unless specified 
   finitely generated `I` and `M = ℕ →₀ R`, any family of completed target
   coefficients gives a map on the completed free module; its inverse Hom image
   recovers every coefficient.
+  More generally, `AdicCompletion.hom_ext_of_span_mkQ_eq_top` determines maps to any
+  additive commutative monoid module over the completed ring by their values on
+  specified completed original lifts of a finite family spanning `M / I M`.
+  This needs neither finiteness of `M` nor finite generation of `I`.
   Maps from the completion of a finite module to any completed-ring module are
   determined by the original module.
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
@@ -250,6 +262,9 @@ Rings are commutative; modules are additive commutative groups unless specified 
   **canonical completed ring** whenever `M / I M` is finite over the original ring,
   for arbitrary `I`; no finiteness or projectivity of `M` is needed. This concerns
   the raw inverse limit, not intrinsic completeness for arbitrary ideals.
+  `AdicCompletion.span_range_eq_top_of_span_mkQ_eq_top` retains the chosen generators:
+  the completed images of the same given finite family spanning `M / I M` span the
+  raw completion over the completed ring. Empty finite families are included.
   The [integer-rational product](AdicModulesTest/CompletionFiniteness.lean) has finite
   nonzero first quotient and completion although the original module is not finite.
   In particular, finite modules remain finite; finite projective modules remain
@@ -623,6 +638,9 @@ and the scalar-torsion and total-boundedness interfaces from
 [Group Theory](https://github.com/FormalFrontier/group-theory), plus the first-order
 Taylor remainder theorem from
 [Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials).
+The completed coordinate-idempotent construction follows the stock `single`/`map`
+transport pattern also used in
+[Finite Étale Algebras](https://github.com/FormalFrontier/finite-etale-algebras/blob/edb115c15526bebde84c275b8a13fa25e9124177/FiniteEtaleAlgebras/PurelyInseparableDescent.lean#L87-L93).
 [Credits and provenance](docs/CREDITS.md) preserve project/adaptation authorship and
 upstream notices; [detailed credits](docs/Results.md#credits-references-and-scope) include
 the endomorphism and Witt-vector constructions. Licensed under [Apache-2.0](LICENSE).

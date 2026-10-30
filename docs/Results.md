@@ -572,6 +572,20 @@ These are statements about the current library, not the historical API inventory
 
 ## Finite and projective modules over the completed ring
 
+For any ideal `I` of a commutative ring `R`, a specified finite family in an
+`R`-module `M` spanning `M / I M` has its completed original images spanning
+`AdicCompletion I M` over the canonical completed ring.
+`AdicCompletion.span_range_eq_top_of_span_mkQ_eq_top` includes the empty family
+and permits independent ring, module and index universes; it assumes neither
+finite generation of `I` nor finiteness of `M`. The family itself must be finite.
+Its consequence `AdicCompletion.hom_ext_of_span_mkQ_eq_top` determines
+completed-ring-linear maps to any additive commutative monoid module over the
+completed ring by their values on those same lifts, without any topology or
+completeness condition on the target. See the
+[tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean) and
+[Hom module](../AdicModules/AdicCompletion/Hom.lean). These statements concern the
+raw inverse limit, not intrinsic completeness for arbitrary ideals.
+
 For any ideal `I` of a commutative ring `R` and any additive commutative group
 `M` with `Module R M`, `[Module.Finite R M]` alone gives
 `Module.Finite (AdicCompletion I R) (AdicCompletion I M)` for the canonical
