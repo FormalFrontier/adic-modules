@@ -22,6 +22,8 @@ annihilation of a real module, not just the zero submodule. Tensoring the ambien
 with the integer unit module, in either order, preserves the exponent two and retains a
 nonzero pure tensor.
 The zero natural-number submodule supplies the exponent-zero boundary.
+The ambient witness also gives radical containment, and the converse is applied
+to the zero ideal over the natural numbers without additive inverses.
 
 The proofs use the module-torsion and primary-component APIs of AdicModules and Mathlib,
 together with Mathlib's integer action, finite-module instance and canonical reduction
@@ -142,6 +144,15 @@ public theorem ZMod.span_two_isKilledByIdealPower :
   change ZMod.castHom (show 2 ∣ 4 from ⟨2, rfl⟩) (ZMod 2) 1 = 0 at hfOne
   rw [map_one] at hfOne
   exact one_ne_zero hfOne
+
+example : Ideal.span {(2 : ℤ)} ≤ (Module.annihilator ℤ (ZMod 4)).radical := by
+  have hKilled : Module.IsKilledByIdealPower ℤ (ZMod 4) (Ideal.span {(2 : ℤ)}) :=
+    ⟨2, ZMod.span_two_isKilledByIdealPower.1⟩
+  exact hKilled.le_radical_annihilator
+
+example : Module.IsKilledByIdealPower ℕ ℕ (⊥ : Ideal ℕ) :=
+  (Module.isKilledByIdealPower_iff_le_radical_annihilator
+    ℕ ℕ ⊥ Submodule.fg_bot).mpr bot_le
 
 /-- The original ambient exponent works uniformly over the infinite constant family. -/
 private theorem ZMod.infinite_pi_isKilledByIdealPower :

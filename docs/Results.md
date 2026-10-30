@@ -193,7 +193,10 @@ These are statements about the current library, not the historical API inventory
 
 - **Bounded torsion and primary components.**
   `Module.IsKilledByIdealPower R M I` means one exponent annihilates the whole
-  module. Submodule and surjective-image results work over a commutative semiring
+  module. Over a commutative semiring and additive commutative monoid module, it
+  implies `I ≤ (Module.annihilator R M).radical`; this is an equivalence when
+  `I.FG`, without a finite-generation assumption on the module.
+  Submodule and surjective-image results work over a commutative semiring
   and additive commutative monoid; quotient and extension results retain their
   commutative-ring/additive-group hypotheses. Over a commutative ring, equivalence
   with `Ideal.primaryComponent M I = ⊤` requires **`Module.Finite R M`**

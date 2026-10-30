@@ -149,6 +149,14 @@ than choosing an exponent separately for each element. The finite-module bridge
 identifies the uniform condition with `Ideal.primaryComponent M I = ⊤` under
 `Module.Finite R M`; do not drop that hypothesis.
 
+For a commutative semiring and an additive commutative monoid module,
+`Module.IsKilledByIdealPower.le_radical_annihilator` gives
+`I ≤ (Module.annihilator R M).radical` without finite-generation assumptions.
+When the ideal is finitely generated,
+`Module.isKilledByIdealPower_iff_le_radical_annihilator` makes this an equivalence.
+Here only `I.FG` is required: the module need not be finitely generated, and no
+additive inverses are assumed.
+
 The [bounded-torsion module](../AdicModules/BoundedIdealPowerTorsion.lean)
 provides monotonicity, submodule, surjection, quotient and extension lemmas.
 Submodule and surjective-image results work over a commutative semiring and an

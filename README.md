@@ -336,6 +336,9 @@ Rings are commutative; modules are additive commutative groups unless specified 
 - **Torsion, spans, closure and CRT** ([torsion](AdicModules/BoundedIdealPowerTorsion.lean),
   [primary exactness](AdicModules/PrimaryComponent.lean), [spans and closure](docs/Results.md#headline-results)):
   for finite modules, uniform ideal-power annihilation iff the primary component is top.
+  Over a commutative semiring with an additive commutative monoid module, uniform
+  annihilation implies `I ≤ (Module.annihilator R M).radical`. For a finitely generated
+  ideal `I` this is an equivalence, with no finite-generation assumption on the module.
   Submodule/image laws also hold for commutative semirings and additive commutative monoids;
   quotient/extension laws retain ring/group hypotheses. Over Dedekind domains, height-one
   primary components preserve exact pairs with torsion **source**; abelian groups use

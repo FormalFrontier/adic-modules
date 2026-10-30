@@ -7,6 +7,7 @@ module
 public import Mathlib.Algebra.Module.Torsion.PrimaryComponent
 public import Mathlib.Data.Fintype.Order
 public import Mathlib.LinearAlgebra.TensorProduct.Associator
+public import Mathlib.RingTheory.Finiteness.Ideal
 
 /-!
 # Modules annihilated by a power of an ideal
@@ -17,6 +18,9 @@ is stronger than asking separately for every element to be killed by some
 ideal power. Tensoring with any module preserves the same annihilating set
 and hence the same ideal power.
 
+For a finitely generated ideal, this condition is equivalent to containment in
+the radical of the annihilator. The forward implication needs no finite generation.
+
 A product is annihilated by an ideal power exactly when its factors share one
 exponent. For finitely many factors, separate bounds give a common bound. For an
 infinite family, pointwise bounds need not be uniform.
@@ -25,6 +29,8 @@ infinite family, pointwise bounds need not be uniform.
 
 Mathlib's `Module.IsTorsionBySet`, annihilator and ideal-primary-component APIs
 supply the torsion interfaces used by the finite-module uniform-exponent bridge.
+Mathlib's finitely generated ideal and radical APIs supply the uniform
+ideal-power containment used by the annihilator criterion.
 The product API uses Mathlib's `Module.annihilator_pi` and
 `Module.isTorsionBySet_iff_subset_annihilator`; the finite bound is supplied by
 `Finite.exists_le` from the finite-order development of Peter Nelson and Yaël Dillies.
@@ -53,6 +59,27 @@ theorem isKilledByIdealPower_iff_exists_pow_le_annihilator (I : Ideal R) :
     IsKilledByIdealPower R M I ↔ ∃ n : ℕ, I ^ n ≤ Module.annihilator R M := by
   simp only [IsKilledByIdealPower, Module.isTorsionBySet_iff_subset_annihilator]
   constructor <;> rintro ⟨n, hn⟩ <;> exact ⟨n, hn⟩
+
+variable {R M} in
+/-- An ideal whose power annihilates a module lies in the radical of its
+annihilator, without a finite-generation hypothesis. -/
+theorem IsKilledByIdealPower.le_radical_annihilator {I : Ideal R}
+    (h : IsKilledByIdealPower R M I) : I ≤ (Module.annihilator R M).radical := by
+  obtain ⟨n, hn⟩ :=
+    (isKilledByIdealPower_iff_exists_pow_le_annihilator R M I).mp h
+  intro x hx
+  exact Ideal.mem_radical_iff.mpr ⟨n, hn (Ideal.pow_mem_pow hx n)⟩
+
+/-- A finitely generated ideal has a power annihilating a module exactly when
+it lies in the radical of the annihilator. The converse uses Mathlib's
+`Ideal.exists_pow_le_of_le_radical_of_fg`. -/
+theorem isKilledByIdealPower_iff_le_radical_annihilator (I : Ideal R) (hI : I.FG) :
+    IsKilledByIdealPower R M I ↔ I ≤ (Module.annihilator R M).radical := by
+  constructor
+  · exact IsKilledByIdealPower.le_radical_annihilator
+  · intro h
+    exact (isKilledByIdealPower_iff_exists_pow_le_annihilator R M I).mpr
+      (Ideal.exists_pow_le_of_le_radical_of_fg h hI)
 
 /-- Once a power of an ideal annihilates a module, every larger power does too. -/
 theorem isTorsionBySet_ideal_pow_of_le (I : Ideal R) {n m : ℕ} (hnm : n ≤ m)
