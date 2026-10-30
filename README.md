@@ -6,6 +6,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- **Surjectivity and splittings under completion.** For any ideal `I` of a
+  commutative ring `R` and any `R`-linear map `f : M → N`, the induced map on
+  `I`-adic completions is surjective if and only if the original composite
+  `M → N / I N` is surjective. If `I ≤ Ideal.jacobson (⊥ : Ideal R)` and the
+  original cokernel `N / range f` is finitely generated, completed surjectivity
+  implies surjectivity of `f`. If moreover the original target `N` is projective,
+  of arbitrary rank, a completed-ring-linear right inverse implies existence of
+  an `R`-linear right inverse, not necessarily one completing to the supplied
+  inverse. No finiteness of `M`, `N` or `I`, Noetherianity, or completeness of the
+  original modules is required. See the
+  [surjectivity criteria](AdicModules/AdicCompletion/Surjectivity.lean).
+
 - **Comaximal completion decomposition.** For any commutative ring `R`, any
   `R`-module `M`, and a finite selection `s` of pairwise comaximal ideals `I i`,
   [`AdicCompletion.equivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainder.lean)
@@ -563,6 +575,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [AdicCompletion.Surjectivity](AdicModules/AdicCompletion/Surjectivity.lean) (surjectivity and original splittings with finite original cokernel) | — |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
@@ -643,4 +656,7 @@ transport pattern also used in
 [Finite Étale Algebras](https://github.com/FormalFrontier/finite-etale-algebras/blob/edb115c15526bebde84c275b8a13fa25e9124177/FiniteEtaleAlgebras/PurelyInseparableDescent.lean#L87-L93).
 [Credits and provenance](docs/CREDITS.md) preserve project/adaptation authorship and
 upstream notices; [detailed credits](docs/Results.md#credits-references-and-scope) include
-the endomorphism and Witt-vector constructions. Licensed under [Apache-2.0](LICENSE).
+the endomorphism and Witt-vector constructions. The surjectivity criteria reuse
+Mathlib's completion, quotient, Nakayama and projective-module formalizations;
+the finite-cokernel approach is also formalized in Formal Frontier's Projective
+Modules library. Licensed under [Apache-2.0](LICENSE).

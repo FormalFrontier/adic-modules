@@ -40,6 +40,7 @@ public import AdicModules.AdicCompletion.Pi
 public import AdicModules.AdicCompletion.Quotient
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.AdicCompletion.Surjectivity
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
