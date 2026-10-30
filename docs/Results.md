@@ -290,8 +290,8 @@ These are statements about the current library, not the historical API inventory
   additive commutative group structures, `[IsAdicComplete I N]` gives the
   canonical extension `AdicCompletion.extend I : (M →ₗ[R] N) →
   (AdicCompletion I M →ₗ[R] N)`. Its canonical-image, quotient, lift and
-  naturality laws require no finite generation of `I`. If `I.FG`,
-  `AdicCompletion.ext_of` gives uniqueness for a Hausdorff target
+  naturality laws require no finite generation of `I`. For `0 < n` and `(I ^ n).FG`,
+  `AdicCompletion.ext_of_fg_pow` gives uniqueness for a Hausdorff target
   `[IsHausdorff I N]`, without completeness. With `I.FG` and a complete target,
   `AdicCompletion.precompOfLinearEquiv I` is an `R`-linear equivalence
   `(AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N)`, whose forward map is
@@ -301,18 +301,39 @@ These are statements about the current library, not the historical API inventory
   [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean) and its
   [nonzero integer free-module example](../AdicModulesTest/AdicCompletion/LinearMap.lean).
 
+- **Automatic completed-scalar linearity.**
+  For `0 < n` and `(I ^ n).FG`, any original `R`-linear map `P → T` between
+  modules with given compatible `R`- and `S = AdicCompletion I R`-actions is
+  `S`-linear if its original target is `I`-Hausdorff. The source may be an
+  additive commutative monoid; the target is an additive commutative group.
+  `AdicCompletion.restrictScalarsHomEquivOfFGPow` is the `S`-linear equivalence
+  `(P →ₗ[S] T) ≃ₗ[S] (P →ₗ[R] T)` for the pointwise target actions. Its five
+  characteristic laws identify the forward map with scalar restriction and
+  show that the inverse retains the original function and additive map.
+  `LinearMap.retraction_adicCompletion_of_fg_pow` upgrades the same specified
+  retraction; only its target is Hausdorff. Neither endpoint needs completeness,
+  finiteness or projectivity, and all carrier universes are independent.
+  The finitely generated ideal APIs, including `AdicCompletion.ext_of` and
+  `AdicCompletion.restrictScalarsHomEquiv`, are the `n = 1` specializations.
+  Uniqueness uses the fixed-stage evaluation-kernel theorem at `n * k` and
+  cofinal Hausdorff separation, including stage zero. No completion along a
+  different ideal or new action is introduced. These are sufficient hypotheses,
+  not a necessity criterion for individual ideals; allowing `n = 0` would not
+  give a valid theorem for all ideals. See the
+  [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean).
+
 - **Fibres and submodules under completed scalars.**
-  Let `R` be a commutative ring, `I` a finitely generated ideal, and
+  Let `R` be a commutative ring, `I` an ideal, `0 < n` with `(I ^ n).FG`, and
   `S = AdicCompletion I R`. An additive commutative monoid `P` has given
   `R`- and `S`-module structures with `IsScalarTower R S P`. For an original
   `R`-linear map `F : P →ₗ[R] T` to an additive commutative group `R`-module
   with `IsHausdorff I T`,
-  `LinearMap.map_smul_eq_map_smul_of_eq_adicCompletion` gives
+  `LinearMap.map_smul_eq_map_smul_of_eq_adicCompletion_of_fg_pow` gives
   `F p = F q → F (a • p) = F (a • q)` for every `a : S`.
   The target has no required `S`-action and need not be complete.
   If `P` is an additive commutative group and `N : Submodule R P` has
   `IsHausdorff I (P ⧸ N)` for its original `R`-quotient, then
-  `Submodule.span_adicCompletion_restrictScalars_eq` gives
+  `Submodule.span_adicCompletion_restrictScalars_eq_of_fg_pow` gives
   `(Submodule.span S (N : Set P)).restrictScalars R = N`.
   The quotient separation hypothesis does not assume an `S`-action on the
   quotient. Source separation, completeness, finite generation and projectivity

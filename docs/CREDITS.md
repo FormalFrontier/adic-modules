@@ -301,8 +301,8 @@ and contributor notices remain in those libraries.
 
 ## Fibres and submodules under completed scalars
 
-The fibre-stability and separated-quotient span results reuse Formal Frontier's
-`AdicCompletion.ext_of` uniqueness theorem and Mathlib's existing completed ring,
+The fibre-stability and separated-quotient span results reuse the library's
+`AdicCompletion.ext_of_fg_pow` uniqueness theorem and Mathlib's existing completed ring,
 `LinearMap.smulRight`, quotient projection and span induction. The completion
 formalizations credit Kenny Lau, Judith Ludwig, Christian Merten and Jiedong
 Jiang. The scalar-orbit provider in `Mathlib.Algebra.Module.LinearMap.End`
@@ -313,6 +313,17 @@ Kudryashov, with Frédéric Dupuis and Heather Macbeth additionally credited for
 span. Their upstream Apache-2.0 author, copyright and license notices remain in
 Mathlib. These results assemble those APIs without copying their proofs or
 introducing new scalar actions.
+
+Positive-power uniqueness reuses the fixed-stage kernel theorem in this library,
+whose finite-linear-combination proof follows Bingyu Xia's Mathlib formalization,
+and Mathlib's `Ideal.FG.pow` and `IsHausdorff.StrictMono.funext`. Automatic
+completed-scalar linearity uses that uniqueness theorem on the given scalar-orbit
+maps; its Hom equivalence uses Mathlib's `LinearMap.restrictScalarsₗ` and the
+pointwise target action. The retraction law uses scalar-restriction injectivity
+and retains the specified original retraction. These arguments generalize the
+finitely generated ideal API without copying the finite-stage proof. The
+Mathlib completion and linear-map author credits above apply; upstream
+Apache-2.0 notices remain unchanged.
 
 ## Comaximal powers and finite Chinese remainders
 

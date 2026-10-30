@@ -6,6 +6,14 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- **Adic separation of quotients.** For any ideal `I` and submodule `N` of an
+  `R`-module over a commutative ring, `M / N` is `I`-Hausdorff exactly when
+  `⨅ n, N ⊔ I ^ n • ⊤ = N`. Membership is detected by congruence to `N` at
+  every power, with representatives allowed to vary. The quotient by `N.comap F`
+  is separated for every linear map `F : P →ₗ[R] M` whenever `M / N` is;
+  no ambient separation, completeness or finiteness is required. See the
+  [quotient separation API](AdicModules/LinearAlgebra/Quotient/Hausdorff.lean).
+
 - **Surjectivity and splittings under completion.** For any ideal `I` of a
   commutative ring `R` and any `R`-linear map `f : M → N`, the induced map on
   `I`-adic completions is surjective if and only if the original composite
@@ -26,21 +34,33 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   modules to be flat, or any finiteness, Noetherianity, separation or
   completeness assumption. No original completed-ring actions are required.
 
-- **Automatic completed-scalar linearity.** Let `I` be a finitely generated ideal
-  of a commutative ring `R`, and set `S = AdicCompletion I R`. For original modules
+- **Monomorphisms and short exact sequences under completion.** For any ideal
+  of a commutative ring, an injective original linear map remains injective after
+  completion if its original cokernel is flat, by
+  [`AdicCompletion.map_injective_of_flat_cokernel`](AdicModules/AdicCompletion/Flat.lean).
+  Consequently, an original short exact sequence with flat original last module
+  remains short exact on the canonical completed maps, by
+  [`AdicCompletion.map_shortExact_of_flat`](AdicModules/AdicCompletion/Flat.lean).
+  No finiteness, Noetherianity, separation, completeness or original
+  completed-ring action is required.
+
+- **Automatic completed-scalar linearity.** Let `I` be an ideal of a commutative
+  ring `R`, let `0 < n` with `(I ^ n).FG`, and set `S = AdicCompletion I R`. For original modules
   `P` and `T` with given `R`- and `S`-actions and scalar towers `R → S → P,T`,
   every `R`-linear map `P → T` respects the `S`-action when `T` is `I`-Hausdorff.
   Here `P` is an additive commutative monoid and `T` an additive commutative group,
   in independent universes.
-  [`AdicCompletion.restrictScalarsHomEquiv`](AdicModules/AdicCompletion/LinearMap.lean)
+  [`AdicCompletion.restrictScalarsHomEquivOfFGPow`](AdicModules/AdicCompletion/LinearMap.lean)
   packages restriction as an `S`-linear equivalence
   `(P →ₗ[S] T) ≃ₗ[S] (P →ₗ[R] T)` for the pointwise `S`-actions on the target;
   its inverse preserves the original function.
-  `LinearMap.retraction_adicCompletion` upgrades a specified `R`-linear retraction
+  `LinearMap.retraction_adicCompletion_of_fg_pow` upgrades a specified `R`-linear retraction
   of an `S`-linear map, keeping that same retraction function. Only the target of
   the retraction must be Hausdorff. Neither original module needs completeness,
   finiteness or projectivity, and the source of the upgraded map need not be
-  Hausdorff. Finite generation of `I` is sufficient through completion-map uniqueness.
+  Hausdorff. Finite generation of a positive power is sufficient through
+  completion-map uniqueness on the same `I`-adic completion. The finitely generated
+  ideal APIs retain their signatures as `n = 1` specializations.
 
 - **Faithfulness and injectivity reflection under completion.** For any ideal `I`
   of a commutative ring `R` and additive commutative group `R`-modules `M, N`,
@@ -303,13 +323,13 @@ Rings are commutative; modules are additive commutative groups unless specified 
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
   [maps](AdicModules/AdicCompletion/LinearMap.lean)): `I.FG` gives the canonical
   completed-ring-linear equivalence for arbitrary dependent products. Any ideal admits
-  map extension to complete targets; `I.FG` gives uniqueness for Hausdorff targets
-  and a Hom equivalence for complete targets.
+  map extension to complete targets; finite generation of a positive power gives
+  uniqueness for Hausdorff targets, while `I.FG` gives a Hom equivalence for complete targets.
   Finite generation of **only `I^n`** gives evaluation kernel `(I^n) • ⊤` and
   `C / (I.map (algebraMap R C))^n ≃ₐ[R] R / I^n`, for `C = AdicCompletion I R`,
   including zero precision ([kernels](AdicModules/AdicCompletion/Kernel.lean), [quotients](AdicModules/AdicCompletion/Quotient.lean)).
 - **Fibres under completed scalars** ([API](AdicModules/AdicCompletion/Submodule.lean)):
-  for `I.FG`, an `R`-linear map from an additive commutative monoid with given
+  for `0 < n` and `(I ^ n).FG`, an `R`-linear map from an additive commutative monoid with given
   compatible `R`- and `AdicCompletion I R`-actions to an `I`-Hausdorff
   `R`-module has fibres stable under completed scalars. The target needs no
   completed-ring action or completeness. An original `R`-submodule with
