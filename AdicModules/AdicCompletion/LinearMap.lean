@@ -5,11 +5,12 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.LinearAlgebra.BilinearMap
+import Mathlib.LinearAlgebra.Span.Basic
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 import Mathlib.RingTheory.AdicCompletion.Completeness
 
 /-!
-# Linear maps from an adic completion
+# Linear maps and completed scalars
 
 `AdicCompletion.extend` sends an `R`-linear map to an adically complete module to its
 canonical extension. It uses Mathlib's completed map, restricts its scalars from
@@ -27,10 +28,28 @@ without assuming target completeness. For a complete target,
 `R`-linear equivalence of Hom modules. Finite generation is a sufficient
 hypothesis for uniqueness; no necessity assertion is made.
 
+For original modules with given compatible `R`- and `AdicCompletion I R`-actions,
+`LinearMap.map_smul_adicCompletion` shows that an `R`-linear map respects the
+completed-ring action when `I` is finitely generated and its target is
+`I`-Hausdorff. The source may be an additive commutative monoid and need not be
+Hausdorff; neither module is required to be complete, finite or projective.
+`restrictScalarsHomEquiv` packages restriction of scalars as an equivalence
+linear over the completed ring, with the pointwise scalar action on the target.
+Its inverse preserves the original function. `LinearMap.retraction_adicCompletion`
+uses this equivalence to upgrade a specified retraction with Hausdorff target.
+
 The extension reuses Mathlib's `map` and `ofLinearEquiv`, and agrees with
 `IsAdicComplete.lift`. Uniqueness uses Mathlib's description of the kernels of
-evaluation for a finitely generated ideal. There is no new inverse-limit
-construction, topology, or scalar action.
+evaluation for a finitely generated ideal. Automatic scalar linearity applies
+`ext_of` to the scalar-orbit maps built with Mathlib's `LinearMap.toSpanSingleton`
+and scalar restriction. There is no new inverse-limit construction, topology,
+or scalar action.
+
+## References
+
+This file builds on the adic-completion formalizations of Kenny Lau, Judith Ludwig,
+Christian Merten, Jiedong Jiang and Bingyu Xia, and on Mathlib's scalar-tower,
+linear-map and span APIs.
 -/
 
 @[expose] public section
@@ -218,3 +237,124 @@ theorem precompOfLinearEquiv_symm_apply_of [IsAdicComplete I N] (hI : I.FG)
   rw [precompOfLinearEquiv_symm_apply, extend_of]
 
 end AdicCompletion
+
+section CompletedScalars
+
+variable {R : Type u} [CommRing R] (I : Ideal R)
+variable {P : Type v} [AddCommMonoid P]
+  [Module R P] [Module (AdicCompletion I R) P] [IsScalarTower R (AdicCompletion I R) P]
+variable {T : Type w} [AddCommGroup T]
+  [Module R T] [Module (AdicCompletion I R) T] [IsScalarTower R (AdicCompletion I R) T]
+  [IsHausdorff I T]
+
+namespace LinearMap
+
+/-- An `R`-linear map between modules with given compatible completed-ring actions
+respects those actions if the ideal is finitely generated and the target is Hausdorff. -/
+theorem map_smul_adicCompletion (hI : I.FG) (F : P →ₗ[R] T)
+    (a : AdicCompletion I R) (p : P) : F (a • p) = a • F p := by
+  have h :
+      F.comp ((toSpanSingleton (AdicCompletion I R) P p).restrictScalars R) =
+        (toSpanSingleton (AdicCompletion I R) T (F p)).restrictScalars R := by
+    apply AdicCompletion.ext_of I (M := R) (N := T) hI
+    intro r
+    change F (AdicCompletion.of I R r • p) = AdicCompletion.of I R r • F p
+    have hof : AdicCompletion.of I R r = algebraMap R (AdicCompletion I R) r := by
+      simp only [AdicCompletion.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
+    simp only [hof, algebraMap_smul, F.map_smul]
+  exact LinearMap.congr_fun h a
+
+end LinearMap
+
+namespace AdicCompletion
+
+/-- Restriction of scalars is an equivalence linear over the completed ring for
+modules with given compatible actions, a finitely generated ideal, and a Hausdorff
+target. Both Hom modules have the pointwise completed-ring action on the target;
+the inverse keeps the original function and additive map. -/
+def restrictScalarsHomEquiv (hI : I.FG) :
+    (P →ₗ[AdicCompletion I R] T) ≃ₗ[AdicCompletion I R] (P →ₗ[R] T) where
+  toLinearMap :=
+    LinearMap.restrictScalarsₗ (R := R) (S := AdicCompletion I R) (M := P) (N := T)
+      (R₁ := AdicCompletion I R)
+  invFun F :=
+    { F.toAddHom with
+      map_smul' := LinearMap.map_smul_adicCompletion I hI F }
+  left_inv G := by
+    apply LinearMap.ext
+    intro p
+    rfl
+  right_inv F := by
+    apply LinearMap.ext
+    intro p
+    rfl
+
+/-- The forward linear map is Mathlib's restriction-of-scalars map. -/
+theorem restrictScalarsHomEquiv_toLinearMap (hI : I.FG) :
+    (restrictScalarsHomEquiv I (P := P) (T := T) hI).toLinearMap =
+      LinearMap.restrictScalarsₗ (R := R) (S := AdicCompletion I R) (M := P) (N := T)
+        (R₁ := AdicCompletion I R) :=
+  rfl
+
+/-- The forward equivalence restricts scalars to the original ring. -/
+@[simp]
+theorem restrictScalarsHomEquiv_apply (hI : I.FG)
+    (G : P →ₗ[AdicCompletion I R] T) :
+    restrictScalarsHomEquiv I hI G = G.restrictScalars R :=
+  rfl
+
+/-- The inverse equivalence evaluates as the original map. -/
+@[simp]
+theorem restrictScalarsHomEquiv_symm_apply (hI : I.FG) (F : P →ₗ[R] T) (p : P) :
+    (restrictScalarsHomEquiv I hI).symm F p = F p :=
+  rfl
+
+/-- Restricting the inverse equivalence recovers the original linear map. -/
+@[simp]
+theorem restrictScalarsHomEquiv_symm_apply_restrictScalars (hI : I.FG) (F : P →ₗ[R] T) :
+    ((restrictScalarsHomEquiv I hI).symm F).restrictScalars R = F := by
+  apply LinearMap.ext
+  intro p
+  rfl
+
+/-- The inverse equivalence recovers a completed-ring-linear map from its restriction. -/
+@[simp]
+theorem restrictScalarsHomEquiv_symm_restrictScalars (hI : I.FG)
+    (G : P →ₗ[AdicCompletion I R] T) :
+    (restrictScalarsHomEquiv I hI).symm (G.restrictScalars R) = G := by
+  apply LinearMap.ext
+  intro p
+  rfl
+
+end AdicCompletion
+
+end CompletedScalars
+
+section Retraction
+
+variable {R : Type u} [CommRing R] (I : Ideal R)
+variable {P : Type v} [AddCommGroup P]
+  [Module R P] [Module (AdicCompletion I R) P] [IsScalarTower R (AdicCompletion I R) P]
+  [IsHausdorff I P]
+variable {Q : Type w} [AddCommMonoid Q]
+  [Module R Q] [Module (AdicCompletion I R) Q] [IsScalarTower R (AdicCompletion I R) Q]
+
+namespace LinearMap
+
+/-- A specified `R`-linear retraction of a completed-ring-linear map remains a
+retraction after upgrading the same function to completed-ring linearity, for a
+finitely generated ideal and a Hausdorff target of the retraction. -/
+theorem retraction_adicCompletion (hI : I.FG)
+    (f : P →ₗ[AdicCompletion I R] Q) (r : Q →ₗ[R] P)
+    (hr : r.comp (f.restrictScalars R) = LinearMap.id) :
+    ((AdicCompletion.restrictScalarsHomEquiv I (P := Q) (T := P) hI).symm r).comp f =
+      LinearMap.id := by
+  apply LinearMap.restrictScalars_injective R
+  rw [LinearMap.restrictScalars_comp,
+    AdicCompletion.restrictScalarsHomEquiv_symm_apply_restrictScalars,
+    LinearMap.restrictScalars_id]
+  exact hr
+
+end LinearMap
+
+end Retraction

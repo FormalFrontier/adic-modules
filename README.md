@@ -18,6 +18,22 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   original modules is required. See the
   [surjectivity criteria](AdicModules/AdicCompletion/Surjectivity.lean).
 
+- **Automatic completed-scalar linearity.** Let `I` be a finitely generated ideal
+  of a commutative ring `R`, and set `S = AdicCompletion I R`. For original modules
+  `P` and `T` with given `R`- and `S`-actions and scalar towers `R → S → P,T`,
+  every `R`-linear map `P → T` respects the `S`-action when `T` is `I`-Hausdorff.
+  Here `P` is an additive commutative monoid and `T` an additive commutative group,
+  in independent universes.
+  [`AdicCompletion.restrictScalarsHomEquiv`](AdicModules/AdicCompletion/LinearMap.lean)
+  packages restriction as an `S`-linear equivalence
+  `(P →ₗ[S] T) ≃ₗ[S] (P →ₗ[R] T)` for the pointwise `S`-actions on the target;
+  its inverse preserves the original function.
+  `LinearMap.retraction_adicCompletion` upgrades a specified `R`-linear retraction
+  of an `S`-linear map, keeping that same retraction function. Only the target of
+  the retraction must be Hausdorff. Neither original module needs completeness,
+  finiteness or projectivity, and the source of the upgraded map need not be
+  Hausdorff. Finite generation of `I` is sufficient through completion-map uniqueness.
+
 - **Comaximal completion decomposition.** For any commutative ring `R`, any
   `R`-module `M`, and a finite selection `s` of pairwise comaximal ideals `I i`,
   [`AdicCompletion.equivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainder.lean)
