@@ -180,7 +180,11 @@ Rings are commutative; modules are additive commutative groups unless specified 
   is an additive, `R`-linear functor to modules over the completed ring. Precompleteness
   for arbitrary `I,J` implies it for `I ⊔ J`. On an `I`-adically complete module,
   endomorphisms congruent to the identity modulo `I • ⊤` are units
-  ([criterion](AdicModules/AdicCompletion/Endomorphism.lean)).
+  ([criterion](AdicModules/AdicCompletion/Endomorphism.lean)). For arbitrary ideals `I,J`
+  of any commutative ring `R`,
+  [`AdicCompletion.map_algebraMap_eq_top_iff`](AdicModules/AdicCompletion/LocalRing.lean)
+  gives `J.map (algebraMap R (AdicCompletion I R)) = ⊤ ↔ I ⊔ J = ⊤`.
+  Negating this detects proper extensions; no finite generation or nontriviality is needed.
 - **Cofinal ideal powers** ([API](AdicModules/AdicCompletion/ChangeIdeal.lean), [integer
   model](AdicModulesTest/CofinalAdicCompletion.lean)): for arbitrary ideals and modules,
   the original-`R`-linear `mapOfPowLE` uses `∃ a : ℕ, I^a ≤ J`, including zero; mutual
@@ -515,7 +519,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
-| [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) |
+| [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
 | [AdicCompletion.Pi](AdicModules/AdicCompletion/Pi.lean) (algebraic arbitrary-product equivalence for `I.FG`; naturality for every ideal) | [AdicCompletionPi](AdicModulesTest/AdicCompletionPi.lean) (full `ℕ → ZMod 4` model for `I = Ideal.span {2}`, a nonzero proper square-zero ideal; empty-product boundary) and [AdicCompletion.DependentPi](AdicModulesTest/AdicCompletion/DependentPi.lean) (private generic `Prop` contracts and a nonzero `ℕ → ℤ` model, not a universal bijectivity proof) |

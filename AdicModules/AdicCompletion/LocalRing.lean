@@ -9,14 +9,19 @@ public import Mathlib.RingTheory.Ideal.Quotient.Nilpotent
 public import Mathlib.RingTheory.LocalRing.RingHom.Basic
 
 /-!
-# Units and locality in adic completions
+# Units, ideal extension, and locality in adic completions
 
 For every ideal `I` of a commutative ring `R`, the canonical first reduction
 `AdicCompletion.evalOneₐ I` detects units. Consequently it is a local homomorphism,
 its kernel lies in the Jacobson radical, and the completion is local whenever `R ⧸ I`
 is local. No finite-generation hypothesis on `I` is needed.
 
-The proof lifts the unit condition to every positive finite quotient using
+For any ideal `J`, extension along the canonical coefficient map is the top ideal exactly
+when `I ⊔ J = ⊤`. The first reduction is surjective and reflects units, so it detects
+whether an ideal of the completion is top. The image of the extended ideal under this
+reduction is the image of `J` in `R ⧸ I`, giving the ideal-sum criterion.
+
+Unit detection is proved by lifting the unit condition to every positive finite quotient using
 `Ideal.Quotient.isUnit_mk_pow_iff_isUnit_mk`. Inverses in these quotients form a compatible
 family: a transition map sends an inverse to an inverse, which is unique. Stage `0` is
 the quotient by the top ideal and is treated separately. This argument uses the
@@ -32,7 +37,9 @@ The local-homomorphism API is from `Mathlib.Algebra.Group.Units.Hom`, by Johan C
 Chris Hughes, and Kevin Buzzard. Locality transport uses
 `Mathlib.RingTheory.LocalRing.RingHom.Basic`, by Kenny Lau, Chris Hughes, and Mario Carneiro;
 the Jacobson criterion is from `Mathlib.RingTheory.Jacobson.Ideal`, by Kenny Lau,
-Devon Tuma, and Wojciech Nawrocki.
+Devon Tuma, and Wojciech Nawrocki. The ideal-map and quotient APIs are from
+`Mathlib.RingTheory.Ideal.Maps`, by Kenny Lau, and
+`Mathlib.RingTheory.Ideal.Quotient.Operations`, by Kenny Lau and Patrick Massot.
 -/
 
 @[expose] public section
@@ -124,6 +131,31 @@ theorem ker_evalOne_le_jacobson :
   have hx0 : evalOneₐ I x = 0 := hx
   simpa only [map_add, map_mul, map_one, hx0, zero_mul, zero_add] using
     (isUnit_one : IsUnit (1 : R ⧸ I))
+
+/-- Extension of `J` to the `I`-adic completion is the unit ideal exactly when `I` and `J`
+are comaximal. No finite-generation hypothesis on either ideal is needed. -/
+@[simp]
+theorem map_algebraMap_eq_top_iff (J : Ideal R) :
+    J.map (algebraMap R (AdicCompletion I R)) = ⊤ ↔ I ⊔ J = ⊤ := by
+  calc
+    J.map (algebraMap R (AdicCompletion I R)) = ⊤ ↔
+        (J.map (algebraMap R (AdicCompletion I R))).map
+          (evalOneₐ I).toRingHom = ⊤ := by
+      constructor
+      · intro h
+        rw [h, Ideal.map_top]
+      · intro h
+        obtain ⟨x, hx, hx1⟩ :=
+          (Ideal.mem_map_iff_of_surjective (evalOneₐ I).toRingHom
+            (evalOneₐ_surjective I)).mp ((Ideal.eq_top_iff_one _).mp h)
+        apply Ideal.eq_top_of_isUnit_mem _ hx
+        apply IsUnit.of_map (evalOneₐ I).toRingHom x
+        rw [hx1]
+        exact isUnit_one
+    _ ↔ I ⊔ J = ⊤ := by
+      rw [Ideal.map_map, evalOneₐ_comp_algebraMap_eq_mk,
+        ← Ideal.comap_eq_top_iff (f := Ideal.Quotient.mk I),
+        Ideal.comap_map_quotientMk]
 
 /-- The adic completion is local if the quotient by its defining ideal is local. -/
 theorem isLocalRing_of_quotient [IsLocalRing (R ⧸ I)] :

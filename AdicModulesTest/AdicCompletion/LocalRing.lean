@@ -8,6 +8,7 @@ public import AdicModules.AdicCompletion.LocalRing
 
 import Mathlib.Algebra.EuclideanDomain.Int
 import Mathlib.Data.Nat.Prime.Int
+import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.AdicCompletion.Noetherian
 import Mathlib.RingTheory.LocalRing.RingHom.Basic
 import Mathlib.RingTheory.Localization.AtPrime.Basic
@@ -16,7 +17,7 @@ import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Tactic.NormNum
 
 /-!
-# Unit detection, Jacobson kernels, and locality for adic completions
+# Units, ideal extension, and locality for adic completions
 
 This module records four proposition-valued specifications for the public API implemented
 in `AdicModules.AdicCompletion.LocalRing`. These definitions state the contract, rather than
@@ -37,6 +38,9 @@ generation and injectivity facts. The imported quotient-locality theorem establi
 completion locality first; the public local-homomorphism, unit-detection and Jacobson-kernel
 results then supply the corresponding model conclusions.
 
+Over `ZMod 6`, the ideal-extension criterion shows that in the `(2)`-adic completion,
+`(2)` extends to a proper ideal whereas `(3)` extends to the top ideal.
+
 ## References
 
 The completion and canonical projection are from Mathlib's
@@ -49,8 +53,8 @@ Wojciech Nawrocki. The concrete model also uses Mathlib’s
 `Mathlib.RingTheory.Localization.AtPrime.Basic`,
 `Mathlib.RingTheory.Localization.Submodule`, and
 `Mathlib.RingTheory.AdicCompletion.Noetherian`. The arbitrary-ideal unit-detection,
-local-homomorphism, Jacobson-kernel and quotient-locality results used here are provided by
-`AdicModules.AdicCompletion.LocalRing`.
+local-homomorphism, Jacobson-kernel, ideal-extension and quotient-locality results used here
+are provided by `AdicModules.AdicCompletion.LocalRing`.
 -/
 
 set_option warningAsError true
@@ -209,5 +213,29 @@ public theorem bottom_and_top_completion_boundaries :
   have hx : IsUnit (AdicCompletion.evalOneₐ (⊤ : Ideal ℤ) x) :=
     isUnit_of_subsingleton _
   exact ⟨(AdicCompletion.isUnit_evalOne_iff (⊤ : Ideal ℤ) x).mp hx, hx⟩
+
+/-- In the `(2)`-adic completion of `ZMod 6`, `(2)` extends properly and `(3)` extends to top. -/
+private theorem zmod_six_completion_ideal_extensions :
+    let I : Ideal (ZMod 6) := Ideal.span {2}
+    let J : Ideal (ZMod 6) := Ideal.span {3}
+    I.map (algebraMap (ZMod 6) (AdicCompletion I (ZMod 6))) ≠ ⊤ ∧
+      J.map (algebraMap (ZMod 6) (AdicCompletion I (ZMod 6))) = ⊤ := by
+  intro I J
+  constructor
+  · intro h
+    have hI : I = ⊤ := by
+      simpa only [sup_idem] using (AdicCompletion.map_algebraMap_eq_top_iff I I).mp h
+    have hu : IsUnit (2 : ZMod 6) :=
+      (Ideal.span_singleton_eq_top (x := (2 : ZMod 6))).mp hI
+    have hc : Nat.Coprime 2 6 := (ZMod.isUnit_iff_coprime 2 6).mp hu
+    exact (by decide : ¬Nat.Coprime 2 6) hc
+  · apply (AdicCompletion.map_algebraMap_eq_top_iff I J).mpr
+    apply (Ideal.eq_top_iff_one (I ⊔ J)).mpr
+    have h₂ : (2 : ZMod 6) ∈ I ⊔ J :=
+      Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)
+    have h₃ : (3 : ZMod 6) ∈ I ⊔ J :=
+      Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)
+    have hsub : (3 : ZMod 6) - 2 = 1 := by norm_num
+    simpa only [hsub] using (I ⊔ J).sub_mem h₃ h₂
 
 end AdicModulesTest.AdicCompletion.LocalRing
