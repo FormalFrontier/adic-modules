@@ -6,6 +6,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
 
 ## Headline results
 
+- **Comaximal completion decomposition.** For any commutative ring `R`, any
+  `R`-module `M`, and a finite selection `s` of pairwise comaximal ideals `I i`,
+  [`AdicCompletion.equivPiOfPairwiseSupEqTop`](AdicModules/AdicCompletion/ChineseRemainder.lean)
+  identifies completion at `∏ i ∈ s, I i` with the product of the individual
+  completions, linearly over `R`. The forward coordinates are the canonical
+  inclusion-induced maps. Evaluation at every precision is the quotient factor;
+  the inverse is characterized by simultaneous residues. No finite generation,
+  Noetherianity, flatness, separatedness or completeness is assumed. Empty
+  selections, singleton selections and precision zero are included. The
+  [integer model](AdicModulesTest/AdicCompletion/ChineseRemainder.lean) distinguishes
+  the diagonal image of 3 from the completed pair `(1, 0)` for the ideals `(2)`
+  and `(3)`.
+
 - **Ideal-power membership.** For a commutative semiring `R` with
   `[IsBezout R]`, an arbitrary ideal `I`, `n : ℕ` and `x : R`,
   [`Ideal.mem_pow_iff_exists_pow_dvd`](AdicModules/RingTheory/Ideal/PowerCompression.lean)

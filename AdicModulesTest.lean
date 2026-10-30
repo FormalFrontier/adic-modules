@@ -9,6 +9,7 @@ public import AdicModulesTest.CompleteProduct
 public import AdicModulesTest.HenselDeterminantImage
 import AdicModulesTest.MvPolynomial.HenselSubmodule
 public import AdicModulesTest.AdicCompletion
+public import AdicModulesTest.AdicCompletion.ChineseRemainder
 public import AdicModulesTest.AdicCompletion.Completeness
 public import AdicModulesTest.AdicCompletion.CompletenessTheorems
 public import AdicModulesTest.AdicCompletion.DependentPi

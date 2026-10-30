@@ -9,6 +9,7 @@ public import AdicModules.MvPolynomial.JacobianPerturbation.Localization
 public import AdicModules.RingTheory.WittVector.Frobenius
 
 public import AdicModules.AdicCompletion.ChangeIdeal
+public import AdicModules.AdicCompletion.ChineseRemainder
 public import AdicModules.BoundedIdealPowerTorsion
 public import AdicModules.MvPolynomial.Jacobian
 public import AdicModules.MvPolynomial.Evaluation
