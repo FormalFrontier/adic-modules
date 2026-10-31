@@ -142,6 +142,24 @@ The Noetherian equivalence applies this library's finitely generated ideal
 criterion, following the mathematical criterion in K. Fujiwara and F. Kato,
 *Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
 
+The finite-cotangent quotient comparisons reuse this library's evaluation kernels
+and class-preserving restriction-of-scalars equivalence, with Mathlib's completed
+coefficient actions and evaluation formalized by Kenny Lau, Judith Ludwig,
+Christian Merten and Jiedong Jiang, and Andrew Yang's ideal cotangent module.
+The coefficient and module comparisons share the equal-ideal/equal-submodule
+quotient and surjective first-isomorphism constructions. These use the quotient
+formalizations by Kenny Lau, Chris Hughes, Mario Carneiro, Anne Baanen and Patrick
+Massot, and the submodule quotient and linear isomorphism APIs by Johannes Hölzl,
+Mario Carneiro, Kevin Buzzard and Yury Kudryashov. The quotient coefficient action
+is Pierre-Alexandre Bazin's. The semilinear construction follows this library's
+Chinese remainder inverse-pair pattern, using Mathlib's equivalence and
+inverse-pair APIs by Nathaniel Thomas, Jeremy Avigad, Johannes Hölzl,
+Mario Carneiro, Anne Baanen, Frédéric Dupuis and Heather Macbeth. Extension from
+original residues uses this library's descent along surjective semilinear maps,
+with its existing additive-monoid target interface. These are compositions of
+existing interfaces, not copied upstream proof bodies; their author,
+copyright and Apache-2.0 notices remain in Mathlib.
+
 The tensor-comparison kernel calculation reuses this library's coefficient quotient
 comparison and fixed-stage kernel theorem, whose finite-linear-combination argument follows
 Bingyu Xia's Mathlib formalization. It composes `quotTensorEquivQuotSMul` from Antoine

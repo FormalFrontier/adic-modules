@@ -35,8 +35,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   For every original `R`-module `M`, finite original cotangent also identifies
   `I^n • ⊤` in `AdicCompletion I M` with the evaluation kernel at every `n`,
   including zero, and makes `AdicCompletion I M` intrinsically complete for `J`
-  under its canonical `S`-action. No finiteness, flatness or completeness of `M` is assumed.
-  See the [cotangent criterion](AdicModules/AdicCompletion/Cotangent.lean).
+  under its canonical `S`-action. Evaluation gives
+  `S / Jⁿ ≃ₐ[R] R / Iⁿ` and, for arbitrary original `M`,
+  `AdicCompletion I M / Jⁿ(AdicCompletion I M) ≃ₛₗ M / IⁿM` over this coefficient
+  equivalence, using the quotient coefficient actions. These comparisons include
+  degree zero, commute with precision reduction and original linear maps, and have
+  inverses induced by the original maps into completion. Maps from `M` with
+  coefficients reduced modulo `Iⁿ` extend uniquely to the completed quotient.
+  No finiteness, flatness or completeness of `M`, or completed-ring action on it,
+  is assumed. The comparisons agree with the separate finite-generation families
+  wherever both hypotheses hold; finite cotangent and finite generation of a
+  positive original power are not identified with one another.
+  See the [cotangent criterion](AdicModules/AdicCompletion/Cotangent.lean) and
+  [quotient comparisons](AdicModules/AdicCompletion/Quotient.lean).
 
 - **Adic separation of quotients.** For any ideal `I` and submodule `N` of an
   `R`-module over a commutative ring, `M / N` is `I`-Hausdorff exactly when
@@ -881,7 +892,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels, finite-power and finite-cotangent evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
-| [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
+| [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) (finite-cotangent semilinear quotients, independent finite-power comparisons and extension from original residues) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.Surjectivity](AdicModules/AdicCompletion/Surjectivity.lean) (surjectivity and original splittings with finite original cokernel) | — |
 | [AdicCompletion.Idempotents](AdicModules/AdicCompletion/Idempotents.lean) (first-evaluation order isomorphism on idempotents and preconnected-spectrum transfer for arbitrary ideals) | — |
