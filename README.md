@@ -46,6 +46,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   local-ring or proper-ideal assumption. See the
   [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
 
+- **Projective completed scalar extension.** For every ideal `I`, put
+  `S = AdicCompletion I R` and `T = S ⊗[R] M`, with the first-factor `S`-action.
+  If `T` is projective over `S`, the canonical comparison `T →ₗ[S] AdicCompletion I M`
+  is injective. It is an equivalence if the original first quotient `M / I M` is
+  finite over `R`, or if `T` itself is finite over `S`. The former hypotheses also
+  give finite presentation of the completion over `S`. No finiteness, flatness,
+  projectivity, Hausdorffness, completeness or `S`-action on original `M` is assumed,
+  and no positive power of `I` need be finitely generated. The kernel for arbitrary
+  `M` is the intersection of `ker (evalₐ I n) • ⊤`, not necessarily the extended
+  ideal powers. See the [tensor comparison](AdicModules/AdicCompletion/TensorProduct.lean)
+  and [finite presentation](AdicModules/AdicCompletion/FinitePresentation.lean).
+
 - **Tensor comparison and Hausdorffification.** Put `S = AdicCompletion I R` and
   `J = I.map (algebraMap R S)`. If `0 < n` and `(I ^ n).FG`, the canonical
   comparison `S ⊗[R] M →ₗ[S] AdicCompletion I M` has kernel
@@ -56,7 +68,7 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   from the source's `J`-Hausdorffification to the completed module, linearly
   over `S`; bijectivity is then equivalent to that same Hausdorffness.
   No original completed-ring action, projectivity, flatness, separation or
-  completeness of `M` is assumed. The all-ideal projective APIs are unchanged.
+  completeness of `M` is assumed.
 
 - **Noetherian completed scalar extension.** Let `S = AdicCompletion I R` and
   `T = S ⊗[R] M`. If `T` is Noetherian over `S` and some specified positive
@@ -459,10 +471,13 @@ Rings are commutative; modules are additive commutative groups unless specified 
   [finite presentation](AdicModules/AdicCompletion/FinitePresentation.lean)): the canonical
   completed-ring-linear comparison is surjective whenever the **original first quotient**
   `M / I M` is finite over `R`, without original projectivity or finiteness. It is injective
-  for original projective modules, so `ofTensorProductEquivOfFiniteQuotientProjective`
-  gives the same canonical equivalence when both premises hold. Finite-original projective
-  names remain specializations. Separate equivalences cover finite modules over Noetherian
-  rings, or finitely presented modules with **finite-free induced/intrinsic cofinality**
+  when `AdicCompletion I R ⊗[R] M` is projective over the completed ring, so
+  `ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct` gives the canonical
+  equivalence when both premises hold. Finite projective tensor sources suffice by
+  first-quotient descent. The original-projective and finite-original projective names
+  remain specializations, with whole-equivalence agreement. Separate equivalences cover
+  finite modules over Noetherian rings, or finitely presented modules with
+  **finite-free induced/intrinsic cofinality**
   (supplied by Artin–Rees over Noetherian rings).
   `AdicCompletion.moduleFinite_of_finite_quotient` gives a finite module over the
   **canonical completed ring** whenever `M / I M` is finite over the original ring,
@@ -478,10 +493,11 @@ Rings are commutative; modules are additive commutative groups unless specified 
   `moduleProjective_of_flat_of_finite_projective_quotient`. More generally,
   `moduleProjective_of_flat_pow_quotients` only requires flatness of every positive
   `M / Iⁿ M` over `R / Iⁿ`, not flatness of original `M`.
-  The original-projective specialization is retained;
-  `moduleFinitePresentation_of_finite_quotient_of_projective` gives finite presentation
-  over the same ring under its unchanged hypotheses. These results assume no action of the
-  completed ring on original `M`, Noetherianity, finite generation of `I`, completeness or separation.
+  `moduleFinitePresentation_of_finite_quotient_of_projective_tensorProduct` gives finite
+  presentation over the same ring when the original first quotient is finite and the tensor
+  source is projective. Its original-projective specialization retains its hypotheses.
+  These results assume no action of the completed ring on original `M`, Noetherianity,
+  finite generation of `I`, completeness or separation.
   In particular, finite modules remain finite and finite projective modules remain projective.
 - **Coordinates and scalar restriction** ([coordinates](AdicModules/AdicCompletion/QuotientTorsion.lean),
   [restriction](AdicModules/AdicCompletion/RestrictScalars.lean)): for an additive commutative group `V`, subgroup

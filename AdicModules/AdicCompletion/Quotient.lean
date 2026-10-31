@@ -125,7 +125,7 @@ theorem quotientPowLinearEquivOfFGPow_transitionMap (I : Ideal R)
   exact (transitionMap_comp_eval_apply I M hjk x).symm
 
 /-- The linear evaluation kernel determines the coefficient evaluation kernel. -/
-private theorem map_pow_eq_ker_evalₐ (I : Ideal R) (n : ℕ)
+theorem map_pow_eq_ker_evalₐ (I : Ideal R) (n : ℕ)
     (h : (I ^ n) • (⊤ : Submodule R (AdicCompletion I R)) = (eval I R n).ker) :
     (I.map (algebraMap R (AdicCompletion I R))) ^ n =
       RingHom.ker (evalₐ I n).toRingHom := by

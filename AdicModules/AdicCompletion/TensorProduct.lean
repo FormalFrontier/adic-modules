@@ -15,6 +15,7 @@ import AdicModules.AdicCompletion.Quotient
 import Mathlib.Algebra.Module.Projective
 import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.Algebra.Polynomial.Monomial
+import Mathlib.LinearAlgebra.Dual.Lemmas
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.LinearAlgebra.Matrix.ToLin
@@ -32,10 +33,20 @@ import Mathlib.RingTheory.TensorProduct.Finite
 For any ideal `I` of a commutative ring `R`, finiteness of the original first quotient
 `M / I M` makes the canonical completed-ring-linear comparison from tensoring with
 `AdicCompletion I R` to `AdicCompletion I M` surjective. No projectivity or finiteness of
-original `M` is required. If original `M` is projective, the comparison is also injective,
-hence an equivalence. It sends pure tensors to scalar multiples of canonical module elements
-and agrees with Mathlib's finite-Noetherian equivalence where both apply. The finite-original
-projective API is retained as a specialization.
+original `M` is required. If the completed scalar extension `AdicCompletion I R ⊗[R] M`
+is projective over the completed ring, the comparison is injective, without any hypothesis
+on the original first quotient. With that quotient finite, it is an equivalence. Finiteness
+and projectivity of the completed scalar extension also suffice, since first evaluation
+derives finiteness of the original first quotient. Original-projective and finite-original
+projective comparisons are specializations. All these equivalences use the same canonical
+forward map; they send pure tensors to scalar multiples of canonical module elements and
+agree with Mathlib's finite-Noetherian equivalence on their overlaps.
+
+For every ideal, the comparison kernel is the intersection of the scalar evaluation
+kernels times its tensor source. These scalar kernels need not be powers of the extended
+ideal. Projective dual separation and scalar coordinate separation make that intersection
+zero when the tensor source is projective. Original `M` need not be finite, flat, projective,
+Hausdorff, complete, or equipped with an action of the completed ring.
 
 If a positive power of `I` is finitely generated, the kernel of the comparison for any
 original module is the intersection of all extended ideal-power submodules of the tensor
@@ -53,8 +64,9 @@ over the quotient of the completed ring by its module annihilator. In particular
 finitely generated `I`, Noetherian `R / I`, and finite original `M` suffice, without
 Noetherianity of original `R`.
 
-For projective modules, injectivity detects coefficients in a free Finsupp module and uses
-a projective retraction and naturality. For surjectivity, choose finite quotient generators
+The kernel calculation composes quotient–tensor equivalences, scalar base cancellation,
+and the first isomorphism theorem for scalar evaluation. Injectivity uses the separating
+dual of the projective tensor source. For surjectivity, choose finite quotient generators
 and original lifts. The chosen-family spanning theorem below makes those same completed
 lifts span the raw completion; each lies in the range of the canonical comparison.
 No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
@@ -68,10 +80,11 @@ nilpotent-ideal criterion with flat target, and assembles their compatible inver
 produces a retraction of one finite free module over the completed ring.
 
 These results use Mathlib's coefficientwise completed-ring action, without an action of the
-completed ring on original `M`. Original projectivity remains necessary in the tensor
-comparison equivalences above; flatness alone does not imply their injectivity.
+completed ring on original `M`. Projectivity of the tensor source suffices for the tensor
+comparison equivalences above; even finite flatness alone does not imply their injectivity.
 `AdicModules.AdicCompletion.FinitePresentation` consumes completed finiteness and projectivity
-in one explicit finite-presentation theorem via `Module.finitePresentation_of_projective`.
+under finite original first quotient and projective completed scalar extension, via
+`Module.finitePresentation_of_projective`.
 
 For an original split surjection, finiteness of the intrinsic original kernel's first adic
 quotient makes the completed-map kernel finite over the same completed ring. The consumer
@@ -103,8 +116,9 @@ common-universe comparison with Mathlib identifies the equivalence obtained by
 Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and Christian Merten,
 supplies the canonical comparison, its naturality, the finite-power comparison, finite-module
 surjectivity, and the Noetherian equivalence. Mathlib's `Algebra/Module/Projective.lean`, by
-Kevin Buzzard and Antoine Labelle, supplies the projective Finsupp retraction, base-change
-projectivity and transport along linear equivalences. Mathlib's
+Kevin Buzzard and Antoine Labelle, supplies base-change projectivity and transport along
+linear equivalences. The projective dual-separation theorem is from Johan Commelin, Fabian
+Glöckle and Kyle Miller's `LinearAlgebra/Dual/Lemmas.lean`. Mathlib's
 `RingTheory/TensorProduct/Finite.lean`, by Kim Morrison and Johan Commelin, supplies
 base-change finiteness; `RingTheory/Finiteness/Basic.lean` supplies its transport along surjections.
 The tensor surjectivity argument uses `Module.Finite.exists_fin` from Johan Commelin's
@@ -118,16 +132,15 @@ The chosen-family refinement uses the finite linear-combination API from Johanne
 from Mathlib's `LinearAlgebra/Pi.lean`.
 See also K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5,
 Proposition 7.2.16, for the finitely generated ideal intrinsic-completion statement.
-Mathlib's
-`LinearAlgebra/DirectSum/Finsupp.lean`, by Johannes Hölzl and Antoine Chambert-Loir, supplies
-the tensor/Finsupp coefficient equivalence. Related finite-projective retraction results are
-in Mathlib's `RingTheory/Finiteness/Projective.lean`, by Johan Commelin.
+Finite-projective splitting is from Mathlib's `RingTheory/Finiteness/Projective.lean`,
+by Johan Commelin.
 The independent-universe Noetherian comparison uses finite-module smallness from Mathlib's
 `RingTheory/Finiteness/Small.lean`, by Antoine Chambert-Loir and María-Inés de Frutos-Fernández,
 and the `Shrink` linear equivalence from Kim Morrison's module API.
-The kernel calculation reuses this library's coefficient quotient equivalence and its
-fixed-stage kernel theorem, whose finite-linear-combination proof follows Bingyu Xia's
-Mathlib formalization. Tensor quotient equivalences are from Antoine Chambert-Loir and
+The kernel calculation uses the quotient-kernel algebra equivalence in Mathlib's
+`RingTheory/Ideal/Quotient/Operations.lean`. Its extended-ideal-power specialization reuses
+this library's fixed-stage kernel theorem, whose finite-linear-combination proof follows
+Bingyu Xia's Mathlib formalization. Tensor quotient equivalences are from Antoine Chambert-Loir and
 Jujian Zhang's `LinearAlgebra/TensorProduct/Quotient.lean`; scalar base cancellation uses
 Kim Morrison, Johan Commelin and Eric Wieser's `LinearAlgebra/TensorProduct/Tower.lean`.
 The Hausdorffification is from Mathlib's adic-completion Basic module by Kenny Lau,
@@ -156,7 +169,7 @@ set_option warningAsError true
 
 noncomputable section
 
-universe uR uM uN uσ uι
+universe uR uM uN uι
 
 open TensorProduct
 
@@ -554,50 +567,6 @@ namespace AdicCompletion
 
 variable {R : Type uR} [CommRing R] (I : Ideal R)
 
-/-- The comparison for the scalar module agrees pointwise with the tensor right unitor. -/
-private lemma ofTensorProduct_self_eq_rid_apply
-    (x : AdicCompletion I R ⊗[R] R) :
-    ofTensorProduct I R x =
-      AlgebraTensorModule.rid R R (AdicCompletion I R) x := by
-  induction x using TensorProduct.inductionOn with
-  | tmul a r =>
-      rw [ofTensorProduct_tmul, AlgebraTensorModule.rid_tmul]
-      apply AdicCompletion.ext
-      intro n
-      rw [smul_eval, of_apply, val_smul_apply]
-      induction a.val n using Quotient.inductionOn' with
-      | _ s =>
-          change
-            (Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R R)) (s * r)) =
-              Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R R)) (r * s)
-          rw [mul_comm]
-  | add x y hx hy =>
-      simp only [map_add, hx, hy]
-
-/-- A coefficient of the tensor/Finsupp equivalence is the completion of the corresponding
-coefficient of the canonical comparison. -/
-private lemma finsuppScalarRight_apply_eq_map_ofTensorProduct
-    (σ : Type uσ) [DecidableEq σ]
-    (x : AdicCompletion I R ⊗[R] (σ →₀ R)) (b : σ) :
-    TensorProduct.finsuppScalarRight R R (AdicCompletion I R) σ x b =
-      map I (Finsupp.lapply b : (σ →₀ R) →ₗ[R] R)
-        (ofTensorProduct I (σ →₀ R) x) := by
-  rw [TensorProduct.finsuppScalarRight_apply, ← ofTensorProduct_self_eq_rid_apply I]
-  rw [← LinearMap.baseChange_eq_ltensor]
-  exact (LinearMap.congr_fun
-    (ofTensorProduct_naturality I (Finsupp.lapply b : (σ →₀ R) →ₗ[R] R)) x).symm
-
-/-- The canonical tensor comparison is injective on an arbitrary Finsupp module. -/
-private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
-    Function.Injective (ofTensorProduct I (σ →₀ R)) := by
-  classical
-  intro x y hxy
-  apply (TensorProduct.finsuppScalarRight R R (AdicCompletion I R) σ).injective
-  apply Finsupp.ext
-  intro b
-  rw [finsuppScalarRight_apply_eq_map_ofTensorProduct I σ x b,
-    finsuppScalarRight_apply_eq_map_ofTensorProduct I σ y b, hxy]
-
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
 /-- Completing a finite linear combination gives the same completed-ring-linear
@@ -736,27 +705,179 @@ instance instModuleFinite [Module.Finite R M] :
     Module.Finite (AdicCompletion I R) (AdicCompletion I M) :=
   moduleFinite_of_finite_quotient I M
 
+/-- Evaluation after the tensor comparison has the coefficient evaluation kernel
+times the tensor source as its kernel. The quotient calculation is over `R`;
+no completed-ring action on the original module is used. -/
+private theorem eval_ofTensorProduct_eq_zero_iff (k : ℕ)
+    (t : AdicCompletion I R ⊗[R] M) :
+    eval I M k (ofTensorProduct I M t) = 0 ↔
+      t ∈ (RingHom.ker (evalₐ I k).toRingHom) •
+        (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)) := by
+  let S := AdicCompletion I R
+  let T := S ⊗[R] M
+  let K : Ideal S := RingHom.ker (evalₐ I k).toRingHom
+  let q : (S ⧸ K) ≃ₐ[R] R ⧸ I ^ k :=
+    Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I k)
+  let e : (T ⧸ K • (⊤ : Submodule S T)) ≃ₗ[R]
+      M ⧸ (I ^ k • (⊤ : Submodule R M)) :=
+    ((quotTensorEquivQuotSMul T K).symm.restrictScalars R).trans
+      (((AlgebraTensorModule.cancelBaseChange R S S (S ⧸ K) M).restrictScalars R).trans
+        ((TensorProduct.congr q.toLinearEquiv (LinearEquiv.refl R M)).trans
+          (quotTensorEquivQuotSMul M (I ^ k))))
+  have he : e.toLinearMap ∘ₗ
+      ((K • (⊤ : Submodule S T)).mkQ.restrictScalars R) =
+      (eval I M k) ∘ₗ (ofTensorProduct I M).restrictScalars R := by
+    apply TensorProduct.ext'
+    intro a m
+    have ha : a • (1 : S ⧸ K) = Ideal.Quotient.mk K a := by
+      change a • Submodule.Quotient.mk (p := K) (1 : S) = _
+      rw [← Submodule.Quotient.mk_smul]
+      simp only [smul_eq_mul, mul_one]
+      rfl
+    change e (Submodule.Quotient.mk (a ⊗ₜ[R] m)) =
+      eval I M k (ofTensorProduct I M (a ⊗ₜ[R] m))
+    simp only [e, LinearEquiv.trans_apply, LinearEquiv.restrictScalars_apply,
+      quotTensorEquivQuotSMul_symm_mk]
+    rw [AlgebraTensorModule.cancelBaseChange_tmul R S S (1 : S ⧸ K) m a,
+      ha, TensorProduct.congr_tmul]
+    change quotTensorEquivQuotSMul M (I ^ k)
+      (q (Ideal.Quotient.mk K a) ⊗ₜ[R] m) = _
+    rw [show q (Ideal.Quotient.mk K a) = evalₐ I k a from
+      Ideal.quotientKerAlgEquivOfSurjective_mk (surjective_evalₐ I k) a,
+      ofTensorProduct_tmul]
+    change quotTensorEquivQuotSMul M (I ^ k) (evalₐ I k a ⊗ₜ[R] m) =
+      a.val k • (of I M m).val k
+    rw [val_smul_eq_evalₐ_smul, of_apply]
+    obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (evalₐ I k a)
+    rw [← hr, quotTensorEquivQuotSMul_mk_tmul]
+    rfl
+  have het := LinearMap.congr_fun he t
+  change e (Submodule.Quotient.mk t) = eval I M k (ofTensorProduct I M t) at het
+  rw [← het, e.map_eq_zero_iff, Submodule.Quotient.mk_eq_zero]
+
+/-- For every ideal, the kernel of the canonical tensor comparison is the intersection
+of the scalar evaluation kernels times its source. No finiteness, flatness or
+separation hypothesis on the original module is required. -/
+theorem ker_ofTensorProduct_eq_iInf_ker_eval_smul :
+    (ofTensorProduct I M).ker =
+      ⨅ n : ℕ,
+        (RingHom.ker (evalₐ I n).toRingHom) •
+          (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)) := by
+  ext t
+  constructor
+  · intro ht
+    apply (Submodule.mem_iInf _).mpr
+    intro n
+    apply (eval_ofTensorProduct_eq_zero_iff I M n t).mp
+    rw [LinearMap.mem_ker.mp ht]
+    exact (eval I M n).map_zero
+  · intro ht
+    change ofTensorProduct I M t = 0
+    apply AdicCompletion.ext
+    intro n
+    exact (eval_ofTensorProduct_eq_zero_iff I M n t).mpr
+      ((Submodule.mem_iInf _).mp ht n)
+
+/-- The canonical tensor comparison is injective if its completed scalar extension is
+projective over the completed ring, for every ideal. No hypothesis on the original module's
+projectivity, finiteness or separation is needed. -/
+theorem ofTensorProduct_injective_of_projective_tensorProduct
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Injective (ofTensorProduct I M) := by
+  rw [← LinearMap.ker_eq_bot, ker_ofTensorProduct_eq_iInf_ker_eval_smul I M]
+  apply eq_bot_iff.mpr
+  intro t ht
+  apply (Module.forall_dual_apply_eq_zero_iff (AdicCompletion I R) t).mp
+  intro φ
+  apply ext_evalₐ
+  intro n
+  have hφ := (Submodule.smul_top_le_comap_smul_top
+    (RingHom.ker (evalₐ I n).toRingHom) φ) ((Submodule.mem_iInf _).mp ht n)
+  change φ t ∈ (RingHom.ker (evalₐ I n).toRingHom) •
+    (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R)) at hφ
+  have hzero : evalₐ I n (φ t) = 0 := by
+    simpa only [Ideal.smul_eq_mul, Ideal.mul_top, RingHom.mem_ker,
+      AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom] using hφ
+  exact hzero.trans (_root_.map_zero (evalₐ I n)).symm
+
+/-- A finite original first quotient and projectivity of the completed scalar extension
+make the canonical tensor comparison bijective, for every ideal. -/
+theorem ofTensorProduct_bijective_of_finite_quotient_of_projective_tensorProduct
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) :=
+  ⟨ofTensorProduct_injective_of_projective_tensorProduct I M,
+    ofTensorProduct_surjective_of_finite_quotient I M⟩
+
+/-- A finite projective completed scalar extension makes the canonical tensor comparison
+bijective. Finiteness of the original first quotient follows by first evaluation. -/
+theorem ofTensorProduct_bijective_of_finite_of_projective_tensorProduct
+    [Module.Finite (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  have : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    moduleFinite_quotient_of_finite_tensorProduct I M
+  let : IsScalarTower R (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    (Module.isTorsionBySet_quotient_ideal_smul M I).isScalarTower
+  have : Module.Finite R (M ⧸ (I • (⊤ : Submodule R M))) :=
+    Module.Finite.trans (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))
+  exact ofTensorProduct_bijective_of_finite_quotient_of_projective_tensorProduct I M
+
+/-- The canonical tensor comparison as an equivalence when the original first quotient is
+finite and the completed scalar extension is projective over the completed ring. -/
+noncomputable def ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
+  LinearEquiv.ofBijective (ofTensorProduct I M)
+    (ofTensorProduct_bijective_of_finite_quotient_of_projective_tensorProduct I M)
+
+/-- The equivalence's whole forward linear map is the canonical tensor comparison. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_toLinearMap
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    (ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M).toLinearMap =
+      ofTensorProduct I M :=
+  rfl
+
+/-- The equivalence agrees with the canonical comparison on every tensor. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_apply
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)]
+    (t : AdicCompletion I R ⊗[R] M) :
+    ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M t =
+      ofTensorProduct I M t :=
+  rfl
+
+/-- The inverse recovers every tensor from its canonical comparison image. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_symm_apply
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)]
+    (t : AdicCompletion I R ⊗[R] M) :
+    (ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M).symm
+      (ofTensorProduct I M t) = t :=
+  (ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M).symm_apply_apply t
+
+/-- The inverse sends each original module element to its tensor with one. -/
+@[simp]
+theorem ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_symm_of
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] (m : M) :
+    (ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M).symm
+      (of I M m) = (1 : AdicCompletion I R) ⊗ₜ[R] m := by
+  simpa only [ofTensorProduct_tmul, one_smul] using
+    ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_symm_apply I M
+      ((1 : AdicCompletion I R) ⊗ₜ[R] m)
+
 /-- For a projective module over a commutative ring, the canonical comparison from tensoring
 with the completed ring to the completed module is injective, for any ideal. -/
 theorem ofTensorProduct_injective_of_projective
     [Module.Projective R M] :
-    Function.Injective (ofTensorProduct I M) := by
-  obtain ⟨g, hfg⟩ := (Module.projective_def' (R := R) (P := M)).mp inferInstance
-  have hsplit :
-      (Finsupp.linearCombination R id).baseChange (AdicCompletion I R) ∘ₗ
-          g.baseChange (AdicCompletion I R) = LinearMap.id := by
-    rw [← LinearMap.baseChange_comp, hfg, LinearMap.baseChange_id]
-  have hg := LinearMap.injective_of_comp_eq_id _ _ hsplit
-  intro x y hxy
-  apply hg
-  apply ofTensorProduct_injective_finsupp I M
-  calc
-    ofTensorProduct I (M →₀ R) (g.baseChange (AdicCompletion I R) x) =
-        map I g (ofTensorProduct I M x) :=
-      (LinearMap.congr_fun (ofTensorProduct_naturality I g) x).symm
-    _ = map I g (ofTensorProduct I M y) := congrArg (map I g) hxy
-    _ = ofTensorProduct I (M →₀ R) (g.baseChange (AdicCompletion I R) y) :=
-      LinearMap.congr_fun (ofTensorProduct_naturality I g) y
+    Function.Injective (ofTensorProduct I M) :=
+  ofTensorProduct_injective_of_projective_tensorProduct I M
 
 /-- For an original projective module finite modulo the ideal, the canonical tensor
 comparison is bijective: projectivity gives injectivity and the finite first quotient gives
@@ -764,16 +885,14 @@ surjectivity. -/
 theorem ofTensorProduct_bijective_of_finite_quotient_of_projective
     [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
     Function.Bijective (ofTensorProduct I M) :=
-  ⟨ofTensorProduct_injective_of_projective I M,
-    ofTensorProduct_surjective_of_finite_quotient I M⟩
+  ofTensorProduct_bijective_of_finite_quotient_of_projective_tensorProduct I M
 
 /-- The canonical tensor comparison as a completed-ring-linear equivalence for an original
 projective module whose first adic quotient is finite. -/
 noncomputable def ofTensorProductEquivOfFiniteQuotientProjective
     [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
     AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
-  LinearEquiv.ofBijective (ofTensorProduct I M)
-    (ofTensorProduct_bijective_of_finite_quotient_of_projective I M)
+  ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M
 
 /-- The finite-quotient projective equivalence has the canonical comparison as its linear map. -/
 @[simp]
@@ -800,6 +919,15 @@ theorem ofTensorProductEquivOfFiniteQuotientProjective_symm_of
       (1 : AdicCompletion I R) ⊗ₜ[R] m := by
   apply (ofTensorProductEquivOfFiniteQuotientProjective I M).injective
   simp
+
+/-- On the original-projective overlap, the two whole equivalences agree through their
+common canonical forward map. -/
+theorem ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct_eq
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
+    ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M =
+      ofTensorProductEquivOfFiniteQuotientProjective I M := by
+  apply LinearEquiv.toLinearMap_injective
+  rfl
 
 /-- Completing a finite linear combination gives the corresponding combination on finite
 powers of the completed ring. -/
@@ -1208,51 +1336,15 @@ section Hausdorffification
 variable {R : Type uR} [CommRing R] (I : Ideal R)
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
-/-- At a finitely generated ideal-power stage, evaluation after the tensor comparison
-has precisely the extended ideal-power kernel. The quotient calculation is over `R`;
-no completed-ring action on the original module is used. -/
-private theorem eval_ofTensorProduct_eq_zero_iff (k : ℕ) (hk : (I ^ k).FG)
+/-- At a finitely generated ideal-power stage, the coefficient evaluation kernel is the
+extended ideal power. -/
+private theorem eval_ofTensorProduct_eq_zero_iff_of_fg_pow (k : ℕ) (hk : (I ^ k).FG)
     (t : AdicCompletion I R ⊗[R] M) :
     eval I M k (ofTensorProduct I M t) = 0 ↔
       t ∈ (I.map (algebraMap R (AdicCompletion I R))) ^ k •
         (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)) := by
-  let S := AdicCompletion I R
-  let T := S ⊗[R] M
-  let K := (I.map (algebraMap R S)) ^ k
-  let e : (T ⧸ K • (⊤ : Submodule S T)) ≃ₗ[R]
-      M ⧸ (I ^ k • (⊤ : Submodule R M)) :=
-    ((quotTensorEquivQuotSMul T K).symm.restrictScalars R).trans
-      (((AlgebraTensorModule.cancelBaseChange R S S (S ⧸ K) M).restrictScalars R).trans
-        ((TensorProduct.congr (quotientPowAlgEquiv I k hk).toLinearEquiv
-          (LinearEquiv.refl R M)).trans (quotTensorEquivQuotSMul M (I ^ k))))
-  have he : e.toLinearMap ∘ₗ
-      ((K • (⊤ : Submodule S T)).mkQ.restrictScalars R) =
-      (eval I M k) ∘ₗ (ofTensorProduct I M).restrictScalars R := by
-    apply TensorProduct.ext'
-    intro a m
-    have ha : a • (1 : S ⧸ K) = Ideal.Quotient.mk K a := by
-      change a • Submodule.Quotient.mk (p := K) (1 : S) = _
-      rw [← Submodule.Quotient.mk_smul]
-      simp only [smul_eq_mul, mul_one]
-      rfl
-    change e (Submodule.Quotient.mk (a ⊗ₜ[R] m)) =
-      eval I M k (ofTensorProduct I M (a ⊗ₜ[R] m))
-    simp only [e, LinearEquiv.trans_apply, LinearEquiv.restrictScalars_apply,
-      quotTensorEquivQuotSMul_symm_mk]
-    rw [AlgebraTensorModule.cancelBaseChange_tmul R S S (1 : S ⧸ K) m a,
-      ha, TensorProduct.congr_tmul]
-    change quotTensorEquivQuotSMul M (I ^ k)
-      (quotientPowAlgEquiv I k hk (Ideal.Quotient.mk K a) ⊗ₜ[R] m) = _
-    rw [quotientPowAlgEquiv_mk, ofTensorProduct_tmul]
-    change quotTensorEquivQuotSMul M (I ^ k) (evalₐ I k a ⊗ₜ[R] m) =
-      a.val k • (of I M m).val k
-    rw [val_smul_eq_evalₐ_smul, of_apply]
-    obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (evalₐ I k a)
-    rw [← hr, quotTensorEquivQuotSMul_mk_tmul]
-    rfl
-  have het := LinearMap.congr_fun he t
-  change e (Submodule.Quotient.mk t) = eval I M k (ofTensorProduct I M t) at het
-  rw [← het, e.map_eq_zero_iff, Submodule.Quotient.mk_eq_zero]
+  rw [map_pow_eq_ker_evalₐ I k (pow_smul_top_eq_ker_eval_of_fg_pow hk)]
+  exact eval_ofTensorProduct_eq_zero_iff I M k t
 
 /-- If a positive power of the ideal is finitely generated, the kernel of the canonical
 tensor comparison is the intersection of the extended ideal-power submodules. No finiteness
@@ -1275,12 +1367,12 @@ theorem ker_ofTensorProduct_eq_iInf_of_fg_pow
       rw [LinearMap.mem_ker.mp ht]
       exact (eval I M (n * k)).map_zero
     exact Submodule.pow_smul_top_le _ _ (Nat.le_mul_of_pos_left k hn)
-      ((eval_ofTensorProduct_eq_zero_iff I M (n * k) (hfg k) t).mp hzero)
+      ((eval_ofTensorProduct_eq_zero_iff_of_fg_pow I M (n * k) (hfg k) t).mp hzero)
   · intro ht
     change ofTensorProduct I M t = 0
     apply AdicCompletion.ext
     intro k
-    have hzero := (eval_ofTensorProduct_eq_zero_iff I M (n * k) (hfg k) t).mpr
+    have hzero := (eval_ofTensorProduct_eq_zero_iff_of_fg_pow I M (n * k) (hfg k) t).mpr
       ((Submodule.mem_iInf _).mp ht (n * k))
     change eval I M k (ofTensorProduct I M t) = 0
     calc

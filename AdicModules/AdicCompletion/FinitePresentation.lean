@@ -14,11 +14,14 @@ import Mathlib.RingTheory.Filtration
 /-!
 # Finite presentation and adic completion
 
-For any ideal `I` of a commutative ring `R`, an original projective module `M` with
-`Module.Finite R (M ⧸ (I • ⊤))` has finitely presented raw completion over the canonical
-completed ring. This uses finite-first-quotient completion finiteness, the canonical tensor
-comparison for projective modules, and stock finite-plus-projective finite presentation.
-It requires no finite-free cofinality, original-module finiteness or finite generation of `I`.
+For any ideal `I` of a commutative ring `R`, a module `M` with finite original first quotient
+`M / I M` has finitely presented raw completion over the canonical completed ring whenever
+`AdicCompletion I R ⊗[R] M` is projective over that ring. This uses finite-first-quotient
+completion finiteness, projectivity transported through the canonical tensor comparison,
+and stock finite-plus-projective finite presentation. It requires no finite-free cofinality,
+original-module finiteness, projectivity, flatness or separation, or finite generation of `I`.
+Original projectivity supplies projectivity of the tensor source by base change; the
+original-projective theorem is retained with its original hypotheses.
 
 A separate comparison concerns finitely presented original modules. Let `R` be a commutative
 ring and `I` any ideal. Suppose that, for every finitely generated submodule `K` of a finite
@@ -69,6 +72,20 @@ open TensorProduct
 
 namespace AdicCompletion
 
+/-- If the original first quotient is finite and the completed scalar extension is
+projective, the raw completion is finitely presented over the completed ring, for any ideal.
+No cofinality, finiteness or projectivity assumption on the original module is needed. -/
+theorem moduleFinitePresentation_of_finite_quotient_of_projective_tensorProduct
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) := by
+  let := moduleFinite_of_finite_quotient I M
+  let : Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
+    Module.Projective.of_equiv (ofTensorProductEquivOfFiniteQuotientProjectiveTensorProduct I M)
+  exact Module.finitePresentation_of_projective (AdicCompletion I R) (AdicCompletion I M)
+
 /-- An original projective module with finite first adic quotient has finitely presented
 completion over the canonical completed ring, for any ideal. No cofinality assumption on
 finite free submodules is needed for this conclusion. -/
@@ -76,9 +93,8 @@ theorem moduleFinitePresentation_of_finite_quotient_of_projective
     {R : Type uR} [CommRing R] (I : Ideal R)
     (M : Type uM) [AddCommGroup M] [Module R M]
     [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
-    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) := by
-  let := moduleFinite_of_finite_quotient I M
-  exact Module.finitePresentation_of_projective (AdicCompletion I R) (AdicCompletion I M)
+    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) :=
+  moduleFinitePresentation_of_finite_quotient_of_projective_tensorProduct I M
 
 section FinitePresentation
 
