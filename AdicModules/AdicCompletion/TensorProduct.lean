@@ -523,7 +523,7 @@ variable (M : Type uM) [AddCommGroup M] [Module R M]
 
 /-- Completing a finite linear combination gives the same completed-ring-linear
 combination after the finite-product comparison. -/
-private lemma map_linearCombination_piEquivOfFintype_symm
+lemma map_linearCombination_piEquivOfFintype_symm
     {ι : Type uι} [Fintype ι] [DecidableEq ι] (v : ι → M) :
     (map I (Fintype.linearCombination R v)).comp
         (piEquivOfFintype I (fun _ : ι => R)).symm.toLinearMap =

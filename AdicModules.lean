@@ -11,6 +11,7 @@ public import AdicModules.MvPolynomial.JacobianPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation.Localization
 public import AdicModules.RingTheory.WittVector.Frobenius
 
+public import AdicModules.AdicCompletion.Basis
 public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.AdicCompletion.ChangeIdealAlgebra
 public import AdicModules.AdicCompletion.ChineseRemainder

@@ -8,9 +8,15 @@ public import Mathlib.RingTheory.AdicCompletion.Algebra
 public import Mathlib.Algebra.Module.Torsion.Basic
 public import Mathlib.RingTheory.Ideal.Quotient.Operations
 public import AdicModules.AdicCompletion.Kernel
+public import Mathlib.Algebra.Module.Projective
+public import Mathlib.RingTheory.Flat.Basic
 
+import Mathlib.Algebra.Algebra.RestrictScalars
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.LinearAlgebra.Quotient.Basic
+import Mathlib.LinearAlgebra.TensorProduct.Quotient
+import Mathlib.RingTheory.Flat.Stability
+import Mathlib.RingTheory.TensorProduct.Basic
 
 /-!
 # Quotients of adic completions
@@ -34,6 +40,12 @@ The fixed-stage coefficient comparison also remains available assuming only
 finite generation of that stage's ideal power, independently of any positive-power
 hypothesis.
 
+For an arbitrary ideal, flatness or projectivity of the raw completion over its
+completed coefficient ring descends to every original ideal-power quotient over
+its coefficient quotient. The original quotient is a retract of scalar extension
+of the completed module along evaluation. Only this one-sided retraction is used;
+no identification of evaluation kernels with extended ideal powers is required.
+
 ## References
 
 The semilinear projections bundle the coordinate evaluation and completed-module
@@ -45,12 +57,18 @@ the quotient module action from Pierre-Alexandre Bazin's
 The construction uses Mathlib's quotient equivalence for equal ideals and its
 first isomorphism theorems for linear maps and algebras. The inverses are
 described using Mathlib's
-algebra homomorphism induced on ideal quotients.
+algebra homomorphism induced on ideal quotients. The descent statements use
+Christian Merten's flat base-change and retract results in Mathlib, Kevin Buzzard
+and Antoine Labelle's projective tensor and splitting results, and the quotient–tensor
+equivalence of Antoine Chambert-Loir and Jujian Zhang. Scalar extension of maps uses
+Mathlib's `LinearMap.liftBaseChange`.
 -/
 
 @[expose] public section
 
-universe u v w
+universe u v w uR uM
+
+open TensorProduct
 
 namespace AdicCompletion
 
@@ -408,5 +426,78 @@ theorem quotientPowAlgEquivOfFGPow_toLinearEquiv (I : Ideal R)
   obtain ⟨r, hr⟩ := Submodule.mkQ_surjective (I ^ k • (⊤ : Submodule R R)) (eval I R k x)
   rw [← hr]
   rfl
+
+/-- The original quotient is a retract of base change along evaluation; both
+flatness and projectivity therefore descend. The scalar dictionaries stay local. -/
+private theorem quotient_flat_projective_retract (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] (n : ℕ) :
+    (Module.Flat (AdicCompletion I R) (AdicCompletion I M) →
+      Module.Flat (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) ∧
+    (Module.Projective (AdicCompletion I R) (AdicCompletion I M) →
+      Module.Projective (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) := by
+  let S := AdicCompletion I R
+  let H := AdicCompletion I M
+  let A := R ⧸ I ^ n
+  let Q := M ⧸ (I ^ n • (⊤ : Submodule R M))
+  let : Algebra S A := (evalₐ I n).toRingHom.toAlgebra
+  let : IsScalarTower R S A := IsScalarTower.of_algHom (evalₐ I n)
+  let : IsScalarTower R A Q :=
+    (Module.isTorsionBySet_quotient_ideal_smul M (I ^ n)).isScalarTower
+  let : Module S Q := Module.restrictScalars S A Q
+  let : IsScalarTower S A Q := IsScalarTower.restrictScalars S A Q
+  -- Evaluation is S-linear for precisely the action induced by evalₐ.
+  let e : H →ₗ[S] Q :=
+    { (eval I M n).toAddMonoidHom with
+      map_smul' := fun s x => (evalₛₗ I M n).map_smulₛₗ s x }
+  let T := A ⊗[S] H
+  let f : M →ₗ[R] T :=
+    ((TensorProduct.mk S A H 1).restrictScalars R).comp (of I M)
+  let c : (A ⊗[R] M) ≃ₗ[A] Q :=
+    (TensorProduct.quotTensorEquivQuotSMul M (I ^ n)).extendScalarsOfSurjective
+      (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R A))
+  let α : Q →ₗ[A] T := (f.liftBaseChange A).comp c.symm.toLinearMap
+  let β : T →ₗ[A] Q := e.liftBaseChange A
+  have hsplit : β.comp α = LinearMap.id := by
+    apply LinearMap.ext
+    intro q
+    obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective
+      (I ^ n • (⊤ : Submodule R M)) q
+    change e.liftBaseChange A
+      (f.liftBaseChange A (c.symm (Submodule.Quotient.mk m))) = _
+    rw [show c.symm (Submodule.Quotient.mk m) = (1 : A) ⊗ₜ[R] m from
+      TensorProduct.quotTensorEquivQuotSMul_symm_mk (I ^ n) m]
+    rw [LinearMap.liftBaseChange_one_tmul]
+    change e.liftBaseChange A ((1 : A) ⊗ₜ[S] of I M m) = _
+    rw [LinearMap.liftBaseChange_one_tmul]
+    exact eval_of I M n m
+  constructor
+  · intro h
+    let : Module.Flat S H := h
+    let : Module.Flat A T := Module.Flat.baseChange S A H
+    exact Module.Flat.of_retract α β hsplit
+  · intro h
+    let : Module.Projective S H := h
+    let : Module.Projective A T := inferInstance
+    exact Module.Projective.of_split α β hsplit
+
+/-- Flatness of the raw completion over its completed coefficient ring implies
+flatness of every original ideal-power quotient over its coefficient quotient. -/
+theorem moduleFlat_quotient_of_flat_completion
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Flat (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
+    Module.Flat (R ⧸ I ^ n)
+      (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
+  (quotient_flat_projective_retract I M n).1 inferInstance
+
+/-- Projectivity of the raw completion over its completed coefficient ring implies
+projectivity of every original ideal-power quotient over its coefficient quotient. -/
+theorem moduleProjective_quotient_of_projective_completion
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Projective (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
+    Module.Projective (R ⧸ I ^ n)
+      (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
+  (quotient_flat_projective_retract I M n).2 inferInstance
 
 end AdicCompletion

@@ -61,6 +61,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   local-ring or proper-ideal assumption. See the
   [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
 
+- **Bases from original residue lifts.** For any ideal `I`, choose original
+  representatives of a finite basis of `M / I M` over `R / I`. Their completed
+  images are a basis of the raw completion exactly when every positive original
+  quotient `M / Iⁿ M` is flat over `R / Iⁿ`. The
+  [`basisOfQuotient`](AdicModules/AdicCompletion/Basis.lean) construction retains
+  the prescribed index and vectors; its coordinate laws give reconstruction and
+  uniqueness at every original precision, including zero. Thus a finite free
+  first quotient and flat positive quotients give free completion. Flatness or
+  projectivity of a completion also descends to every original quotient, without
+  finiteness assumptions. These results need no finite generation of `I`,
+  Noetherianity, complete base or original finiteness, flatness, projectivity,
+  separation or completed-ring action on `M`.
+
 - **Projective completed scalar extension.** For every ideal `I`, put
   `S = AdicCompletion I R` and `T = S ⊗[R] M`, with the first-factor `S`-action.
   If `T` is projective over `S`, the canonical comparison `T →ₗ[S] AdicCompletion I M`
