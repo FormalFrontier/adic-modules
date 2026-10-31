@@ -54,16 +54,8 @@ private theorem submodule_eq_bot_of_le_smul_of_isNilpotent
     (J : Ideal A) (hJ : IsNilpotent J) (P : Submodule A X)
     (hP : P ≤ J • P) : P = ⊥ := by
   obtain ⟨n, hn⟩ := hJ
-  have hpow (k : ℕ) : P ≤ J ^ k • P := by
-    induction k with
-    | zero => simpa only [pow_zero, one_smul] using (le_refl P)
-    | succ k ih =>
-      calc
-        P ≤ J • P := hP
-        _ ≤ J • (J ^ k • P) := smul_mono_right J ih
-        _ = J ^ (k + 1) • P := by rw [pow_succ', Submodule.mul_smul]
-  refine le_antisymm ?_ bot_le
-  simpa only [hn, Ideal.zero_eq_bot, Submodule.bot_smul] using hpow n
+  apply Submodule.eq_bot_of_le_smul_of_pow_smul_eq_bot J n P ?_ hP
+  rw [hn, Ideal.zero_eq_bot, Submodule.bot_smul]
 
 /-- A linear map with flat target is bijective if it is bijective modulo a
 nilpotent ideal. No finiteness or source-flatness hypothesis is required.

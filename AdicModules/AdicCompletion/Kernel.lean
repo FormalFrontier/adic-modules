@@ -29,8 +29,10 @@ and module may lie in independent universes.
 Finiteness of the stock cotangent module of one positive ideal power `I ^ p` over `R ⧸ I ^ p`
 gives this equality at every degree, without assuming finite generation of any original ideal
 power. Finite original cotangent and finite generation of a positive original power are special
-cases. A finitely generated ideal `H` generating `I ^ n` modulo `I ^ (n + 1)` already computes
-the evaluation kernel at `n`. Applying this to auxiliary powers gives cofinally many stages;
+cases. A finitely generated ideal `H` whose action on `M`, together with `I ^ (n + 1) • ⊤`,
+generates `I ^ n • ⊤` already computes the evaluation kernel at `n`. In particular, it suffices
+that `H` generates `I ^ n` modulo `I ^ (n + 1)` as ideals.
+Applying this to auxiliary powers gives cofinally many stages;
 lifting a higher coordinate to the original module then descends the equality to any lower stage.
 Neither the original module nor its first quotient nor its completion is assumed finite.
 
@@ -52,10 +54,10 @@ The ring and the two original modules may lie in independent universes.
 
 Bingyu Xia's `AdicCompletion.pow_smul_top_eq_ker_eval` in Mathlib's
 `RingTheory/AdicCompletion/Completeness.lean` assumes `I.FG`. The proof here adapts its
-finite-linear-combination argument to a finitely generated coefficient ideal generating
-`I ^ n` modulo `I ^ (n + 1)`. The original coefficient map need only be surjective after the first
-reduction of `I ^ n • ⊤`; Mathlib's first-reduction surjectivity theorem and finite direct-sum
-comparison then compute its completed range. The single-power finite-generation theorem
+finite-linear-combination argument to a finitely generated coefficient ideal whose action generates
+`I ^ n • ⊤` modulo `I ^ (n + 1) • ⊤`. The original coefficient map need only be surjective after
+the first reduction of `I ^ n • ⊤`; Mathlib's first-reduction surjectivity theorem and finite
+direct-sum comparison then compute its completed range. The single-power finite-generation theorem
 is a specialization of this argument.
 
 The cotangent argument uses Mathlib's ideal cotangent formalization by Andrew Yang and the
@@ -161,14 +163,18 @@ private theorem span_smul_top_eq_ker_eval_of_mkQ_comp_surjective
     _ = (ofPowSMul I M n).range.restrictScalars R := by rw [hcompleted]
     _ = (eval I M n).ker := restrictScalars_range_ofPowSMul_eq_ker_eval I
 
-/-- A finitely generated ideal generating an original power modulo the next power computes its
-completed evaluation kernel. -/
-theorem smul_top_eq_ker_eval_of_fg_sup_pow
+/-- A finitely generated coefficient ideal whose action generates an original power submodule
+modulo the next power submodule computes the completed evaluation kernel. -/
+theorem smul_top_eq_ker_eval_of_fg_sup_pow_smul
     (I H : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
-    (n : ℕ) (hH : H.FG) (hpow : H ⊔ I ^ (n + 1) = I ^ n) :
-    H • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
+    (n : ℕ) (hH : H.FG)
+    (hpow : (H • (⊤ : Submodule R M)) ⊔
+      (I ^ (n + 1) • (⊤ : Submodule R M)) = I ^ n • (⊤ : Submodule R M)) :
+    H • (⊤ : Submodule R (AdicCompletion I M)) =
+      (AdicCompletion.eval I M n).ker := by
   classical
-  have hHI : H ≤ I ^ n := le_sup_left.trans hpow.le
+  have hModuleSup : H • (⊤ : Submodule R M) ≤ I ^ n • ⊤ :=
+    le_sup_left.trans hpow.le
   obtain ⟨k, a, ha⟩ := Submodule.fg_iff_exists_fin_generating_family.mp hH
   rw [Ideal.submodule_span_eq] at ha
   let N : Submodule R M := I ^ n • ⊤
@@ -179,8 +185,7 @@ theorem smul_top_eq_ker_eval_of_fg_sup_pow
     rw [range_lsum_smul, LinearMap.range_id, ← span_smul_eq, ha]
   have hf : ∀ x, f₀ x ∈ N := by
     intro x
-    exact (Submodule.smul_mono_left hHI)
-      (hfRange ▸ LinearMap.mem_range_self f₀ x)
+    exact hModuleSup (hfRange ▸ LinearMap.mem_range_self f₀ x)
   let f : (Fin k →₀ M) →ₗ[R] N := f₀.codRestrict N hf
   have hfactor : N.subtype.comp f = f₀ :=
     LinearMap.subtype_comp_codRestrict _ _ _
@@ -195,7 +200,7 @@ theorem smul_top_eq_ker_eval_of_fg_sup_pow
     apply Submodule.map_injective_of_injective N.injective_subtype
     rw [Submodule.map_sup, hsmul, hfr, Submodule.map_subtype_top]
     change I ^ (n + 1) • (⊤ : Submodule R M) ⊔ H • ⊤ = I ^ n • ⊤
-    rw [sup_comm, ← Submodule.sup_smul, hpow]
+    rw [sup_comm, hpow]
   have hmodI : Function.Surjective ((I • (⊤ : Submodule R N)).mkQ.comp f) := by
     apply LinearMap.range_eq_top.mp
     rw [LinearMap.range_comp, Submodule.map_mkQ_eq_top]
@@ -203,6 +208,16 @@ theorem smul_top_eq_ker_eval_of_fg_sup_pow
   have heq := span_smul_top_eq_ker_eval_of_mkQ_comp_surjective
     (I := I) (M := M) (n := n) a f hfactor hmodI
   simpa only [ha] using heq
+
+/-- A finitely generated ideal generating an original power modulo the next power computes its
+completed evaluation kernel. -/
+theorem smul_top_eq_ker_eval_of_fg_sup_pow
+    (I H : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (n : ℕ) (hH : H.FG) (hpow : H ⊔ I ^ (n + 1) = I ^ n) :
+    H • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
+  apply smul_top_eq_ker_eval_of_fg_sup_pow_smul I H M n hH
+  simpa only [Submodule.sup_smul] using
+    congrArg (fun J : Ideal R => J • (⊤ : Submodule R M)) hpow
 
 /-- If `I ^ n` is finitely generated, its scalar multiple of the whole completed module is
 exactly the kernel of evaluation at `n`. This replaces the hypothesis `I.FG` in Mathlib's

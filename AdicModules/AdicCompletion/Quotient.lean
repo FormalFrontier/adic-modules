@@ -10,6 +10,7 @@ public import Mathlib.RingTheory.Ideal.Quotient.Operations
 public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.RestrictScalars
 public import Mathlib.Algebra.Module.Projective
+public import Mathlib.Algebra.Module.FinitePresentation
 public import Mathlib.RingTheory.Flat.Basic
 
 import Mathlib.Algebra.Algebra.RestrictScalars
@@ -51,11 +52,12 @@ maps and compatible with precision transitions. Degree zero, trivial rings and
 independent ring and module universes are included, without finiteness, separation
 or completeness assumptions on the original module.
 
-For an arbitrary ideal, flatness or projectivity of the raw completion over its
-completed coefficient ring descends to every original ideal-power quotient over
-its coefficient quotient. The original quotient is a retract of scalar extension
-of the completed module along evaluation. Only this one-sided retraction is used;
-no identification of evaluation kernels with extended ideal powers is required.
+For an arbitrary ideal, flatness, projectivity or finite presentation of the raw
+completion over its completed coefficient ring descends to every original ideal-power
+quotient over its coefficient quotient, including degree zero. The original quotient
+is a retract of scalar extension of the completed module along evaluation. Only this
+one-sided retraction is used; no identification of evaluation kernels with extended
+ideal powers is required.
 
 ## References
 
@@ -81,7 +83,9 @@ The descent statements use
 Christian Merten's flat base-change and retract results in Mathlib, Kevin Buzzard
 and Antoine Labelle's projective tensor and splitting results, and the quotient–tensor
 equivalence of Antoine Chambert-Loir and Jujian Zhang. Scalar extension of maps uses
-Mathlib's `LinearMap.liftBaseChange`.
+Mathlib's `LinearMap.liftBaseChange`. Finite-presentation descent uses Andrew Yang's
+base-change and surjective-image results in `Algebra/Module/FinitePresentation.lean`,
+together with Mathlib's split kernel/range identity and finite-range theorem.
 -/
 
 @[expose] public section
@@ -824,14 +828,16 @@ theorem quotientPowSemilinearEquivOfFiniteCotangent_existsUnique
   rw [quotientPowSemilinearEquivOfFiniteCotangent_symm_mk]
   exact (hg' m).trans (hg m).symm
 
-/-- The original quotient is a retract of base change along evaluation; both
-flatness and projectivity therefore descend. The scalar dictionaries stay local. -/
+/-- The original quotient is a retract of base change along evaluation; flatness,
+projectivity and finite presentation descend. The scalar dictionaries stay local. -/
 private theorem quotient_flat_projective_retract (I : Ideal R)
     (M : Type v) [AddCommGroup M] [Module R M] (n : ℕ) :
     (Module.Flat (AdicCompletion I R) (AdicCompletion I M) →
       Module.Flat (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) ∧
     (Module.Projective (AdicCompletion I R) (AdicCompletion I M) →
-      Module.Projective (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) := by
+      Module.Projective (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) ∧
+    (Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) →
+      Module.FinitePresentation (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))) := by
   let S := AdicCompletion I R
   let H := AdicCompletion I M
   let A := R ⧸ I ^ n
@@ -867,7 +873,7 @@ private theorem quotient_flat_projective_retract (I : Ideal R)
     change e.liftBaseChange A ((1 : A) ⊗ₜ[S] of I M m) = _
     rw [LinearMap.liftBaseChange_one_tmul]
     exact eval_of I M n m
-  constructor
+  refine ⟨?_, ?_, ?_⟩
   · intro h
     let : Module.Flat S H := h
     let : Module.Flat A T := Module.Flat.baseChange S A H
@@ -876,6 +882,14 @@ private theorem quotient_flat_projective_retract (I : Ideal R)
     let : Module.Projective S H := h
     let : Module.Projective A T := inferInstance
     exact Module.Projective.of_split α β hsplit
+  · intro h
+    let : Module.FinitePresentation S H := h
+    let : Module.FinitePresentation A T := inferInstance
+    apply Module.finitePresentation_of_surjective β
+    · intro q
+      exact ⟨α q, LinearMap.congr_fun hsplit q⟩
+    · rw [LinearMap.ker_eq_range_of_comp_eq_id hsplit]
+      exact Submodule.fg_range _
 
 /-- Flatness of the raw completion over its completed coefficient ring implies
 flatness of every original ideal-power quotient over its coefficient quotient. -/
@@ -895,6 +909,19 @@ theorem moduleProjective_quotient_of_projective_completion
     [Module.Projective (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
     Module.Projective (R ⧸ I ^ n)
       (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
-  (quotient_flat_projective_retract I M n).2 inferInstance
+  (quotient_flat_projective_retract I M n).2.1 inferInstance
+
+/-- Finite presentation of the raw completion over its canonical completed ring descends
+to every original ideal-power quotient, including degree zero, for an arbitrary ideal.
+No finite generation of any ideal power, or finiteness or completeness of the original
+module, is required. -/
+theorem moduleFinitePresentation_quotient_of_finitePresentation_completion
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M)]
+    (n : ℕ) :
+    Module.FinitePresentation (R ⧸ I ^ n)
+      (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
+  (quotient_flat_projective_retract I M n).2.2 inferInstance
 
 end AdicCompletion

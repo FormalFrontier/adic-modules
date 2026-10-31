@@ -6,13 +6,32 @@ module
 
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.TensorProduct
+public import AdicModules.AdicCompletion.Quotient
 public import Mathlib.Algebra.Module.FinitePresentation
 
+import Mathlib.LinearAlgebra.TensorProduct.Quotient
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.Filtration
+import Mathlib.RingTheory.Flat.EquationalCriterion
 
 /-!
 # Finite presentation and adic completion
+
+If the raw completion of an original module is flat over its canonical completed ring,
+its finite presentation is equivalent to finite presentation of any chosen positive
+original quotient `M / Iⁿ M` over `R / Iⁿ`. The ideal is arbitrary. The ascent uses ordinary
+coefficient base change to the first original quotient, the residual projectivity
+criterion and completed finiteness; it does not identify an original quotient with a
+quotient of the completion or require a global completion–tensor equivalence.
+
+For any ideal `I`, if the original first quotient `M / I M` is finitely presented
+over `R / I`, the raw completion is projective over its canonical completed ring
+if and only if every positive original quotient `M / Iⁿ M` is flat over `R / Iⁿ`.
+The forward implication needs no finite-presentation hypothesis. Finite presentation
+of the completion supplies the residual hypothesis by the quotient descent theorem,
+so the same criterion applies under completed finite presentation. No Noetherianity,
+finite generation of an ideal power, or finiteness, flatness, completeness, separation
+or completed-ring action on the original module is assumed.
 
 For any ideal `I` of a commutative ring `R`, a module `M` with finite original first quotient
 `M / I M` has finitely presented raw completion over the canonical completed ring whenever
@@ -60,6 +79,13 @@ are reused from Mathlib. The Noetherian bridge uses Mathlib's Artin–Rees lemma
 `Ideal.exists_pow_inf_eq_pow_smul` and `Module.finitePresentation_of_finite`.
 The completed-module finite-presentation theorem uses Andrew Yang's formalization
 `Module.finitePresentation_of_projective` in `Mathlib.Algebra.Module.FinitePresentation`.
+The residual finite-presentation criterion combines this library's quotient-projectivity
+descent and flat-quotient completion theorem with Mathlib's projective-implies-flat
+instance and flat finitely presented projectivity theorem in
+`Mathlib.RingTheory.Flat.EquationalCriterion`. Finite-presentation ascent also uses
+Mathlib's quotient–tensor equivalence, formalized by Antoine Chambert-Loir and Jujian Zhang
+in `Mathlib.LinearAlgebra.TensorProduct.Quotient`, together with scalar extension and
+cancellation of iterated base change in `Mathlib.LinearAlgebra.TensorProduct.Tower`.
 -/
 
 @[expose] public section
@@ -71,6 +97,81 @@ universe uR uM
 open TensorProduct
 
 namespace AdicCompletion
+
+/-- With finitely presented original first quotient over `R ⧸ I`, the raw completion
+is projective over its canonical completed ring exactly when all positive original
+ideal-power quotients are flat over their coefficient quotients. The ideal is arbitrary;
+no finiteness or completeness assumption on the original module is required. -/
+theorem moduleProjective_iff_flat_pow_quotients
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.FinitePresentation (R ⧸ I)
+      (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) ↔
+      ∀ n : ℕ, 0 < n → Module.Flat (R ⧸ I ^ n)
+        (M ⧸ (I ^ n • (⊤ : Submodule R M))) := by
+  constructor
+  · intro h n _
+    let : Module.Projective (AdicCompletion I R) (AdicCompletion I M) := h
+    let := moduleProjective_quotient_of_projective_completion I M n
+    infer_instance
+  · intro hflat
+    -- Transport the whole quotient-module proposition, including its scalar dictionary.
+    let : Module.Flat (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (congrArg (fun J : Ideal R =>
+        Module.Flat (R ⧸ J) (M ⧸ (J • (⊤ : Submodule R M))))
+        (pow_one I)).mp (hflat 1 Nat.one_pos)
+    let : Module.Projective (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+      Module.Flat.projective_of_finitePresentation
+    exact moduleProjective_of_flat_pow_quotients I M hflat
+
+/-- For a raw completion flat over its canonical completed ring, finite presentation is
+detected by any chosen positive original ideal-power quotient over its coefficient quotient.
+The ideal is arbitrary; no finiteness, flatness, separation or completeness assumption on
+the original module, or finite generation of an ideal power, is required. -/
+theorem moduleFinitePresentation_iff_finitePresentation_quotient_of_flat
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Flat (AdicCompletion I R) (AdicCompletion I M)]
+    (n : ℕ) (hn : 0 < n) :
+    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) ↔
+      Module.FinitePresentation (R ⧸ I ^ n)
+        (M ⧸ (I ^ n • (⊤ : Submodule R M))) := by
+  constructor
+  · intro hfp
+    let : Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) := hfp
+    exact moduleFinitePresentation_quotient_of_finitePresentation_completion I M n
+  · intro hfp
+    let A := R ⧸ I ^ n
+    let B := R ⧸ I
+    let Q := M ⧸ (I ^ n • (⊤ : Submodule R M))
+    let : Module.FinitePresentation A Q := hfp
+    have hpow : I ^ n ≤ I := Ideal.pow_le_self (Nat.ne_of_gt hn)
+    let : Algebra A B := (Ideal.Quotient.factorₐ R hpow).toRingHom.toAlgebra
+    let : IsScalarTower R A B := IsScalarTower.of_algHom (Ideal.Quotient.factorₐ R hpow)
+    let : IsScalarTower R A Q :=
+      (Module.isTorsionBySet_quotient_ideal_smul M (I ^ n)).isScalarTower
+    let : IsScalarTower R B (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (Module.isTorsionBySet_quotient_ideal_smul M I).isScalarTower
+    let e : (A ⊗[R] M) ≃ₗ[A] Q :=
+      (quotTensorEquivQuotSMul M (I ^ n)).extendScalarsOfSurjective
+        (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R A))
+    let e₁ : (B ⊗[R] M) ≃ₗ[B] (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (quotTensorEquivQuotSMul M I).extendScalarsOfSurjective
+        (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R B))
+    -- These tensors involve only the original module and its original quotient coefficients.
+    let c : (B ⊗[A] Q) ≃ₗ[B] (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (e.symm.baseChange A B _ _).trans
+        ((AlgebraTensorModule.cancelBaseChange R A B B M).trans e₁)
+    let : Module.FinitePresentation B (B ⊗[A] Q) := inferInstance
+    let : Module.FinitePresentation B (M ⧸ (I • (⊤ : Submodule R M))) :=
+      Module.FinitePresentation.of_equiv c
+    let : Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
+      (moduleProjective_iff_flat_pow_quotients I M).mpr
+        (fun k _ => moduleFlat_quotient_of_flat_completion I M k)
+    let : Module.Finite (AdicCompletion I R) (AdicCompletion I M) :=
+      (moduleFinite_iff_finite_quotient I M).mpr inferInstance
+    exact Module.finitePresentation_of_projective (AdicCompletion I R) (AdicCompletion I M)
 
 /-- If the original first quotient is finite and the completed scalar extension is
 projective, the raw completion is finitely presented over the completed ring, for any ideal.

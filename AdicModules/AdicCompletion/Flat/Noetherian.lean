@@ -5,12 +5,16 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.RingTheory.Flat.EquationalCriterion
-public import Mathlib.RingTheory.AdicCompletion.Basic
+public import Mathlib.RingTheory.AdicCompletion.Algebra
 public import Mathlib.Algebra.Module.Torsion.Basic
 import Mathlib.RingTheory.Filtration
 import Mathlib.LinearAlgebra.TensorProduct.Pi
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import AdicModules.AdicCompletion.Pi
+import AdicModules.AdicCompletion.Cotangent
+import AdicModules.AdicCompletion.Quotient
+import AdicModules.LinearAlgebra.Quotient.Flat
+import CoherentModules.RingTheory.Flat.Equiv
 
 /-!
 # Flatness of complete modules over a Noetherian ring
@@ -24,6 +28,12 @@ the quotients gives uniform approximate-kernel estimates. Successive corrections
 then prove that finite coefficient-matrix images are closed, and finite generation
 of coefficient kernels gives the equational criterion for flatness.
 
+As an application, if `AdicCompletion I R` is Noetherian, then the raw completion
+of an arbitrary original `R`-module `M` is flat over it exactly when every positive
+original quotient `M / IⁿM` is flat over `R / Iⁿ`. In particular, the raw completion
+of a flat original module is flat. No Noetherianity or completeness of `R`, finite
+generation of `I` or `M`, or completed-ring action on original `M` is assumed.
+
 ## References
 
 The standard mathematical ingredients are Artin–Rees and the equational criterion
@@ -32,6 +42,10 @@ Artin–Rees, the flatness API of Johan Commelin, Jujian Zhang and Yongle Hu, an
 Mitchell Lee and Junyan Xu's equational criterion. Finite-product tensor
 coordinates and adic completeness use the formalizations of Judith Ludwig and
 Christian Merten and the existing ideal-action and product-completeness APIs.
+The raw-completion application combines this criterion with this library's
+finite-cotangent completeness and quotient comparisons, and the action-preserving
+semilinear flatness transport in `CoherentModules.RingTheory.Flat.Equiv`, by
+Formal Frontier Agents.
 -/
 
 @[expose] public section
@@ -471,3 +485,46 @@ theorem Module.Flat.of_isAdicComplete
     have hz := congrFun (show f (g (Pi.single j 1)) = 0 from hcol) (0 : Fin 1)
     simpa only [f, LinearMap.pi_apply, Fintype.linearCombination_apply,
       smul_eq_mul, mul_comm, Pi.zero_apply] using hz
+
+universe uR uM
+
+namespace AdicCompletion
+
+/-- Over a Noetherian completed coefficient ring, the raw completion is flat
+if and only if every positive original ideal-power quotient is flat over its
+corresponding coefficient quotient. -/
+theorem moduleFlat_iff_flat_quotient
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing (AdicCompletion I R)] :
+    Module.Flat (AdicCompletion I R) (AdicCompletion I M) ↔
+      ∀ n : ℕ, 0 < n → Module.Flat (R ⧸ I ^ n)
+        (M ⧸ (I ^ n • (⊤ : Submodule R M))) := by
+  constructor
+  · intro hflat n _
+    let : Module.Flat (AdicCompletion I R) (AdicCompletion I M) := hflat
+    exact moduleFlat_quotient_of_flat_completion I M n
+  · intro hflat
+    let : Module.Finite (R ⧸ I) I.Cotangent := finite_cotangent_of_isNoetherianRing I
+    let : IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
+        (AdicCompletion I M) := isAdicComplete_map_of_finite_cotangent I M
+    apply Module.Flat.of_isAdicComplete
+      (I.map (algebraMap R (AdicCompletion I R))) (AdicCompletion I M)
+    intro n hn
+    let : Module.Flat (R ⧸ I ^ n)
+        (M ⧸ (I ^ n • (⊤ : Submodule R M))) := hflat n hn
+    exact Module.Flat.of_semilinearEquiv
+      (quotientPowAlgEquivOfFiniteCotangent I n).toRingEquiv
+      (quotientPowSemilinearEquivOfFiniteCotangent I M n)
+
+/-- The raw completion of a flat original module is flat over its completed
+coefficient ring when that completed coefficient ring is Noetherian. -/
+theorem moduleFlat_of_flat
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing (AdicCompletion I R)] [Module.Flat R M] :
+    Module.Flat (AdicCompletion I R) (AdicCompletion I M) :=
+  (moduleFlat_iff_flat_quotient I M).mpr
+    (fun n _ ↦ Module.Flat.quotient_smul_top M (I ^ n))
+
+end AdicCompletion

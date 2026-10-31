@@ -7,7 +7,11 @@ module
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 
 /-!
-# Canonical ideal quotients and additive squares
+# Canonical ideal quotients, nilpotent actions and additive squares
+
+A submodule contained in its ideal multiple vanishes if a fixed power of the
+ideal annihilates it. The ideal itself need not be nilpotent, and no finite
+generation hypothesis is needed.
 
 The kernel of a nested quotient factor is the image ideal times the whole
 quotient module, using its quotient-ring action. An additive commutative square
@@ -24,11 +28,36 @@ These results use Mathlib's quotient and kernel APIs by Johannes Hölzl,
 Mario Carneiro, Kevin Buzzard and Yury Kudryashov; its quotient-ring module
 action by Pierre-Alexandre Bazin; its ideal-image and scalar-restriction APIs;
 and Judith Ludwig and Christian Merten's `LinearMap.reduceModIdeal`.
+The action-nilpotent vanishing criterion uses the standard elementary iteration
+of ideal multiplication, without a finite-generation form of Nakayama's lemma.
 -/
 
 @[expose] public section
 
-universe uR uM uA uX uY uX₀ uY₀
+universe u v uR uM uA uX uY uX₀ uY₀
+
+namespace Submodule
+
+/-- A submodule contained in its ideal multiple is zero if some fixed power of
+the ideal annihilates the submodule. No finite generation or nilpotence of the
+ideal itself is required. The exponent may be zero. -/
+theorem eq_bot_of_le_smul_of_pow_smul_eq_bot
+    {S : Type u} [CommSemiring S]
+    {V : Type v} [AddCommMonoid V] [Module S V]
+    (q : Ideal S) (n : ℕ) (P : Submodule S V)
+    (hkill : (q ^ n) • P = ⊥) (hP : P ≤ q • P) : P = ⊥ := by
+  have hpow (k : ℕ) : P ≤ q ^ k • P := by
+    induction k with
+    | zero => simpa only [pow_zero, one_smul] using (le_refl P)
+    | succ k ih =>
+      calc
+        P ≤ q • P := hP
+        _ ≤ q • (q ^ k • P) := smul_mono_right q ih
+        _ = q ^ (k + 1) • P := by rw [pow_succ', Submodule.mul_smul]
+  refine le_antisymm ?_ bot_le
+  simpa only [hkill] using hpow n
+
+end Submodule
 
 /-- The kernel of a nested quotient factor is the image ideal times the whole
 module, with the canonical quotient-ring scalar action. -/

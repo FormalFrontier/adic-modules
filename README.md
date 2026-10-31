@@ -49,6 +49,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   See the [cotangent criterion](AdicModules/AdicCompletion/Cotangent.lean) and
   [quotient comparisons](AdicModules/AdicCompletion/Quotient.lean).
 
+- **Stationary adic evaluation.** For every ideal `I` of a commutative ring `R`,
+  every `R`-module `M` and every `n ≥ 0`, evaluation on the whole completion at `n`
+  is injective exactly when `I^(n+1) M = I^n M`. Under this equality,
+  `linearEquivQuotientOfPowSMulTopEq` identifies `AdicCompletion I M` with the
+  original quotient `M / I^n M`; its inverse sends the residue of `m` to `of(m)`.
+  Equality of the ideal powers `I^(n+1) = I^n` gives
+  `algEquivQuotientOfPowEq : AdicCompletion I R ≃ₐ[R] R / I^n`.
+  No finite generation, Noetherianity, original completeness or separation is required.
+  See [stationary evaluation](AdicModules/AdicCompletion/Stationary.lean).
+
 - **Adic separation of quotients.** For any ideal `I` and submodule `N` of an
   `R`-module over a commutative ring, `M / N` is `I`-Hausdorff exactly when
   `⨅ n, N ⊔ I ^ n • ⊤ = N`. Membership is detected by congruence to `N` at
@@ -95,6 +105,20 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   finiteness assumptions. These results need no finite generation of `I`,
   Noetherianity, complete base or original finiteness, flatness, projectivity,
   separation or completed-ring action on `M`.
+
+- **Finite presentation detected at any positive precision.** For any ideal `I`,
+  suppose the raw completion `AdicCompletion I M` is flat over its canonical
+  completed ring `AdicCompletion I R`. It is finitely presented exactly when
+  any chosen positive original quotient `M / Iⁿ M` is finitely presented over
+  `R / Iⁿ`. Finite presentation at one positive precision therefore propagates
+  to every original quotient and makes the completion finite projective.
+  Descent alone also holds at `n = 0`, without completed flatness. The residual
+  projectivity criterion remains available assuming only finite presentation
+  of `M / I M` and flatness of all positive original quotients. These results
+  require no Noetherianity, finite generation of any ideal power, or finiteness,
+  flatness, completeness, separation or completed-ring action on original `M`.
+  See [quotient descent](AdicModules/AdicCompletion/Quotient.lean) and the
+  [finite-presentation criteria](AdicModules/AdicCompletion/FinitePresentation.lean).
 
 - **Projective completed scalar extension.** For every ideal `I`, put
   `S = AdicCompletion I R` and `T = S ⊗[R] M`, with the first-factor `S`-action.
@@ -170,6 +194,16 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   `N / KⁿN` is flat over `A / Kⁿ`. The ring need not be complete, and neither
   `N` nor its first quotient need be finite. See
   [`Module.Flat.of_isAdicComplete`](AdicModules/AdicCompletion/Flat/Noetherian.lean).
+
+- **Flat raw completion over a Noetherian completed ring.** For any ideal `I`
+  of a commutative ring `R`, suppose `S = AdicCompletion I R` is Noetherian.
+  Then the raw completion of any original `R`-module `M` is flat over `S`
+  exactly when every positive original quotient `M / IⁿM` is flat over `R / Iⁿ`.
+  In particular, the raw completion of a flat original module is flat over `S`.
+  No Noetherianity or completeness of `R`, finite generation of `I` or `M`,
+  finiteness of the first quotient, or completed-ring action on original `M`
+  is assumed. See
+  [`AdicCompletion.moduleFlat_iff_flat_quotient` and `moduleFlat_of_flat`](AdicModules/AdicCompletion/Flat/Noetherian.lean).
 
 - **Completion with a flat last module.** For any ideal `I` of a commutative
   ring `R`, an exact pair `M → N → P` with surjective second map remains
@@ -888,12 +922,13 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
-| [AdicCompletion.Flat.Noetherian](AdicModules/AdicCompletion/Flat/Noetherian.lean) (flat intrinsic quotients imply flatness of an arbitrary complete module over a Noetherian ring) | — |
+| [AdicCompletion.Flat.Noetherian](AdicModules/AdicCompletion/Flat/Noetherian.lean) (intrinsic complete-module flatness and raw-completion flatness over a Noetherian completed ring) | — |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels, finite-power and finite-cotangent evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) (finite-cotangent semilinear quotients, independent finite-power comparisons and extension from original residues) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [AdicCompletion.Stationary](AdicModules/AdicCompletion/Stationary.lean) (stationary-evaluation criterion and whole-completion equivalences with original power quotients) | — |
 | [AdicCompletion.Surjectivity](AdicModules/AdicCompletion/Surjectivity.lean) (surjectivity and original splittings with finite original cokernel) | — |
 | [AdicCompletion.Idempotents](AdicModules/AdicCompletion/Idempotents.lean) (first-evaluation order isomorphism on idempotents and preconnected-spectrum transfer for arbitrary ideals) | — |
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
@@ -973,7 +1008,9 @@ Reuses [Lean](https://lean-lang.org/), [Mathlib](https://github.com/leanprover-c
 and the scalar-torsion and total-boundedness interfaces from
 [Group Theory](https://github.com/FormalFrontier/group-theory), plus the first-order
 Taylor remainder theorem from
-[Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials).
+[Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials)
+and the semilinear flatness transport from
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules).
 The completed coordinate-idempotent construction follows the stock `single`/`map`
 transport pattern also used in
 [Finite Étale Algebras](https://github.com/FormalFrontier/finite-etale-algebras/blob/edb115c15526bebde84c275b8a13fa25e9124177/FiniteEtaleAlgebras/PurelyInseparableDescent.lean#L87-L93).

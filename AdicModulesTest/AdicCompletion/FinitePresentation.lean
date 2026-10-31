@@ -16,7 +16,13 @@ import AdicModules.AdicCompletion.Cotangent
 import AdicModules.Noetherian
 
 /-!
-# Completion and tensor products for the integer residue module
+# Finite-presentation detection and completion–tensor comparison
+
+Finite presentation of a raw completion descends to its original first quotient.
+Combining this with the residual-FP criterion gives projectivity of that completion
+from flatness of all positive original quotients, for every ideal. If the completion
+is flat over its completed ring, finite presentation at one positive original precision
+propagates to every original quotient.
 
 The integer residue module `ZMod 2` over `ℤ` is finitely presented but not projective.
 Its completion at `(2)` has a nonzero canonical element. The sequence
@@ -48,6 +54,36 @@ and Mathlib's finite-presentation and Artin–Rees inputs.
 set_option warningAsError true
 
 open scoped TensorProduct
+
+universe uR uM
+
+-- The completed-FP criterion is a consumer of descent, not a stronger library wrapper.
+example {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M)]
+    (hflat : ∀ n : ℕ, 0 < n → Module.Flat (R ⧸ I ^ n)
+      (M ⧸ (I ^ n • (⊤ : Submodule R M)))) :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  let : Module.FinitePresentation (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    (congrArg (fun J : Ideal R =>
+      Module.FinitePresentation (R ⧸ J) (M ⧸ (J • (⊤ : Submodule R M))))
+      (pow_one I)).mp
+      (AdicCompletion.moduleFinitePresentation_quotient_of_finitePresentation_completion I M 1)
+  exact (AdicCompletion.moduleProjective_iff_flat_pow_quotients I M).mpr hflat
+
+-- One positive precision suffices to obtain finite presentation at every precision.
+example {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Flat (AdicCompletion I R) (AdicCompletion I M)]
+    (n : ℕ) (hn : 0 < n)
+    [Module.FinitePresentation (R ⧸ I ^ n)
+      (M ⧸ (I ^ n • (⊤ : Submodule R M)))] (k : ℕ) :
+    Module.FinitePresentation (R ⧸ I ^ k)
+      (M ⧸ (I ^ k • (⊤ : Submodule R M))) := by
+  let : Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) :=
+    (AdicCompletion.moduleFinitePresentation_iff_finitePresentation_quotient_of_flat
+      I M n hn).mpr inferInstance
+  exact AdicCompletion.moduleFinitePresentation_quotient_of_finitePresentation_completion I M k
 
 namespace IntegerResidue
 

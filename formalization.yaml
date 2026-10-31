@@ -4,30 +4,11 @@ version: "v0.4"
 project:
   name: "adic-modules"
   description: >-
-    Bounded ideal-power torsion, primary-component exactness, abstract adic
-    completions, restriction of scalars for Mathlib adic completions, integer
-    singleton spans in unital rings, kernel pullbacks of submodule images under
-    semilinear maps to additive monoids, submodule closure from neighborhood bases,
-    p-adic ideal-power bases and proper dense integer spans with top neighborhood
-    suprema, valuation-ring principal-adic completions, completed valuation
-    integers, localization, residue fields and composite valuation subrings in
-    Lean. Also includes comaximal powers of arbitrary semiring left ideals with
-    a written subtraction-free proof, a left-ideal density criterion with a
-    written direct additive proof for supplied ring powers topologies, and a
-    dense-subsemiring span-closure comparison with generatorwise coefficient
-    continuity. Finite Chinese remainders for fully two-sided ideal families in
-    possibly noncommutative rings give canonical ring and common-base linear
-    equivalences, inverse representative cosets, independent powers and
-    precision-reduction compatibility. Left-ideal and real, discrete,
-    p-adic and degenerate-boundary model source files retain original independent
-    calculations, alongside additional private integer-density, natural-matrix
-    comaximal-powers and real rational-axis applications. Coprime monic Hensel
-    factor lifting over adically complete commutative rings and irreducible
-    reduction from a global monic factor-lifting property, with an adically
-    complete corollary, are also included. Henselian pairs are preserved by
-    nonempty directed ring direct limits with compatible ideals; a canonical
-    stage element belongs to the supremum of image ideals exactly when its
-    image belongs to an ideal at some later stage.
+    Lean theory of ideal-power torsion and adic module and ring completions,
+    with quotient, tensor, finiteness and flatness interfaces. Also covers
+    Henselian pairs and polynomial lifting, valuation-ring completions and
+    localization, submodule closure and p-adic density, comaximal ideal powers
+    and finite Chinese remainders.
   authors:
     - "Formal Frontier Agents"
   responsible_maintainers:
@@ -120,55 +101,29 @@ related_formalizations:
     note: >-
       Strong finite-system Hensel lifting uses
       MvPolynomial.eval₂_sub_eval₂_sub_sum_pderiv_mem_sq from the released
-      MultivariatePolynomials.Taylor interface. Its resolved dependency
-      graph also includes coherent-modules and algebraic-direct-limits;
-      these are transitive package dependencies, not additional directly
-      imported proof sources here. Exact public releases are pinned in
-      lake-manifest.json.
+      MultivariatePolynomials.Taylor interface. The resolved package graph
+      also includes algebraic-direct-limits as a transitive package dependency,
+      not a directly imported proof source here. Exact public releases are
+      pinned in lake-manifest.json.
+  - id: "https://github.com/FormalFrontier/coherent-modules"
+    relationship: "builds-on"
+    note: >-
+      The raw-completion flatness criterion over a Noetherian completed
+      coefficient ring uses the released CoherentModules.RingTheory.Flat.Equiv
+      interface for semilinear flatness transport, retaining the canonical
+      quotient actions. Coherent Modules is also reached through Multivariate
+      Polynomials; an explicit root pin selects the shared public release
+      recorded in lake-manifest.json.
   - id: "https://github.com/leanprover-community/mathlib4"
     relationship: "builds-on"
     note: >-
       Mathematical infrastructure at revision
       83abb3e776bdefcbc447a1e44d0debe4010039e5 with Lean v4.34.0-rc2 and
-      the complete pinned Lake dependency graph. The submodule-closure formula
-      reuses Filter.HasBasis.iInter_add_right_eq_closure, canonical submodule
-      carriers and PLift basis reindexing for Sort-valued indices. The cyclic-ring
-      integer-span results reuse cyclic additive endomorphisms and right
-      multiplication evaluated at one, with the canonical integer action and
-      singleton-span interfaces. The comaximal-powers theorem reuses Mathlib's
-      semiring left-ideal membership and power APIs, authored by Kenny Lau,
-      and follows Neil Strickland's geometric-sum proof idea through a recurrence
-      without subtraction or a commutation premise. Mathlib's sup_pow_eq_top and
-      sup_pow_eq_top' have additional two-sidedness assumptions on the unpowered
-      and powered ideals, respectively; two private lemmas recover these
-      conclusions from the public theorem. The left-ideal density proof uses
-      nhds_of_zero to translate the supplied ideal-power basis and
-      mem_closure_iff_nhds_basis to test closure, together with the comaximal-powers
-      theorem, without restriction to integer scalars. P-adic bases reuse the
-      geometric closed-ball basis and norm/ideal carrier identity; density transports integer casts
-      through unit multiplication, and properness uses the existing p-adic inverse
-      and faithful integer casts. Top suprema with restricted ideal neighborhoods
-      consume the generic submodule-closure formula, the dense-closure
-      characterization and complete-lattice APIs. The dense-subsemiring comparison
-      uses canonical Subsemiring.module and Subsemiring.smul_def restriction,
-      AddSubmonoid.topologicalClosure for additive closure under separately
-      continuous addition, Continuous.range_subset_closure_image_dense at the
-      selected generators and Submodule.span_induction with the strengthened
-      assertion that every scalar multiple lies in that closure.
-      Submodule.span_subset_span supplies the reverse inclusion. The original
-      real and discrete-module calculations, independent of the comparison, reuse
-      singleton-span eliminators, rational cast density, continuous-image closure,
-      coordinate and product continuity, irrational sqrt two and the closed
-      integer image in the real line. The real model also includes an additional
-      private application of Submodule.closure_span_eq_of_dense_subsemiring to
-      the rational axis.
-      P-adic singleton models apply closure_image_closure, DenseRange.closure_range,
-      span_singleton_eq_range and Int.cast_smul_eq_zsmul directly on the canonical
-      self-module, with norm/ideal closedness and existing neighborhood bases.
-      Empty, zero and subsingleton calculations use stock span and closure APIs;
-      indiscrete rational self-module controls use stock indiscrete topology.
-      The independent discrete rational module uses ULift.module' and its
-      canonical algebraic transport, retaining the separate scalar topology.
+      the complete pinned Lake dependency graph. Reuses Mathlib's module,
+      ideal, completion, valuation and topology APIs. The comaximal-powers
+      argument follows Neil Strickland's geometric-sum idea using Kenny Lau's
+      left-ideal interfaces. Result-specific formalization approaches and
+      contributor credit are detailed in docs/CREDITS.md.
 
 automation:
   methods:
@@ -182,187 +137,46 @@ automation:
 
 status:
   scope: >-
-    For a commutative semiring R with IsBezout R, an arbitrary ideal I,
-    every n : ℕ and x : R, Ideal.mem_pow_iff_exists_pow_dvd gives
-    x ∈ I ^ n iff there is t ∈ I with t ^ n dividing x. IsBezout means that
-    every finitely generated ideal is principal; I itself need not be finitely
-    generated. The criterion includes n = 0 and x = 0, with no ring or domain
-    assumption. Without IsBezout, the same criterion holds when every pair of
-    elements of I has a common divisor in I. Ideal powers also commute with
-    nonempty inclusion-directed suprema of ideals in a commutative semiring.
-    Ideal.map_le_jacobson_of_isLocalization sends any ideal I of a commutative
-    ring R into the Jacobson radical of a commutative R-algebra A that is a
-    localization of R at the elements equal to 1 modulo I. The ring universes
-    are independent, with no further hypotheses on R, A or I.
-    HenselianRing.directLimit preserves Henselian pairs under nonempty directed
-    systems of commutative rings whose transition homomorphisms map each ideal
-    into the later ideal. The target ideal is the supremum of the canonical
-    image ideals. Ring.DirectLimit.of_mem_iSup_map_iff characterizes eventual
-    ideal membership of a canonical stage element. Index and ring universes
-    are independent; neither transition injectivity or surjectivity, global
-    Noetherianity, properness, nontriviality nor completeness is required.
-    Polynomial.exists_monic_factorization_of_isAdicComplete lifts coprime monic
-    residue factors with both prescribed reductions over any commutative ring R,
-    ideal I and IsAdicComplete I R. It requires no proper-ideal, local-ring,
-    Noetherian or finite-generation hypothesis.
-    Polynomial.exists_monic_irreducible_pow_of_monic_factorization takes an
-    arbitrary commutative ring R, a maximal ideal I and the global property that
-    every monic polynomial, including reducible ones, lifts all coprime monic
-    residue factorizations to monic factors with both prescribed reductions.
-    It shows that a monic irreducible polynomial reduces to q^e with q monic
-    irreducible and e positive, without domain, locality, completeness,
-    Noetherianity or finite-residue-field assumptions.
-    Polynomial.exists_monic_irreducible_pow_of_isAdicComplete is its corollary
-    for IsAdicComplete I R. The global input is not a new Henselian class or an
-    asserted equivalence with Mathlib's simple-root Henselian classes. The
-    5-adic examples independently prove irreducibility of X² - 5 over the field
-    and integer ring, its nonirreducible reduction X² with exponent 2, and an
-    exponent-1 example; the global input follows from the factor theorem.
-    Uniform ideal-power torsion, height-one Dedekind primary-component exactness
-    for torsion-source pairs, ordinary integer-prime subgroup restrictions and
-    valuation-free abstract completions for finitely generated ideals; Mathlib
-    adic completion under restriction of scalars along arbitrary commutative
-    algebras, with compatible module actions and ideal extension, without finite
-    generation, flatness or separatedness; submodule closure as the infimum of
-    sums with active submodule neighborhoods of zero over a semiring, with
-    independent scalar, module and Sort-valued index universes, a compatible
-    group topology and fixed-scalar continuity. This requires no scalar topology,
-    Hausdorffness, countability or closedness, and does not construct a topology
-    from arbitrary semiring filtrations. In a NonAssocRing with the canonical
-    integer action, additive cyclicity or a top singleton integer span implies
-    surjective integer casts; nonsurjective casts make every singleton integer
-    span proper, without multiplication associativity, commutativity,
-    characteristic-zero, nontriviality or topology assumptions. Also included
-    are dense integer spans of units in any ring with dense integer casts and
-    fixed-element multiplication continuity; prime p-adic ideal-power
-    neighborhood bases for the usual norm topology, self- and integer-scalar
-    linearity, dense integer spans of p-adic units and integer generators not
-    divisible by p, properness for every integer generator, and the proper dense
-    integer span of 3 in the 2-adic integers excluding 1, whose supremum with every
-    restricted ideal generated by 2^n is top. Clients add excluded elements
-    using positive-degree ideal neighborhoods.
-    Separated nonzero principal-adic valuation-ring
-    completions of arbitrary valuation rank, with independent ring and field
-    universes. Local, residue, spectrum and localization results keep their
-    actual maximal-ideal, radical-disjointness and nonzero-prime hypotheses.
-    Submodule.closure_span_eq_of_dense_subsemiring identifies the set closures
-    of spans over a dense subsemiring and its ambient semiring acting on an
-    additive commutative monoid, with independent scalar and module universes
-    and topologies,
-    separately continuous addition and coefficient-map continuity only at the
-    selected members of an arbitrary generating set. The action is canonically
-    restricted on the same module. It assumes no additive group, joint addition,
-    global coefficient continuity, ContinuousSMul, T1, nonempty generators or
-    finiteness. Empty and zero-generator spans have closure of the zero singleton,
-    which need not be that singleton without T1. The proof uses additive-submonoid
-    topological closure, generatorwise continuous dense images and span induction
-    with the assertion that every scalar multiple lies in that closure.
-    The original span and closure calculations in the model source files
-    Real, Discrete, PadicInt, Boundary and Indiscrete are independent of the
-    generic proof. Real also includes an additional private application of
-    Submodule.closure_span_eq_of_dense_subsemiring to the rational axis, identifying
-    its proper closure and excluding the second coordinate unit.
-    Real and Discrete retain the rational-axis, missing-density,
-    missing-coefficient-continuity and mixed-axis calculations. PadicInt uses
-    the canonical normed p-adic self-module and integer restriction: arbitrary
-    singleton closures agree by direct stock reuse; units and one give whole
-    closures, the nonzero nonunit p gives a proper closed norm sublevel ideal
-    excluding one (including p = 2), and zero gives the closed zero singleton.
-    Existing ideal-power neighborhoods, zero membership and shifted norm balls
-    are included. Boundary supplies empty, zero and arbitrary-set subsingleton
-    calculations, and a nontrivial indiscrete rational self-module where the zero
-    singleton is nonclosed, its closure is universal and T1 fails. Indiscrete uses
-    indiscrete rational scalars and independent discrete ULift rationals with the
-    canonical action: the integer-cast range subsemiring is dense and proper,
-    fixed-scalar maps are continuous, the integer and restricted-subsemiring
-    singleton spans coincide and are closed proper with transported half
-    excluded, but the rational span is whole and coefficient continuity fails.
-    General nonseparated reduction, height/rational-rank additivity, isolated
-    subgroups, value-group exact sequences and source completion are not claimed.
-    The public root also re-exports Ideal.dense_iff_sup_eq_top_of_hasBasis:
-    for every R : Type u with Ring R, TopologicalSpace R and
-    IsTopologicalAddGroup R, and arbitrary left ideals I and J, a given basis
-    (𝓝 (0 : R)).HasBasis (fun _n : ℕ ↦ True)
-    (fun n ↦ ((I ^ n : Ideal R) : Set R)) yields
-    Dense (J : Set R) iff J ⊔ I = ⊤. No two-sidedness, separation, closedness,
-    multiplication continuity or continuous ring scalar action is required.
-    Its written direct additive proof translates the powers basis to each ring
-    element and tests closure by intersection with these neighborhoods. Density
-    at 1 and degree one puts 1 in J ⊔ I; conversely, all-power comaximality
-    decomposes r = j + i and gives j - r = -i in I ^ n. The topology is the same
-    supplied topology, not one constructed from an arbitrary filtration. All
-    ideal coefficients, carriers, sums and powers are those of the original
-    ring. The proof needs no restriction to integer scalars or submodule
-    closure formula.
-    Separately, AdicModules.RingTheory.Ideal.Operations provides the public
-    Ideal.sup_pow_eq_top_of_sup_eq_top with the full universe-polymorphic statement
-    ∀ {R : Type u} [Semiring R] {J I : Ideal R} {n : ℕ}, J ⊔ I = ⊤ → J ⊔ I ^ n = ⊤.
-    Its written proof uses a subtraction-free geometric-sum recurrence and only
-    left multiplication closure. Both ideals are arbitrary left ideals, and
-    powers are whole ideal powers in the original semiring, not spans of powers
-    of chosen generators. The application API covers every natural exponent,
-    including zero, without commutativity, additive inverses, ring, domain,
-    cancellation, nontriviality or two-sidedness hypotheses. Two private
-    specializations recover Mathlib's conclusions when the unpowered or powered
-    ideal, respectively, is two-sided; they add no public entry points or
-    hypotheses to the general theorem. The density proof applies this algebraic
-    implication and uses the compatible additive-group topology directly.
-    Model files contain direct calculations and theorem applications: the original
-    integers with (2)-adic topology and the proper dense ideal (3), all-power
-    comaximality and residue representatives; nonzero proper non-two-sided
-    column ideals in M₂(ℤ), an induced second-column powers topology with a
-    nonclosed proper dense ideal, non-Hausdorffness and discontinuous right
-    multiplication; canonical M₂(ℕ) semiring columns with membership iff
-    contracts, idempotent positive powers and both all-power suprema,
-    noncommuting elementary matrix units (not invertible units), failure of
-    multiplication cancellation and an additive-inverse obstruction for the
-    canonical addition. In that semiring E01 squared is zero but the square
-    of its generated left ideal contains nonzero E11, so generator powers
-    cannot replace ideal powers. Boundary proof terms cover zeroth versus first
-    powers, discrete integer nondensity despite comaximality and failure of the
-    (2)-power basis, the closed proper nondense (2) in the actual (2)-adic
-    integers, top/indiscrete and bottom/discrete bases, density of every ideal
-    but not the empty set in the indiscrete integers and failure of T1 there,
-    density of the top ideal with only a semiring and topology, bottom density
-    iff the defining ideal is top under the stated ring powers-basis hypothesis,
-    and subsingleton semirings and the one-element ring with all ideal powers.
-    Purely algebraic semiring models require no extra commutative, domain or
-    ring structure. The direct calculations do not invoke the general density
-    criterion. The integer file additionally applies that criterion to (3) in
-    the (2)-adic topology, and the natural-matrix file applies the comaximal-powers
-    theorem to its column ideals.
-    For a possibly noncommutative ring R and a finite index type in an independent
-    universe, a fully two-sided ideal family with pairwise supremum top gives
-    the canonical quotient-by-intersection ring equivalence to the product of
-    quotients. Each tuple has a unique preimage as a quotient class; its
-    simultaneous ring representatives form an additive coset of the intersection.
-    The ring equivalence and its inverse agree with Mathlib's commutative
-    constructions. Independent natural powers, including zero, need comaximality
-    only of the original family, still with full family two-sidedness. The
-    common-base R-linear equivalence uses the same additive equivalence and
-    canonical left quotient/Pi actions; its characteristic API identifies the
-    underlying type and additive equivalences, canonical forward function, components,
-    representatives, scalar preservation and the inverse quotient-class bridge.
-    Forward and inverse equivalences commute with quotient factors for pointwise
-    family inclusions, and with independent precision reduction, including zero.
-    With full two-sidedness but no finiteness or comaximality, the canonical map
-    agrees as a function with the product of linear quotient factors and
-    preserves the common left R-action. Separately, given one solution, the
-    congruence solution-coset lemma works for arbitrary ring left ideals and index
-    types; the independent-power comaximality guard needs only a semiring and
-    arbitrary left ideals. Neither is a finite CRT for arbitrary left ideals.
+    Uniform ideal-power torsion and height-one primary-component exactness for
+    torsion-source pairs over Dedekind domains; raw inverse-limit completions
+    and scalar restriction along commutative algebras with compatible actions.
+    Abstract uniform-completion comparisons require finitely generated ideals.
+    A right-surjective exact pair remains middle exact after completion under
+    induced/intrinsic range cofinality. The tensor comparison is surjective for a finite first
+    original quotient and injective for a projective completed scalar extension.
+    For finitely presented original modules, bijectivity follows from finite-free
+    cofinality.
+    A completed coefficient ring is Noetherian exactly when an original power
+    quotient at any chosen precision n >= 2 is Noetherian; equivalently, the
+    first quotient is Noetherian and the cotangent module is finite.
+    The raw-module flatness criterion assumes a Noetherian completed
+    coefficient ring. Under flatness of the raw module completion, its finite
+    presentation is detected by any positive original power quotient.
+    Henselian-pair criteria and coprime monic factor lifting over adically
+    complete commutative rings; irreducible reduction at a maximal ideal uses
+    a global monic factor-lifting property. Directed limits preserve Henselian
+    pairs for nonempty directed systems with compatible ideals.
+    Separated principal-adic valuation-ring comparisons require a nonzero
+    generator; local and localization results retain their maximal-ideal,
+    radical-disjointness and nonzero-prime hypotheses.
+    Submodule closure uses a supplied compatible additive-group topology and
+    continuous fixed-scalar actions. Dense-subsemiring span closure uses
+    separately continuous addition and coefficient continuity at the generators.
+    Left-ideal density uses a supplied ideal-power basis in a topological
+    additive group, not an arbitrary filtration topology construction.
+    Comaximal powers work for arbitrary semiring left ideals; Chinese remainders
+    for finite ideal families in rings require pairwise comaximality and full
+    two-sidedness. Detailed statements and applications are in docs/Guide.md,
+    docs/Results.md and the module documentation. Book correspondence is partial:
+    general nonseparated reduction, height/rational-rank additivity, isolated
+    subgroups and value-group exact sequences are outside the stated scope.
 
 review:
-  status: "incomplete"
+  status: "agent-reviewed"
   notes: >-
-    Bounded torsion, separated principal-adic valuation-ring completions and
-    the submodule-closure formula use the book as mathematical background.
-    The closure theorem starts with a supplied compatible additive-group
-    topology over a semiring with fixed-scalar continuity, rather than
-    constructing a topology from an arbitrary semiring filtration. General
-    nonseparated reduction, height/rational-rank additivity, isolated
-    subgroups, value-group exact sequences and a formalization of the book
-    in full are outside the stated scope.
+    The Lean code has undergone independent review by Formal Frontier AI agents,
+    not human peer review or source-author endorsement. This describes code
+    review, not completeness of correspondence with the mathematical sources.
 
 acknowledgements: >-
   Lean and mathlib authors for the proof assistant and mathematical infrastructure;

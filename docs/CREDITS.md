@@ -96,6 +96,18 @@ Nakayama's lemma ([Stacks Project, Tag 00DV](https://stacks.math.columbia.edu/ta
 and Orzech's theorem: M. Orzech, *Onto endomorphisms are isomorphisms*,
 American Mathematical Monthly 78 (1971), 357–362.
 
+The split-kernel completion comparison in
+[`AdicCompletion.Kernel`](../AdicModules/AdicCompletion/Kernel.lean) uses a
+projector on the original modules, following the approach in Formal Frontier Agents'
+[Projective Modules](https://github.com/FormalFrontier/projective-modules) and
+[Stable Range](https://github.com/FormalFrontier/stable-range) formalizations,
+including contributions by Prism and Iris. It combines Mathlib's completion
+interfaces by Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang,
+Antoine Chambert-Loir's exact-sequence splitting, and the submodule-equivalence
+API by Johannes Hölzl, Mario Carneiro, Kevin Buzzard, Yury Kudryashov,
+Frédéric Dupuis and Heather Macbeth. Projective Modules and Stable Range are
+construction references here, not package dependencies.
+
 The finite-first-quotient tensor comparison reuses this library's chosen-original-lifts
 spanning theorem and Mathlib's canonical completed-ring action and tensor comparison
 (Judith Ludwig and Christian Merten). Finite quotient generators use Johan Commelin's
@@ -133,6 +145,18 @@ coordinates and intrinsic completeness reuse the formalizations of Judith Ludwig
 and Christian Merten and this library's ideal-action and product-completeness APIs.
 The uniform-estimate and successive-correction proof is independently assembled
 Formal Frontier Agent expression, without copying upstream proof bodies.
+
+Tiller authored the raw-completion flatness criterion over a Noetherian completed
+coefficient ring and its flat-original-module specialization. These compose that
+complete-module criterion with this library's Noetherian-completion cotangent
+finiteness, intrinsic completeness, semilinear quotient comparisons and forward
+quotient descent. Flatness is transported through the given coefficient and module
+equivalences by `Module.Flat.of_semilinearEquiv` from Formal Frontier Agents'
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules/blob/4d5340c7f78895f2be6fb9f2ec183443ecf5497c/CoherentModules/RingTheory/Flat/Equiv.lean),
+retaining both canonical quotient actions. The original-flat specialization uses
+this library's quotient flatness theorem, whose Mathlib base-change and
+quotient–tensor formalizations are credited above. No upstream proof body is
+copied, and the upstream author and Apache-2.0 notices remain in their libraries.
 
 The complete-base conormal criteria use Andrew Yang's canonical ideal cotangent
 module and quotient map in Mathlib, together with Johan Commelin's finite-module
@@ -358,13 +382,18 @@ Strong Hensel lifting for finite polynomial systems reuses
 remainder theorem from
 [Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials).
 It is used through the released `MultivariatePolynomials.Taylor` interface,
-not by vendoring its proof text. The resolved package graph also includes
-[Coherent Modules](https://github.com/FormalFrontier/coherent-modules) and
+not by vendoring its proof text.
+
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules) is also a
+direct dependency: the raw-completion flatness criterion imports its focused
+`CoherentModules.RingTheory.Flat.Equiv` interface for semilinear flatness transport.
+The same package is reached through Multivariate Polynomials; one explicit root
+pin selects the shared revision. The resolved package graph also includes
 [Algebraic Direct Limits](https://github.com/FormalFrontier/algebraic-direct-limits)
-through Multivariate Polynomials. These are transitive package dependencies,
-not additional directly imported proof sources here. Exact public release pins
-are recorded in [lake-manifest.json](../lake-manifest.json); upstream licensing
-and contributor notices remain in those libraries.
+through Multivariate Polynomials, as a transitive package dependency rather than
+a directly imported proof source here. Exact public release pins are recorded
+in [lake-manifest.json](../lake-manifest.json); upstream licensing and contributor
+notices remain in those libraries.
 
 ## Fibres and submodules under completed scalars
 

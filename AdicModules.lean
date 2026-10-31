@@ -51,6 +51,7 @@ public import AdicModules.AdicCompletion.Pi
 public import AdicModules.AdicCompletion.Quotient
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.AdicCompletion.Stationary
 public import AdicModules.AdicCompletion.Submodule
 public import AdicModules.AdicCompletion.Surjectivity
 public import AdicModules.AdicCompletion.TensorProduct
