@@ -4,11 +4,14 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.RingTheory.AdicCompletion.Functoriality
+public import AdicModules.LinearAlgebra.Quotient.Basic
+import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.LinearAlgebra.TensorProduct.Quotient
+import Mathlib.RingTheory.Flat.Stability
 public import Mathlib.RingTheory.Smooth.Quotient
 
 /-!
-# Detecting isomorphisms modulo nilpotent ideals
+# Flat quotient modules and nilpotent isomorphism criteria
 
 A linear map to a flat module is bijective if its reduction modulo a nilpotent
 ideal is bijective. Neither module needs to be finitely generated, and the
@@ -19,6 +22,14 @@ ideal. Reduced injectivity then puts the kernel inside the ideal times the
 source. Flatness of the target identifies this intersection with the ideal
 times the kernel, so the same nilpotent iteration kills the kernel.
 
+Flatness of an original module descends to the canonical quotient module over
+the quotient ring. More generally, for arbitrary original ideals `J,K`, if the
+image of `K` in `R/J` is nilpotent and `N/JN` is flat over `R/J`, bijectivity
+modulo `K` implies bijectivity modulo `J`. The ideals need not be nested:
+quotienting the given equivalence further first gives bijectivity modulo `J ⊔ K`.
+The nested factor kernels and additive square then reduce to the nilpotent
+flat-target theorem over `R/J`.
+
 ## References
 
 The kernel-intersection step uses Nailin Guan's Mathlib theorem
@@ -26,11 +37,16 @@ The kernel-intersection step uses Nailin Guan's Mathlib theorem
 `LinearMap.reduceModIdeal`, formalized by Judith Ludwig and Christian Merten.
 The nilpotent iteration is the standard elementary argument, with no
 finite-generation form of Nakayama's lemma needed.
+Quotient flatness uses Christian Merten's Mathlib flat base-change API,
+Antoine Chambert-Loir and Jujian Zhang's quotient–tensor equivalence, and
+Kenny Lau and Yury Kudryashov's scalar extension along a surjective algebra map.
+Further quotient transport uses the submodule quotient and third isomorphism
+APIs by Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov.
 -/
 
 @[expose] public section
 
-universe uA uX uY
+universe uA uX uY uR uM uN
 
 private theorem submodule_eq_bot_of_le_smul_of_isNilpotent
     {A : Type uA} [CommSemiring A]
@@ -101,3 +117,89 @@ theorem LinearMap.bijective_of_reduceModIdeal_bijective_of_isNilpotent
     rw [← LinearMap.ker_inf_smul_top_eq_smul_of_flat J f hs]
     exact le_inf le_rfl hk
   exact ⟨LinearMap.ker_eq_bot.mp hker, hs⟩
+
+/-- Flatness descends to the original quotient module with its canonical
+quotient-ring action, by flat base change and the quotient–tensor equivalence. -/
+theorem Module.Flat.quotient_smul_top
+    {R : Type uR} [CommRing R]
+    (N : Type uN) [AddCommGroup N] [Module R N] [Module.Flat R N]
+    (J : Ideal R) :
+    Module.Flat (R ⧸ J) (N ⧸ (J • (⊤ : Submodule R N))) := by
+  exact Module.Flat.of_linearEquiv
+    ((TensorProduct.quotTensorEquivQuotSMul N J).extendScalarsOfSurjective
+      (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R (R ⧸ J)))).symm
+
+-- Quotient the given equivalence further. All maps here are restricted to R,
+-- so no identification of the two quotient coefficient rings is needed.
+private theorem LinearMap.bijective_reduceModIdeal_of_le
+    {R : Type uR} [CommRing R]
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    (K L : Ideal R) (hKL : K ≤ L) (f : M →ₗ[R] N)
+    (hf : Function.Bijective (f.reduceModIdeal K)) :
+    Function.Bijective (f.reduceModIdeal L) := by
+  let e := (LinearEquiv.ofBijective (f.reduceModIdeal K) hf).restrictScalars R
+  let p : Submodule R M := K • ⊤
+  let q : Submodule R N := K • ⊤
+  let P : Submodule R M := L • ⊤
+  let Q : Submodule R N := L • ⊤
+  have he : (P.map p.mkQ).map e.toLinearMap = Q.map q.mkQ := by
+    simp only [P, Q, Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ,
+      LinearEquiv.range]
+  let E := (Submodule.quotientQuotientEquivQuotient p P
+      (Submodule.smul_mono_left hKL)).symm |>.trans
+    ((Submodule.Quotient.equiv (P.map p.mkQ) (Q.map q.mkQ) e he).trans
+      (Submodule.quotientQuotientEquivQuotient q Q (Submodule.smul_mono_left hKL)))
+  have hE : (E : M ⧸ P → N ⧸ Q) = f.reduceModIdeal L := by
+    funext x
+    obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
+    rfl
+  rw [← hE]
+  exact E.bijective
+
+/-- If the image of `K` in `R/J` is nilpotent and `N/JN` is flat over `R/J`,
+bijectivity modulo `K` implies bijectivity modulo `J`. The ideals need not
+contain one another. The nilpotent flat-target criterion is applied over `R/J`. -/
+theorem LinearMap.bijective_reduceModIdeal_of_isNilpotent_map
+    {R : Type uR} [CommRing R]
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    (J K : Ideal R)
+    [Module.Flat (R ⧸ J) (N ⧸ (J • (⊤ : Submodule R N)))]
+    (hK : IsNilpotent (K.map (Ideal.Quotient.mk J)))
+    (f : M →ₗ[R] N)
+    (hf : Function.Bijective (f.reduceModIdeal K)) :
+    Function.Bijective (f.reduceModIdeal J) := by
+  let L := J ⊔ K
+  have hL : L.map (Ideal.Quotient.mk J) = K.map (Ideal.Quotient.mk J) := by
+    simp only [L, Ideal.map_sup, Ideal.map_quotient_self, bot_sup_eq]
+  have hfL : Function.Bijective (f.reduceModIdeal L) :=
+    f.bijective_reduceModIdeal_of_le K L le_sup_right hf
+  apply LinearMap.bijective_of_reduceModIdeal_bijective_of_isNilpotent
+    (K.map (Ideal.Quotient.mk J)) hK (f.reduceModIdeal J)
+  have hJL : J ≤ L := le_sup_left
+  let rM : (M ⧸ (J • (⊤ : Submodule R M))) →ₗ[R]
+      M ⧸ (L • (⊤ : Submodule R M)) :=
+    Submodule.factor (Submodule.smul_mono_left hJL)
+  let rN : (N ⧸ (J • (⊤ : Submodule R N))) →ₗ[R]
+      N ⧸ (L • (⊤ : Submodule R N)) :=
+    Submodule.factor (Submodule.smul_mono_left hJL)
+  have hrM : Function.Surjective rM :=
+    Submodule.factor_surjective (Submodule.smul_mono_left hJL)
+  have kM (x : M ⧸ (J • (⊤ : Submodule R M))) :
+      rM x = 0 ↔ x ∈ K.map (Ideal.Quotient.mk J) •
+        (⊤ : Submodule (R ⧸ J) (M ⧸ (J • (⊤ : Submodule R M)))) := by
+    simpa only [rM, hL] using
+      Submodule.factor_eq_zero_iff_mem_map_smul_top J L hJL x
+  have kN (y : N ⧸ (J • (⊤ : Submodule R N))) :
+      rN y = 0 ↔ y ∈ K.map (Ideal.Quotient.mk J) •
+        (⊤ : Submodule (R ⧸ J) (N ⧸ (J • (⊤ : Submodule R N)))) := by
+    simpa only [rN, hL] using
+      Submodule.factor_eq_zero_iff_mem_map_smul_top J L hJL y
+  apply LinearMap.bijective_reduceModIdeal_of_addHom_square
+    (K.map (Ideal.Quotient.mk J)) (f.reduceModIdeal J)
+    rM.toAddMonoidHom rN.toAddMonoidHom hrM kM kN
+    (f.reduceModIdeal L).toAddMonoidHom hfL
+  intro x
+  obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
+  rfl

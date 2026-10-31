@@ -131,6 +131,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   modules to be flat, or any finiteness, Noetherianity, separation or
   completeness assumption. No original completed-ring actions are required.
 
+- **Inverse criterion with flat target quotients.** For any ideal `I` of a
+  commutative ring `R`, an `R`-linear map `f : M → N` is bijective if `M` is
+  `I`-adically complete, `N` is `I`-Hausdorff, every positive original quotient
+  `N / IⁿN` is flat over `R / Iⁿ`, and `f` modulo `I` is bijective.
+  Original flatness of the target suffices as a specialization. Neither base
+  completeness, module finiteness or projectivity, nor finite generation of the
+  ideal is required. See the [flat-target criteria](AdicModules/AdicCompletion/Flat.lean).
+  The [quotient-flat API](AdicModules/LinearAlgebra/Quotient/Flat.lean) also compares
+  arbitrary original ideals `J,K`: nilpotence of the image of `K` in `R/J`,
+  flatness of `N/JN` over `R/J`, and bijectivity modulo `K` imply bijectivity
+  modulo `J`, without an inclusion between the ideals.
+
 - **Monomorphisms and short exact sequences under completion.** For any ideal
   of a commutative ring, an injective original linear map remains injective after
   completion if its original cokernel is flat, by
@@ -842,6 +854,8 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.TensorProduct](AdicModules/AdicCompletion/TensorProduct.lean) | [AdicCompletion.TensorProduct](AdicModulesTest/AdicCompletion/TensorProduct.lean) (finite-projective comparison and non-finite countable Finsupp injectivity) |
 | [Algebra.Module.Int](AdicModules/Algebra/Module/Int.lean) | [Algebra.Module.Int](AdicModulesTest/Algebra/Module/Int.lean) |
 | [LinearAlgebra.Pi](AdicModules/LinearAlgebra/Pi.lean) (finitely generated ideal action on dependent products and coordinatewise reduction kernel) | See the `AdicCompletion.DependentPi` models above |
+| [LinearAlgebra.Quotient.Basic](AdicModules/LinearAlgebra/Quotient/Basic.lean) (nested factor kernels, additive quotient squares and power-quotient nilpotence) | — |
+| [LinearAlgebra.Quotient.Flat](AdicModules/LinearAlgebra/Quotient/Flat.lean) (quotient flatness and nilpotent quotient-image comparison) | — |
 | [LinearAlgebra.Quotient.Coefficients](AdicModules/LinearAlgebra/Quotient/Coefficients.lean) | — |
 | [LinearAlgebra.Quotient.End](AdicModules/LinearAlgebra/Quotient/End.lean) | [LinearAlgebra.Quotient.End](AdicModulesTest/LinearAlgebra/Quotient/End.lean) |
 | [LinearAlgebra.Span.Basic](AdicModules/LinearAlgebra/Span/Basic.lean) | [KernelPullback](AdicModulesTest/KernelPullback.lean) |

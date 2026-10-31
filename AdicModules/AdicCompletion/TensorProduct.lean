@@ -177,56 +177,6 @@ open TensorProduct
 
 universe uA uB ud uX uY uX₀ uY₀
 
-namespace LinearMap
-
-section QuotientSquare
-
-variable {A : Type uA} [CommRing A]
-variable {X : Type uX} [AddCommGroup X] [Module A X]
-variable {Y : Type uY} [AddCommGroup Y] [Module A Y]
-variable {X₀ : Type uX₀} [AddCommGroup X₀]
-variable {Y₀ : Type uY₀} [AddCommGroup Y₀]
-
-/-- An additive residual isomorphism detects bijectivity modulo an ideal.
-Only the source quotient map needs an explicit surjectivity hypothesis. -/
-private theorem bijective_reduceModIdeal_of_addHom_square
-    (J : Ideal A) (f : X →ₗ[A] Y) (rX : X →+ X₀) (rY : Y →+ Y₀)
-    (hX : Function.Surjective rX)
-    (kX : ∀ x, rX x = 0 ↔ x ∈ J • (⊤ : Submodule A X))
-    (kY : ∀ y, rY y = 0 ↔ y ∈ J • (⊤ : Submodule A Y))
-    (g₀ : X₀ →+ Y₀) (hg₀ : Function.Bijective g₀)
-    (comm : ∀ x, rY (f x) = g₀ (rX x)) :
-    Function.Bijective (f.reduceModIdeal J) := by
-  constructor
-  · intro x y hxy
-    obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A X)) x
-    obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A X)) y
-    apply (Submodule.Quotient.eq _).2
-    apply (kX (x - y)).1
-    rw [map_sub]
-    apply sub_eq_zero.mpr
-    apply hg₀.1
-    have hmem : f x - f y ∈ J • (⊤ : Submodule A Y) :=
-      (Submodule.Quotient.eq _).1 (by
-        simpa only [LinearMap.reduceModIdeal_apply] using hxy)
-    have hzero := (kY (f x - f y)).2 hmem
-    rw [map_sub] at hzero
-    rw [← comm x, ← comm y]
-    exact sub_eq_zero.mp hzero
-  · intro y
-    obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A Y)) y
-    obtain ⟨x₀, hx₀⟩ := hg₀.2 (rY y)
-    obtain ⟨x, hx⟩ := hX x₀
-    refine ⟨Submodule.Quotient.mk x, ?_⟩
-    rw [LinearMap.reduceModIdeal_apply]
-    apply (Submodule.Quotient.eq _).2
-    apply (kY (f x - y)).1
-    rw [map_sub, comm x, hx, hx₀, sub_self]
-
-end QuotientSquare
-
-end LinearMap
-
 namespace Matrix
 
 section RangeReduction
@@ -1004,33 +954,6 @@ private lemma linearCombination_quotient_transition {d : ℕ} (v : Fin d → M)
         (fun i => Ideal.Quotient.factorPow I hmn (a i)) :=
   linearCombination_quotient_factor M (Ideal.pow_le_pow_right hmn) v a
 
-/-- The image of the original ideal in a power quotient is nilpotent. -/
-private lemma isNilpotent_ideal_image_pow (n : ℕ) :
-    IsNilpotent (I.map (Ideal.Quotient.mk (I ^ n))) := by
-  use n
-  simp only [← Ideal.map_pow, Ideal.map_quotient_self, Ideal.zero_eq_bot]
-
-/-- The kernel of reduction from a power quotient to the first quotient is the
-image of the ideal times the target module. -/
-private lemma quotient_reduction_eq_zero_iff (n : ℕ) (hn : n ≠ 0)
-    (y : M ⧸ (I ^ n • (⊤ : Submodule R M))) :
-    Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) y = 0 ↔
-      y ∈ ((I.map (Ideal.Quotient.mk (I ^ n))) •
-        (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))) := by
-  have hker :
-      (Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) :
-        (M ⧸ (I ^ n • (⊤ : Submodule R M))) →ₗ[R]
-          M ⧸ (I • (⊤ : Submodule R M))).ker =
-        I • (⊤ : Submodule R (M ⧸ (I ^ n • (⊤ : Submodule R M)))) := by
-    rw [Submodule.ker_mapQ, Submodule.comap_id, Submodule.map_smul'', Submodule.map_top,
-      Submodule.range_mkQ]
-  have hsmul := Submodule.restrictScalars_map_smul_eq (R := R ⧸ I ^ n) I
-    (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))
-  change y ∈ (Submodule.factor
-    (Submodule.smul_mono_left (Ideal.pow_le_self hn))).ker ↔ _
-  rw [hker]
-  exact Iff.symm (SetLike.ext_iff.mp hsmul y)
-
 /-- A split surjection restricts to an isomorphism on the range of its split projector. -/
 private lemma bijective_domRestrict_range_comp
     {A : Type*} [CommRing A] {X : Type*} [AddCommGroup X] [Module A X]
@@ -1128,12 +1051,6 @@ private theorem moduleProjective_of_compatible_stage_bijective {d : ℕ} (v : Fi
   rw [hevalH]
   exact hz x n
 
-/-- The quotient–tensor equivalence with its quotient-ring scalar linearity. -/
-private noncomputable def quotTensorEquivQuotSMulLinear (J : Ideal R) :
-    ((R ⧸ J) ⊗[R] M) ≃ₗ[R ⧸ J] M ⧸ (J • (⊤ : Submodule R M)) :=
-  (TensorProduct.quotTensorEquivQuotSMul M J).extendScalarsOfSurjective
-    (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R (R ⧸ J)))
-
 /-- If every positive adic quotient is flat over its coefficient quotient and the first
 quotient is finite projective, the raw completion is projective over the completed ring.
 The ideal is arbitrary, and the completed-module action is the canonical one. -/
@@ -1209,7 +1126,7 @@ theorem moduleProjective_of_flat_pow_quotients
         (RingHom.ker q) ?_ (g.comp (E n).toLin'.range.subtype) ?_
       · change IsNilpotent (RingHom.ker (Ideal.Quotient.factor (Ideal.pow_le_self hn)))
         rw [Ideal.Quotient.factor_ker]
-        exact isNilpotent_ideal_image_pow I n
+        exact Ideal.isNilpotent_map_quotient_pow I n
       · apply Matrix.bijective_reduceModIdeal_range_of_quotient_square q
           (Ideal.Quotient.factor_surjective _) (E n) e₁ (hres n hn) (hE n) g p
           ((Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) :
@@ -1220,7 +1137,8 @@ theorem moduleProjective_of_flat_pow_quotients
           change _ ↔ y ∈ (RingHom.ker (Ideal.Quotient.factor (Ideal.pow_le_self hn))) •
             (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))
           rw [Ideal.Quotient.factor_ker]
-          exact quotient_reduction_eq_zero_iff I M n hn y
+          exact Submodule.factor_eq_zero_iff_mem_map_smul_top (I ^ n) I
+            (Ideal.pow_le_self hn) y
         · intro a
           change Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn))
             (Fintype.linearCombination (R ⧸ I ^ n)
@@ -1241,7 +1159,7 @@ theorem moduleProjective_of_flat_of_finite_projective_quotient
     Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
   apply moduleProjective_of_flat_pow_quotients I M
   intro k _
-  exact Module.Flat.of_linearEquiv (quotTensorEquivQuotSMulLinear M (I ^ k)).symm
+  exact Module.Flat.quotient_smul_top M (I ^ k)
 
 /-- An original projective module finite modulo the ideal has projective completion over the
 completed ring, for any ideal. -/
@@ -1251,7 +1169,9 @@ instance instModuleProjectiveOfFiniteQuotient
   let : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
     Module.Finite.of_restrictScalars_finite R (R ⧸ I) _
   let : Module.Projective (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
-    Module.Projective.of_equiv' (quotTensorEquivQuotSMulLinear M I)
+    Module.Projective.of_equiv'
+      ((TensorProduct.quotTensorEquivQuotSMul M I).extendScalarsOfSurjective
+        (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R (R ⧸ I))))
   exact moduleProjective_of_flat_of_finite_projective_quotient I M
 
 /-- For a finite projective module, tensoring with the completed ring gives its adic completion.

@@ -447,3 +447,18 @@ history examined. A project label, AI generation, Git author field or mathematic
 citation alone does not settle a concrete ownership, copying or redistribution
 concern. Rights/provenance, mathematical correctness, complete proof checking
 and source coverage are distinct matters.
+
+## Flat-target inverse criteria and quotient transport
+
+The original-map inverse criterion combines this library's completed-map
+injectivity and reflection theorems with Judith Ludwig and Christian Merten's
+Mathlib first-quotient surjectivity criteria. The positive stages use the
+nilpotent flat-target criterion, whose kernel-intersection step is Nailin Guan's
+Mathlib formalization. Quotient flatness uses Christian Merten's flat base change,
+Antoine Chambert-Loir and Jujian Zhang's quotient–tensor equivalence, and Kenny Lau
+and Yury Kudryashov's scalar extension along a surjective algebra map.
+Nested quotient transport uses the quotient-ring action formalized by
+Pierre-Alexandre Bazin and the submodule quotient and third isomorphism APIs by
+Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov. The additive
+square and ideal-image kernel arguments are shared with the tensor-product
+projectivity criteria.

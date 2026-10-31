@@ -25,6 +25,10 @@ Hausdorff injectivity criterion for `of`.
 Independently of Hausdorffness, `map_injective_of_reduceModIdeal_injective`
 deduces injectivity of the completed map from injectivity on every original
 power quotient. It uses only coordinatewise extensionality.
+`map_bijective_of_reduceModIdeal_bijective` combines this with Mathlib's
+first-quotient surjectivity criterion: bijectivity at every positive original
+power quotient implies bijectivity of the canonical completed map. Stage zero
+is automatic, and no completeness or finite-generation hypothesis is needed.
 
 `AdicCompletion.extend` sends an `R`-linear map to an adically complete module to its
 canonical extension. It uses Mathlib's completed map, restricts its scalars from
@@ -96,6 +100,30 @@ theorem map_injective_of_reduceModIdeal_injective (f : M →ₗ[R] N)
   apply hf n
   simpa only [AdicCompletion.map_val_apply] using
     congrArg (fun z : AdicCompletion I N ↦ z.val n) hxy
+
+/-- Bijectivity on every positive original power quotient implies bijectivity
+of the canonical completed map. Stage zero is automatically a singleton quotient. -/
+theorem map_bijective_of_reduceModIdeal_bijective (f : M →ₗ[R] N)
+    (hf : ∀ n : ℕ, 0 < n → Function.Bijective (f.reduceModIdeal (I ^ n))) :
+    Function.Bijective (AdicCompletion.map I f) := by
+  constructor
+  · apply map_injective_of_reduceModIdeal_injective I f
+    intro n
+    by_cases hn : n = 0
+    · subst n
+      let : Subsingleton (M ⧸ (I ^ 0 • (⊤ : Submodule R M))) :=
+        Submodule.Quotient.subsingleton_iff.mpr (by simp)
+      exact fun _ _ _ ↦ Subsingleton.elim _ _
+    · exact (hf n (Nat.pos_of_ne_zero hn)).1
+  · apply map_surjective_of_mkQ_comp_surjective
+    intro y
+    have hf1 : Function.Bijective (f.reduceModIdeal I) := by
+      have h := hf 1 Nat.zero_lt_one
+      rw [pow_one] at h
+      exact h
+    obtain ⟨x, hx⟩ := hf1.2 y
+    obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+    exact ⟨x, hx⟩
 
 /-- Completion distinguishes original linear maps to an I-Hausdorff target. -/
 theorem map_injective_of_isHausdorff [IsHausdorff I N] :

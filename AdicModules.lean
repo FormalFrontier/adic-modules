@@ -57,6 +57,7 @@ public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.LocalizedModule
 public import AdicModules.LinearAlgebra.Pi
+public import AdicModules.LinearAlgebra.Quotient.Basic
 public import AdicModules.LinearAlgebra.Quotient.DFinsupp
 public import AdicModules.LinearAlgebra.Quotient.End
 public import AdicModules.LinearAlgebra.Quotient.Flat

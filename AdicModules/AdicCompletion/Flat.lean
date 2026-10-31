@@ -5,11 +5,12 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.Exactness
-import AdicModules.AdicCompletion.LinearMap
+public import AdicModules.AdicCompletion.LinearMap
+public import AdicModules.LinearAlgebra.Quotient.Flat
 public import Mathlib.RingTheory.Smooth.Quotient
 
 /-!
-# Flat cokernels and exactness of adic completion
+# Flat targets, inverse criteria and exactness of adic completion
 
 Adic completion preserves injectivity of an original linear map with flat
 original cokernel. It also preserves middle exactness of a right-surjective exact
@@ -21,6 +22,14 @@ The ideal is arbitrary. No finiteness, separation, completeness or action of the
 completed ring is assumed on the original modules. All completed maps and scalar
 actions are the canonical ones.
 
+For a map from an `I`-adically complete original source to an `I`-Hausdorff
+original target, bijectivity modulo `I` implies original bijectivity if every
+positive target quotient `N / IⁿN` is flat over `R / Iⁿ`. In particular, original
+flatness of the target suffices. No complete base, finite generation or original
+completed-ring action is required. The quotient-image nilpotence criterion gives
+bijectivity at each positive stage; the canonical completed-map bridge and
+Mathlib's original-map surjectivity criterion then give the conclusion.
+
 ## References
 
 The proof uses Nailin Guan's Mathlib theorem
@@ -30,6 +39,8 @@ induced and intrinsic filtrations on the first map's range agree at every power;
 no new tensor or completion construction is needed. For injectivity, the existing
 quotient maps are injective at every power, and the canonical completion map is
 injective by coordinatewise extensionality, using Mathlib's completion-map API.
+The inverse criterion also uses their first-quotient surjectivity theorem and
+this library's nilpotent flat-target theorem and quotient flat base change.
 -/
 
 @[expose] public section
@@ -121,3 +132,43 @@ theorem map_shortExact_of_flat
     map_surjective I hg⟩
 
 end AdicCompletion
+
+/-- A map from an adically complete source to a Hausdorff target is bijective
+if it is bijective modulo the ideal and every positive original target quotient
+is flat over its coefficient quotient. Neither base completeness nor finiteness
+of the ideal or either module is required. -/
+theorem LinearMap.bijective_of_reduceModIdeal_bijective_of_flat_pow_quotients
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    [IsAdicComplete I M] [IsHausdorff I N]
+    (hflat : ∀ n : ℕ, 0 < n →
+      Module.Flat (R ⧸ I ^ n) (N ⧸ (I ^ n • (⊤ : Submodule R N))))
+    (f : M →ₗ[R] N)
+    (hf : Function.Bijective (f.reduceModIdeal I)) :
+    Function.Bijective f := by
+  have hstage (n : ℕ) (hn : 0 < n) :
+      Function.Bijective (f.reduceModIdeal (I ^ n)) := by
+    let := hflat n hn
+    exact f.bijective_reduceModIdeal_of_isNilpotent_map (I ^ n) I
+      (Ideal.isNilpotent_map_quotient_pow I n) hf
+  refine ⟨AdicCompletion.injective_of_map_injective I f
+    (AdicCompletion.map_bijective_of_reduceModIdeal_bijective I f hstage).1, ?_⟩
+  apply _root_.surjective_of_mkQ_comp_surjective (I := I)
+  intro y
+  obtain ⟨x, hx⟩ := hf.2 y
+  obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) x
+  exact ⟨x, hx⟩
+
+/-- For a flat Hausdorff target and an adically complete source, bijectivity
+modulo the ideal implies bijectivity of the original linear map. -/
+theorem LinearMap.bijective_of_reduceModIdeal_bijective_of_flat
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    [IsAdicComplete I M] [IsHausdorff I N] [Module.Flat R N]
+    (f : M →ₗ[R] N)
+    (hf : Function.Bijective (f.reduceModIdeal I)) :
+    Function.Bijective f := by
+  exact f.bijective_of_reduceModIdeal_bijective_of_flat_pow_quotients I
+    (fun n _ ↦ Module.Flat.quotient_smul_top N (I ^ n)) hf
