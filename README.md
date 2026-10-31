@@ -20,6 +20,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   no ambient separation, completeness or finiteness is required. See the
   [quotient separation API](AdicModules/LinearAlgebra/Quotient/Hausdorff.lean).
 
+- **Tensor comparison and Hausdorffification.** Put `S = AdicCompletion I R` and
+  `J = I.map (algebraMap R S)`. If `0 < n` and `(I ^ n).FG`, the canonical
+  comparison `S ⊗[R] M →ₗ[S] AdicCompletion I M` has kernel
+  `⨅ k, J ^ k • ⊤`, for arbitrary original `M`. It is injective exactly when
+  the tensor source is Hausdorff for its original `I`-action. If in addition the
+  original first quotient `M / I M` is finite, the comparison induces
+  [`ofTensorProductHausdorffificationEquivOfFiniteQuotient`](AdicModules/AdicCompletion/TensorProduct.lean)
+  from the source's `J`-Hausdorffification to the completed module, linearly
+  over `S`; bijectivity is then equivalent to that same Hausdorffness.
+  No original completed-ring action, projectivity, flatness, separation or
+  completeness of `M` is assumed. The all-ideal projective APIs are unchanged.
+
 - **Surjectivity and splittings under completion.** For any ideal `I` of a
   commutative ring `R` and any `R`-linear map `f : M → N`, the induced map on
   `I`-adic completions is surjective if and only if the original composite

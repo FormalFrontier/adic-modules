@@ -8,8 +8,11 @@ public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
 import AdicModules.AdicCompletion.Kernel
 import AdicModules.AdicCompletion.Pi
+import AdicModules.AdicCompletion.Quotient
 import Mathlib.Algebra.Module.Projective
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.LinearAlgebra.TensorProduct.Quotient
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.Finiteness.Small
 import Mathlib.RingTheory.TensorProduct.Finite
@@ -25,11 +28,19 @@ hence an equivalence. It sends pure tensors to scalar multiples of canonical mod
 and agrees with Mathlib's finite-Noetherian equivalence where both apply. The finite-original
 projective API is retained as a specialization.
 
-Injectivity detects coefficients in a free Finsupp module and uses a projective retraction
-and naturality. For surjectivity, choose finite quotient generators and original lifts.
-The chosen-family spanning theorem below makes those same completed lifts span the raw
-completion; each lies in the range of the canonical comparison. No Noetherian hypothesis
-on the ring or finite-generation hypothesis on the ideal is needed.
+If a positive power of `I` is finitely generated, the kernel of the comparison for any
+original module is the intersection of all extended ideal-power submodules of the tensor
+source. Thus injectivity is equivalent to original-`I` Hausdorffness of that source. With
+only finiteness of the original first quotient added, the comparison induces a named
+completed-ring-linear equivalence from the source's Hausdorffification to the completed
+module. Its whole-map and representative laws describe the forward and inverse maps.
+The bijectivity criterion uses this equivalence and its quotient projection.
+
+For projective modules, injectivity detects coefficients in a free Finsupp module and uses
+a projective retraction and naturality. For surjectivity, choose finite quotient generators
+and original lifts. The chosen-family spanning theorem below makes those same completed
+lifts span the raw completion; each lies in the range of the canonical comparison.
+No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
 
 Finiteness of `M / I M` also gives finiteness of the raw completion over the canonical
 completed ring. With original projectivity, the completion is projective over that ring by
@@ -44,6 +55,12 @@ quotient makes the completed-map kernel finite over the same completed ring. The
 through the canonical split-kernel comparison from `AdicModules.AdicCompletion.Kernel`.
 
 ## Implementation notes
+
+The kernel calculation uses the coefficient quotient comparison at stages `n * k`,
+including zero, and the tensor quotient and base-change equivalences. Stage comparisons
+are linear over the original ring. The Hausdorffification and first isomorphism theorem
+are Mathlib's existing constructions. The positive-power hypothesis is sufficient, not
+an individual-ideal necessity criterion; no such hypothesis is added to the projective APIs.
 
 The ring and module universes are independent. Only the agreement with Mathlib's Noetherian
 equivalence uses a common universe, as required by that equivalence.
@@ -84,6 +101,15 @@ in Mathlib's `RingTheory/Finiteness/Projective.lean`, by Johan Commelin.
 The independent-universe Noetherian comparison uses finite-module smallness from Mathlib's
 `RingTheory/Finiteness/Small.lean`, by Antoine Chambert-Loir and María-Inés de Frutos-Fernández,
 and the `Shrink` linear equivalence from Kim Morrison's module API.
+The kernel calculation reuses this library's coefficient quotient equivalence and its
+fixed-stage kernel theorem, whose finite-linear-combination proof follows Bingyu Xia's
+Mathlib formalization. Tensor quotient equivalences are from Antoine Chambert-Loir and
+Jujian Zhang's `LinearAlgebra/TensorProduct/Quotient.lean`; scalar base cancellation uses
+Kim Morrison, Johan Commelin and Eric Wieser's `LinearAlgebra/TensorProduct/Tower.lean`.
+The Hausdorffification is from Mathlib's adic-completion Basic module by Kenny Lau,
+Judith Ludwig, Christian Merten and Jiedong Jiang. The first isomorphism theorem is from
+Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov's
+`LinearAlgebra/Isomorphisms.lean`.
 -/
 
 set_option warningAsError true
@@ -423,5 +449,209 @@ theorem ofTensorProductEquivOfFiniteNoetherian_eq_ofBijective
   exact ofTensorProductEquivOfFiniteNoetherian_apply I M x
 
 end Noetherian
+
+end AdicCompletion
+
+namespace AdicCompletion
+
+section Hausdorffification
+
+variable {R : Type uR} [CommRing R] (I : Ideal R)
+variable (M : Type uM) [AddCommGroup M] [Module R M]
+
+/-- At a finitely generated ideal-power stage, evaluation after the tensor comparison
+has precisely the extended ideal-power kernel. The quotient calculation is over `R`;
+no completed-ring action on the original module is used. -/
+private theorem eval_ofTensorProduct_eq_zero_iff (k : ℕ) (hk : (I ^ k).FG)
+    (t : AdicCompletion I R ⊗[R] M) :
+    eval I M k (ofTensorProduct I M t) = 0 ↔
+      t ∈ (I.map (algebraMap R (AdicCompletion I R))) ^ k •
+        (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)) := by
+  let S := AdicCompletion I R
+  let T := S ⊗[R] M
+  let K := (I.map (algebraMap R S)) ^ k
+  let e : (T ⧸ K • (⊤ : Submodule S T)) ≃ₗ[R]
+      M ⧸ (I ^ k • (⊤ : Submodule R M)) :=
+    ((quotTensorEquivQuotSMul T K).symm.restrictScalars R).trans
+      (((AlgebraTensorModule.cancelBaseChange R S S (S ⧸ K) M).restrictScalars R).trans
+        ((TensorProduct.congr (quotientPowAlgEquiv I k hk).toLinearEquiv
+          (LinearEquiv.refl R M)).trans (quotTensorEquivQuotSMul M (I ^ k))))
+  have he : e.toLinearMap ∘ₗ
+      ((K • (⊤ : Submodule S T)).mkQ.restrictScalars R) =
+      (eval I M k) ∘ₗ (ofTensorProduct I M).restrictScalars R := by
+    apply TensorProduct.ext'
+    intro a m
+    have ha : a • (1 : S ⧸ K) = Ideal.Quotient.mk K a := by
+      change a • Submodule.Quotient.mk (p := K) (1 : S) = _
+      rw [← Submodule.Quotient.mk_smul]
+      simp only [smul_eq_mul, mul_one]
+      rfl
+    change e (Submodule.Quotient.mk (a ⊗ₜ[R] m)) =
+      eval I M k (ofTensorProduct I M (a ⊗ₜ[R] m))
+    simp only [e, LinearEquiv.trans_apply, LinearEquiv.restrictScalars_apply,
+      quotTensorEquivQuotSMul_symm_mk]
+    rw [AlgebraTensorModule.cancelBaseChange_tmul R S S (1 : S ⧸ K) m a,
+      ha, TensorProduct.congr_tmul]
+    change quotTensorEquivQuotSMul M (I ^ k)
+      (quotientPowAlgEquiv I k hk (Ideal.Quotient.mk K a) ⊗ₜ[R] m) = _
+    rw [quotientPowAlgEquiv_mk, ofTensorProduct_tmul]
+    change quotTensorEquivQuotSMul M (I ^ k) (evalₐ I k a ⊗ₜ[R] m) =
+      a.val k • (of I M m).val k
+    rw [val_smul_eq_evalₐ_smul, of_apply]
+    obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (evalₐ I k a)
+    rw [← hr, quotTensorEquivQuotSMul_mk_tmul]
+    rfl
+  have het := LinearMap.congr_fun he t
+  change e (Submodule.Quotient.mk t) = eval I M k (ofTensorProduct I M t) at het
+  rw [← het, e.map_eq_zero_iff, Submodule.Quotient.mk_eq_zero]
+
+/-- If a positive power of the ideal is finitely generated, the kernel of the canonical
+tensor comparison is the intersection of the extended ideal-power submodules. No finiteness
+or separation of the original module is required. -/
+theorem ker_ofTensorProduct_eq_iInf_of_fg_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) :
+    (ofTensorProduct I M).ker =
+      (⨅ k : ℕ,
+        (I.map (algebraMap R (AdicCompletion I R))) ^ k •
+          (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M))) := by
+  have hfg (k : ℕ) : (I ^ (n * k)).FG := by
+    rw [pow_mul]
+    exact hI.pow
+  ext t
+  constructor
+  · intro ht
+    apply (Submodule.mem_iInf _).mpr
+    intro k
+    have hzero : eval I M (n * k) (ofTensorProduct I M t) = 0 := by
+      rw [LinearMap.mem_ker.mp ht]
+      exact (eval I M (n * k)).map_zero
+    exact Submodule.pow_smul_top_le _ _ (Nat.le_mul_of_pos_left k hn)
+      ((eval_ofTensorProduct_eq_zero_iff I M (n * k) (hfg k) t).mp hzero)
+  · intro ht
+    change ofTensorProduct I M t = 0
+    apply AdicCompletion.ext
+    intro k
+    have hzero := (eval_ofTensorProduct_eq_zero_iff I M (n * k) (hfg k) t).mpr
+      ((Submodule.mem_iInf _).mp ht (n * k))
+    change eval I M k (ofTensorProduct I M t) = 0
+    calc
+      _ = transitionMap I M (Nat.le_mul_of_pos_left k hn)
+          (eval I M (n * k) (ofTensorProduct I M t)) :=
+        (transitionMap_comp_eval_apply I M _ _).symm
+      _ = 0 := by rw [hzero]; rfl
+
+/-- Under finite generation of a positive ideal power, the canonical tensor comparison is
+injective exactly when its source is Hausdorff for the original ideal action. -/
+theorem ofTensorProduct_injective_iff_isHausdorff_of_fg_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) :
+    Function.Injective (ofTensorProduct I M) ↔
+      IsHausdorff I (AdicCompletion I R ⊗[R] M) := by
+  rw [← LinearMap.ker_eq_bot, ker_ofTensorProduct_eq_iInf_of_fg_pow I M hn hI]
+  constructor
+  · intro h
+    apply (IsHausdorff.map_algebraMap_iff (I := I) (S := AdicCompletion I R)).mp
+    refine ⟨fun t ht => ?_⟩
+    have hm := (Submodule.mem_iInf (fun k : ℕ =>
+      (I.map (algebraMap R (AdicCompletion I R))) ^ k •
+        (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)))).mpr
+      (fun k => SModEq.zero.mp (ht k))
+    rw [h] at hm
+    exact (Submodule.mem_bot _).mp hm
+  · intro h
+    exact ((IsHausdorff.map_algebraMap_iff (I := I)
+      (S := AdicCompletion I R)).mpr h).iInf_pow_smul
+
+/-- For a module finite modulo the original ideal, the canonical tensor comparison identifies
+its source's Hausdorffification with the completed module, provided a positive ideal power is
+finitely generated. The equivalence is induced by the same tensor comparison. -/
+noncomputable def ofTensorProductHausdorffificationEquivOfFiniteQuotient
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Hausdorffification
+      (I.map (algebraMap R (AdicCompletion I R))) (AdicCompletion I R ⊗[R] M)
+        ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
+  (Submodule.quotEquivOfEq _ _ (ker_ofTensorProduct_eq_iInf_of_fg_pow I M hn hI).symm).trans
+    ((ofTensorProduct I M).quotKerEquivOfSurjective
+      (ofTensorProduct_surjective_of_finite_quotient I M))
+
+/-- The Hausdorffification equivalence composed with the quotient projection is the
+canonical tensor comparison on the whole tensor product. -/
+theorem ofTensorProductHausdorffificationEquivOfFiniteQuotient_comp_of
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] :
+    (ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI).toLinearMap
+        ∘ₗ Hausdorffification.of (I.map (algebraMap R (AdicCompletion I R)))
+          (AdicCompletion I R ⊗[R] M) =
+      ofTensorProduct I M := by
+  ext t
+  rfl
+
+/-- The Hausdorffification equivalence sends the class of any tensor to its canonical
+comparison image. -/
+@[simp]
+theorem ofTensorProductHausdorffificationEquivOfFiniteQuotient_apply_of
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    (t : AdicCompletion I R ⊗[R] M) :
+    ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI
+        (Hausdorffification.of (I.map (algebraMap R (AdicCompletion I R)))
+          (AdicCompletion I R ⊗[R] M) t) =
+      ofTensorProduct I M t :=
+  LinearMap.congr_fun
+    (ofTensorProductHausdorffificationEquivOfFiniteQuotient_comp_of I M hn hI) t
+
+/-- The inverse Hausdorffification equivalence sends a comparison image to the class of
+the original tensor. -/
+@[simp]
+theorem ofTensorProductHausdorffificationEquivOfFiniteQuotient_symm_apply
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))]
+    (t : AdicCompletion I R ⊗[R] M) :
+    (ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI).symm
+        (ofTensorProduct I M t) =
+      Hausdorffification.of (I.map (algebraMap R (AdicCompletion I R)))
+        (AdicCompletion I R ⊗[R] M) t := by
+  rw [← ofTensorProductHausdorffificationEquivOfFiniteQuotient_apply_of I M hn hI t,
+    LinearEquiv.symm_apply_apply]
+
+/-- The inverse Hausdorffification equivalence sends an original module element to the
+class of its tensor with one. -/
+@[simp]
+theorem ofTensorProductHausdorffificationEquivOfFiniteQuotient_symm_of
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] (m : M) :
+    (ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI).symm
+        (of I M m) =
+      Hausdorffification.of (I.map (algebraMap R (AdicCompletion I R)))
+        (AdicCompletion I R ⊗[R] M) ((1 : AdicCompletion I R) ⊗ₜ[R] m) := by
+  simpa only [ofTensorProduct_tmul, one_smul] using
+    ofTensorProductHausdorffificationEquivOfFiniteQuotient_symm_apply I M hn hI
+      ((1 : AdicCompletion I R) ⊗ₜ[R] m)
+
+/-- For a module finite modulo the original ideal, the comparison is bijective exactly when
+the tensor source is Hausdorff. This follows by factoring through the Hausdorffification
+equivalence and its quotient projection. -/
+theorem ofTensorProduct_bijective_iff_isHausdorff_of_fg_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Function.Bijective (ofTensorProduct I M) ↔
+      IsHausdorff I (AdicCompletion I R ⊗[R] M) := by
+  constructor
+  · intro h
+    exact (ofTensorProduct_injective_iff_isHausdorff_of_fg_pow I M hn hI).mp h.1
+  · intro h
+    have hJ : IsHausdorff (I.map (algebraMap R (AdicCompletion I R)))
+        (AdicCompletion I R ⊗[R] M) := IsHausdorff.map_algebraMap_iff.mpr h
+    have hq : Function.Bijective
+        (Hausdorffification.of (I.map (algebraMap R (AdicCompletion I R)))
+          (AdicCompletion I R ⊗[R] M)) := by
+      refine ⟨?_, Submodule.mkQ_surjective _⟩
+      apply LinearMap.ker_eq_bot.mp
+      rw [Hausdorffification.of, Submodule.ker_mkQ]
+      exact hJ.iInf_pow_smul
+    rw [← ofTensorProductHausdorffificationEquivOfFiniteQuotient_comp_of I M hn hI]
+    exact (ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI).bijective.comp hq
+
+end Hausdorffification
 
 end AdicCompletion

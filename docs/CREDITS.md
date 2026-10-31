@@ -107,6 +107,20 @@ inverse-limit results, not the whole intrinsic-completion assertion of Fujiwara�
 Proposition 7.2.16, which has a finitely generated ideal setting. The comparison and
 finite-original Mathlib surjectivity declarations, author notices and licenses are preserved.
 
+The tensor-comparison kernel calculation reuses this library's coefficient quotient
+comparison and fixed-stage kernel theorem, whose finite-linear-combination argument follows
+Bingyu Xia's Mathlib formalization. It composes `quotTensorEquivQuotSMul` from Antoine
+Chambert-Loir and Jujian Zhang's `LinearAlgebra/TensorProduct/Quotient.lean`,
+`cancelBaseChange` from Kim Morrison, Johan Commelin and Eric Wieser's
+`LinearAlgebra/TensorProduct/Tower.lean`, and the coefficient comparison at cofinal
+multiples of the specified positive exponent. It identifies evaluation after the same
+canonical tensor comparison, without rebuilding tensor right exactness. The quotient
+equivalence uses Mathlib's existing Hausdorffification from Kenny Lau, Judith Ludwig,
+Christian Merten and Jiedong Jiang's adic-completion Basic module, together with the
+first isomorphism theorem from Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury
+Kudryashov's `LinearAlgebra/Isomorphisms.lean`. Their Apache-2.0 notices remain upstream;
+these interfaces and formalization approaches are reused without copying their proofs.
+
 The valuation-integers completeness bridge is motivated by I. Fesenko and
 S. Vostokov, *Local Fields and Their Extensions*, second edition (2002),
 II §1, Corollary 1. It independently assembles Mathlib's valuation-integers,

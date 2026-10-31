@@ -341,6 +341,34 @@ These are statements about the current library, not the historical API inventory
   Both results use the given actions and the canonical completed scalar ring.
   See the [fibre and submodule API](../AdicModules/AdicCompletion/Submodule.lean).
 
+- **Tensor-comparison kernel and Hausdorffification.**
+  Let `R` be a commutative ring, `I : Ideal R`, and `M` an additive commutative
+  group with its original `R`-action, in an independent universe. Put
+  `S = AdicCompletion I R`, `T = S ⊗[R] M` and `J = I.map (algebraMap R S)`.
+  For `0 < n` and `(I ^ n).FG`,
+  `AdicCompletion.ker_ofTensorProduct_eq_iInf_of_fg_pow` identifies the kernel
+  of the canonical `S`-linear comparison `F` with `H = ⨅ k, J ^ k • ⊤` in
+  `Submodule S T`. No finiteness of the original module or its first quotient
+  is needed. `ofTensorProduct_injective_iff_isHausdorff_of_fg_pow` gives
+  `Function.Injective F ↔ IsHausdorff I T` for the original `R`-action on `T`.
+
+  With only `Module.Finite R (M ⧸ (I • ⊤))` added,
+  `AdicCompletion.ofTensorProductHausdorffificationEquivOfFiniteQuotient`
+  constructs `E : Hausdorffification J T ≃ₗ[S] AdicCompletion I M` by the
+  first isomorphism theorem. For the quotient projection `q`, its
+  `_comp_of` law is `E.toLinearMap ∘ₗ q = F`. The simp laws `_apply_of`,
+  `_symm_apply` and `_symm_of` give `E (q t) = F t`, `E.symm (F t) = q t`
+  for every tensor `t`, and `E.symm (AdicCompletion.of I M m) = q (1 ⊗ₜ m)`.
+  `ofTensorProduct_bijective_iff_isHausdorff_of_fg_pow` uses this factorization
+  to characterize bijectivity by the same original-`I` Hausdorffness.
+  The tensor has its canonical first-factor `S`-action; original `M` receives
+  no `S`-action. There is no flatness, projectivity, original finiteness,
+  separation, completeness or Noetherianity premise. Finite generation of a
+  positive power is a sufficient ideal condition, not an individual-ideal
+  necessity criterion. The existing projective comparisons retain their
+  arbitrary-ideal hypotheses. See the
+  [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean).
+
 - **Adic completion of projective modules.**
   For a commutative ring `R`, an additive commutative group `M` with `Module R M`
   and `Module.Projective R M`, and any ideal `I`,
