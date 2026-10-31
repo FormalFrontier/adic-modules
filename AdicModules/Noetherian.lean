@@ -595,20 +595,9 @@ theorem isNoetherian_of_isNoetherian
     apply (restrictScalarsEquiv (S := B) I B).injective
     exact (restrictScalarsEquiv_mapRingHom (S := B) I a).trans ha
   let : RingHomSurjective ρ := ⟨hρ⟩
-  let e := restrictScalarsEquiv (S := B) I M
   let L : AdicCompletion I M →ₛₗ[ρ] AdicCompletion J M :=
-    { toFun := e.symm
-      map_add' := e.symm.map_add
-      map_smul' := by
-        intro a x
-        apply e.injective
-        change e (e.symm (a • x)) = e (ρ a • e.symm x)
-        calc
-          e (e.symm (a • x)) = a • x := e.apply_symm_apply _
-          _ = a • e (e.symm x) :=
-            congrArg (fun y => a • y) (e.apply_symm_apply x).symm
-          _ = e (ρ a • e.symm x) :=
-            (restrictScalarsEquiv_smul (S := B) I a (e.symm x)).symm }
-  exact (LinearMap.isNoetherian_iff_of_bijective L e.symm.bijective).mpr inferInstance
+    restrictScalarsSemilinearMap (S := B) I M
+  exact (LinearMap.isNoetherian_iff_of_bijective L
+    (restrictScalarsSemilinearMap_bijective (S := B) I M)).mpr inferInstance
 
 end AdicCompletion

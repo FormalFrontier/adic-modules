@@ -23,9 +23,11 @@ equivalent over `R`. No finiteness, separatedness, or completeness assumption is
 The equivalence goes from completion along the extended ideal to completion
 along `I`. Its inverse, both quotient representatives, and the transition maps
 are described by the accompanying lemmas. It also intertwines the canonical
-completed scalar actions through the completed coefficient ring map. Under this
-comparison, the completed coefficient ring map agrees with completion of the
-original coefficient linear map.
+completed scalar actions through the completed coefficient ring map. Its inverse
+is the bijective semilinear map `restrictScalarsSemilinearMap`, with scalar
+compatibility given by `LinearMap.map_smulₛₗ`; the coefficient ring map need not
+be invertible. Under this comparison, the completed coefficient ring map agrees
+with completion of the original coefficient linear map.
 
 ## References
 
@@ -196,6 +198,43 @@ theorem restrictScalarsEquiv_smul (I : Ideal R) (a : AdicCompletion I R)
   rw [smul_eval, smul_eval, val_smul_eq_evalₐ_smul, val_smul_eq_evalₐ_smul,
     evalₐ_mapRingHom]
   exact restrictScalarsLevelEquiv_smul I n (evalₐ I n a) (x.val n)
+
+/-- The inverse restriction-of-scalars comparison, semilinear over the canonical
+completed coefficient ring map. Both completions retain their canonical completed
+module actions. This map is bijective even though the coefficient ring map need
+not be injective or surjective. -/
+noncomputable def restrictScalarsSemilinearMap (I : Ideal R) (N : Type*) [AddCommGroup N]
+    [Module R N] [Module S N] [IsScalarTower R S N] :
+    AdicCompletion I N →ₛₗ[
+      mapRingHom I (I.map (algebraMap R S)) (algebraMap R S) Ideal.le_comap_map]
+      AdicCompletion (I.map (algebraMap R S)) N :=
+  let e := restrictScalarsEquiv (S := S) I N
+  { toFun := e.symm
+    map_add' := e.symm.map_add
+    map_smul' := by
+      intro a x
+      apply e.injective
+      calc
+        e (e.symm (a • x)) = a • x := e.apply_symm_apply _
+        _ = a • e (e.symm x) :=
+          congrArg (fun y => a • y) (e.apply_symm_apply x).symm
+        _ = e (mapRingHom I (I.map (algebraMap R S)) (algebraMap R S)
+            Ideal.le_comap_map a • e.symm x) :=
+          (restrictScalarsEquiv_smul (S := S) I a (e.symm x)).symm }
+
+/-- The semilinear comparison has the same function as the inverse original-ring
+linear comparison. -/
+@[simp]
+theorem restrictScalarsSemilinearMap_apply (I : Ideal R) (x : AdicCompletion I M) :
+    restrictScalarsSemilinearMap (S := S) I M x =
+      (restrictScalarsEquiv (S := S) I M).symm x :=
+  rfl
+
+/-- The semilinear restriction comparison is bijective on completed modules. -/
+theorem restrictScalarsSemilinearMap_bijective (I : Ideal R) (N : Type*)
+    [AddCommGroup N] [Module R N] [Module S N] [IsScalarTower R S N] :
+    Function.Bijective (restrictScalarsSemilinearMap (S := S) I N) :=
+  (restrictScalarsEquiv (S := S) I N).symm.bijective
 
 /-- Under restriction of scalars, the completed coefficient ring map is the
 completion of the original coefficient linear map. -/
