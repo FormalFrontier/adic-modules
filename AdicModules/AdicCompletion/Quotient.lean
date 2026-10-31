@@ -26,6 +26,15 @@ import Mathlib.RingTheory.TensorProduct.Basic
 
 The coordinate projections are semilinear over the corresponding coefficient
 evaluations, including the normalized first projection to the residue quotient.
+For every `m ≤ n`, the original two-stage quotient `I^m M / I^n M` is canonically
+isomorphic to the quotient of the evaluation kernels at `m` and `n`. This comparison
+is induced by the original map to the completion and needs no finiteness assumption.
+It also supplies original representatives for the unconditional scalar law: the
+`p`th coefficient evaluation kernel times the `q`th module evaluation kernel lies
+in the `(p + q)`th module evaluation kernel. The comparisons preserve leading
+scalar products of original representatives, requiring only next-precision agreement
+for each factor. No evaluation kernel is identified with an intrinsic ideal-power
+submodule of the completion here.
 
 Let `I` be an ideal of a commutative ring `R`, put `S = AdicCompletion I R`,
 and let `J` be the extension of `I` to `S`. If `I.Cotangent` is finite over `R ⧸ I`,
@@ -179,6 +188,202 @@ theorem factor_evalOneₛₗ_eq_evalOneₐ (I : Ideal R) (x : AdicCompletion I R
   rw [evalOneₛₗ_apply, ← factorₐ_evalₐ_one,
     ← factor_eval_eq_evalₐ I x (le_of_eq (Ideal.mul_top _))]
   exact Quotient.inductionOn' (eval I R 1 x) (fun _ ↦ rfl)
+
+private noncomputable def powToKerEvalQuotient (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] (m n : ℕ) :
+    ↥(I ^ m • (⊤ : Submodule R M)) →ₗ[R]
+      (eval I M m).ker ⧸ ((eval I M n).ker).comap ((eval I M m).ker).subtype :=
+  (((eval I M n).ker).comap ((eval I M m).ker).subtype).mkQ.comp
+    (((of I M).comp (I ^ m • (⊤ : Submodule R M)).subtype).codRestrict
+      (eval I M m).ker (fun a => by
+        rw [LinearMap.mem_ker, LinearMap.comp_apply, eval_of]
+        exact (Submodule.Quotient.mk_eq_zero _).mpr a.property))
+
+private theorem ker_powToKerEvalQuotient (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] (m n : ℕ) :
+    (powToKerEvalQuotient I M m n).ker =
+      (I ^ n • (⊤ : Submodule R M)).comap
+        (I ^ m • (⊤ : Submodule R M)).subtype := by
+  rw [powToKerEvalQuotient, LinearMap.ker_comp, Submodule.ker_mkQ]
+  ext a
+  change eval I M n (of I M (a : M)) = 0 ↔ (a : M) ∈ I ^ n • (⊤ : Submodule R M)
+  rw [eval_of]
+  exact Submodule.Quotient.mk_eq_zero _
+
+private theorem exists_pow_representative (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n)
+    (x : (eval I M m).ker) :
+    ∃ a : ↥(I ^ m • (⊤ : Submodule R M)),
+      (I ^ n • (⊤ : Submodule R M)).mkQ (a : M) = eval I M n (x : AdicCompletion I M) := by
+  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective
+    (I ^ n • (⊤ : Submodule R M)) (eval I M n (x : AdicCompletion I M))
+  have ham : (I ^ m • (⊤ : Submodule R M)).mkQ a = 0 := by
+    calc
+      _ = transitionMap I M hmn ((I ^ n • (⊤ : Submodule R M)).mkQ a) :=
+        (Submodule.factor_mk (Submodule.pow_smul_top_le I M hmn) a).symm
+      _ = eval I M m (x : AdicCompletion I M) := by
+        rw [ha]
+        exact transitionMap_comp_eval_apply I M hmn (x : AdicCompletion I M)
+      _ = 0 := x.property
+  exact ⟨⟨a, (Submodule.Quotient.mk_eq_zero _).mp ham⟩, ha⟩
+
+private theorem surjective_powToKerEvalQuotient (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n) :
+    Function.Surjective (powToKerEvalQuotient I M m n) := by
+  intro z
+  obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective _ z
+  obtain ⟨a, ha⟩ := exists_pow_representative I M hmn x
+  refine ⟨a, ?_⟩
+  apply (Submodule.Quotient.eq _).mpr
+  change eval I M n (of I M (a : M) - (x : AdicCompletion I M)) = 0
+  rw [map_sub, eval_of, ha, sub_self]
+
+/-- The original two-stage ideal-power quotient is the quotient of the corresponding
+completion evaluation kernels. The forward map is induced by `of`, with no finite-generation,
+separation or completeness assumption on the original module. -/
+noncomputable def powQuotientEquivKerEvalQuotient (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n) :
+    (↥(I ^ m • (⊤ : Submodule R M)) ⧸
+      (I ^ n • (⊤ : Submodule R M)).comap
+        (I ^ m • (⊤ : Submodule R M)).subtype) ≃ₗ[R]
+    ((eval I M m).ker ⧸
+      ((eval I M n).ker).comap ((eval I M m).ker).subtype) :=
+  private_decl% ((Submodule.quotEquivOfEq _ _
+    (ker_powToKerEvalQuotient I M m n).symm).trans
+      ((powToKerEvalQuotient I M m n).quotKerEquivOfSurjective
+        (surjective_powToKerEvalQuotient I M hmn)))
+
+/-- The kernel-quotient comparison takes an original representative to its canonical
+image in the completion. -/
+@[simp]
+theorem powQuotientEquivKerEvalQuotient_mk (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n)
+    (a : ↥(I ^ m • (⊤ : Submodule R M))) :
+    powQuotientEquivKerEvalQuotient I M hmn (Submodule.Quotient.mk a) =
+      Submodule.Quotient.mk (⟨of I M (a : M), by
+        rw [LinearMap.mem_ker, eval_of]
+        exact (Submodule.Quotient.mk_eq_zero _).mpr a.property⟩ : (eval I M m).ker) := by
+  simp only [powQuotientEquivKerEvalQuotient]
+  rfl
+
+/-- An original representative of the higher evaluation computes the inverse comparison. -/
+theorem powQuotientEquivKerEvalQuotient_symm_mk (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n)
+    (x : (eval I M m).ker) (a : ↥(I ^ m • (⊤ : Submodule R M)))
+    (ha : (I ^ n • (⊤ : Submodule R M)).mkQ (a : M) =
+      eval I M n (x : AdicCompletion I M)) :
+    (powQuotientEquivKerEvalQuotient I M hmn).symm (Submodule.Quotient.mk x) =
+      Submodule.Quotient.mk a := by
+  apply (powQuotientEquivKerEvalQuotient I M hmn).injective
+  rw [LinearEquiv.apply_symm_apply, powQuotientEquivKerEvalQuotient_mk]
+  apply (Submodule.Quotient.eq _).mpr
+  change eval I M n ((x : AdicCompletion I M) - of I M (a : M)) = 0
+  rw [map_sub, eval_of, ha, sub_self]
+
+/-- The inverse comparison followed by the original quotient inclusion agrees with
+higher evaluation on the whole lower evaluation kernel. -/
+theorem mapQ_comp_powQuotientEquivKerEvalQuotient_symm (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n) :
+    (((I ^ n • (⊤ : Submodule R M)).comap
+        (I ^ m • (⊤ : Submodule R M)).subtype).mapQ
+      (I ^ n • (⊤ : Submodule R M)) (I ^ m • (⊤ : Submodule R M)).subtype le_rfl).comp
+      ((powQuotientEquivKerEvalQuotient I M hmn).symm.toLinearMap.comp
+        (((eval I M n).ker).comap ((eval I M m).ker).subtype).mkQ) =
+      (eval I M n).comp ((eval I M m).ker).subtype := by
+  ext x
+  obtain ⟨a, ha⟩ := exists_pow_representative I M hmn x
+  simpa only [LinearMap.comp_apply, LinearEquiv.coe_coe, Submodule.mkQ_apply,
+    powQuotientEquivKerEvalQuotient_symm_mk I M hmn x a ha,
+    Submodule.mapQ_apply, Submodule.coe_subtype] using ha
+
+/-- A coefficient in the `p`th evaluation kernel takes the `q`th module evaluation
+kernel into the `(p + q)`th kernel, unconditionally for the canonical completed action.
+Original representatives are supplied by the two-stage quotient comparison. -/
+theorem smul_mem_ker_eval_add (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] {p q : ℕ}
+    {s : AdicCompletion I R} {x : AdicCompletion I M}
+    (hs : s ∈ (eval I R p).ker) (hx : x ∈ (eval I M q).ker) :
+    s • x ∈ (eval I M (p + q)).ker := by
+  let es := powQuotientEquivKerEvalQuotient I R (Nat.le_add_right p q)
+  let ex := powQuotientEquivKerEvalQuotient I M (Nat.le_add_left q p)
+  obtain ⟨r, hr⟩ := Submodule.mkQ_surjective _
+    (es.symm (Submodule.Quotient.mk (⟨s, hs⟩ : (eval I R p).ker)))
+  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective _
+    (ex.symm (Submodule.Quotient.mk (⟨x, hx⟩ : (eval I M q).ker)))
+  have hrval : (I ^ (p + q) • (⊤ : Submodule R R)).mkQ (r : R) = eval I R (p + q) s := by
+    have h := LinearMap.congr_fun
+      (mapQ_comp_powQuotientEquivKerEvalQuotient_symm I R (Nat.le_add_right p q))
+      (⟨s, hs⟩ : (eval I R p).ker)
+    simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, Submodule.mkQ_apply] at h
+    rw [← hr] at h
+    exact h
+  have haval : (I ^ (p + q) • (⊤ : Submodule R M)).mkQ (a : M) = eval I M (p + q) x := by
+    have h := LinearMap.congr_fun
+      (mapQ_comp_powQuotientEquivKerEvalQuotient_symm I M (Nat.le_add_left q p))
+      (⟨x, hx⟩ : (eval I M q).ker)
+    simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, Submodule.mkQ_apply] at h
+    rw [← ha] at h
+    exact h
+  have hrpow : (r : R) ∈ I ^ p := by
+    simpa only [Ideal.smul_eq_mul, Ideal.mul_top] using r.property
+  have hprod : (r : R) • (a : M) ∈ I ^ (p + q) • (⊤ : Submodule R M) := by
+    rw [pow_add, Submodule.mul_smul]
+    exact Submodule.smul_mem_smul hrpow a.property
+  change eval I R (p + q) s • eval I M (p + q) x = 0
+  rw [← hrval, ← haval]
+  change (Submodule.Quotient.mk ((r : R) • (a : M)) :
+    M ⧸ (I ^ (p + q) • (⊤ : Submodule R M))) = 0
+  exact (Submodule.Quotient.mk_eq_zero _).mpr hprod
+
+/-- Leading scalar products computed through the kernel-quotient comparison are the
+products of original representatives. Each factor need only agree with its representative
+at its own next precision. -/
+theorem powQuotientEquivKerEvalQuotient_symm_mk_smul (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] (p q : ℕ)
+    (s : (eval I R p).ker) (x : (eval I M q).ker)
+    (r : R) (hr : r ∈ I ^ p) (a : M) (ha : a ∈ I ^ q • (⊤ : Submodule R M))
+    (hsr : (I ^ (p + 1) • (⊤ : Submodule R R)).mkQ r =
+      eval I R (p + 1) (s : AdicCompletion I R))
+    (hxa : (I ^ (q + 1) • (⊤ : Submodule R M)).mkQ a =
+      eval I M (q + 1) (x : AdicCompletion I M)) :
+    (powQuotientEquivKerEvalQuotient I M (Nat.le_succ (p + q))).symm
+      (Submodule.Quotient.mk
+        (⟨(s : AdicCompletion I R) • (x : AdicCompletion I M),
+          smul_mem_ker_eval_add I M s.property x.property⟩ : (eval I M (p + q)).ker)) =
+      Submodule.Quotient.mk (⟨r • a, by
+        rw [pow_add, Submodule.mul_smul]
+        exact Submodule.smul_mem_smul hr ha⟩ :
+          ↥(I ^ (p + q) • (⊤ : Submodule R M))) := by
+  have hs : (s : AdicCompletion I R) - of I R r ∈ (eval I R (p + 1)).ker := by
+    rw [LinearMap.mem_ker, map_sub, eval_of, hsr, sub_self]
+  have hx : (x : AdicCompletion I M) - of I M a ∈ (eval I M (q + 1)).ker := by
+    rw [LinearMap.mem_ker, map_sub, eval_of, hxa, sub_self]
+  have hrmem : of I R r ∈ (eval I R p).ker := by
+    rw [LinearMap.mem_ker, eval_of]
+    apply (Submodule.Quotient.mk_eq_zero _).mpr
+    simpa only [Ideal.smul_eq_mul, Ideal.mul_top] using hr
+  have hleft : ((s : AdicCompletion I R) - of I R r) • (x : AdicCompletion I M) ∈
+      (eval I M (p + q + 1)).ker := by
+    exact Eq.mp (congrArg
+      (fun n => ((s : AdicCompletion I R) - of I R r) • (x : AdicCompletion I M) ∈
+        (eval I M n).ker) (Nat.add_right_comm p 1 q))
+      (smul_mem_ker_eval_add I M hs x.property)
+  have hright : of I R r • ((x : AdicCompletion I M) - of I M a) ∈
+      (eval I M (p + q + 1)).ker := by
+    exact Eq.mp (congrArg
+      (fun n => of I R r • ((x : AdicCompletion I M) - of I M a) ∈
+        (eval I M n).ker) (Nat.add_assoc p q 1).symm)
+      (smul_mem_ker_eval_add I M hrmem hx)
+  have hdiff : (s : AdicCompletion I R) • (x : AdicCompletion I M) -
+      of I R r • of I M a ∈ (eval I M (p + q + 1)).ker := by
+    simpa only [sub_smul, smul_sub, sub_add_sub_cancel] using
+      (eval I M (p + q + 1)).ker.add_mem hleft hright
+  apply powQuotientEquivKerEvalQuotient_symm_mk
+  have h := LinearMap.mem_ker.mp hdiff
+  rw [map_sub, sub_eq_zero] at h
+  calc
+    _ = eval I M (p + q + 1) (of I R r • of I M a) := rfl
+    _ = eval I M (p + q + 1) ((s : AdicCompletion I R) • (x : AdicCompletion I M)) := h.symm
 
 private noncomputable def quotientPowLinearEquivOfKernel
     (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M] (n : ℕ)

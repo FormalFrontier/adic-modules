@@ -18,6 +18,13 @@ of the coefficient ideal, of the range, or of the source quotient.
 Commuting scalar actions are required only on the target. Projectivity
 is required only on the original module `M`, not on either quotient or target.
 The endomorphism results are specializations to the canonical quotient.
+
+If the image of `I M` in `M / Q` is finitely generated, one finitely generated
+left subideal `J ≤ I` has the same acted image: `J M ⊔ Q = I M ⊔ Q`.
+Here `Q` is any submodule over a ring, with no containment or two-sidedness
+hypothesis. The quotient-image proof follows the acted first-layer argument
+in `AdicModules.AdicCompletion.Kernel`, using the finite scalar-cover argument
+below and Mathlib's quotient map/comap identities.
 -/
 
 @[expose] public section
@@ -135,6 +142,31 @@ end Ideal
 namespace Ideal
 
 variable {R : Type u} [Ring R]
+
+/-- A finitely generated image of `I M` modulo any submodule is already the
+image of `J M` for a finitely generated left subideal `J ≤ I`. Neither a
+containment condition on the submodule nor two-sidedness of the ideal is needed. -/
+theorem exists_fg_subideal_smul_sup_eq_of_fg_map_mkQ
+    {M : Type v} [AddCommGroup M] [Module R M]
+    (I : Ideal R) (Q : Submodule R M)
+    (hF : ((I • (⊤ : Submodule R M)).map Q.mkQ).FG) :
+    ∃ J : Ideal R, J.FG ∧ J ≤ I ∧
+      J • (⊤ : Submodule R M) ⊔ Q = I • (⊤ : Submodule R M) ⊔ Q := by
+  have hmap (K : Ideal R) : (K • (⊤ : Submodule R M)).map Q.mkQ =
+      K • (⊤ : Submodule R (M ⧸ Q)) := by
+    rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ]
+  have hfinite : (I • (⊤ : Submodule R (M ⧸ Q))).FG := by
+    rw [← hmap I]
+    exact hF
+  obtain ⟨J, hJ, hJI, hcover⟩ := exists_fg_subideal_cover hfinite
+    (by rw [moduleSpan_eq_smul_top])
+  rw [moduleSpan_eq_smul_top, ← hmap I, ← hmap J] at hcover
+  have heq : (J • (⊤ : Submodule R M)).map Q.mkQ =
+      (I • (⊤ : Submodule R M)).map Q.mkQ :=
+    le_antisymm (Submodule.map_mono (Submodule.smul_mono_left hJI)) hcover
+  refine ⟨J, hJ, hJI, ?_⟩
+  simpa only [Submodule.comap_map_mkQ, sup_comm Q] using
+    congrArg (fun P : Submodule R (M ⧸ Q) => P.comap Q.mkQ) heq
 
 /-- The canonical quotient by the submodule of finite sums `i • m`. -/
 abbrev ModuleQuotient (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M] :=

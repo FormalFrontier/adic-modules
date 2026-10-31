@@ -14,6 +14,7 @@ public import Mathlib.RingTheory.PrincipalIdealDomain
 
 import AdicModules.AdicCompletion.Cotangent
 import AdicModules.Noetherian
+import Mathlib.RingTheory.Flat.EquationalCriterion
 
 /-!
 # Finite-presentation detection and completion–tensor comparison
@@ -84,6 +85,18 @@ example {R : Type uR} [CommRing R] (I : Ideal R)
     (AdicCompletion.moduleFinitePresentation_iff_finitePresentation_quotient_of_flat
       I M n hn).mpr inferInstance
   exact AdicCompletion.moduleFinitePresentation_quotient_of_finitePresentation_completion I M k
+
+-- A Noetherian residue ring suffices for finite flat raw completions to be projective.
+example {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing (R ⧸ I)]
+    [Module.Flat (AdicCompletion I R) (AdicCompletion I M)]
+    [Module.Finite (AdicCompletion I R) (AdicCompletion I M)] :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  let : Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) :=
+    (AdicCompletion.moduleFinitePresentation_iff_finite_of_flat_of_isNoetherian_quotient
+      I M).mpr inferInstance
+  exact Module.Flat.projective_of_finitePresentation
 
 namespace IntegerResidue
 
