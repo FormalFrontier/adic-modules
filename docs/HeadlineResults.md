@@ -69,6 +69,27 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   The target needs no completed-ring action; see the
   [Hom-out equivalence](../AdicModules/AdicCompletion/LinearMap.lean).
 
+- **Noetherian completed modules from original quotients.** For every ideal `I`
+  of a commutative ring `R` and every original `R`-module `M`, the raw completion
+  `H = AdicCompletion I M` is Noetherian over `C = AdicCompletion I R` exactly
+  when the original `M / I² M` is Noetherian over `R`. Equivalently, for each
+  chosen `n ≥ 2`, the original `M / Iⁿ M` is Noetherian over `R / Iⁿ` with its
+  canonical quotient action. See
+  [`AdicCompletion.isNoetherian_iff_quotient_sq` and `isNoetherian_iff_quotient_pow`](../AdicModules/Noetherian.lean).
+  No Noetherianity of `R` or `C`, finite generation of `I` or `M`, original
+  completeness or separation is assumed; ring and module universes are independent.
+  The exponent bound is sharp: precision zero always gives a zero quotient,
+  while a Noetherian first quotient need not give a Noetherian completion.
+  Necessity also holds at every `n ≥ 0` by `isNoetherian_quotient_pow`.
+
+  More generally, Noetherianity of the original associated graded module
+  `Ideal.AssociatedGradedModule I M` over
+  `reesAlgebra I / I.map (algebraMap R (reesAlgebra I))` suffices by
+  `AdicCompletion.isNoetherian_of_associatedGradedModule`. Its proof selects
+  finitely many homogeneous leading classes of an arbitrary submodule of `H`
+  and reconstructs coefficients in `C`, without assuming intrinsic completeness
+  of `H` or identifying its evaluation kernels with ideal powers.
+
 - **Completion of a Noetherian original module.** For every ideal `I` of a
   commutative ring `R`, a Noetherian `R`-module `M` has raw completion Noetherian
   over the canonical completed ring `AdicCompletion I R`. Neither `R` nor
@@ -77,17 +98,6 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   are independent. This is only a sufficient condition: the `(2)`-adic completion
   of `ℤ[1/2]` is zero, although `ℤ[1/2]` is not a Noetherian `ℤ`-module. See
   [`AdicCompletion.isNoetherian_of_isNoetherian`](../AdicModules/Noetherian.lean).
-
-- **Original quotients of a Noetherian completed module.** For any ideal `I` of a
-  commutative ring `R` and any original `R`-module `M`, if
-  `H = AdicCompletion I M` is Noetherian over `C = AdicCompletion I R`, then every
-  original `M / Iⁿ M` is Noetherian over `R / Iⁿ` with its canonical quotient action.
-  [`AdicCompletion.isNoetherian_quotient_pow`](../AdicModules/Noetherian.lean)
-  includes all `n ≥ 0`; the zeroth quotient is zero. No Noetherianity of `R` or `C`,
-  finite generation of `I` or finiteness of `M` is required, and the ring and module
-  universes are independent. This is only a necessary consequence of Noetherianity
-  of `H`, not a converse or a claim that `C` is Noetherian. Finite generation of a
-  positive ideal power alone does not give this quotient-Noetherianity conclusion.
 
 - **Noetherian original module power quotients.** For any ideal `I` of a
   commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original

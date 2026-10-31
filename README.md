@@ -30,10 +30,14 @@ further result families, examples and boundary cases.
   and the image of `IM` in `M / I²M` is finitely generated over original `R`.
   Neither `R` nor `R / I` need be Noetherian. See the
   [original-quotient criterion](AdicModules/LinearAlgebra/Quotient/Noetherian.lean).
-  Separately, if `H` is Noetherian over `C`, every original `M / IⁿM` is
-  Noetherian over `R / Iⁿ` with its canonical quotient action, including `n = 0`;
-  Noetherianity of `C` is not required. This is a necessary consequence, not a
-  criterion for `H`; see [quotient descent](AdicModules/Noetherian.lean).
+
+- **Noetherian completed modules.** For any ideal and original module, `H` is
+  Noetherian over `C` iff the original `M / I²M` is Noetherian over `R`;
+  equivalently, iff any chosen `M / IⁿM`, `n ≥ 2`, is Noetherian over `R / Iⁿ`
+  with its canonical action. No Noetherian coefficient ring, finite generation,
+  original completeness or separation is required. Noetherianity of the original
+  associated graded module over the quotient Rees algebra also suffices.
+  See the [module criterion](AdicModules/Noetherian.lean).
 
 - **Module completion and stationary evaluation.** If the image of `I M` in
   the original `M / I² M` is finitely generated over `R`, then `Iⁿ H = ker(evalₙ)`
