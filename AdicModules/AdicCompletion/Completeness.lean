@@ -10,10 +10,12 @@ Authors: Bingyu Xia
 -/
 module
 
+public import Mathlib.Algebra.Module.Projective
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 
 import AdicModules.AdicCompletion.Kernel
 import Mathlib.Algebra.Module.Submodule.Pointwise
+import Mathlib.LinearAlgebra.Dual.Lemmas
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Choose
 
@@ -26,6 +28,9 @@ Hausdorffness transfers along injective linear maps. Every linear map takes the
 intrinsic ideal-power filtration into the target filtration; target Hausdorffness
 and injectivity then give source Hausdorffness. No strictness or closed-image
 condition is required.
+
+Projective modules over an `I`-Hausdorff coefficient ring are `I`-Hausdorff,
+without finite-generation or completeness assumptions.
 
 Finite generation of a positive power of `I` makes `AdicCompletion I M` intrinsically
 `I`-adically complete for its original `R`-module structure. The all-stage evaluation-kernel
@@ -58,6 +63,8 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
 * Mathlib's adic completeness API by Kenny Lau, Judith Ludwig, Christian Merten
   and Jiedong Jiang, and its submodule congruence API by Kenny Lau, provide
   the predicates and zero-submodule congruence criterion used here.
+* Mathlib's `Module.forall_dual_apply_eq_zero_iff` supplies separation by dual maps
+  for projective modules of arbitrary rank.
 * Bingyu Xia's `AdicCompletion.isAdicComplete` in Mathlib's
   `RingTheory/AdicCompletion/Completeness.lean` supplies the diagonal completeness argument;
   here finite generation of one positive ideal power replaces `I.FG`.
@@ -114,6 +121,21 @@ theorem isAdicComplete_of_fg_pow
   rfl
 
 end AdicCompletion
+
+/-- A projective module over an adically Hausdorff coefficient ring is adically Hausdorff. -/
+theorem IsHausdorff.of_projective
+    {R : Type uR} [CommRing R] (I : Ideal R) (M : Type uM)
+    [AddCommGroup M] [Module R M] [Module.Projective R M] [IsHausdorff I R] :
+    IsHausdorff I M := by
+  constructor
+  intro x hx
+  apply (Module.forall_dual_apply_eq_zero_iff R x).mp
+  intro φ
+  apply IsHausdorff.haus ‹IsHausdorff I R› (φ x)
+  intro n
+  rw [SModEq.sub_mem, sub_zero]
+  exact Submodule.smul_top_le_comap_smul_top (I ^ n) φ
+    (by simpa only [SModEq.sub_mem, sub_zero] using hx n)
 
 variable {R : Type u} [CommRing R] {M : Type v} [AddCommGroup M] [Module R M]
 

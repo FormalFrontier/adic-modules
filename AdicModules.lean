@@ -31,6 +31,7 @@ public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.CompleteBase
+public import AdicModules.AdicCompletion.DFinsupp
 public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
@@ -54,6 +55,7 @@ public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.LocalizedModule
 public import AdicModules.LinearAlgebra.Pi
+public import AdicModules.LinearAlgebra.Quotient.DFinsupp
 public import AdicModules.LinearAlgebra.Quotient.End
 public import AdicModules.LinearAlgebra.Quotient.Flat
 public import AdicModules.LinearAlgebra.Quotient.Hausdorff
@@ -113,7 +115,9 @@ public import AdicModules.RingTheory.HenselianPi
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
-compares adic completions under restriction of scalars. For a finite projective module over
+compares adic completions under restriction of scalars. For every ideal, completion of a
+dependent direct sum is the canonical completed-ring-linear restricted product, defined
+by finite support at each original quotient evaluation. For a finite projective module over
 any commutative ring, the canonical tensor comparison is a completion-ring-linear equivalence,
 with independent ring and module universes and no Noetherian hypothesis. It also describes
 submodule closure using a basis of submodule neighborhoods of zero in a given topological

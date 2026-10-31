@@ -20,6 +20,12 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   no ambient separation, completeness or finiteness is required. See the
   [quotient separation API](AdicModules/LinearAlgebra/Quotient/Hausdorff.lean).
 
+- **Separation of projective modules.** For any ideal `I` of a commutative ring,
+  an `I`-Hausdorff coefficient ring makes every projective module `I`-Hausdorff,
+  with no finite-generation or completeness assumption. The existing canonical
+  map into adic completion is therefore injective. See
+  [`IsHausdorff.of_projective`](AdicModules/AdicCompletion/Completeness.lean).
+
 - **Modules over precomplete and complete bases.** For any ideal `I` of a
   commutative ring `R` with `[IsPrecomplete I R]`, finiteness of `M / I M`
   over `R / I` makes the original module `M` precomplete. If `M` is also
@@ -407,6 +413,17 @@ Rings are commutative; modules are additive commutative groups unless specified 
   This needs neither finiteness of `M` nor finite generation of `I`.
   Maps from the completion of a finite module to any completed-ring module are
   determined by the original module.
+- **Dependent direct sums for every ideal** ([comparison](AdicModules/AdicCompletion/DFinsupp.lean),
+  [original quotients](AdicModules/LinearAlgebra/Quotient/DFinsupp.lean)):
+  `AdicCompletion.dfinsuppEquiv` identifies the raw completion of `Π₀ i, M i` with
+  `AdicCompletion.restrictedProduct I M`, linearly over the canonical completed ring.
+  Its families have finite nonzero-coordinate support at **each original quotient
+  evaluation**, with a finite exceptional set that may depend on the precision.
+  The forward coordinates are the completed direct-sum projections; the inverse
+  recovers the prescribed original quotient coordinates. No finite generation,
+  Noetherianity, component finiteness, separatedness or completeness is assumed,
+  and ring, index and fiber universes are independent. For finite index types this
+  is the whole product and agrees with the finite product comparison.
 - **Products from a finitely generated positive power** ([comparison and completeness](AdicModules/AdicCompletion/Pi.lean)):
   for any commutative ring, ideal `I`, dependent family of modules and given `n > 0`
   with `(I ^ n).FG`, `AdicCompletion.piEquivOfFGPow` makes the canonical product
@@ -780,6 +797,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.LocalRing](AdicModules/AdicCompletion/LocalRing.lean) (unit detection and ideal extension for arbitrary ideals) | [AdicCompletion.LocalRing](AdicModulesTest/AdicCompletion/LocalRing.lean) (`ZMod 6`: `(2)` extends properly and `(3)` extends to top in the `(2)`-adic completion) |
 | [AdicCompletion.PadicInt](AdicModules/AdicCompletion/PadicInt.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) |
 | [AdicCompletion.PadicIntTopology](AdicModules/AdicCompletion/PadicIntTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (proper open mod-four kernel and its image) |
+| [AdicCompletion.DFinsupp](AdicModules/AdicCompletion/DFinsupp.lean) and [LinearAlgebra.Quotient.DFinsupp](AdicModules/LinearAlgebra/Quotient/DFinsupp.lean) (all-ideal dependent direct-sum completion and original quotient comparisons) | — |
 | [AdicCompletion.Pi](AdicModules/AdicCompletion/Pi.lean) (algebraic arbitrary-product equivalence for `I.FG`; naturality for every ideal) | [AdicCompletionPi](AdicModulesTest/AdicCompletionPi.lean) (full `ℕ → ZMod 4` model for `I = Ideal.span {2}`, a nonzero proper square-zero ideal; empty-product boundary) and [AdicCompletion.DependentPi](AdicModulesTest/AdicCompletion/DependentPi.lean) (private generic `Prop` contracts and a nonzero `ℕ → ℤ` model, not a universal bijectivity proof) |
 | Separate completeness contract/model file | [AdicCompletion.Completeness](AdicModulesTest/AdicCompletion/Completeness.lean) (three proposition `#check`s and completeness/boundary models) |
 | [AdicCompletion.Topology](AdicModules/AdicCompletion/Topology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (evaluation-kernel basis application) |
