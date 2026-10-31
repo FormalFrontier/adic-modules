@@ -39,6 +39,7 @@ public import AdicModules.AdicCompletion.Idempotents
 public import AdicModules.AdicCompletion.Kernel
 public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.AdicCompletion.LocalRing
+public import AdicModules.AdicCompletion.Localization
 public import AdicModules.AdicCompletion.PadicInt
 public import AdicModules.AdicCompletion.PadicIntTopology
 public import AdicModules.AdicCompletion.Pi
@@ -50,6 +51,7 @@ public import AdicModules.AdicCompletion.Surjectivity
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Algebra.Module.Int
 public import AdicModules.LinearAlgebra.Descent
+public import AdicModules.LinearAlgebra.LocalizedModule
 public import AdicModules.LinearAlgebra.Pi
 public import AdicModules.LinearAlgebra.Quotient.End
 public import AdicModules.LinearAlgebra.Quotient.Hausdorff

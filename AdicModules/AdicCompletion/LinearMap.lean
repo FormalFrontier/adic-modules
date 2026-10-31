@@ -22,6 +22,10 @@ opposite endpoint need not be Hausdorff, and no finite generation or completenes
 is required. These laws use Mathlib's canonical completion, `of`, `map`, and the
 Hausdorff injectivity criterion for `of`.
 
+Independently of Hausdorffness, `map_injective_of_reduceModIdeal_injective`
+deduces injectivity of the completed map from injectivity on every original
+power quotient. It uses only coordinatewise extensionality.
+
 `AdicCompletion.extend` sends an `R`-linear map to an adically complete module to its
 canonical extension. It uses Mathlib's completed map, restricts its scalars from
 `AdicCompletion I R` to `R`, and then applies the inverse of `ofLinearEquiv`.
@@ -81,6 +85,17 @@ namespace AdicCompletion
 variable {R : Type u} [CommRing R] (I : Ideal R)
 variable {M : Type v} [AddCommGroup M] [Module R M]
 variable {N : Type w} [AddCommGroup N] [Module R N]
+
+/-- Injectivity on all original power quotients implies injectivity of completion. -/
+theorem map_injective_of_reduceModIdeal_injective (f : M →ₗ[R] N)
+    (hf : ∀ n : ℕ, Function.Injective (f.reduceModIdeal (I ^ n))) :
+    Function.Injective (AdicCompletion.map I f) := by
+  intro x y hxy
+  apply AdicCompletion.ext
+  intro n
+  apply hf n
+  simpa only [AdicCompletion.map_val_apply] using
+    congrArg (fun z : AdicCompletion I N ↦ z.val n) hxy
 
 /-- Completion distinguishes original linear maps to an I-Hausdorff target. -/
 theorem map_injective_of_isHausdorff [IsHausdorff I N] :

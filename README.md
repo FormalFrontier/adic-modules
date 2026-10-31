@@ -44,6 +44,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   original modules is required. See the
   [surjectivity criteria](AdicModules/AdicCompletion/Surjectivity.lean).
 
+- **Completion at residual-unit denominators.** For any ideal `I` of a
+  commutative ring `R`, localization at a submonoid whose elements are units in
+  `R / I` induces a bijection on `I`-adic completions of arbitrary modules.
+  [`AdicCompletion.localizedModuleEquiv`](AdicModules/AdicCompletion/Localization.lean)
+  packages the same canonical completed map as an equivalence linear over
+  `AdicCompletion I R`. It is natural in the original module, compares with any
+  stock module localization, and sends a fraction back using the inverse of its
+  denominator in the completed ring. The residual-unit condition is necessary
+  already for the original module `R`, but not for each fixed module. No
+  finiteness, Noetherianity, flatness, separation, completeness or original
+  completed-ring action is assumed, and the original localization map need not
+  be injective. Ring and module universes are independent.
+
 - **Completion with a flat last module.** For any ideal `I` of a commutative
   ring `R`, an exact pair `M → N → P` with surjective second map remains
   exact at the middle after completion if the original `P` is flat over `R`.
@@ -693,6 +706,8 @@ For the full source inventory, see the checked-in source directories and root mo
 
 | Library leaf (prefix `AdicModules.`) | Related modules (prefix `AdicModulesTest.`) |
 | --- | --- |
+| [AdicCompletion.Localization](AdicModules/AdicCompletion/Localization.lean) (equivalence, denominator formula, comparison and naturality) | — |
+| [LinearAlgebra.LocalizedModule](AdicModules/LinearAlgebra/LocalizedModule.lean) (ideal quotients and residual-unit bijectivity) | — |
 | [BoundedIdealPowerTorsion](AdicModules/BoundedIdealPowerTorsion.lean) | [BoundedIdealPowerTorsion](AdicModulesTest/BoundedIdealPowerTorsion.lean) |
 | [Polynomial.Coprime](AdicModules/Polynomial/Coprime.lean) | [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (monic coprimeness criterion and factor uniqueness) |
 | [Polynomial.Hensel](AdicModules/Polynomial/Hensel.lean) | [Polynomial.Hensel](AdicModulesTest/Polynomial/Hensel.lean), [Polynomial.FactorizationUniqueness](AdicModulesTest/Polynomial/FactorizationUniqueness.lean) (nonlocal power series, zero ring and product-projection boundary) |

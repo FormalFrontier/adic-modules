@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.Exactness
+import AdicModules.AdicCompletion.LinearMap
 public import Mathlib.RingTheory.Smooth.Quotient
 
 /-!
@@ -69,12 +70,7 @@ theorem map_injective_of_flat_cokernel
     apply (Submodule.Quotient.eq _).mpr
     rw [← hcomap, Submodule.mem_comap, map_sub]
     exact (Submodule.Quotient.eq _).mp hxy
-  intro x y hxy
-  apply AdicCompletion.ext
-  intro n
-  apply hlevel n
-  simpa only [AdicCompletion.map_val_apply] using
-    congrArg (fun z : AdicCompletion I N ↦ z.val n) hxy
+  exact map_injective_of_reduceModIdeal_injective I f hlevel
 
 /-- Completion preserves middle exactness of a right-surjective exact pair whose
 last original module is flat. The first map need not be injective, and the ideal
