@@ -7,6 +7,9 @@ module
 public import AdicModules.AdicCompletion.Quotient
 public import Mathlib.RingTheory.AdicCompletion.LocalRing
 public import Mathlib.RingTheory.Noetherian.Basic
+import Mathlib.Algebra.Module.Torsion.Basic
+import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.RingTheory.AdicCompletion.Noetherian
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Ring
@@ -16,23 +19,67 @@ import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.Tactic.SplitIfs
 
 /-!
-# Noetherianity of adically complete rings
+# Noetherian modules and adically complete rings
 
 An adically complete commutative ring is Noetherian if its ideal of definition is
 finitely generated and its quotient by that ideal is Noetherian. Applying this
 criterion to the adic completion gives the corresponding result without requiring
-the original ring to be complete or Noetherian.
+the original ring to be complete or Noetherian. A Noetherian module is separated for any
+ideal contained in the Jacobson radical of its annihilator; this follows by applying
+Mathlib's Krull separation theorem over the quotient by the annihilator.
 
 ## References
 
+* Mathlib's `RingTheory/AdicCompletion/Noetherian.lean`, by Andrew Yang, supplies
+  Krull separation over a Noetherian ring. The module generalization also uses
+  `RingTheory/Noetherian/Basic.lean`, by Mario Carneiro, Kevin Buzzard and
+  María Inés de Frutos-Fernández; `LinearAlgebra/Isomorphisms.lean`, by
+  Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov; and the
+  canonical quotient-annihilator action from Pierre-Alexandre Bazin's
+  `Algebra/Module/Torsion/Basic.lean`.
 * K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
 -/
 
 @[expose] public section
 
-universe u
+universe u v
 
 variable {R : Type u} [CommRing R]
+
+private theorem isNoetherianRing_quotient_annihilator
+    {A : Type u} [CommRing A] (X : Type v) [AddCommGroup X] [Module A X]
+    [IsNoetherian A X] : IsNoetherianRing (A ⧸ Module.annihilator A X) := by
+  let f := LinearMap.lsmul A X
+  have : IsNoetherian A (Module.End A X) := isNoetherian_linearMap A X X
+  have : IsNoetherian A (LinearMap.range f) :=
+    isNoetherian_of_injective (LinearMap.range f).subtype Subtype.val_injective
+  have hker : LinearMap.ker f = (Module.annihilator A X : Submodule A A) := by
+    ext a
+    exact (Module.mem_annihilator_iff_lsmul_eq_zero).symm
+  have hquot : IsNoetherian A (A ⧸ Module.annihilator A X) := by
+    rw [← hker]
+    exact f.quotKerEquivRange.isNoetherian_iff.mpr inferInstance
+  exact isNoetherian_of_tower A hquot
+
+/-- A Noetherian module is adically separated when the ideal lies in the Jacobson
+radical of its annihilator. This generalizes Mathlib's Noetherian-ring finite-module
+Krull separation theorem by passing to the quotient by the annihilator. -/
+theorem IsHausdorff.of_le_jacobson_annihilator
+    {A : Type u} [CommRing A] (K : Ideal A)
+    (X : Type v) [AddCommGroup X] [Module A X] [IsNoetherian A X]
+    (hK : K ≤ Ideal.jacobson (Module.annihilator A X)) : IsHausdorff K X := by
+  let B := A ⧸ Module.annihilator A X
+  let : Module B X := Module.quotientAnnihilator
+  let : IsScalarTower A B X := (Module.isTorsionBySet_annihilator A X).isScalarTower
+  have : IsNoetherianRing B := isNoetherianRing_quotient_annihilator X
+  have : Module.Finite B X := Module.Finite.of_restrictScalars_finite A B X
+  have hKB : K.map (algebraMap A B) ≤ Ideal.jacobson ⊥ := by
+    rw [Ideal.map_le_iff_le_comap]
+    change K ≤ Ideal.comap (Ideal.Quotient.mk (Module.annihilator A X)) _
+    rw [Ideal.comap_jacobson_of_surjective (Ideal.Quotient.mk_surjective),
+      ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
+    exact hK
+  exact IsHausdorff.map_algebraMap_iff.mp (IsHausdorff.of_le_jacobson _ X hKB)
 
 private theorem completion_quotient_isNoetherianRing (I : Ideal R) (hI : I.FG)
     [IsNoetherianRing (R ⧸ I)] :
@@ -46,8 +93,6 @@ private theorem completion_quotient_isNoetherianRing (I : Ideal R) (hI : I.FG)
 section Reconstruction
 
 open scoped BigOperators
-
-universe v
 
 variable (I : Ideal R) [IsAdicComplete I R] (K : Ideal R)
   {ι : Type v} [Fintype ι]

@@ -32,6 +32,19 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   No original completed-ring action, projectivity, flatness, separation or
   completeness of `M` is assumed. The all-ideal projective APIs are unchanged.
 
+- **Noetherian completed scalar extension.** Let `S = AdicCompletion I R` and
+  `T = S ⊗[R] M`. If `T` is Noetherian over `S` and some specified positive
+  power of `I` is finitely generated, the same canonical tensor comparison is
+  an `S`-linear equivalence, with whole-map and inverse-on-original-element laws.
+  No finiteness, flatness, projectivity, separation, completeness or `S`-action
+  on original `M` is required. Finiteness of `T` alone implies finiteness of
+  `M / I M` over `R / I`, for every ideal. In particular, `I.FG`, Noetherian
+  `R / I`, and finite original `M` give a bijective comparison without assuming
+  Noetherian `R`. See the [tensor comparison](AdicModules/AdicCompletion/TensorProduct.lean).
+  The [module separation theorem](AdicModules/Noetherian.lean) applies to every
+  Noetherian module `X` and ideal `K ≤ Ideal.jacobson (Module.annihilator R X)`,
+  with no Noetherian base-ring or finite-generation condition on `K`.
+
 - **Surjectivity and splittings under completion.** For any ideal `I` of a
   commutative ring `R` and any `R`-linear map `f : M → N`, the induced map on
   `I`-adic completions is surjective if and only if the original composite

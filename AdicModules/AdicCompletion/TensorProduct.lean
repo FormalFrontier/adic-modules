@@ -6,6 +6,8 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
+import AdicModules.Noetherian
+import AdicModules.AdicCompletion.LocalRing
 import AdicModules.AdicCompletion.Kernel
 import AdicModules.AdicCompletion.Pi
 import AdicModules.AdicCompletion.Quotient
@@ -35,6 +37,14 @@ only finiteness of the original first quotient added, the comparison induces a n
 completed-ring-linear equivalence from the source's Hausdorffification to the completed
 module. Its whole-map and representative laws describe the forward and inverse maps.
 The bijectivity criterion uses this equivalence and its quotient projection.
+
+If the tensor source is Noetherian over the completed ring, that same positive-power
+hypothesis makes the comparison an equivalence. Finiteness of the tensor source already
+implies finiteness of the original first quotient over `R / I`, for every ideal, by base
+change along first evaluation. A Noetherian tensor source is separated by Krull separation
+over the quotient of the completed ring by its module annihilator. In particular, a
+finitely generated `I`, Noetherian `R / I`, and finite original `M` suffice, without
+Noetherianity of original `R`.
 
 For projective modules, injectivity detects coefficients in a free Finsupp module and uses
 a projective retraction and naturality. For surjectivity, choose finite quotient generators
@@ -109,7 +119,10 @@ Kim Morrison, Johan Commelin and Eric Wieser's `LinearAlgebra/TensorProduct/Towe
 The Hausdorffification is from Mathlib's adic-completion Basic module by Kenny Lau,
 Judith Ludwig, Christian Merten and Jiedong Jiang. The first isomorphism theorem is from
 Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov's
-`LinearAlgebra/Isomorphisms.lean`.
+`LinearAlgebra/Isomorphisms.lean`. Finite first-quotient descent also uses the scalar
+extension of linear equivalences along a surjective algebra map from Kenny Lau and
+Yury Kudryashov's `Algebra/Algebra/Basic.lean` and the quotient module action from
+Pierre-Alexandre Bazin's `Algebra/Module/Torsion/Basic.lean`.
 -/
 
 set_option warningAsError true
@@ -240,6 +253,25 @@ theorem ofTensorProduct_surjective_of_finite_quotient
   rintro _ ⟨i, rfl⟩
   exact ⟨(1 : AdicCompletion I R) ⊗ₜ[R] v i, by
     simp only [ofTensorProduct_tmul, one_smul]⟩
+
+/-- Finiteness of the canonical completed scalar extension implies finiteness of the
+original first quotient over the first ring quotient, for every ideal. -/
+theorem moduleFinite_quotient_of_finite_tensorProduct
+    [Module.Finite (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) := by
+  let S := AdicCompletion I R
+  let B := R ⧸ I
+  let : Algebra S B := (evalOneₐ I).toRingHom.toAlgebra
+  let : IsScalarTower R S B :=
+    IsScalarTower.of_algebraMap_eq' (evalOneₐ_comp_algebraMap_eq_mk I).symm
+  let : IsScalarTower R B (M ⧸ (I • (⊤ : Submodule R M))) :=
+    (Module.isTorsionBySet_quotient_ideal_smul M I).isScalarTower
+  have : Module.Finite B (B ⊗[S] (S ⊗[R] M)) := inferInstance
+  let e := AlgebraTensorModule.cancelBaseChange R S B B M
+  have : Module.Finite B (B ⊗[R] M) := Module.Finite.equiv e
+  exact Module.Finite.equiv
+    ((quotTensorEquivQuotSMul M I).extendScalarsOfSurjective
+      (Ideal.Quotient.mk_surjective))
 
 /-- If the first adic quotient is finite over the original ring, its raw inverse-limit
 completion is finite over the canonical completed ring, for any ideal. This generalizes the
@@ -653,5 +685,90 @@ theorem ofTensorProduct_bijective_iff_isHausdorff_of_fg_pow
     exact (ofTensorProductHausdorffificationEquivOfFiniteQuotient I M hn hI).bijective.comp hq
 
 end Hausdorffification
+
+variable {R : Type uR} [CommRing R] (I : Ideal R)
+variable (M : Type uM) [AddCommGroup M] [Module R M]
+
+/-- If a positive ideal power is finitely generated and the canonical completed scalar
+extension is Noetherian, the canonical tensor comparison is bijective. -/
+theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_fg_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  have : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    moduleFinite_quotient_of_finite_tensorProduct I M
+  let : IsScalarTower R (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    (Module.isTorsionBySet_quotient_ideal_smul M I).isScalarTower
+  have : Module.Finite R (M ⧸ (I • (⊤ : Submodule R M))) :=
+    Module.Finite.trans (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))
+  have hJ : I.map (algebraMap R (AdicCompletion I R)) ≤
+      Ideal.jacobson (⊥ : Ideal (AdicCompletion I R)) := by
+    apply le_trans ?_ (ker_evalOne_le_jacobson I)
+    rw [Ideal.map_le_iff_le_comap, RingHom.comap_ker,
+      evalOneₐ_comp_algebraMap_eq_mk, Ideal.mk_ker]
+  apply (ofTensorProduct_bijective_iff_isHausdorff_of_fg_pow I M hn hI).mpr
+  apply (IsHausdorff.map_algebraMap_iff (I := I) (S := AdicCompletion I R)).mp
+  exact IsHausdorff.of_le_jacobson_annihilator _ _
+    (hJ.trans (Ideal.jacobson_mono bot_le))
+
+/-- The canonical completed-ring-linear tensor equivalence when a positive ideal power
+is finitely generated and the completed scalar extension is Noetherian. -/
+noncomputable def ofTensorProductEquivOfNoetherianTensorProductOfFGPow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
+  LinearEquiv.ofBijective (ofTensorProduct I M)
+    (ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_fg_pow I M hn hI)
+
+/-- The forward map is the canonical tensor comparison. -/
+@[simp]
+theorem ofTensorProductEquivOfNoetherianTensorProductOfFGPow_toLinearMap
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    (ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M hn hI).toLinearMap =
+      ofTensorProduct I M := rfl
+
+/-- The equivalence agrees with the canonical comparison on every tensor. -/
+@[simp]
+theorem ofTensorProductEquivOfNoetherianTensorProductOfFGPow_apply
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)]
+    (t : AdicCompletion I R ⊗[R] M) :
+    ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M hn hI t =
+      ofTensorProduct I M t := rfl
+
+/-- The inverse recovers every tensor from its canonical comparison image. -/
+@[simp]
+theorem ofTensorProductEquivOfNoetherianTensorProductOfFGPow_symm_apply
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)]
+    (t : AdicCompletion I R ⊗[R] M) :
+    (ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M hn hI).symm
+      (ofTensorProduct I M t) = t :=
+  (ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M hn hI).symm_apply_apply t
+
+/-- The inverse sends an original module element to its unit pure tensor. -/
+@[simp]
+theorem ofTensorProductEquivOfNoetherianTensorProductOfFGPow_symm_of
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] (m : M) :
+    (ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M hn hI).symm
+      (of I M m) = (1 : AdicCompletion I R) ⊗ₜ[R] m := by
+  simpa only [ofTensorProduct_tmul, one_smul] using
+    ofTensorProductEquivOfNoetherianTensorProductOfFGPow_symm_apply I M hn hI
+      ((1 : AdicCompletion I R) ⊗ₜ[R] m)
+
+/-- A finitely generated ideal with Noetherian first ring quotient gives a bijective
+canonical tensor comparison for every finite original module, without Noetherianity of
+the original ring. -/
+theorem ofTensorProduct_bijective_of_fg_of_noetherian_quotient
+    (hI : I.FG) [IsNoetherianRing (R ⧸ I)] [Module.Finite R M] :
+    Function.Bijective (ofTensorProduct I M) := by
+  have : IsNoetherianRing (AdicCompletion I R) := isNoetherianRing_of_fg I hI
+  let e := ofTensorProductEquivOfNoetherianTensorProductOfFGPow I M
+    (n := 1) Nat.one_pos (by simpa only [pow_one] using hI)
+  rw [← ofTensorProductEquivOfNoetherianTensorProductOfFGPow_toLinearMap I M
+    (n := 1) Nat.one_pos (by simpa only [pow_one] using hI)]
+  exact e.bijective
 
 end AdicCompletion
