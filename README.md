@@ -60,9 +60,6 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   kernels through `Jⁿ H`, without requiring `J ≤ I`. See the
   [kernel identities](AdicModules/AdicCompletion/Kernel.lean) and
   [completeness criteria](AdicModules/AdicCompletion/Completeness.lean).
-  These conclusions also hold whenever `H` is Noetherian over `AdicCompletion I R`,
-  without Noetherianity of that completed ring; see the
-  [module Noetherian criterion](AdicModules/Noetherian.lean).
 
 - **Stationary adic evaluation.** For every ideal `I` of a commutative ring `R`,
   every `R`-module `M` and every `n ≥ 0`, evaluation on the whole completion at `n`
@@ -132,9 +129,6 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   of `M / I M` and flatness of all positive original quotients. These results
   require no Noetherianity, finite generation of any ideal power, or finiteness,
   flatness, completeness, separation or completed-ring action on original `M`.
-  If `R / I` is Noetherian, a flat raw completion is finitely presented exactly
-  when it is finite over the completed ring; finite flat raw completions are
-  therefore projective, without Noetherianity of `R` or its completed ring.
   See [quotient descent](AdicModules/AdicCompletion/Quotient.lean) and the
   [finite-presentation criteria](AdicModules/AdicCompletion/FinitePresentation.lean).
 

@@ -7,8 +7,6 @@ module
 public import AdicModules.AdicCompletion.Quotient
 public import Mathlib.RingTheory.AdicCompletion.LocalRing
 public import Mathlib.RingTheory.Noetherian.Basic
-import AdicModules.AdicCompletion.Completeness
-import CoherentModules.RingTheory.Noetherian
 import Mathlib.Algebra.Module.Torsion.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.AdicCompletion.Noetherian
@@ -22,7 +20,7 @@ import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.Tactic.SplitIfs
 
 /-!
-# Noetherian modules and adic completions
+# Noetherian modules and adically complete rings
 
 An adically complete commutative ring is Noetherian if its ideal of definition is
 finitely generated and its quotient by that ideal is Noetherian. Applying this
@@ -40,12 +38,6 @@ Applied to the kernels of the canonical semilinear evaluations, it gives finite
 generation of submodules of an arbitrary module's adic completion from successive
 approximations.
 
-A raw completed module that is Noetherian over the completed coefficient ring is
-intrinsically complete for the original ideal action, and every original ideal-power
-submodule is an evaluation kernel. No Noetherianity of the completed ring is required.
-The proof descends Noetherianity to the original second quotient, restricts its canonical
-quotient-ring action, and applies the finite-generation criterion for the original first layer.
-
 ## References
 
 * Mathlib's `RingTheory/AdicCompletion/Noetherian.lean`, by Andrew Yang, supplies
@@ -55,9 +47,6 @@ quotient-ring action, and applies the finite-generation criterion for the origin
   Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov; and the
   canonical quotient-annihilator action from Pierre-Alexandre Bazin's
   `Algebra/Module/Torsion/Basic.lean`.
-* `CoherentModules.RingTheory.Noetherian` supplies Noetherian descent along
-  surjective semilinear maps. Scalar restriction uses Mathlib's bijective-semilinear
-  Noetherian equivalence.
 * K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
 -/
 
@@ -66,50 +55,6 @@ quotient-ring action, and applies the finite-generation criterion for the origin
 universe u v w z
 
 variable {R : Type u} [CommRing R]
-
-namespace AdicCompletion
-
-private theorem fg_first_layer_of_isNoetherian
-    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
-    [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] :
-    ((I • (⊤ : Submodule R M)).map
-      (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG := by
-  let Q := M ⧸ (I ^ 2 • (⊤ : Submodule R M))
-  let B := R ⧸ I ^ 2
-  have : IsNoetherian B Q :=
-    isNoetherian_of_surjective_semilinear
-      (evalₛₗ I M 2) (evalₛₗ_surjective I M 2)
-  have : RingHomSurjective (algebraMap R B) := ⟨Ideal.Quotient.mk_surjective⟩
-  let e : Q →ₛₗ[algebraMap R B] Q :=
-    { toFun := id
-      map_add' := fun _ _ => rfl
-      map_smul' := fun r x => (IsScalarTower.algebraMap_smul B r x).symm }
-  have : IsNoetherian R Q :=
-    (LinearMap.isNoetherian_iff_of_bijective e Function.bijective_id).mpr inferInstance
-  exact IsNoetherian.noetherian _
-
-/-- If a completed module is Noetherian over the completed coefficient ring, all its
-original ideal-power submodules are evaluation kernels, including degree zero.
-The completed coefficient ring need not itself be Noetherian. -/
-theorem pow_smul_top_eq_ker_eval_of_isNoetherian
-    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
-    [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
-    I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker :=
-  pow_smul_top_eq_ker_eval_of_fg_first_layer I M
-    (fg_first_layer_of_isNoetherian I M) n
-
-/-- A completed module that is Noetherian over the completed coefficient ring is
-intrinsically complete for the original ideal action. No Noetherianity or completeness
-of either coefficient ring, finiteness or completeness of the original module,
-or finite generation of the ideal is required. -/
-theorem isAdicComplete_of_isNoetherian
-    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
-    [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] :
-    IsAdicComplete I (AdicCompletion I M) :=
-  isAdicComplete_of_pow_smul_top_eq_ker_eval I M
-    (pow_smul_top_eq_ker_eval_of_isNoetherian I M)
-
-end AdicCompletion
 
 private theorem isNoetherianRing_quotient_annihilator
     {A : Type u} [CommRing A] (X : Type v) [AddCommGroup X] [Module A X]
