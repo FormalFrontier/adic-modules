@@ -41,6 +41,9 @@ Applied to the kernels of the canonical semilinear evaluations, it gives finite
 generation of submodules of an arbitrary module's adic completion from successive
 approximations.
 
+Noetherianity over the completed coefficient ring descends to every original
+ideal-power quotient with its canonical quotient-ring action, including degree zero.
+
 A raw completed module that is Noetherian over the completed coefficient ring is
 intrinsically complete for the original ideal action, and every original ideal-power
 submodule is an evaluation kernel. No Noetherianity of the completed ring is required.
@@ -73,6 +76,16 @@ variable {R : Type u} [CommRing R]
 
 namespace AdicCompletion
 
+/-- If a completed module is Noetherian over the completed coefficient ring, every
+original ideal-power quotient is Noetherian over the corresponding quotient ring
+with its canonical action, including degree zero. -/
+theorem isNoetherian_quotient_pow
+    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
+    IsNoetherian (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
+  isNoetherian_of_surjective_semilinear
+    (evalₛₗ I M n) (evalₛₗ_surjective I M n)
+
 private theorem fg_first_layer_of_isNoetherian
     (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
     [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] :
@@ -80,9 +93,7 @@ private theorem fg_first_layer_of_isNoetherian
       (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG := by
   let Q := M ⧸ (I ^ 2 • (⊤ : Submodule R M))
   let B := R ⧸ I ^ 2
-  have : IsNoetherian B Q :=
-    isNoetherian_of_surjective_semilinear
-      (evalₛₗ I M 2) (evalₛₗ_surjective I M 2)
+  have : IsNoetherian B Q := isNoetherian_quotient_pow I M 2
   have : RingHomSurjective (algebraMap R B) := ⟨Ideal.Quotient.mk_surjective⟩
   let e : Q →ₛₗ[algebraMap R B] Q :=
     { toFun := id
