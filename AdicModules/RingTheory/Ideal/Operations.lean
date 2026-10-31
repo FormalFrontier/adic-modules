@@ -36,11 +36,6 @@ selection, for which both indexed intersections are top. The proof iterates the
 binary scalar-image theorem, using Mathlib's finite sup-intersection theorem.
 The ambient index type is arbitrary and may lie in a third universe.
 
-An equality `J • P ⊔ I² • P = I • P` propagates to
-`J^n • P ⊔ I^(n+1) • P = I^n • P` for every natural exponent. Here `P` is
-an arbitrary submodule over a commutative semiring; no containment of ideals
-or finite generation is required. The proof commutes the ideal actions.
-
 ## References
 
 * Mathlib's left-ideal operations, power and ideal-on-submodule action APIs in
@@ -102,58 +97,6 @@ theorem pairwise_sup_eq_top_pow
 end Ideal
 
 namespace Submodule
-
-/-- An acted congruence modulo the square propagates to every degree. Ideal containment
-is not required: the original acted containment propagates by commuting ideal actions. -/
-theorem pow_smul_sup_next_eq_of_smul_sup_sq_eq
-    {R : Type u} [CommSemiring R] {M : Type v} [AddCommMonoid M] [Module R M]
-    (I J : Ideal R) (P : Submodule R M)
-    (h : J • P ⊔ I ^ 2 • P = I • P) (n : ℕ) :
-    J ^ n • P ⊔ I ^ (n + 1) • P = I ^ n • P := by
-  have hJP : J • P ≤ I • P := le_sup_left.trans h.le
-  have hpow_le (k : ℕ) : J ^ k • P ≤ I ^ k • P := by
-    induction k with
-    | zero => exact le_rfl
-    | succ k ih =>
-      calc
-        J ^ (k + 1) • P = J • (J ^ k • P) := by
-          rw [pow_succ', Submodule.mul_smul]
-        _ ≤ J • (I ^ k • P) := Submodule.smul_mono le_rfl ih
-        _ = I ^ k • (J • P) := by
-          rw [← Submodule.mul_smul, mul_comm J, Submodule.mul_smul]
-        _ ≤ I ^ k • (I • P) := Submodule.smul_mono le_rfl hJP
-        _ = I ^ (k + 1) • P := by rw [← Submodule.mul_smul, ← pow_succ]
-  refine le_antisymm
-    (sup_le (hpow_le n)
-      (Submodule.smul_mono_left (Ideal.pow_le_pow_right (Nat.le_succ n)))) ?_
-  induction n with
-  | zero =>
-    simp only [pow_zero, Ideal.one_eq_top, Submodule.top_smul]
-    exact le_sup_left
-  | succ n ih =>
-    have hnext : J ^ n • (I ^ 2 • P) ≤ I ^ (n + 2) • P := by
-      calc
-        J ^ n • (I ^ 2 • P) = I ^ 2 • (J ^ n • P) := by
-          rw [← Submodule.mul_smul, mul_comm, Submodule.mul_smul]
-        _ ≤ I ^ 2 • (I ^ n • P) := Submodule.smul_mono le_rfl (hpow_le n)
-        _ = I ^ (n + 2) • P := by
-          rw [← Submodule.mul_smul, ← pow_add, Nat.add_comm 2 n]
-    have hJI : J ^ n • (I • P) ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := by
-      calc
-        J ^ n • (I • P) = J ^ n • (J • P ⊔ I ^ 2 • P) := by rw [h]
-        _ = J ^ (n + 1) • P ⊔ J ^ n • (I ^ 2 • P) := by
-          rw [Submodule.smul_sup, ← Submodule.mul_smul, ← pow_succ]
-        _ ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := sup_le_sup le_rfl hnext
-    calc
-      I ^ (n + 1) • P = I • (I ^ n • P) := by
-        rw [pow_succ', Submodule.mul_smul]
-      _ ≤ I • (J ^ n • P ⊔ I ^ (n + 1) • P) := Submodule.smul_mono le_rfl ih
-      _ = J ^ n • (I • P) ⊔ I ^ (n + 2) • P := by
-        rw [Submodule.smul_sup]
-        congr 1
-        · rw [← Submodule.mul_smul, mul_comm I (J ^ n), Submodule.mul_smul]
-        · rw [← Submodule.mul_smul, ← pow_succ']
-      _ ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := sup_le hJI le_sup_right
 
 /-- The scalar images of comaximal ideals intersect in the image of their
 intersection, on any submodule over a commutative semiring. The ideal action

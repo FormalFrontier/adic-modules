@@ -60,19 +60,6 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   kernels through `Jⁿ H`, without requiring `J ≤ I`. See the
   [kernel identities](AdicModules/AdicCompletion/Kernel.lean) and
   [completeness criteria](AdicModules/AdicCompletion/Completeness.lean).
-  These conclusions also hold whenever `H` is Noetherian over `AdicCompletion I R`,
-  without Noetherianity of that completed ring; see the
-  [module Noetherian criterion](AdicModules/Noetherian.lean).
-
-- **Noetherian original module power quotients.** For any ideal `I` of a
-  commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original
-  quotient `M / Iⁿ M` is Noetherian over `R` exactly when `M / I M` is
-  Noetherian over `R` and the image of `I M` in `M / I² M` is finitely generated
-  over original `R`. Each quotient's canonical `R / I^q` action gives the
-  equivalent module-Noetherianity predicate. No Noetherianity of `R` or `R / I`,
-  finiteness of the original ideal or its cotangent, or finiteness, separation,
-  or completeness of `M` is assumed. The exponent bound is sharp. See the
-  [original-quotient criterion](AdicModules/LinearAlgebra/Quotient/Noetherian.lean).
 
 - **Stationary adic evaluation.** For every ideal `I` of a commutative ring `R`,
   every `R`-module `M` and every `n ≥ 0`, evaluation on the whole completion at `n`
@@ -142,9 +129,6 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   of `M / I M` and flatness of all positive original quotients. These results
   require no Noetherianity, finite generation of any ideal power, or finiteness,
   flatness, completeness, separation or completed-ring action on original `M`.
-  If `R / I` is Noetherian, a flat raw completion is finitely presented exactly
-  when it is finite over the completed ring; finite flat raw completions are
-  therefore projective, without Noetherianity of `R` or its completed ring.
   See [quotient descent](AdicModules/AdicCompletion/Quotient.lean) and the
   [finite-presentation criteria](AdicModules/AdicCompletion/FinitePresentation.lean).
 
