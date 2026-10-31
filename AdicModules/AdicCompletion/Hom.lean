@@ -22,7 +22,12 @@ For a finite projective source, `homEquivOfFiniteProjective` makes this comparis
 a linear equivalence for every ideal. For a finitely generated ideal,
 `homEquivOfProjective` does so for any projective original source, without a
 finiteness assumption on that source. The target module is arbitrary in both
-cases. Independently, maps from the completion of a finite module to any module
+cases. If every original-ring ideal-power submodule of the source completion is its
+evaluation kernel, `existsUnique_homComparison_of_ker_eval` composes the finite-projective
+equivalence with `restrictScalarsHomEquivOfKernel`: every original-ring-linear map between
+the raw completions comes from a unique completed original Hom element. This needs no
+completeness hypothesis on the original target or its raw completion.
+Independently, maps from the completion of a finite module to any module
 over the completed ring agree if they agree on the original module. More generally,
 a specified finite family spanning the first quotient determines such maps by
 agreement on its completed original lifts, even when the original module is not finite.
@@ -503,6 +508,19 @@ theorem homEquivOfFiniteProjective_toLinearMap :
 theorem homEquivOfFiniteProjective_apply (F : AdicCompletion I (M →ₗ[R] N)) :
     homEquivOfFiniteProjective I M N F = homComparison I M N F :=
   rfl
+
+/-- Every original-ring-linear map between raw completions is represented by a unique
+completed original Hom element when the source is finite projective and every source
+ideal-power submodule is an evaluation kernel. The ideal and original target are arbitrary. -/
+theorem existsUnique_homComparison_of_ker_eval
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] AdicCompletion I N) :
+    ∃! z : AdicCompletion I (M →ₗ[R] N), (homComparison I M N z).restrictScalars R = F := by
+  simpa only [LinearEquiv.trans_apply, homEquivOfFiniteProjective_apply,
+    restrictScalarsHomEquivOfKernel_apply] using
+    ((homEquivOfFiniteProjective I M N).trans
+      (restrictScalarsHomEquivOfKernel I hM)).bijective.existsUnique F
 
 /-- The inverse Hom equivalence sends a completed original map to the original map's
 canonical image in the completion of Hom. -/

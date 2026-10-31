@@ -27,7 +27,7 @@ rev = "5d58abb977f3281238ee5b4f37303a275b1b2426"
 [[require]]
 name = "coherent-modules"
 git = "https://github.com/FormalFrontier/coherent-modules.git"
-rev = "4d5340c7f78895f2be6fb9f2ec183443ecf5497c"
+rev = "3ecdd76a4a629991718f6bf3f4d290fffb81973f"
 
 [[lean_lib]]
 name = "AdicModules"

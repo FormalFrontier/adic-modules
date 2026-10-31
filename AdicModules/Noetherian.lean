@@ -62,7 +62,8 @@ needs no action of the completed coefficient ring.
   Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov; and the
   canonical quotient-annihilator action from Pierre-Alexandre Bazin's
   `Algebra/Module/Torsion/Basic.lean`.
-* `CoherentModules.RingTheory.Noetherian` supplies Noetherian descent along
+* `CoherentModules.RingTheory.Noetherian` supplies Noetherianity of the scalar
+  ring modulo a Noetherian module's annihilator and Noetherian descent along
   surjective semilinear maps. Scalar restriction uses Mathlib's bijective-semilinear
   Noetherian equivalence.
 * K. Fujiwara and F. Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
@@ -144,21 +145,6 @@ theorem isAdicComplete_of_isNoetherian
     (pow_smul_top_eq_ker_eval_of_isNoetherian I M)
 
 end AdicCompletion
-
-private theorem isNoetherianRing_quotient_annihilator
-    {A : Type u} [CommRing A] (X : Type v) [AddCommGroup X] [Module A X]
-    [IsNoetherian A X] : IsNoetherianRing (A ⧸ Module.annihilator A X) := by
-  let f := LinearMap.lsmul A X
-  have : IsNoetherian A (Module.End A X) := isNoetherian_linearMap A X X
-  have : IsNoetherian A (LinearMap.range f) :=
-    isNoetherian_of_injective (LinearMap.range f).subtype Subtype.val_injective
-  have hker : LinearMap.ker f = (Module.annihilator A X : Submodule A A) := by
-    ext a
-    exact (Module.mem_annihilator_iff_lsmul_eq_zero).symm
-  have hquot : IsNoetherian A (A ⧸ Module.annihilator A X) := by
-    rw [← hker]
-    exact f.quotKerEquivRange.isNoetherian_iff.mpr inferInstance
-  exact isNoetherian_of_tower A hquot
 
 /-- A Noetherian module is adically separated when the ideal lies in the Jacobson
 radical of its annihilator. This generalizes Mathlib's Noetherian-ring finite-module

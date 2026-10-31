@@ -64,6 +64,14 @@ function and additive map. `LinearMap.retraction_adicCompletion_of_fg_pow` uses
 this equivalence to upgrade a specified retraction with Hausdorff target.
 The corresponding finitely generated ideal APIs are the `n = 1` specializations.
 
+For canonical raw completions, `LinearMap.map_smul_adicCompletion_of_ker_eval`
+requires only the source kernel identities to upgrade every original-ring-linear map
+to completed-ring linearity. The original target is arbitrary: no intrinsic completeness,
+target or coefficient kernel equality, or finite-generation hypothesis is needed.
+`restrictScalarsHomEquivOfKernel` packages restriction as a completed-ring-linear Hom
+equivalence with a same-function inverse, and agrees with the positive-power equivalence
+on canonical raw modules whenever a positive ideal power is finitely generated.
+
 The extension reuses Mathlib's `map` and `ofLinearEquiv`, and agrees with
 `IsAdicComplete.lift`. Uniqueness approximates a completed source element by an
 original representative at every precision, uses the source kernel identity to
@@ -72,6 +80,9 @@ The first-layer and positive-power specializations reuse the public kernel
 suppliers. Automatic scalar linearity applies `ext_of_fg_pow` to the scalar-orbit
 maps out of the completed coefficient ring, built with Mathlib's
 `LinearMap.toSpanSingleton` and scalar restriction; its hypotheses are unchanged.
+The canonical raw-target theorem first compares coordinates on original source elements
+using coefficient representatives and unconditional target power-to-kernel containment,
+then applies `ext_of_ker_eval` to the fixed-scalar orbit maps out of the source completion.
 All completions remain `I`-adic. There is no new inverse-limit construction,
 topology, or scalar action. Finite generation of `I ^ 0` alone does not suffice
 for uniform uniqueness.
@@ -607,6 +618,159 @@ theorem restrictScalarsHomEquiv_symm_restrictScalars (hI : I.FG)
 end AdicCompletion
 
 end CompletedScalars
+
+section CanonicalRawScalars
+
+variable {R : Type u} [CommRing R] (I : Ideal R)
+variable {M : Type v} [AddCommGroup M] [Module R M]
+variable {N : Type w} [AddCommGroup N] [Module R N]
+
+namespace AdicCompletion
+
+private theorem eval_smul_eq_of_mk_eq (n : ℕ) (a : AdicCompletion I R) (r : R)
+    (hr : Ideal.Quotient.mk (I ^ n) r = evalₐ I n a) (x : AdicCompletion I M) :
+    eval I M n (a • x) = r • eval I M n x := by
+  calc
+    eval I M n (a • x) = a.val n • eval I M n x := smul_eval I n a x
+    _ = evalₐ I n a • eval I M n x := val_smul_eq_evalₐ_smul I n a _
+    _ = Ideal.Quotient.mk (I ^ n) r • eval I M n x := by rw [hr]
+    _ = r • eval I M n x := algebraMap_smul (R ⧸ I ^ n) r _
+
+end AdicCompletion
+
+namespace LinearMap
+
+/-- Every original-ring-linear map between canonical raw completions respects the
+canonical completed-ring actions when all source ideal-power submodules are evaluation
+kernels. The original target is arbitrary; neither its intrinsic completeness nor
+any target or coefficient kernel equality is required. -/
+theorem map_smul_adicCompletion_of_ker_eval
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (AdicCompletion.eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] AdicCompletion I N)
+    (a : AdicCompletion I R) (x : AdicCompletion I M) : F (a • x) = a • F x := by
+  have h :
+      F.comp (DistribSMul.toLinearMap R (AdicCompletion I M) a) =
+        (DistribSMul.toLinearMap R (AdicCompletion I N) a).comp F := by
+    apply AdicCompletion.ext_of_ker_eval I hM
+    intro m
+    apply AdicCompletion.ext
+    intro n
+    obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ I n a)
+    have hsource : a • AdicCompletion.of I M m - AdicCompletion.of I M (r • m) ∈
+        (I ^ n • ⊤ : Submodule R (AdicCompletion I M)) := by
+      rw [hM n, LinearMap.mem_ker, map_sub,
+        AdicCompletion.eval_smul_eq_of_mk_eq I n a r hr]
+      simp only [map_smul, sub_self]
+    have htarget : F (a • AdicCompletion.of I M m) - F (AdicCompletion.of I M (r • m)) ∈
+        (AdicCompletion.eval I N n).ker := by
+      rw [← F.map_sub]
+      exact AdicCompletion.pow_smul_top_le_ker_eval I (M := N) n
+        (Submodule.smul_top_le_comap_smul_top (I ^ n) F hsource)
+    rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at htarget
+    calc
+      AdicCompletion.eval I N n (F (a • AdicCompletion.of I M m)) =
+          AdicCompletion.eval I N n (F (AdicCompletion.of I M (r • m))) := htarget
+      _ = r • AdicCompletion.eval I N n (F (AdicCompletion.of I M m)) := by
+        simp only [map_smul]
+      _ = AdicCompletion.eval I N n (a • F (AdicCompletion.of I M m)) :=
+        (AdicCompletion.eval_smul_eq_of_mk_eq I n a r hr _).symm
+  exact LinearMap.congr_fun h x
+
+end LinearMap
+
+namespace AdicCompletion
+
+/-- Restriction of scalars between canonical raw completions is an equivalence
+linear over the completed ring when all source ideal-power submodules are evaluation
+kernels. Its inverse keeps the original function and additive map. Both Hom modules
+have the pointwise completed-ring action on the target; the original target is arbitrary. -/
+def restrictScalarsHomEquivOfKernel
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    (AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I N) ≃ₗ[AdicCompletion I R]
+      (AdicCompletion I M →ₗ[R] AdicCompletion I N) where
+  toLinearMap :=
+    LinearMap.restrictScalarsₗ (R := R) (S := AdicCompletion I R)
+      (M := AdicCompletion I M) (N := AdicCompletion I N) (R₁ := AdicCompletion I R)
+  invFun F :=
+    { F.toAddHom with
+      map_smul' := LinearMap.map_smul_adicCompletion_of_ker_eval I hM F }
+  left_inv G := by
+    apply LinearMap.ext
+    intro x
+    rfl
+  right_inv F := by
+    apply LinearMap.ext
+    intro x
+    rfl
+
+/-- The forward linear map is Mathlib's canonical restriction-of-scalars map. -/
+@[simp]
+theorem restrictScalarsHomEquivOfKernel_toLinearMap
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    (restrictScalarsHomEquivOfKernel I (N := N) hM).toLinearMap =
+      LinearMap.restrictScalarsₗ (R := R) (S := AdicCompletion I R)
+        (M := AdicCompletion I M) (N := AdicCompletion I N) (R₁ := AdicCompletion I R) :=
+  rfl
+
+/-- The source-kernel equivalence restricts scalars to the original ring. -/
+@[simp]
+theorem restrictScalarsHomEquivOfKernel_apply
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (G : AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I N) :
+    restrictScalarsHomEquivOfKernel I hM G = G.restrictScalars R :=
+  rfl
+
+/-- The inverse source-kernel equivalence evaluates as the original map. -/
+@[simp]
+theorem restrictScalarsHomEquivOfKernel_symm_apply
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] AdicCompletion I N) (x : AdicCompletion I M) :
+    (restrictScalarsHomEquivOfKernel I hM).symm F x = F x :=
+  rfl
+
+/-- Restricting the inverse source-kernel equivalence recovers the original linear map. -/
+@[simp]
+theorem restrictScalarsHomEquivOfKernel_symm_apply_restrictScalars
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] AdicCompletion I N) :
+    ((restrictScalarsHomEquivOfKernel I hM).symm F).restrictScalars R = F := by
+  apply LinearMap.ext
+  intro x
+  rfl
+
+/-- The inverse source-kernel equivalence recovers a completed-ring-linear map
+from its restriction. -/
+@[simp]
+theorem restrictScalarsHomEquivOfKernel_symm_restrictScalars
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (G : AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I N) :
+    (restrictScalarsHomEquivOfKernel I hM).symm (G.restrictScalars R) = G := by
+  apply LinearMap.ext
+  intro x
+  rfl
+
+/-- On canonical raw completions, the positive-finitely-generated-power equivalence
+agrees with the source-kernel equivalence for any proof of the source kernel identities. -/
+theorem restrictScalarsHomEquivOfFGPow_eq_restrictScalarsHomEquivOfKernel
+    {p : ℕ} (hp : 0 < p) (hI : (I ^ p).FG)
+    (hM : ∀ n : ℕ,
+      I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    restrictScalarsHomEquivOfFGPow I (P := AdicCompletion I M) (T := AdicCompletion I N) hp hI =
+      restrictScalarsHomEquivOfKernel I hM := by
+  apply LinearEquiv.ext
+  intro G
+  rfl
+
+end AdicCompletion
+
+end CanonicalRawScalars
 
 section Retraction
 

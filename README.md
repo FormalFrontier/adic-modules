@@ -299,6 +299,14 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   Hausdorff. Finite generation of a positive power is sufficient through
   completion-map uniqueness on the same `I`-adic completion. The finitely generated
   ideal APIs retain their signatures as `n = 1` specializations.
+  For canonical raw completions `H_M = AdicCompletion I M` and
+  `H_N = AdicCompletion I N`, equality of every original-ring ideal-power submodule
+  of `H_M` with its evaluation kernel suffices instead:
+  every `R`-linear map `H_M → H_N` respects the canonical completed-ring actions.
+  `AdicCompletion.restrictScalarsHomEquivOfKernel` gives the resulting `S`-linear
+  Hom equivalence with a same-function inverse. The original target `N` is arbitrary;
+  no intrinsic completeness of `N` or `H_N`, target or coefficient kernel equality,
+  finite generation of an ideal power, or Noetherianity is required.
 
 - **Faithfulness and injectivity reflection under completion.** For any ideal `I`
   of a commutative ring `R` and additive commutative group `R`-modules `M, N`,
@@ -561,6 +569,10 @@ Rings are commutative; modules are additive commutative groups unless specified 
   projective original source, without a finiteness assumption on `M`. In both
   cases the target `N` is arbitrary: no finiteness, projectivity, flatness,
   completeness or separatedness of `N`, or Noetherianity of `R`, is required.
+  For a finite projective source whose completed original-ring ideal-power submodules
+  are the evaluation kernels, every `R`-linear map between the raw completions is
+  represented by a unique completed original Hom element, after restricting the
+  comparison's scalars to `R`.
   The comparison is natural in arbitrary original source and target maps. For
   finitely generated `I` and `M = ℕ →₀ R`, any family of completed target
   coefficients gives a map on the completed free module; its inverse Hom image
