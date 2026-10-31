@@ -24,6 +24,11 @@ coefficient base change to the first original quotient, the residual projectivit
 criterion and completed finiteness; it does not identify an original quotient with a
 quotient of the completion or require a global completion–tensor equivalence.
 
+If the residue ring `R / I` is Noetherian, finite presentation of a flat raw completion
+is equivalent to its finiteness over the completed ring. In particular, finite flat raw
+completions are projective, without Noetherianity of the original or completed ring,
+finite generation of the ideal, or finiteness of the original module.
+
 For any ideal `I`, if the original first quotient `M / I M` is finitely presented
 over `R / I`, the raw completion is projective over its canonical completed ring
 if and only if every positive original quotient `M / Iⁿ M` is flat over `R / Iⁿ`.
@@ -82,7 +87,11 @@ The completed-module finite-presentation theorem uses Andrew Yang's formalizatio
 The residual finite-presentation criterion combines this library's quotient-projectivity
 descent and flat-quotient completion theorem with Mathlib's projective-implies-flat
 instance and flat finitely presented projectivity theorem in
-`Mathlib.RingTheory.Flat.EquationalCriterion`. Finite-presentation ascent also uses
+`Mathlib.RingTheory.Flat.EquationalCriterion`. The Noetherian residue-ring corollary
+combines this library's completed finiteness and positive-quotient finite-presentation
+criteria with Andrew Yang's `Module.finitePresentation_of_finite`. Its projectivity
+consequence uses `Module.Flat.projective_of_finitePresentation`, formalized by Mitchell Lee
+and Junyan Xu. Finite-presentation ascent also uses
 Mathlib's quotient–tensor equivalence, formalized by Antoine Chambert-Loir and Jujian Zhang
 in `Mathlib.LinearAlgebra.TensorProduct.Quotient`, together with scalar extension and
 cancellation of iterated base change in `Mathlib.LinearAlgebra.TensorProduct.Tower`.
@@ -172,6 +181,32 @@ theorem moduleFinitePresentation_iff_finitePresentation_quotient_of_flat
     let : Module.Finite (AdicCompletion I R) (AdicCompletion I M) :=
       (moduleFinite_iff_finite_quotient I M).mpr inferInstance
     exact Module.finitePresentation_of_projective (AdicCompletion I R) (AdicCompletion I M)
+
+/-- Over a Noetherian residue ring, a raw completion flat over its canonical completed
+ring is finitely presented exactly when it is finite over that ring. No Noetherianity of
+the original or completed ring, finite generation of the ideal, or finiteness, flatness,
+separation or completeness of the original module is required. -/
+theorem moduleFinitePresentation_iff_finite_of_flat_of_isNoetherian_quotient
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing (R ⧸ I)]
+    [Module.Flat (AdicCompletion I R) (AdicCompletion I M)] :
+    Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) ↔
+      Module.Finite (AdicCompletion I R) (AdicCompletion I M) := by
+  constructor
+  · intro hfp
+    let : Module.FinitePresentation (AdicCompletion I R) (AdicCompletion I M) := hfp
+    infer_instance
+  · intro hfinite
+    let : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (moduleFinite_iff_finite_quotient I M).mp hfinite
+    apply (moduleFinitePresentation_iff_finitePresentation_quotient_of_flat
+      I M 1 Nat.one_pos).mpr
+    -- Transport the whole quotient-module proposition, including its scalar dictionary.
+    exact (congrArg (fun J : Ideal R =>
+      Module.FinitePresentation (R ⧸ J) (M ⧸ (J • (⊤ : Submodule R M))))
+      (pow_one I)).mpr
+      (Module.finitePresentation_of_finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))))
 
 /-- If the original first quotient is finite and the completed scalar extension is
 projective, the raw completion is finitely presented over the completed ring, for any ideal.

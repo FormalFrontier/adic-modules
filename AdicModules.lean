@@ -64,6 +64,7 @@ public import AdicModules.LinearAlgebra.Quotient.DFinsupp
 public import AdicModules.LinearAlgebra.Quotient.End
 public import AdicModules.LinearAlgebra.Quotient.Flat
 public import AdicModules.LinearAlgebra.Quotient.Hausdorff
+public import AdicModules.LinearAlgebra.Quotient.Noetherian
 public import AdicModules.LinearAlgebra.SModEq.Pow
 public import AdicModules.LinearAlgebra.Span.Basic
 public import AdicModules.LinearAlgebra.Correspondence
