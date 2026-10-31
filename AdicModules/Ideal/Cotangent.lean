@@ -7,16 +7,19 @@ module
 public import Mathlib.RingTheory.Ideal.Cotangent
 
 import Mathlib.RingTheory.Finiteness.Basic
+import Mathlib.RingTheory.Ideal.Quotient.PowTransition
+import Mathlib.RingTheory.Noetherian.Basic
 import Mathlib.Tactic.Choose
 
 /-!
-# Lifting cotangent generators
+# Cotangent finiteness and lifting generators
 
 A family in an ideal whose images generate its cotangent module expresses the ideal as
 its original span modulo the square. The indexing type need not be finite; finiteness is
 needed only when deducing finite generation of the lift ideal. Finite cotangent modules admit
 finite families of original representatives, and finitely generated ideals have finite cotangent
-modules over their quotient rings.
+modules over their quotient rings. Noetherianity of any power quotient of exponent at least two
+also makes the original cotangent finite, without finite generation of the ideal.
 
 ## References
 
@@ -48,6 +51,23 @@ theorem finite_cotangent_of_fg (I : Ideal R) (hI : I.FG) :
   let : Module.Finite R I := Module.Finite.of_fg hI
   let : Module.Finite R I.Cotangent :=
     Module.Finite.of_surjective I.toCotangent I.toCotangent_surjective
+  exact Module.Finite.of_restrictScalars_finite R (R ⧸ I) I.Cotangent
+
+/-- A Noetherian power quotient of exponent at least two makes the cotangent
+finite over the residue ring. -/
+theorem finite_cotangent_of_isNoetherianRing_quotient_pow
+    (I : Ideal R) {n : ℕ} (hn : 2 ≤ n)
+    [IsNoetherianRing (R ⧸ I ^ n)] :
+    Module.Finite (R ⧸ I) I.Cotangent := by
+  let : IsNoetherianRing (R ⧸ I ^ 2) :=
+    isNoetherianRing_of_surjective (R ⧸ I ^ n) (R ⧸ I ^ 2)
+      (Quotient.factorPow I hn) (Quotient.factor_surjective (pow_le_pow_right hn))
+  have hfg : (I.cotangentIdeal.restrictScalars R).FG :=
+    Submodule.FG.restrictScalars_of_surjective I.cotangentIdeal.fg_of_isNoetherianRing
+      (Ideal.Quotient.mk_surjective :
+        Function.Surjective (algebraMap R (R ⧸ I ^ 2)))
+  let : Module.Finite R I.cotangentIdeal := Module.Finite.of_fg hfg
+  let : Module.Finite R I.Cotangent := Module.Finite.equiv I.cotangentEquivIdeal.symm
   exact Module.Finite.of_restrictScalars_finite R (R ⧸ I) I.Cotangent
 
 /-- Cotangent generators express an ideal as their span modulo its square. -/

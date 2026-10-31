@@ -12,6 +12,17 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   `I`-adic completion is Noetherian without assuming that `R` itself is complete
   or Noetherian. See the [Noetherian criterion](AdicModules/Noetherian.lean).
 
+- **Noetherian completion from any higher power quotient.** For any ideal `I`
+  of a commutative ring `R` and any `n ≥ 2`, `AdicCompletion I R` is Noetherian
+  if and only if `R / I ^ n` is Noetherian. No finite generation of `I` or any
+  positive power, Noetherianity of `R`, completeness or separation is assumed.
+  The uniform lower bound is sharp: a Noetherian first quotient need not give
+  a Noetherian completion. The
+  [pure ideal bridge](AdicModules/Ideal/Cotangent.lean) shows that the higher
+  quotient hypothesis makes the original `I.Cotangent` finite over `R / I`;
+  the [completion criterion](AdicModules/AdicCompletion/Cotangent.lean) then
+  applies the residue-and-cotangent criterion below.
+
 - **Raw completion and finite original cotangent.** For any ideal `I` of a
   commutative ring `R`, the raw completion `S = AdicCompletion I R` is Noetherian
   exactly when `R / I` is Noetherian and the original cotangent module
@@ -855,8 +866,8 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
-| [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and raw Noetherianity) | — |
-| [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (original cotangent generators and ideal span modulo the square) | — |
+| [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and power-quotient Noetherianity) | — |
+| [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (original cotangent finiteness from power quotients and lifted generators) | — |
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |

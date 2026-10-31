@@ -25,6 +25,9 @@ corresponding evaluation, and the completion is intrinsically complete for that 
 Consequently, the raw completion is Noetherian exactly when the original residue
 ring is Noetherian and the original cotangent module is finite. No finite generation
 of the original ideal, or completeness or separatedness of the original ring, is assumed.
+Equivalently, at any exponent at least two, the original power quotient is Noetherian.
+The pure ideal cotangent-finiteness bridge and unconditional evaluation surjectivity
+reduce this criterion to the residue-and-cotangent criterion.
 
 The structural argument chooses a finitely generated ideal `H ≤ I` with
 `I = H ⊔ I ^ 2`. The shared fixed-stage kernel theorem in
@@ -119,26 +122,10 @@ for its original residue action. -/
 theorem finite_cotangent_of_isNoetherianRing (I : Ideal R)
     [IsNoetherianRing (AdicCompletion I R)] :
     Module.Finite (R ⧸ I) I.Cotangent := by
-  let P : Ideal R := I ^ 1 • (⊤ : Ideal R)
-  let : Module.Finite (AdicCompletion I R) (AdicCompletion I P) :=
-    Module.Finite.of_injective (ofPowSMul I R 1)
-      (ofPowSMul_injective (I := I) (M := R) 1)
-  let e : P ≃ₗ[R] I := LinearEquiv.ofEq _ _ (by
-    simp only [P, pow_one, Ideal.smul_eq_mul, Ideal.mul_top])
-  let : Module.Finite (AdicCompletion I R) (AdicCompletion I I) :=
-    Module.Finite.equiv (congr I e)
-  have hq : Module.Finite (R ⧸ I) (I ⧸ (I • (⊤ : Submodule R I))) :=
-    (moduleFinite_iff_finite_quotient I I).mp inferInstance
-  let c : I.Cotangent ≃ₗ[R] (I ⧸ (I • (⊤ : Submodule R I))) :=
-    { toFun := fun x => x
-      invFun := fun x => x
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
-  exact (Module.Finite.equiv_iff (c.extendScalarsOfSurjective
-    (Ideal.Quotient.mk_surjective :
-      Function.Surjective (algebraMap R (R ⧸ I))))).mpr hq
+  let : IsNoetherianRing (R ⧸ I ^ 2) :=
+    isNoetherianRing_of_surjective (AdicCompletion I R) (R ⧸ I ^ 2)
+      (evalₐ I 2).toRingHom (surjective_evalₐ I 2)
+  exact Ideal.finite_cotangent_of_isNoetherianRing_quotient_pow I (le_refl 2)
 
 /-- Noetherianity of raw completion is equivalent to Noetherian residue and
 finite original cotangent, with no original ideal-finiteness or completeness premise.
@@ -156,6 +143,28 @@ theorem isNoetherianRing_iff_quotient_and_finite_cotangent (I : Ideal R) :
   · rintro ⟨hquot, hcot⟩
     let : IsNoetherianRing (R ⧸ I) := hquot
     let : Module.Finite (R ⧸ I) I.Cotangent := hcot
+    exact isNoetherianRing_of_finite_cotangent I
+
+/-- At every exponent at least two, Noetherianity of the original power quotient
+is equivalent to Noetherianity of the adic completion. -/
+theorem isNoetherianRing_iff_quotient_pow
+    (I : Ideal R) {n : ℕ} (hn : 2 ≤ n) :
+    IsNoetherianRing (AdicCompletion I R) ↔
+      IsNoetherianRing (R ⧸ I ^ n) := by
+  constructor
+  · intro hS
+    let : IsNoetherianRing (AdicCompletion I R) := hS
+    exact isNoetherianRing_of_surjective (AdicCompletion I R) (R ⧸ I ^ n)
+      (evalₐ I n).toRingHom (surjective_evalₐ I n)
+  · intro hquot
+    let : IsNoetherianRing (R ⧸ I ^ n) := hquot
+    have hle : I ^ n ≤ I :=
+      Ideal.pow_le_self (ne_of_gt (lt_of_lt_of_le (by decide : 0 < 2) hn))
+    let : IsNoetherianRing (R ⧸ I) :=
+      isNoetherianRing_of_surjective (R ⧸ I ^ n) (R ⧸ I)
+        (Ideal.Quotient.factor hle) (Ideal.Quotient.factor_surjective hle)
+    let : Module.Finite (R ⧸ I) I.Cotangent :=
+      Ideal.finite_cotangent_of_isNoetherianRing_quotient_pow I hn
     exact isNoetherianRing_of_finite_cotangent I
 
 end AdicCompletion
