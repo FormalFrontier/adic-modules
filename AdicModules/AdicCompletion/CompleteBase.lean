@@ -5,7 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.TensorProduct
-public import Mathlib.RingTheory.Ideal.Cotangent
+public import AdicModules.Ideal.Cotangent
 
 import AdicModules.AdicCompletion.Completeness
 import AdicModules.Noetherian
@@ -254,11 +254,7 @@ theorem Ideal.fg_iff_finite_cotangent
     {R : Type uR} [CommRing R] (I : Ideal R) [IsAdicComplete I R] :
     I.FG ↔ Module.Finite (R ⧸ I) I.Cotangent := by
   constructor
-  · intro hI
-    let : Module.Finite R I := Module.Finite.of_fg hI
-    let : Module.Finite R I.Cotangent :=
-      Module.Finite.of_surjective I.toCotangent I.toCotangent_surjective
-    exact Module.Finite.of_restrictScalars_finite R (R ⧸ I) I.Cotangent
+  · exact Ideal.finite_cotangent_of_fg I
   · intro hI
     -- Compare the conormal and first quotient through their canonical scalar towers.
     let e : I.Cotangent ≃ₗ[R] (I ⧸ (I • (⊤ : Submodule R I))) :=

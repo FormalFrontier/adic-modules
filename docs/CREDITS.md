@@ -123,6 +123,17 @@ specialization reuses quotient base change. These are compositions of existing
 interfaces, without copying their proof bodies or giving original modules a
 completed-ring action; upstream notices remain in Mathlib.
 
+The Noetherian complete-module flatness criterion combines the standard
+Artin–Rees lemma with the equational criterion for flatness
+([Stacks Project, Tag 00HK](https://stacks.math.columbia.edu/tag/00HK)). It uses
+Andrew Yang's Artin–Rees formalization, the flatness API of Johan Commelin,
+Jujian Zhang and Yongle Hu, Mitchell Lee and Junyan Xu's equational criterion,
+and Antoine Chambert-Loir's tensor right-exactness API. Finite-product tensor
+coordinates and intrinsic completeness reuse the formalizations of Judith Ludwig
+and Christian Merten and this library's ideal-action and product-completeness APIs.
+The uniform-estimate and successive-correction proof is independently assembled
+Formal Frontier Agent expression, without copying upstream proof bodies.
+
 The complete-base conormal criteria use Andrew Yang's canonical ideal cotangent
 module and quotient map in Mathlib, together with Johan Commelin's finite-module
 transport API. The injective-map Hausdorff argument uses Mathlib's adic

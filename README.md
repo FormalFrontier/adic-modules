@@ -123,6 +123,13 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   completed-ring action is assumed, and the original localization map need not
   be injective. Ring and module universes are independent.
 
+- **Flatness of complete modules over a Noetherian ring.** For any ideal `K`
+  of a Noetherian commutative ring `A`, an arbitrary intrinsically `K`-adically
+  complete and Hausdorff module `N` is flat if each positive intrinsic quotient
+  `N / KⁿN` is flat over `A / Kⁿ`. The ring need not be complete, and neither
+  `N` nor its first quotient need be finite. See
+  [`Module.Flat.of_isAdicComplete`](AdicModules/AdicCompletion/Flat/Noetherian.lean).
+
 - **Completion with a flat last module.** For any ideal `I` of a commutative
   ring `R`, an exact pair `M → N → P` with surjective second map remains
   exact at the middle after completion if the original `P` is flat over `R`.
@@ -153,14 +160,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   No finiteness, Noetherianity, separation, completeness or original
   completed-ring action is required.
 
-- **Intrinsic completeness from one finitely generated positive power.** For any
-  commutative ring `R`, ideal `I` and original `R`-module `M`, a given `n > 0`
-  with `(I ^ n).FG` identifies `(I ^ k) • ⊤` in the same `AdicCompletion I M`
-  with the kernel of evaluation at every `k`, including zero, and makes that completion
-  intrinsically `I`-adically complete for its original `R`-action. The ring and module
-  universes are independent; no `I.FG` or Noetherian hypothesis, and no finiteness,
-  projectivity, separatedness or completeness of `M` is required. See the
-  [kernel identity](AdicModules/AdicCompletion/Kernel.lean) and
+- **Kernels and completeness from one positive-power cotangent.** For any
+  commutative ring `R`, ideal `I` and original `R`-module `M`, a given `p > 0`
+  with `(I ^ p).Cotangent` finite over `R / I ^ p` identifies `(I ^ n) • ⊤`
+  in `AdicCompletion I M` with the evaluation kernel at every `n`, including zero.
+  The completion is intrinsically complete for the canonically extended ideal
+  `J = I.map (algebraMap R (AdicCompletion I R))`, and for its original `I`-action.
+  Finite original cotangent and finite generation of a positive original power are
+  special cases. No original ideal power need be finitely generated; no Noetherianity,
+  finiteness, flatness, projectivity, separatedness or completeness of `R` or `M`
+  is assumed. Ring and module universes are independent. This floor does not imply
+  `J.FG` or Noetherianity of the completed ring, even with Noetherian `R / I`.
+  See the [kernel identity](AdicModules/AdicCompletion/Kernel.lean) and
   [completeness theorem](AdicModules/AdicCompletion/Completeness.lean).
 
 - **Automatic completed-scalar linearity.** Let `I` be an ideal of a commutative
@@ -836,6 +847,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
+| [AdicCompletion.Flat.Noetherian](AdicModules/AdicCompletion/Flat/Noetherian.lean) (flat intrinsic quotients imply flatness of an arbitrary complete module over a Noetherian ring) | — |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels, finite-power and finite-cotangent evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |

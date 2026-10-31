@@ -37,9 +37,9 @@ Equality of the intrinsic ideal-power filtration with the evaluation kernels mak
 `AdicCompletion I M` intrinsically `I`-adically complete for its original `R`-module
 structure. Finite generation of a positive power of `I` supplies this equality.
 The all-stage evaluation-kernel identity turns the compatible diagonal family of a Cauchy
-sequence into an intrinsic limit. Finite generation of the original cotangent module
-over the original residue ring also gives intrinsic completeness, for the extended ideal
-acting on every completed module.
+sequence into an intrinsic limit. Finiteness of the cotangent of one positive original ideal
+power over its quotient ring also gives intrinsic completeness, for the extended ideal acting
+on every completed module. In particular, finite original cotangent suffices.
 
 Precompleteness for two arbitrary ideals implies precompleteness for their sum.
 The proof splits successive differences of an even subsequence into two sequences
@@ -138,15 +138,29 @@ theorem isAdicComplete_of_fg_pow
   isAdicComplete_of_pow_smul_top_eq_ker_eval I M
     (pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI)
 
+/-- A positive power with finite cotangent makes every completed module complete
+for the canonically extended ideal. -/
+theorem isAdicComplete_map_of_finite_cotangent_pow
+    {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M]
+    {p : ℕ} (hp : 0 < p)
+    [Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent] :
+    IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
+      (AdicCompletion I M) :=
+  (IsAdicComplete.map_algebraMap_iff I (AdicCompletion I M)).mpr
+    (isAdicComplete_of_pow_smul_top_eq_ker_eval I M
+      (pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M hp))
+
 /-- Finite cotangent makes every completed module complete for the extended ideal. -/
 theorem isAdicComplete_map_of_finite_cotangent
     {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
     [AddCommGroup M] [Module R M] [Module.Finite (R ⧸ I) I.Cotangent] :
     IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
-      (AdicCompletion I M) :=
-  (IsAdicComplete.map_algebraMap_iff I (AdicCompletion I M)).mpr
-    (isAdicComplete_of_pow_smul_top_eq_ker_eval I M
-      (pow_smul_top_eq_ker_eval_of_finite_cotangent I M))
+      (AdicCompletion I M) := by
+  let : Module.Finite (R ⧸ I ^ 1) (I ^ 1).Cotangent := by
+    rw [pow_one]
+    infer_instance
+  exact isAdicComplete_map_of_finite_cotangent_pow I M (p := 1) Nat.zero_lt_one
 
 end AdicCompletion
 

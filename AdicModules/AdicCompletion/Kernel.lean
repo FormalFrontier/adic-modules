@@ -26,13 +26,12 @@ single power `I ^ n` identifies the kernel of `AdicCompletion.eval I M n` with
 `(I ^ n) • ⊤` in `Submodule R (AdicCompletion I M)`. The exponent may be zero, and the ring
 and module may lie in independent universes.
 
-Finite generation of one positive power additionally gives this equality at every degree,
-without assuming `I.FG`. The proof lifts a higher coordinate to the original module and
-applies the fixed-stage equality to the residual.
-
-Finiteness of the original cotangent module `I.Cotangent` over `R ⧸ I` is another sufficient
-condition for the equality at every degree, for every original module `M`. A finitely generated
-ideal `H` generating `I ^ n` modulo `I ^ (n + 1)` already computes the evaluation kernel at `n`.
+Finiteness of the stock cotangent module of one positive ideal power `I ^ p` over `R ⧸ I ^ p`
+gives this equality at every degree, without assuming finite generation of any original ideal
+power. Finite original cotangent and finite generation of a positive original power are special
+cases. A finitely generated ideal `H` generating `I ^ n` modulo `I ^ (n + 1)` already computes
+the evaluation kernel at `n`. Applying this to auxiliary powers gives cofinally many stages;
+lifting a higher coordinate to the original module then descends the equality to any lower stage.
 Neither the original module nor its first quotient nor its completion is assumed finite.
 
 For any ideal, completion of the kernel of an original split surjection is canonically
@@ -60,7 +59,8 @@ comparison then compute its completed range. The single-power finite-generation 
 is a specialization of this argument.
 
 The cotangent argument uses Mathlib's ideal cotangent formalization by Andrew Yang and the
-span-modulo-square bridge in `AdicModules.Ideal.Cotangent`.
+span-modulo-square bridge in `AdicModules.Ideal.Cotangent`. The positive-power argument
+applies the same bridge to `I ^ p` and reuses the higher-coordinate lifting argument for descent.
 
 The split-kernel comparison reuses Mathlib's completion formalizations by Kenny Lau, Judith
 Ludwig, Christian Merten and Jiedong Jiang, the exact-sequence splitting formalization by
@@ -242,28 +242,84 @@ private theorem pow_eq_sup_next (I H : Ideal R) (hI : I = H ⊔ I ^ 2) (n : ℕ)
         rw [← pow_succ]
         exact le_sup_right)
 
+/-- An evaluation-kernel equality descends from a higher precision. -/
+theorem pow_smul_top_eq_ker_eval_of_le
+    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    {m n : ℕ} (hnm : n ≤ m)
+    (hm : (I ^ m) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (eval I M m).ker) :
+    (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (eval I M n).ker := by
+  refine le_antisymm (pow_smul_top_le_ker_eval ..) ?_
+  intro z hz
+  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective
+    (I ^ m • (⊤ : Submodule R M)) (eval I M m z)
+  have han : Submodule.mkQ (I ^ n • (⊤ : Submodule R M)) a = 0 := by
+    calc
+      _ = transitionMap I M hnm (Submodule.mkQ (I ^ m • (⊤ : Submodule R M)) a) :=
+        (Submodule.factor_mk (Submodule.pow_smul_top_le I M hnm) a).symm
+      _ = transitionMap I M hnm (eval I M m z) := by rw [ha]
+      _ = eval I M n z := transitionMap_comp_eval_apply I M hnm z
+      _ = 0 := LinearMap.mem_ker.mp hz
+  have hamem : a ∈ I ^ n • (⊤ : Submodule R M) :=
+    (Submodule.Quotient.mk_eq_zero _).mp han
+  have hoa : of I M a ∈ I ^ n • (⊤ : Submodule R (AdicCompletion I M)) :=
+    (Submodule.smul_top_le_comap_smul_top (I ^ n) (of I M)) hamem
+  have hres : z - of I M a ∈ I ^ m • (⊤ : Submodule R (AdicCompletion I M)) := by
+    rw [hm, LinearMap.mem_ker, map_sub, eval_of, ha, sub_self]
+  have hresn := Submodule.pow_smul_top_le I (AdicCompletion I M) hnm hres
+  simpa only [sub_add_cancel] using Submodule.add_mem _ hresn hoa
+
+/-- Finite cotangent of a positive ideal power identifies every evaluation kernel. -/
+theorem pow_smul_top_eq_ker_eval_of_finite_cotangent_pow
+    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    {p : ℕ} (hp : 0 < p)
+    [Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent] (n : ℕ) :
+    (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (eval I M n).ker := by
+  classical
+  obtain ⟨r, v, hv⟩ := Ideal.exists_fin_span_toCotangent_eq_top (I ^ p)
+  let H : Ideal R := Ideal.span (Set.range (fun i : Fin r => (v i : R)))
+  have hP : I ^ p = H ⊔ (I ^ p) ^ 2 :=
+    Ideal.eq_span_sup_sq_of_span_toCotangent_eq_top (I ^ p) v hv
+  have hHI : H ≤ I ^ p := le_sup_left.trans hP.ge
+  have hH : H.FG := Submodule.fg_span (Set.finite_range _)
+  -- Only the auxiliary powers `H ^ k` are required to be finitely generated.
+  have hcofinal (k : ℕ) :
+      (I ^ (p * k)) • (⊤ : Submodule R (AdicCompletion I M)) =
+        (eval I M (p * k)).ker := by
+    have hHpow : H ^ k ≤ I ^ (p * k) := by
+      rw [pow_mul]
+      exact Ideal.pow_right_mono hHI k
+    have hnext : (I ^ p) ^ (k + 1) ≤ I ^ (p * k + 1) := by
+      rw [← pow_mul]
+      apply Ideal.pow_le_pow_right
+      rw [Nat.mul_succ]
+      exact Nat.add_le_add_left (Nat.succ_le_of_lt hp) (p * k)
+    have hpow : H ^ k ⊔ I ^ (p * k + 1) = I ^ (p * k) := by
+      refine le_antisymm
+        (sup_le hHpow (Ideal.pow_le_pow_right (Nat.le_succ (p * k)))) ?_
+      calc
+        I ^ (p * k) = (I ^ p) ^ k := pow_mul I p k
+        _ = H ^ k ⊔ (I ^ p) ^ (k + 1) := pow_eq_sup_next (I ^ p) H hP k
+        _ ≤ H ^ k ⊔ I ^ (p * k + 1) := sup_le_sup le_rfl hnext
+    have hstage := smul_top_eq_ker_eval_of_fg_sup_pow I (H ^ k) M (p * k) hH.pow hpow
+    refine le_antisymm (pow_smul_top_le_ker_eval (I := I) (M := M) (p * k)) ?_
+    rw [← hstage]
+    exact Submodule.smul_mono_left hHpow
+  exact pow_smul_top_eq_ker_eval_of_le I M
+    ((Nat.le_succ n).trans (Nat.le_mul_of_pos_left (n + 1) hp)) (hcofinal (n + 1))
+
 /-- Finite cotangent identifies the ideal-power filtration on every completed module
 with the kernels of evaluation. -/
 theorem pow_smul_top_eq_ker_eval_of_finite_cotangent
     (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
     [Module.Finite (R ⧸ I) I.Cotangent] (n : ℕ) :
     (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
-  classical
-  obtain ⟨k, w, hw⟩ := Module.Finite.exists_fin (R := R ⧸ I) (M := I.Cotangent)
-  choose v hv using fun i : Fin k => I.toCotangent_surjective (w i)
-  have hvspan : Submodule.span (R ⧸ I)
-      (Set.range (fun i : Fin k => I.toCotangent (v i))) = ⊤ := by
-    simpa only [hv] using hw
-  let H : Ideal R := Ideal.span (Set.range (fun i : Fin k => (v i : R)))
-  have hI : I = H ⊔ I ^ 2 :=
-    Ideal.eq_span_sup_sq_of_span_toCotangent_eq_top I v hvspan
-  have hHI : H ≤ I := le_sup_left.trans hI.ge
-  have hH : H.FG := Submodule.fg_span (Set.finite_range _)
-  have hstage := smul_top_eq_ker_eval_of_fg_sup_pow I (H ^ n) M n hH.pow
-    (pow_eq_sup_next I H hI n).symm
-  refine le_antisymm (pow_smul_top_le_ker_eval (I := I) (M := M) n) ?_
-  rw [← hstage]
-  exact Submodule.smul_mono_left (Ideal.pow_right_mono hHI n)
+  let : Module.Finite (R ⧸ I ^ 1) (I ^ 1).Cotangent := by
+    rw [pow_one]
+    infer_instance
+  exact pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M (p := 1) Nat.zero_lt_one n
 
 section SplitSurjection
 
@@ -404,31 +460,8 @@ theorem pow_smul_top_eq_ker_eval_of_fg_pos_pow
     {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) :
     (I ^ k) • (⊤ : Submodule R (AdicCompletion I M)) =
       (AdicCompletion.eval I M k).ker := by
-  refine le_antisymm (pow_smul_top_le_ker_eval ..) ?_
-  intro z hz
-  -- Work at a higher finitely generated power, not at the possibly non-finitely generated `I ^ k`.
-  let m := n * (k + 1)
-  have hkm : k ≤ m :=
-    (Nat.le_succ k).trans (Nat.le_mul_of_pos_left (k + 1) hn)
-  have hfg : (I ^ m).FG := by
-    simpa only [m, pow_mul] using (Ideal.FG.pow (n := k + 1) hI)
-  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective
-    (I ^ m • (⊤ : Submodule R M)) (eval I M m z)
-  have hak : Submodule.mkQ (I ^ k • (⊤ : Submodule R M)) a = 0 := by
-    calc
-      _ = transitionMap I M hkm (Submodule.mkQ (I ^ m • (⊤ : Submodule R M)) a) :=
-        (Submodule.factor_mk (Submodule.pow_smul_top_le I M hkm) a).symm
-      _ = transitionMap I M hkm (eval I M m z) := by rw [ha]
-      _ = eval I M k z := transitionMap_comp_eval_apply I M hkm z
-      _ = 0 := LinearMap.mem_ker.mp hz
-  have hamem : a ∈ I ^ k • (⊤ : Submodule R M) :=
-    (Submodule.Quotient.mk_eq_zero _).mp hak
-  have hoa : of I M a ∈ I ^ k • (⊤ : Submodule R (AdicCompletion I M)) :=
-    (Submodule.smul_top_le_comap_smul_top (I ^ k) (of I M)) hamem
-  have hres : z - of I M a ∈ I ^ m • (⊤ : Submodule R (AdicCompletion I M)) := by
-    rw [pow_smul_top_eq_ker_eval_of_fg_pow hfg, LinearMap.mem_ker,
-      map_sub, eval_of, ha, sub_self]
-  have hresk := Submodule.pow_smul_top_le I (AdicCompletion I M) hkm hres
-  simpa only [sub_add_cancel] using Submodule.add_mem _ hresk hoa
+  let : Module.Finite (R ⧸ I ^ n) (I ^ n).Cotangent :=
+    Ideal.finite_cotangent_of_fg (I ^ n) hI
+  exact pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M hn k
 
 end AdicCompletion

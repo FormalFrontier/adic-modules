@@ -52,15 +52,6 @@ namespace AdicCompletion
 
 variable {R : Type uR} [CommRing R]
 
-/-- Finite cotangent modules admit finite families of original representatives. -/
-private theorem exists_fin_span_toCotangent_eq_top (I : Ideal R)
-    [Module.Finite (R ⧸ I) I.Cotangent] :
-    ∃ (k : ℕ) (v : Fin k → I),
-      Submodule.span (R ⧸ I) (Set.range (fun i : Fin k => I.toCotangent (v i))) = ⊤ := by
-  obtain ⟨k, w, hw⟩ := Module.Finite.exists_fin (R := R ⧸ I) (M := I.Cotangent)
-  choose v hv using fun i : Fin k => I.toCotangent_surjective (w i)
-  exact ⟨k, v, by simpa only [hv] using hw⟩
-
 /-- Original cotangent generators generate the extended ideal in the raw completion. -/
 theorem map_eq_span_of_span_toCotangent_eq_top (I : Ideal R)
     {ι : Type uι} [Finite ι] (v : ι → I)
@@ -94,7 +85,7 @@ theorem map_eq_span_of_span_toCotangent_eq_top (I : Ideal R)
 theorem fg_map_of_finite_cotangent (I : Ideal R)
     [Module.Finite (R ⧸ I) I.Cotangent] :
     (I.map (algebraMap R (AdicCompletion I R))).FG := by
-  obtain ⟨k, v, hv⟩ := exists_fin_span_toCotangent_eq_top I
+  obtain ⟨k, v, hv⟩ := Ideal.exists_fin_span_toCotangent_eq_top I
   rw [map_eq_span_of_span_toCotangent_eq_top I v hv]
   exact Submodule.fg_span (Set.finite_range _)
 

@@ -5,12 +5,13 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.Exactness
+public import AdicModules.AdicCompletion.Flat.Noetherian
 public import AdicModules.AdicCompletion.LinearMap
 public import AdicModules.LinearAlgebra.Quotient.Flat
 public import Mathlib.RingTheory.Smooth.Quotient
 
 /-!
-# Flat targets, inverse criteria and exactness of adic completion
+# Flatness, inverse criteria and exactness of adic completion
 
 Adic completion preserves injectivity of an original linear map with flat
 original cokernel. It also preserves middle exactness of a right-surjective exact
@@ -29,6 +30,11 @@ flatness of the target suffices. No complete base, finite generation or original
 completed-ring action is required. The quotient-image nilpotence criterion gives
 bijectivity at each positive stage; the canonical completed-map bridge and
 Mathlib's original-map surjectivity criterion then give the conclusion.
+
+The re-exported Noetherian criterion proves that an arbitrary intrinsically
+complete module is flat when all its positive intrinsic quotients are flat over
+the corresponding quotient rings. It requires neither a complete base ring nor
+a finite first quotient.
 
 ## References
 
