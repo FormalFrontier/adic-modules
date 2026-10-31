@@ -9,10 +9,14 @@ public import Mathlib.RingTheory.AdicCompletion.LocalRing
 public import Mathlib.RingTheory.Noetherian.Basic
 import AdicModules.AdicCompletion.Completeness
 import AdicModules.AdicCompletion.LinearMap
+import AdicModules.AdicCompletion.RingHom
+import AdicModules.AdicCompletion.Surjectivity
 import CoherentModules.RingTheory.Noetherian
 import Mathlib.Algebra.Module.Torsion.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.AdicCompletion.Noetherian
+import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+import Mathlib.RingTheory.TensorProduct.Finite
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Ring
@@ -31,6 +35,11 @@ criterion to the adic completion gives the corresponding result without requirin
 the original ring to be complete or Noetherian. A Noetherian module is separated for any
 ideal contained in the Jacobson radical of its annihilator; this follows by applying
 Mathlib's Krull separation theorem over the quotient by the annihilator.
+
+For every ideal, a Noetherian original module has Noetherian raw completion over the
+canonical completed coefficient ring. The proof uses the Noetherian quotient by the
+original module's annihilator and restriction of completed scalars. Neither the original
+coefficient ring nor any of its ideal-power quotients needs to be Noetherian.
 
 The coefficient-reconstruction theorem `Submodule.fg_of_adic_approximation` applies
 to a separated decreasing filtration on an arbitrary module. Its successive
@@ -62,6 +71,8 @@ needs no action of the completed coefficient ring.
   Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov; and the
   canonical quotient-annihilator action from Pierre-Alexandre Bazin's
   `Algebra/Module/Torsion/Basic.lean`.
+* Mathlib's `RingTheory/AdicCompletion/AsTensorProduct.lean`, by Judith Ludwig and
+  Christian Merten, supplies surjectivity of the tensor comparison for finite modules.
 * `CoherentModules.RingTheory.Noetherian` supplies Noetherianity of the scalar
   ring modulo a Noetherian module's annihilator and Noetherian descent along
   surjective semilinear maps. Scalar restriction uses Mathlib's bijective-semilinear
@@ -546,3 +557,58 @@ theorem AdicCompletion.isNoetherianRing_of_fg
   have := completion_quotient_isNoetherianRing I hI
   exact IsAdicComplete.isNoetherianRing_of_fg
     (I.map (algebraMap R (AdicCompletion I R))) (hI.map _)
+
+namespace AdicCompletion
+
+/-- The raw adic completion of a Noetherian original module is Noetherian over the
+canonical completed coefficient ring. No Noetherianity of the original ring or its
+ideal-power quotients, finite generation of the ideal, separation or completeness is
+required. The proof passes to the quotient by the original module's annihilator. -/
+theorem isNoetherian_of_isNoetherian
+    {R : Type u} [CommRing R] (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M] [IsNoetherian R M] :
+    IsNoetherian (AdicCompletion I R) (AdicCompletion I M) := by
+  let B := R ⧸ Module.annihilator R M
+  let : Module B M := Module.quotientAnnihilator
+  let : IsScalarTower R B M := (Module.isTorsionBySet_annihilator R M).isScalarTower
+  have : IsNoetherianRing B := isNoetherianRing_quotient_annihilator M
+  have : Module.Finite B M := Module.Finite.of_restrictScalars_finite R B M
+  let J := I.map (algebraMap R B)
+  have : IsNoetherianRing (B ⧸ J) :=
+    isNoetherianRing_of_surjective B (B ⧸ J) (Ideal.Quotient.mk J)
+      Ideal.Quotient.mk_surjective
+  have : IsNoetherianRing (AdicCompletion J B) :=
+    isNoetherianRing_of_fg J (IsNoetherian.noetherian J)
+  have : Module.Finite (AdicCompletion J B) (AdicCompletion J M) :=
+    Module.Finite.of_surjective (ofTensorProduct J M)
+      (ofTensorProduct_surjective_of_finite J M)
+  let ρ := mapRingHom I J (algebraMap R B) Ideal.le_comap_map
+  have hq : Function.Surjective (Algebra.linearMap R B) := Ideal.Quotient.mk_surjective
+  have hmap : Function.Surjective (map I (Algebra.linearMap R B)) :=
+    (map_surjective_iff_mkQ_comp_surjective I (Algebra.linearMap R B)).mpr
+      ((Submodule.mkQ_surjective (I • (⊤ : Submodule R B))).comp hq)
+  -- The completed quotient map is surjective, but need not be an isomorphism.
+  have hρ : Function.Surjective ρ := by
+    intro b
+    obtain ⟨a, ha⟩ := hmap (restrictScalarsEquiv (S := B) I B b)
+    refine ⟨a, ?_⟩
+    apply (restrictScalarsEquiv (S := B) I B).injective
+    exact (restrictScalarsEquiv_mapRingHom (S := B) I a).trans ha
+  let : RingHomSurjective ρ := ⟨hρ⟩
+  let e := restrictScalarsEquiv (S := B) I M
+  let L : AdicCompletion I M →ₛₗ[ρ] AdicCompletion J M :=
+    { toFun := e.symm
+      map_add' := e.symm.map_add
+      map_smul' := by
+        intro a x
+        apply e.injective
+        change e (e.symm (a • x)) = e (ρ a • e.symm x)
+        calc
+          e (e.symm (a • x)) = a • x := e.apply_symm_apply _
+          _ = a • e (e.symm x) :=
+            congrArg (fun y => a • y) (e.apply_symm_apply x).symm
+          _ = e (ρ a • e.symm x) :=
+            (restrictScalarsEquiv_smul (S := B) I a (e.symm x)).symm }
+  exact (LinearMap.isNoetherian_iff_of_bijective L e.symm.bijective).mpr inferInstance
+
+end AdicCompletion

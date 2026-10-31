@@ -51,6 +51,7 @@ public import AdicModules.AdicCompletion.Pi
 public import AdicModules.AdicCompletion.Quotient
 public import AdicModules.AdicCompletion.QuotientTorsion
 public import AdicModules.AdicCompletion.RestrictScalars
+public import AdicModules.AdicCompletion.RingHom
 public import AdicModules.AdicCompletion.Stationary
 public import AdicModules.AdicCompletion.Submodule
 public import AdicModules.AdicCompletion.Surjectivity
@@ -121,9 +122,16 @@ public import AdicModules.RingTheory.HenselianPi
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
-compares adic completions under restriction of scalars. For every ideal, completion of a
-dependent direct sum is the canonical completed-ring-linear restricted product, defined
-by finite support at each original quotient evaluation. For a finite projective module over
+compares adic completions under restriction of scalars, respecting the completed scalar
+actions through canonical maps between completed coefficient rings. A ring map carrying
+one ideal into another induces a ring map on completions. For an algebra, its image-ideal
+completion has a named opt-in algebra over the completed coefficient ring,
+`AdicCompletion.extendedAlgebra`, retaining the stock ring and original scalar tower.
+It does not replace existing coefficient algebras: completing `R → AdicCompletion I R`
+need not give the coefficient map into the next completion.
+For every ideal, completion of a dependent direct sum is the canonical completed-ring-linear
+restricted product, defined by finite support at each original quotient evaluation.
+For a finite projective module over
 any commutative ring, the canonical tensor comparison is a completion-ring-linear equivalence,
 with independent ring and module universes and no Noetherian hypothesis. It also describes
 submodule closure using a basis of submodule neighborhoods of zero in a given topological

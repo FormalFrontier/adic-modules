@@ -4,8 +4,9 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.RingTheory.AdicCompletion.Basic
+public import AdicModules.AdicCompletion.RingHom
 public import Mathlib.LinearAlgebra.Quotient.Basic
+public import Mathlib.RingTheory.AdicCompletion.Functoriality
 public import Mathlib.RingTheory.Ideal.Maps
 
 set_option warningAsError true
@@ -16,12 +17,15 @@ set_option warningAsError true
 Let `R → S` be an algebra, `M` an `S`-module with a compatible `R`-module structure,
 and `I` an ideal of `R`. The filtration of `M` by the powers of `I` agrees, after
 restriction of scalars, with the filtration by powers of the extended ideal in `S`.
-Thus their native quotients and their inverse-limit adic completions are linearly
+Thus their quotients and their inverse-limit adic completions are linearly
 equivalent over `R`. No finiteness, separatedness, or completeness assumption is used.
 
 The equivalence goes from completion along the extended ideal to completion
-along `I`. Its inverse, both quotient representatives, and the native transition
-maps are described by the accompanying lemmas.
+along `I`. Its inverse, both quotient representatives, and the transition maps
+are described by the accompanying lemmas. It also intertwines the canonical
+completed scalar actions through the completed coefficient ring map. Under this
+comparison, the completed coefficient ring map agrees with completion of the
+original coefficient linear map.
 
 ## References
 
@@ -74,7 +78,7 @@ theorem restrictScalarsLevelEquiv_symm_mk (I : Ideal R) (n : ℕ) (x : M) :
   apply (restrictScalarsLevelEquiv I M n).injective
   simp
 
-/-- The level comparisons commute with the native transition maps. -/
+/-- The level comparisons commute with the transition maps. -/
 theorem restrictScalarsLevelEquiv_transitionMap (I : Ideal R) {m n : ℕ}
     (hmn : m ≤ n)
     (x : M ⧸ ((I.map (algebraMap R S)) ^ n • ⊤ : Submodule S M)) :
@@ -88,7 +92,7 @@ theorem restrictScalarsLevelEquiv_transitionMap (I : Ideal R) {m n : ℕ}
         Submodule.factor _ (restrictScalarsLevelEquiv I M n (Submodule.mkQ _ x))
     simp
 
-/-- The inverse level comparisons commute with the native transition maps. -/
+/-- The inverse level comparisons commute with the transition maps. -/
 theorem restrictScalarsLevelEquiv_symm_transitionMap (I : Ideal R) {m n : ℕ}
     (hmn : m ≤ n) (x : M ⧸ (I ^ n • ⊤ : Submodule R M)) :
     (restrictScalarsLevelEquiv I M m).symm (transitionMap I M hmn x) =
@@ -98,8 +102,8 @@ theorem restrictScalarsLevelEquiv_symm_transitionMap (I : Ideal R) {m n : ℕ}
   rw [restrictScalarsLevelEquiv_transitionMap]
   simp
 
-/-- Restricting scalars commutes with forming the native inverse-limit
-completion: extended-ideal completion is the original-ideal completion as an
+/-- Restricting scalars commutes with forming the inverse-limit completion:
+extended-ideal completion is the original-ideal completion as an
 `R`-module. -/
 def restrictScalarsEquiv (I : Ideal R) (N : Type*) [AddCommGroup N]
     [Module R N] [Module S N] [IsScalarTower R S N] :
@@ -159,5 +163,62 @@ theorem restrictScalarsEquiv_symm_of (I : Ideal R) (x : M) :
       of (I.map (algebraMap R S)) M x := by
   apply (restrictScalarsEquiv I M).injective
   simp
+
+/-- The quotient comparison intertwines the original quotient-coefficient
+actions through the induced coefficient map. -/
+theorem restrictScalarsLevelEquiv_smul (I : Ideal R) (n : ℕ) (r : R ⧸ I ^ n)
+    (x : M ⧸ ((I.map (algebraMap R S)) ^ n • ⊤ : Submodule S M)) :
+    restrictScalarsLevelEquiv I M n
+        (Ideal.quotientMap ((I.map (algebraMap R S)) ^ n) (algebraMap R S)
+          ((Ideal.pow_right_mono Ideal.le_comap_map n).trans
+            (Ideal.le_comap_pow (algebraMap R S) n)) r • x) =
+      r • restrictScalarsLevelEquiv I M n x := by
+  obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective r
+  induction x using Submodule.Quotient.induction_on with
+  | _ x =>
+    simp only [Ideal.quotientMap_mk, Module.Quotient.mk_smul_mk,
+      restrictScalarsLevelEquiv_mk, IsScalarTower.algebraMap_smul]
+
+/-- Restriction of scalars intertwines the canonical completed module actions
+through the canonical completed coefficient ring map. No finiteness or
+intrinsic-completeness assumption is required. -/
+theorem restrictScalarsEquiv_smul (I : Ideal R) (a : AdicCompletion I R)
+    (x : AdicCompletion (I.map (algebraMap R S)) M) :
+    restrictScalarsEquiv I M
+        (mapRingHom I (I.map (algebraMap R S)) (algebraMap R S) Ideal.le_comap_map a • x) =
+      a • restrictScalarsEquiv I M x := by
+  apply AdicCompletion.ext
+  intro n
+  change restrictScalarsLevelEquiv I M n
+      ((mapRingHom I (I.map (algebraMap R S)) (algebraMap R S)
+        Ideal.le_comap_map a • x).val n) =
+    (a • restrictScalarsEquiv I M x).val n
+  rw [smul_eval, smul_eval, val_smul_eq_evalₐ_smul, val_smul_eq_evalₐ_smul,
+    evalₐ_mapRingHom]
+  exact restrictScalarsLevelEquiv_smul I n (evalₐ I n a) (x.val n)
+
+/-- Under restriction of scalars, the completed coefficient ring map is the
+completion of the original coefficient linear map. -/
+@[simp]
+theorem restrictScalarsEquiv_mapRingHom (I : Ideal R) (a : AdicCompletion I R) :
+    restrictScalarsEquiv I S
+        (mapRingHom I (I.map (algebraMap R S)) (algebraMap R S) Ideal.le_comap_map a) =
+      map I (Algebra.linearMap R S) a := by
+  apply AdicCompletion.ext
+  intro n
+  induction a using AdicCompletion.induction_on with
+  | _ a =>
+    rw [map_mk]
+    change restrictScalarsLevelEquiv I S n
+        (eval (I.map (algebraMap R S)) S n
+          (mapRingHom I (I.map (algebraMap R S)) (algebraMap R S)
+            Ideal.le_comap_map (mk I R a))) =
+      Submodule.Quotient.mk (algebraMap R S (a.val n))
+    rw [← factor_evalₐ_eq_eval (I.map (algebraMap R S)) _
+      (le_of_eq (Ideal.mul_top _).symm), evalₐ_mapRingHom, evalₐ_mk]
+    rw [Ideal.quotientMap_mk, Ideal.Quotient.factor_mk,
+      ← Ideal.Quotient.mk_eq_mk]
+    exact restrictScalarsLevelEquiv_mk (R := R) (S := S) (M := S) I n
+      (algebraMap R S (a.val n))
 
 end AdicCompletion

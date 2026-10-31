@@ -69,6 +69,15 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   The target needs no completed-ring action; see the
   [Hom-out equivalence](../AdicModules/AdicCompletion/LinearMap.lean).
 
+- **Completion of a Noetherian original module.** For every ideal `I` of a
+  commutative ring `R`, a Noetherian `R`-module `M` has raw completion Noetherian
+  over the canonical completed ring `AdicCompletion I R`. Neither `R` nor
+  `R / I` need be Noetherian, and no finite generation of `I`, flatness,
+  faithfulness, separation or completeness is assumed. Ring and module universes
+  are independent. This is only a sufficient condition: the `(2)`-adic completion
+  of `ℤ[1/2]` is zero, although `ℤ[1/2]` is not a Noetherian `ℤ`-module. See
+  [`AdicCompletion.isNoetherian_of_isNoetherian`](../AdicModules/Noetherian.lean).
+
 - **Original quotients of a Noetherian completed module.** For any ideal `I` of a
   commutative ring `R` and any original `R`-module `M`, if
   `H = AdicCompletion I M` is Noetherian over `C = AdicCompletion I R`, then every
@@ -681,6 +690,16 @@ Rings are commutative; modules are additive commutative groups unless specified 
   with a sign twist for negative `ℓ`. For an `R`-algebra `S` and compatible module
   actions and scalar tower, completion at the mapped ideal agrees **`R`-linearly**
   with completion at `I`, without finiteness, flatness, separation or completeness.
+  It intertwines the completed scalar actions through the canonical
+  [completed ring map](../AdicModules/AdicCompletion/RingHom.lean). More generally,
+  every ring map carrying one ideal into another induces a ring map of completions.
+  For an `R`-algebra `S`, `AdicCompletion.extendedAlgebra` is the named opt-in
+  algebra over `AdicCompletion I R` on the completion along the extended ideal,
+  retaining its stock ring structure and original-`R` scalar tower. Select this
+  value locally or explicitly; ordinary imports leave existing coefficient
+  algebras unchanged. When `S = AdicCompletion I R`, its map completes the
+  original `R → S` and need not equal the stock coefficient map `of` into the
+  next completion.
 - **Adic topology and compactness** ([module maps](../AdicModules/Topology/Algebra/Module/AdicTopology.lean),
   [algebra topology](../AdicModules/Topology/Algebra/AdicTopology.lean)): module and mapped-ideal
   topologies agree. Semilinear maps are continuous for `I.map φ ≤ J`, open if surjective

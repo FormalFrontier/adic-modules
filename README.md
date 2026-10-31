@@ -19,6 +19,12 @@ further result families, examples and boundary cases.
   Neither `I.FG` nor Noetherianity of `R` is required.
   See [cotangent criteria](AdicModules/AdicCompletion/Cotangent.lean).
 
+- **Completion of a Noetherian original module.** For any ideal `I`, a
+  Noetherian original `R`-module `M` has raw completion `H` Noetherian over `C`
+  with its canonical action. No Noetherianity of `R` or `R / I`, ideal finiteness,
+  flatness, faithfulness, separation or completeness is assumed; the converse
+  fails. See [Noetherian modules](AdicModules/Noetherian.lean).
+
 - **Noetherian original module quotients.** For any ideal and `n ≥ 2`, the
   original `M / IⁿM` is Noetherian over `R` iff `M / IM` is Noetherian over `R`
   and the image of `IM` in `M / I²M` is finitely generated over original `R`.
@@ -86,6 +92,10 @@ further result families, examples and boundary cases.
   [cofinality](AdicModules/AdicCompletion/ChangeIdeal.lean),
   [CRT](AdicModules/AdicCompletion/ChineseRemainderAlgebra.lean) and
   [products](AdicModules/AdicCompletion/Pi.lean).
+  A ring map carrying one ideal into another induces a homomorphism between
+  their completions. For an `R`-algebra, the completed coefficient map gives
+  the named, non-global `AdicCompletion.extendedAlgebra`; existing coefficient
+  algebras are unchanged. See [completed ring maps](AdicModules/AdicCompletion/RingHom.lean).
 
 - **Henselian lifting.** Over a Henselian pair `(R,I)`, a finite square
   polynomial system with unit Jacobian determinant at a root modulo `I`
@@ -220,6 +230,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) (finite-cotangent semilinear quotients, independent finite-power comparisons and extension from original residues) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
+| [AdicCompletion.RingHom](AdicModules/AdicCompletion/RingHom.lean) (ring maps and the named completed coefficient algebra) | [AdicCompletion.RingHom](AdicModulesTest/AdicCompletion/RingHom.lean) (stock and named maps/actions on an iterated completion) |
 | [AdicCompletion.Stationary](AdicModules/AdicCompletion/Stationary.lean) (stationary-evaluation criterion and whole-completion equivalences with original power quotients) | — |
 | [AdicCompletion.Surjectivity](AdicModules/AdicCompletion/Surjectivity.lean) (surjectivity and original splittings with finite original cokernel) | — |
 | [AdicCompletion.Idempotents](AdicModules/AdicCompletion/Idempotents.lean) (first-evaluation order isomorphism on idempotents and preconnected-spectrum transfer for arbitrary ideals) | — |
