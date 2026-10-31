@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+public import AdicModules.LinearAlgebra.Quotient.Flat
 
 import AdicModules.Noetherian
 import AdicModules.AdicCompletion.LocalRing
@@ -12,11 +13,17 @@ import AdicModules.AdicCompletion.Kernel
 import AdicModules.AdicCompletion.Pi
 import AdicModules.AdicCompletion.Quotient
 import Mathlib.Algebra.Module.Projective
+import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.Monomial
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.LinearAlgebra.Projection
 import Mathlib.LinearAlgebra.TensorProduct.Quotient
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.Finiteness.Small
+import Mathlib.RingTheory.Idempotents
+import Mathlib.RingTheory.Flat.Stability
 import Mathlib.RingTheory.TensorProduct.Finite
 
 /-!
@@ -53,9 +60,16 @@ lifts span the raw completion; each lies in the range of the canonical compariso
 No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
 
 Finiteness of `M / I M` also gives finiteness of the raw completion over the canonical
-completed ring. With original projectivity, the completion is projective over that ring by
-base change and the canonical equivalence. These results use Mathlib's coefficientwise
-completed-ring action, without an action of the completed ring on original `M`.
+completed ring. If `M / I M` is finite projective over `R / I` and every positive quotient
+`M / Iⁿ M` is flat over `R / Iⁿ`, the completion is projective over that ring. In particular,
+this applies when the original `M` is flat. The proof lifts the residual split projector
+through the coefficient quotients, proves that the restricted maps are isomorphisms by a
+nilpotent-ideal criterion with flat target, and assembles their compatible inverses. This
+produces a retraction of one finite free module over the completed ring.
+
+These results use Mathlib's coefficientwise completed-ring action, without an action of the
+completed ring on original `M`. Original projectivity remains necessary in the tensor
+comparison equivalences above; flatness alone does not imply their injectivity.
 `AdicModules.AdicCompletion.FinitePresentation` consumes completed finiteness and projectivity
 in one explicit finite-presentation theorem via `Module.finitePresentation_of_projective`.
 
@@ -123,6 +137,17 @@ Johannes Hölzl, Mario Carneiro, Kevin Buzzard and Yury Kudryashov's
 extension of linear equivalences along a surjective algebra map from Kenny Lau and
 Yury Kudryashov's `Algebra/Algebra/Basic.lean` and the quotient module action from
 Pierre-Alexandre Bazin's `Algebra/Module/Torsion/Basic.lean`.
+
+The flat-quotient projectivity argument uses Andrew Yang's noncommutative idempotent-lifting
+theorem in Mathlib's `RingTheory/Idempotents.lean`, the finite matrix/linear-map correspondence
+in `LinearAlgebra/Matrix/ToLin.lean`, and Johan Commelin's finite-projective splitting theorem.
+The original-flat specialization uses Christian Merten's flat base-change formalization in
+`RingTheory/Flat/Stability.lean` and the quotient–tensor equivalence by Antoine Chambert-Loir
+and Jujian Zhang in `LinearAlgebra/TensorProduct/Quotient.lean`. Split-range reduction uses
+Mathlib's `LinearAlgebra/Projection.lean`. Compatible scalar residues are assembled by
+polynomial evaluation and Mathlib's `AdicCompletion.liftRingHom`, following the construction
+in `AdicModules.AdicCompletion.Idempotents`. The nilpotent comparison criterion is in
+`AdicModules.LinearAlgebra.Quotient.Flat`.
 -/
 
 set_option warningAsError true
@@ -134,6 +159,396 @@ noncomputable section
 universe uR uM uN uσ uι
 
 open TensorProduct
+
+universe uA uB ud uX uY uX₀ uY₀
+
+namespace LinearMap
+
+section QuotientSquare
+
+variable {A : Type uA} [CommRing A]
+variable {X : Type uX} [AddCommGroup X] [Module A X]
+variable {Y : Type uY} [AddCommGroup Y] [Module A Y]
+variable {X₀ : Type uX₀} [AddCommGroup X₀]
+variable {Y₀ : Type uY₀} [AddCommGroup Y₀]
+
+/-- An additive residual isomorphism detects bijectivity modulo an ideal.
+Only the source quotient map needs an explicit surjectivity hypothesis. -/
+private theorem bijective_reduceModIdeal_of_addHom_square
+    (J : Ideal A) (f : X →ₗ[A] Y) (rX : X →+ X₀) (rY : Y →+ Y₀)
+    (hX : Function.Surjective rX)
+    (kX : ∀ x, rX x = 0 ↔ x ∈ J • (⊤ : Submodule A X))
+    (kY : ∀ y, rY y = 0 ↔ y ∈ J • (⊤ : Submodule A Y))
+    (g₀ : X₀ →+ Y₀) (hg₀ : Function.Bijective g₀)
+    (comm : ∀ x, rY (f x) = g₀ (rX x)) :
+    Function.Bijective (f.reduceModIdeal J) := by
+  constructor
+  · intro x y hxy
+    obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A X)) x
+    obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A X)) y
+    apply (Submodule.Quotient.eq _).2
+    apply (kX (x - y)).1
+    rw [map_sub]
+    apply sub_eq_zero.mpr
+    apply hg₀.1
+    have hmem : f x - f y ∈ J • (⊤ : Submodule A Y) :=
+      (Submodule.Quotient.eq _).1 (by
+        simpa only [LinearMap.reduceModIdeal_apply] using hxy)
+    have hzero := (kY (f x - f y)).2 hmem
+    rw [map_sub] at hzero
+    rw [← comm x, ← comm y]
+    exact sub_eq_zero.mp hzero
+  · intro y
+    obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective (J • (⊤ : Submodule A Y)) y
+    obtain ⟨x₀, hx₀⟩ := hg₀.2 (rY y)
+    obtain ⟨x, hx⟩ := hX x₀
+    refine ⟨Submodule.Quotient.mk x, ?_⟩
+    rw [LinearMap.reduceModIdeal_apply]
+    apply (Submodule.Quotient.eq _).2
+    apply (kY (f x - y)).1
+    rw [map_sub, comm x, hx, hx₀, sub_self]
+
+end QuotientSquare
+
+end LinearMap
+
+namespace Matrix
+
+section RangeReduction
+
+variable {A : Type uA} [CommRing A]
+variable {B : Type uB} [CommRing B]
+variable {d : Type ud}
+
+/-- For a finite coefficient vector, coordinatewise vanishing is membership in the
+coefficient kernel times the whole free module. -/
+private theorem pi_map_eq_zero_iff [Finite d] (q : A →+* B) (v : d → A) :
+    (fun i => q (v i)) = 0 ↔
+      v ∈ (RingHom.ker q) • (⊤ : Submodule A (d → A)) := by
+  classical
+  let := Fintype.ofFinite d
+  constructor
+  · intro hv
+    rw [← Finset.univ_sum_single v]
+    apply Submodule.sum_mem
+    intro i _
+    have hi : v i ∈ RingHom.ker q := by
+      change q (v i) = 0
+      exact congrFun hv i
+    simpa only [← Pi.single_smul, smul_eq_mul, mul_one] using
+      (Submodule.smul_mem_smul hi
+        (Submodule.mem_top : (Pi.single i (1 : A) : d → A) ∈
+          (⊤ : Submodule A (d → A))))
+  · intro hv
+    refine Submodule.smul_induction_on hv (fun a ha w _ => ?_)
+      (fun v w hv hw => ?_)
+    · funext i
+      change q (a * w i) = 0
+      rw [map_mul, (show q a = 0 from ha), zero_mul]
+    · funext i
+      change q (v i + w i) = 0
+      simp only [map_add, congrFun hv i, congrFun hw i, Pi.zero_apply, add_zero]
+
+variable [Fintype d] [DecidableEq d]
+
+/-- Coordinate reduction on the range of a compatible pair of matrices. -/
+private def rangeReduction (q : A →+* B) (E : Matrix d d A) (E₀ : Matrix d d B)
+    (hcompat : E.map q = E₀) : E.toLin'.range →+ E₀.toLin'.range where
+  toFun x := ⟨fun i => q ((x : d → A) i), by
+    obtain ⟨v, hv⟩ := x.property
+    refine ⟨fun i => q (v i), ?_⟩
+    funext i
+    change (E₀ *ᵥ (fun j => q (v j))) i = q ((x : d → A) i)
+    calc
+      (E₀ *ᵥ (fun j => q (v j))) i = q ((E *ᵥ v) i) := by
+        rw [← hcompat]
+        exact (q.map_mulVec E v i).symm
+      _ = q ((x : d → A) i) := congrArg (fun w : d → A => q (w i)) hv⟩
+  map_zero' := by
+    apply Subtype.ext
+    funext i
+    exact q.map_zero
+  map_add' x y := by
+    apply Subtype.ext
+    funext i
+    exact q.map_add ((x : d → A) i) ((y : d → A) i)
+
+/-- A surjective coefficient homomorphism induces a surjection on compatible matrix ranges.
+Idempotence is not needed for this assertion. -/
+private theorem rangeReduction_surjective (q : A →+* B) (E : Matrix d d A)
+    (E₀ : Matrix d d B) (hcompat : E.map q = E₀) (hq : Function.Surjective q) :
+    Function.Surjective (rangeReduction q E E₀ hcompat) := by
+  intro y
+  obtain ⟨v, hv⟩ := y.property
+  choose u hu using fun i => hq (v i)
+  have hu' : q ∘ u = v := funext hu
+  refine ⟨⟨E.toLin' u, LinearMap.mem_range_self _ u⟩, ?_⟩
+  apply Subtype.ext
+  funext i
+  change q ((E *ᵥ u) i) = (y : d → B) i
+  rw [q.map_mulVec E u i, hcompat, hu']
+  exact congrFun hv i
+
+/-- The kernel of reduction on an idempotent range is the coefficient kernel times
+that range. This uses the projection to the range, not exactness of an image functor. -/
+private theorem rangeReduction_eq_zero_iff (q : A →+* B) (E : Matrix d d A)
+    (E₀ : Matrix d d B) (hcompat : E.map q = E₀) (hE : IsIdempotentElem E)
+    (x : E.toLin'.range) :
+    rangeReduction q E E₀ hcompat x = 0 ↔
+      x ∈ (RingHom.ker q) • (⊤ : Submodule A E.toLin'.range) := by
+  have hproj : IsIdempotentElem E.toLin' := by
+    change E.toLin'.comp E.toLin' = E.toLin'
+    rw [← Matrix.toLin'_mul, hE.eq]
+  let π : (d → A) →ₗ[A] E.toLin'.range :=
+    ((LinearMap.isProj_range_iff_isIdempotentElem E.toLin').mpr hproj).codRestrict
+  constructor
+  · intro hx
+    have hzero : (fun i => q ((x : d → A) i)) = 0 :=
+      congrArg (fun z : E₀.toLin'.range => (z : d → B)) hx
+    have hmem := (pi_map_eq_zero_iff q (x : d → A)).1 hzero
+    have hmem' :=
+      (Submodule.smul_top_le_comap_smul_top (RingHom.ker q) π) hmem
+    change π (x : d → A) ∈
+      (RingHom.ker q) • (⊤ : Submodule A E.toLin'.range) at hmem'
+    simpa only [π, LinearMap.IsProj.codRestrict_apply_cod] using hmem'
+  · intro hx
+    have hmem :=
+      (Submodule.smul_top_le_comap_smul_top (RingHom.ker q) E.toLin'.range.subtype) hx
+    change (x : d → A) ∈ (RingHom.ker q) • (⊤ : Submodule A (d → A)) at hmem
+    apply Subtype.ext
+    exact (pi_map_eq_zero_iff q (x : d → A)).2 hmem
+
+end RangeReduction
+
+section QuotientSquare
+
+variable {A : Type uA} [CommRing A]
+variable {B : Type uB} [CommRing B]
+variable {d : Type ud} [Fintype d] [DecidableEq d]
+variable {Y : Type uY} [AddCommGroup Y] [Module A Y]
+variable {Y₀ : Type uY₀} [AddCommGroup Y₀] [Module B Y₀]
+
+/-- A residual bijection on the reduced projector range gives bijectivity modulo the
+coefficient kernel. There is no action of `A` on the residual target in this statement. -/
+private theorem bijective_reduceModIdeal_range_of_quotient_square
+    (q : A →+* B) (hq : Function.Surjective q)
+    (E : Matrix d d A) (E₀ : Matrix d d B)
+    (hcompat : E.map q = E₀) (hE : IsIdempotentElem E)
+    (g : (d → A) →ₗ[A] Y) (g₀ : (d → B) →ₗ[B] Y₀) (rY : Y →+ Y₀)
+    (kY : ∀ y, rY y = 0 ↔ y ∈ (RingHom.ker q) • (⊤ : Submodule A Y))
+    (comm : ∀ v, rY (g v) = g₀ (fun i => q (v i)))
+    (hg₀ : Function.Bijective (g₀.comp E₀.toLin'.range.subtype)) :
+    Function.Bijective
+      ((g.comp E.toLin'.range.subtype).reduceModIdeal (RingHom.ker q)) := by
+  apply LinearMap.bijective_reduceModIdeal_of_addHom_square (RingHom.ker q)
+    (g.comp E.toLin'.range.subtype) (rangeReduction q E E₀ hcompat) rY
+    (rangeReduction_surjective q E E₀ hcompat hq)
+    (rangeReduction_eq_zero_iff q E E₀ hcompat hE) kY
+    (g₀.comp E₀.toLin'.range.subtype).toAddMonoidHom hg₀
+  intro x
+  exact comm (x : d → A)
+
+end QuotientSquare
+
+end Matrix
+
+universe u
+
+namespace AdicCompletion
+
+variable {R : Type u} [CommRing R] (I : Ideal R) {d : ℕ}
+
+/-- Products of two elements of a positive adjacent coefficient kernel vanish. -/
+private lemma adjacent_coefficient_kernel_mul_eq_zero {n : ℕ} (hn : 1 ≤ n)
+    {x y : R ⧸ I ^ (n + 1)}
+    (hx : x ∈ RingHom.ker (Ideal.Quotient.factorPowSucc I n))
+    (hy : y ∈ RingHom.ker (Ideal.Quotient.factorPowSucc I n)) : x * y = 0 := by
+  rw [Ideal.Quotient.factor_ker] at hx hy
+  obtain ⟨r, hr, rfl⟩ := Ideal.mem_image_of_mem_map_of_surjective
+    (Ideal.Quotient.mk (I ^ (n + 1))) Ideal.Quotient.mk_surjective hx
+  obtain ⟨s, hs, rfl⟩ := Ideal.mem_image_of_mem_map_of_surjective
+    (Ideal.Quotient.mk (I ^ (n + 1))) Ideal.Quotient.mk_surjective hy
+  rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem]
+  have hrs : r * s ∈ I ^ (n + n) := by
+    simpa only [pow_add] using Ideal.mul_mem_mul hr hs
+  exact Ideal.pow_le_pow_right (I := I) (Nat.add_le_add_left hn n) hrs
+
+/-- A matrix in a positive adjacent matrix kernel has square zero. -/
+private lemma adjacent_matrix_kernel_sq_eq_zero {n : ℕ} (hn : 1 ≤ n)
+    (B : Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)))
+    (hB : B ∈ RingHom.ker
+      ((Ideal.Quotient.factorPowSucc I n).mapMatrix :
+        Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)) →+*
+          Matrix (Fin d) (Fin d) (R ⧸ I ^ n))) :
+    B ^ 2 = 0 := by
+  have hentry (i j : Fin d) :
+      B i j ∈ RingHom.ker (Ideal.Quotient.factorPowSucc I n) := by
+    change Ideal.Quotient.factorPowSucc I n (B i j) = 0
+    exact congrArg (fun A : Matrix (Fin d) (Fin d) (R ⧸ I ^ n) ↦ A i j)
+      (RingHom.mem_ker.mp hB)
+  ext i j
+  rw [pow_two, Matrix.mul_apply]
+  change (∑ k : Fin d, B i k * B k j) = 0
+  exact Finset.sum_eq_zero fun k _ ↦
+    adjacent_coefficient_kernel_mul_eq_zero I hn (hentry i k) (hentry k j)
+
+/-- Quotient transitions on finite matrices are surjective entrywise. -/
+private lemma matrix_factorPow_surjective {m n : ℕ} (hmn : m ≤ n) :
+    Function.Surjective
+      ((Ideal.Quotient.factorPow I hmn).mapMatrix :
+        Matrix (Fin d) (Fin d) (R ⧸ I ^ n) →+*
+          Matrix (Fin d) (Fin d) (R ⧸ I ^ m)) := by
+  classical
+  intro A
+  choose b hb using fun i j ↦
+    Ideal.Quotient.factor_surjective (Ideal.pow_le_pow_right (I := I) hmn) (A i j)
+  refine ⟨Matrix.of b, ?_⟩
+  ext i j
+  exact hb i j
+
+/-- The noncommutative lifting theorem applies to each positive adjacent matrix map. -/
+private lemma exists_idempotent_matrix_successor {n : ℕ} (hn : 1 ≤ n)
+    (e : Matrix (Fin d) (Fin d) (R ⧸ I ^ n)) (he : IsIdempotentElem e) :
+    ∃ b : Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)),
+      IsIdempotentElem b ∧ (Ideal.Quotient.factorPowSucc I n).mapMatrix b = e := by
+  exact exists_isIdempotentElem_eq_of_ker_isNilpotent
+    ((Ideal.Quotient.factorPowSucc I n).mapMatrix :
+      Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)) →+*
+        Matrix (Fin d) (Fin d) (R ⧸ I ^ n))
+    (fun B hB => ⟨2, adjacent_matrix_kernel_sq_eq_zero I hn B hB⟩)
+    e (matrix_factorPow_surjective I (Nat.le_succ n) e) he
+
+/-- Choose a lift of the already chosen preceding idempotent, not an independent lift
+of its first residue. -/
+private noncomputable def idempotentMatrixSuccessor {n : ℕ} (hn : 1 ≤ n)
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ n) // IsIdempotentElem e}) :
+    {b : Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)) // IsIdempotentElem b} :=
+  ⟨Classical.choose (exists_idempotent_matrix_successor I hn e.val e.property),
+    (Classical.choose_spec (exists_idempotent_matrix_successor I hn e.val e.property)).1⟩
+
+private lemma idempotentMatrixSuccessor_map {n : ℕ} (hn : 1 ≤ n)
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ n) // IsIdempotentElem e}) :
+    (Ideal.Quotient.factorPowSucc I n).mapMatrix
+      (idempotentMatrixSuccessor I hn e).val = e.val :=
+  (Classical.choose_spec (exists_idempotent_matrix_successor I hn e.val e.property)).2
+
+/-- The positive-level sequence starts at the given first idempotent. -/
+private noncomputable def positiveIdempotentMatrices
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e}) :
+    (n : ℕ) → {b : Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)) // IsIdempotentElem b} :=
+  Nat.rec
+    (motive := fun n ↦
+      {b : Matrix (Fin d) (Fin d) (R ⧸ I ^ (n + 1)) // IsIdempotentElem b})
+    e (fun n b ↦ idempotentMatrixSuccessor I (Nat.succ_le_succ (Nat.zero_le n)) b)
+
+private lemma positiveIdempotentMatrices_successor
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e}) (n : ℕ) :
+    (Ideal.Quotient.factorPowSucc I (n + 1)).mapMatrix
+      (positiveIdempotentMatrices I e (n + 1)).val =
+        (positiveIdempotentMatrices I e n).val :=
+  idempotentMatrixSuccessor_map I (Nat.succ_le_succ (Nat.zero_le n))
+    (positiveIdempotentMatrices I e n)
+
+/-- Adjoin the unique zeroth matrix without a lifting step from level zero. -/
+private noncomputable def idempotentMatrixCoefficients
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e}) :
+    (n : ℕ) → Matrix (Fin d) (Fin d) (R ⧸ I ^ n)
+  | 0 => 0
+  | n + 1 => (positiveIdempotentMatrices I e n).val
+
+private lemma idempotentMatrixCoefficients_isIdempotent
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e}) (n : ℕ) :
+    IsIdempotentElem (idempotentMatrixCoefficients I e n) := by
+  cases n with
+  | zero => exact .zero
+  | succ n => exact (positiveIdempotentMatrices I e n).property
+
+private lemma idempotentMatrixCoefficients_successor
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e}) (n : ℕ) :
+    (Ideal.Quotient.factorPowSucc I n).mapMatrix
+      (idempotentMatrixCoefficients I e (n + 1)) = idempotentMatrixCoefficients I e n := by
+  cases n with
+  | zero =>
+    let : Subsingleton (R ⧸ I ^ 0) := by
+      simpa only [pow_zero, Ideal.one_eq_top] using
+        (inferInstance : Subsingleton (R ⧸ (⊤ : Ideal R)))
+    exact Subsingleton.elim _ _
+  | succ n => exact positiveIdempotentMatrices_successor I e n
+
+private lemma idempotentMatrixCoefficients_compatible
+    (e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e})
+    {m n : ℕ} (hmn : m ≤ n) :
+    (Ideal.Quotient.factorPow I hmn).mapMatrix (idempotentMatrixCoefficients I e n) =
+      idempotentMatrixCoefficients I e m := by
+  ext i j
+  have hsucc (k : ℕ) : idempotentMatrixCoefficients I e k i j =
+      Ideal.Quotient.factorPowSucc I k (idempotentMatrixCoefficients I e (k + 1) i j) :=
+    (congrArg (fun A : Matrix (Fin d) (Fin d) (R ⧸ I ^ k) ↦ A i j)
+      (idempotentMatrixCoefficients_successor I e k)).symm
+  exact (Ideal.Quotient.eq_factor_of_eq_factor_succ (I := fun k : ℕ ↦ I ^ k)
+    (fun _ _ h ↦ Ideal.pow_le_pow_right (I := I) h)
+    (fun k ↦ idempotentMatrixCoefficients I e k i j) hsucc hmn).symm
+
+/-- Every residual idempotent finite matrix has a compatible family of idempotent
+lifts at all power quotients. Choices are not asserted to be unique. -/
+private lemma exists_compatible_idempotent_matrices
+    (e₁ : Matrix (Fin d) (Fin d) (R ⧸ I)) (he₁ : IsIdempotentElem e₁) :
+    ∃ e : (n : ℕ) → Matrix (Fin d) (Fin d) (R ⧸ I ^ n),
+      (∀ n, IsIdempotentElem (e n)) ∧
+      (∀ n, (Ideal.Quotient.factorPowSucc I n).mapMatrix (e (n + 1)) = e n) ∧
+      (∀ {m n : ℕ} (hmn : m ≤ n),
+        (Ideal.Quotient.factorPow I hmn).mapMatrix (e n) = e m) ∧
+      (Ideal.Quotient.factor (show I ^ 1 ≤ I by simp)).mapMatrix (e 1) = e₁ := by
+  let e : {e : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) // IsIdempotentElem e} :=
+    ⟨(Ideal.Quotient.factor (show I ≤ I ^ 1 by simp)).mapMatrix e₁,
+      he₁.map ((Ideal.Quotient.factor (show I ≤ I ^ 1 by simp)).mapMatrix)⟩
+  refine ⟨idempotentMatrixCoefficients I e,
+    idempotentMatrixCoefficients_isIdempotent I e,
+    idempotentMatrixCoefficients_successor I e,
+    fun hmn ↦ idempotentMatrixCoefficients_compatible I e hmn, ?_⟩
+  ext i j
+  change Ideal.Quotient.factor (show I ^ 1 ≤ I by simp)
+    (Ideal.Quotient.factor (show I ≤ I ^ 1 by simp) (e₁ i j)) = e₁ i j
+  simp only [Ideal.Quotient.factor_comp_apply, Ideal.Quotient.factor_eq, RingHom.id_apply]
+
+/-- Polynomial evaluation at compatible residues commutes with coefficient reduction. -/
+private lemma polynomial_eval₂RingHom_compatible
+    (a : (n : ℕ) → R ⧸ I ^ n)
+    (ha : ∀ {m n : ℕ} (hmn : m ≤ n), Ideal.Quotient.factorPow I hmn (a n) = a m) :
+    ∀ {m n : ℕ} (hmn : m ≤ n),
+      (Ideal.Quotient.factorPow I hmn).comp
+        (Polynomial.eval₂RingHom (Ideal.Quotient.mk (I ^ n)) (a n)) =
+          Polynomial.eval₂RingHom (Ideal.Quotient.mk (I ^ m)) (a m) := by
+  intro m n hmn
+  apply Polynomial.ringHom_ext
+  · intro r
+    simpa only [RingHom.comp_apply, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_C] using
+      (Ideal.Quotient.factor_mk (Ideal.pow_le_pow_right (I := I) hmn) r)
+  · simpa only [RingHom.comp_apply, Polynomial.coe_eval₂RingHom, Polynomial.eval₂_X] using
+      (ha hmn)
+
+/-- Assemble arbitrary compatible coefficient residues through the completion's
+universal ring-map lifting property. -/
+private noncomputable def liftCompatibleCoefficients
+    (a : (n : ℕ) → R ⧸ I ^ n)
+    (ha : ∀ {m n : ℕ} (hmn : m ≤ n), Ideal.Quotient.factorPow I hmn (a n) = a m) :
+    AdicCompletion I R :=
+  liftRingHom I
+    (fun n ↦ Polynomial.eval₂RingHom (Ideal.Quotient.mk (I ^ n)) (a n))
+    (polynomial_eval₂RingHom_compatible I a ha) (Polynomial.X : Polynomial R)
+
+/-- Evaluation of the assembled coefficient family recovers its specified residue. -/
+private lemma evalₐ_liftCompatibleCoefficients
+    (a : (n : ℕ) → R ⧸ I ^ n)
+    (ha : ∀ {m n : ℕ} (hmn : m ≤ n), Ideal.Quotient.factorPow I hmn (a n) = a m)
+    (n : ℕ) : evalₐ I n (liftCompatibleCoefficients I a ha) = a n := by
+  unfold liftCompatibleCoefficients
+  rw [evalₐ_liftRingHom I
+    (fun k ↦ Polynomial.eval₂RingHom (Ideal.Quotient.mk (I ^ k)) (a k))
+    (polynomial_eval₂RingHom_compatible I a ha) n (Polynomial.X : Polynomial R)]
+  exact Polynomial.eval₂_X _ _
+
+end AdicCompletion
 
 namespace AdicCompletion
 
@@ -185,6 +600,32 @@ private theorem ofTensorProduct_injective_finsupp (σ : Type uσ) :
 
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
+/-- Completing a finite linear combination gives the same completed-ring-linear
+combination after the finite-product comparison. -/
+private lemma map_linearCombination_piEquivOfFintype_symm
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] (v : ι → M) :
+    (map I (Fintype.linearCombination R v)).comp
+        (piEquivOfFintype I (fun _ : ι => R)).symm.toLinearMap =
+      Fintype.linearCombination (AdicCompletion I R) (fun i => of I M (v i)) := by
+  classical
+  have hone : of I R 1 = (1 : AdicCompletion I R) := by
+    simpa only [algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply] using
+      (map_one (algebraMap R (AdicCompletion I R)))
+  have he (i : ι) :
+      (piEquivOfFintype I (fun _ : ι => R)).symm (Pi.single i 1) =
+        of I (ι → R) (Pi.single i 1) := by
+    apply (piEquivOfFintype I (fun _ : ι => R)).injective
+    rw [LinearEquiv.apply_symm_apply, piEquivOfFintype_apply, pi_of]
+    funext j
+    by_cases hij : i = j <;> simp [hij, hone]
+  apply (LinearEquiv.piRing (AdicCompletion I R) (AdicCompletion I M) ι
+    (AdicCompletion I R)).injective
+  funext i
+  change map I (Fintype.linearCombination R v)
+    ((piEquivOfFintype I (fun _ : ι => R)).symm (Pi.single i 1)) = _
+  rw [he, map_of]
+  simp only [LinearEquiv.piRing_apply, Fintype.linearCombination_apply_single, one_smul]
+
 /-- A finite family spanning the first adic quotient has completed images
 spanning the raw completion over the canonical completed ring. -/
 theorem span_range_eq_top_of_span_mkQ_eq_top
@@ -209,28 +650,9 @@ theorem span_range_eq_top_of_span_mkQ_eq_top
     exact (span_range_eq_top_iff_surjective_fintypeLinearCombination R _).mp hv
   let e := piEquivOfFintype I (fun _ : ι => R)
   let g := (map I f).comp e.symm.toLinearMap
-  have hone : of I R 1 = (1 : AdicCompletion I R) := by
-    simpa only [algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply] using
-      (map_one (algebraMap R (AdicCompletion I R)))
-  -- The finite-product comparison respects the same original basis vectors.
-  have he (i : ι) : e.symm (Pi.single i 1) = of I (ι → R) (Pi.single i 1) := by
-    apply e.injective
-    rw [LinearEquiv.apply_symm_apply]
-    change Pi.single i 1 = piEquivOfFintype I (fun _ : ι => R)
-      (of I (ι → R) (Pi.single i 1))
-    rw [piEquivOfFintype_apply, pi_of]
-    funext j
-    by_cases hij : i = j <;> simp [hij, hone]
   have hg : g = Fintype.linearCombination (AdicCompletion I R)
-      (fun i : ι => of I M (v i)) := by
-    apply (LinearEquiv.piRing (AdicCompletion I R) (AdicCompletion I M) ι
-      (AdicCompletion I R)).injective
-    funext i
-    change map I f (e.symm (Pi.single i 1)) =
-      Fintype.linearCombination (AdicCompletion I R) (fun i : ι => of I M (v i))
-        (Pi.single i 1)
-    rw [he, map_of]
-    simp only [f, Fintype.linearCombination_apply_single, one_smul]
+      (fun i : ι => of I M (v i)) :=
+    map_linearCombination_piEquivOfFintype_symm I M v
   apply (span_range_eq_top_iff_surjective_fintypeLinearCombination (AdicCompletion I R) _).mpr
   rw [← hg]
   exact (map_surjective_of_mkQ_comp_surjective hsurj).comp e.symm.surjective
@@ -379,12 +801,307 @@ theorem ofTensorProductEquivOfFiniteQuotientProjective_symm_of
   apply (ofTensorProductEquivOfFiniteQuotientProjective I M).injective
   simp
 
+/-- Completing a finite linear combination gives the corresponding combination on finite
+powers of the completed ring. -/
+private lemma map_linearCombination_piEquivFin_symm {d : ℕ} (v : Fin d → M) :
+    (map I (Fintype.linearCombination R v)).comp (piEquivFin I d).symm.toLinearMap =
+      Fintype.linearCombination (AdicCompletion I R) (fun i => of I M (v i)) :=
+  map_linearCombination_piEquivOfFintype_symm I M v
+
+/-- The finite-stage formula for the completion of an original finite linear combination. -/
+private lemma map_linearCombination_piEquivFin_symm_val {d : ℕ} (v : Fin d → M)
+    (a : Fin d → AdicCompletion I R) (n : ℕ) :
+    (map I (Fintype.linearCombination R v) ((piEquivFin I d).symm a)).val n =
+      Fintype.linearCombination (R ⧸ I ^ n)
+        (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i))
+        (fun i => evalₐ I n (a i)) := by
+  have h := LinearMap.congr_fun (map_linearCombination_piEquivFin_symm I M v) a
+  change map I (Fintype.linearCombination R v) ((piEquivFin I d).symm a) = _ at h
+  calc
+    _ = (Fintype.linearCombination (AdicCompletion I R) (fun i => of I M (v i)) a).val n :=
+      congrArg (fun x : AdicCompletion I M => x.val n) h
+    _ = _ := by
+      simp only [Fintype.linearCombination_apply, val_sum_apply, smul_eval,
+        val_smul_eq_evalₐ_smul, of_apply, Submodule.mkQ_apply]
+
+/-- Finite linear combinations of fixed original elements commute with quotient factors. -/
+private lemma linearCombination_quotient_factor {J K : Ideal R} (hJK : J ≤ K)
+    {d : ℕ} (v : Fin d → M) (a : Fin d → R ⧸ J) :
+    Submodule.factor (Submodule.smul_mono_left hJK)
+        (Fintype.linearCombination (R ⧸ J)
+          (fun i => Submodule.Quotient.mk (p := (J • ⊤ : Submodule R M)) (v i)) a) =
+      Fintype.linearCombination (R ⧸ K)
+        (fun i => Submodule.Quotient.mk (p := (K • ⊤ : Submodule R M)) (v i))
+        (fun i => Ideal.Quotient.factor hJK (a i)) := by
+  classical
+  simp only [Fintype.linearCombination_apply, map_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (a i)
+  rw [← hr]
+  rfl
+
+/-- Finite linear combinations of fixed original elements commute with all adic
+quotient transitions. -/
+private lemma linearCombination_quotient_transition {d : ℕ} (v : Fin d → M)
+    {m n : ℕ} (hmn : m ≤ n) (a : Fin d → R ⧸ I ^ n) :
+    transitionMap I M hmn
+        (Fintype.linearCombination (R ⧸ I ^ n)
+          (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i)) a) =
+      Fintype.linearCombination (R ⧸ I ^ m)
+        (fun i => Submodule.Quotient.mk (p := (I ^ m • ⊤ : Submodule R M)) (v i))
+        (fun i => Ideal.Quotient.factorPow I hmn (a i)) :=
+  linearCombination_quotient_factor M (Ideal.pow_le_pow_right hmn) v a
+
+/-- The image of the original ideal in a power quotient is nilpotent. -/
+private lemma isNilpotent_ideal_image_pow (n : ℕ) :
+    IsNilpotent (I.map (Ideal.Quotient.mk (I ^ n))) := by
+  use n
+  simp only [← Ideal.map_pow, Ideal.map_quotient_self, Ideal.zero_eq_bot]
+
+/-- The kernel of reduction from a power quotient to the first quotient is the
+image of the ideal times the target module. -/
+private lemma quotient_reduction_eq_zero_iff (n : ℕ) (hn : n ≠ 0)
+    (y : M ⧸ (I ^ n • (⊤ : Submodule R M))) :
+    Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) y = 0 ↔
+      y ∈ ((I.map (Ideal.Quotient.mk (I ^ n))) •
+        (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))) := by
+  have hker :
+      (Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) :
+        (M ⧸ (I ^ n • (⊤ : Submodule R M))) →ₗ[R]
+          M ⧸ (I • (⊤ : Submodule R M))).ker =
+        I • (⊤ : Submodule R (M ⧸ (I ^ n • (⊤ : Submodule R M)))) := by
+    rw [Submodule.ker_mapQ, Submodule.comap_id, Submodule.map_smul'', Submodule.map_top,
+      Submodule.range_mkQ]
+  have hsmul := Submodule.restrictScalars_map_smul_eq (R := R ⧸ I ^ n) I
+    (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))
+  change y ∈ (Submodule.factor
+    (Submodule.smul_mono_left (Ideal.pow_le_self hn))).ker ↔ _
+  rw [hker]
+  exact Iff.symm (SetLike.ext_iff.mp hsmul y)
+
+/-- A split surjection restricts to an isomorphism on the range of its split projector. -/
+private lemma bijective_domRestrict_range_comp
+    {A : Type*} [CommRing A] {X : Type*} [AddCommGroup X] [Module A X]
+    {Y : Type*} [AddCommGroup Y] [Module A Y]
+    (p : X →ₗ[A] Y) (j : Y →ₗ[A] X) (hpj : p.comp j = LinearMap.id) :
+    Function.Bijective (p.domRestrict (j.comp p).range) := by
+  have hsplit (y : Y) : p (j y) = y := LinearMap.congr_fun hpj y
+  have hfix (x : (j.comp p).range) : j (p x.val) = x.val := by
+    obtain ⟨x₀, hx₀⟩ := x.property
+    rw [← hx₀]
+    change j (p (j (p x₀))) = j (p x₀)
+    rw [hsplit]
+  constructor
+  · intro x y hxy
+    apply Subtype.ext
+    exact (hfix x).symm.trans ((congrArg j hxy).trans (hfix y))
+  · intro y
+    refine ⟨⟨j y, ⟨j y, ?_⟩⟩, hsplit y⟩
+    change j (p (j y)) = j y
+    rw [hsplit]
+
+/-- Compatible isomorphisms from finite-stage submodules give a retraction into a
+finite free module over the completed ring. The forward map is the completion of one
+fixed original linear combination. -/
+private theorem moduleProjective_of_compatible_stage_bijective {d : ℕ} (v : Fin d → M)
+    (P : ∀ n : ℕ, Submodule (R ⧸ I ^ n) (Fin d → R ⧸ I ^ n))
+    (hP : ∀ {m n : ℕ} (hmn : m ≤ n) (a : P n),
+      (fun i => Ideal.Quotient.factorPow I hmn (a.val i)) ∈ P m)
+    (hb : ∀ n : ℕ, Function.Bijective
+      ((Fintype.linearCombination (R ⧸ I ^ n)
+        (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i))).domRestrict
+          (P n))) :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  classical
+  let e n := LinearEquiv.ofBijective
+    ((Fintype.linearCombination (R ⧸ I ^ n)
+      (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i))).domRestrict
+        (P n)) (hb n)
+  let z (x : AdicCompletion I M) (n : ℕ) : Fin d → R ⧸ I ^ n :=
+    ((e n).symm (x.val n)).val
+  have hz (x : AdicCompletion I M) (n : ℕ) :
+      Fintype.linearCombination (R ⧸ I ^ n)
+        (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i)) (z x n) =
+          x.val n :=
+    (e n).apply_symm_apply (x.val n)
+  have hcompat (x : AdicCompletion I M) {m n : ℕ} (hmn : m ≤ n) :
+      (fun i => Ideal.Quotient.factorPow I hmn (z x n i)) = z x m := by
+    have heq :
+        (⟨fun i => Ideal.Quotient.factorPow I hmn (z x n i),
+          hP hmn ((e n).symm (x.val n))⟩ : P m) = (e m).symm (x.val m) := by
+      apply (e m).injective
+      rw [LinearEquiv.apply_symm_apply]
+      change Fintype.linearCombination (R ⧸ I ^ m)
+        (fun i => Submodule.Quotient.mk (p := (I ^ m • ⊤ : Submodule R M)) (v i))
+          (fun i => Ideal.Quotient.factorPow I hmn (z x n i)) = x.val m
+      rw [← linearCombination_quotient_transition I M v hmn, hz]
+      exact x.property hmn
+    exact congrArg Subtype.val heq
+  have hadd (x y : AdicCompletion I M) (n : ℕ) : z (x + y) n = z x n + z y n := by
+    simp only [z, val_add_apply, map_add, Submodule.coe_add]
+  have hsmul (s : AdicCompletion I R) (x : AdicCompletion I M) (n : ℕ) :
+      z (s • x) n = evalₐ I n s • z x n := by
+    simp only [z, smul_eval, val_smul_eq_evalₐ_smul, map_smul, Submodule.coe_smul]
+  let h (x : AdicCompletion I M) (i : Fin d) : AdicCompletion I R :=
+    liftCompatibleCoefficients I (fun n => z x n i)
+      (fun hmn => congrFun (hcompat x hmn) i)
+  have heval (x : AdicCompletion I M) (i : Fin d) (n : ℕ) :
+      evalₐ I n (h x i) = z x n i :=
+    evalₐ_liftCompatibleCoefficients I _ _ n
+  let H : AdicCompletion I M →ₗ[AdicCompletion I R] Fin d → AdicCompletion I R :=
+    { toFun := h
+      map_add' := fun x y => by
+        funext i
+        apply ext_evalₐ
+        intro n
+        change evalₐ I n (h (x + y) i) = evalₐ I n (h x i + h y i)
+        rw [map_add, heval, heval, heval]
+        exact congrFun (hadd x y n) i
+      map_smul' := fun s x => by
+        funext i
+        apply ext_evalₐ
+        intro n
+        change evalₐ I n (h (s • x) i) = evalₐ I n (s * h x i)
+        rw [map_mul, heval, heval]
+        exact congrFun (hsmul s x n) i }
+  let F := (map I (Fintype.linearCombination R v)).comp (piEquivFin I d).symm.toLinearMap
+  apply Module.Projective.of_split H F
+  apply LinearMap.ext
+  intro x
+  apply AdicCompletion.ext
+  intro n
+  change (map I (Fintype.linearCombination R v) ((piEquivFin I d).symm (H x))).val n = x.val n
+  rw [map_linearCombination_piEquivFin_symm_val I M v]
+  have hevalH : (fun i => evalₐ I n (H x i)) = z x n := funext fun i => heval x i n
+  rw [hevalH]
+  exact hz x n
+
+/-- The quotient–tensor equivalence with its quotient-ring scalar linearity. -/
+private noncomputable def quotTensorEquivQuotSMulLinear (J : Ideal R) :
+    ((R ⧸ J) ⊗[R] M) ≃ₗ[R ⧸ J] M ⧸ (J • (⊤ : Submodule R M)) :=
+  (TensorProduct.quotTensorEquivQuotSMul M J).extendScalarsOfSurjective
+    (Ideal.Quotient.mk_surjective : Function.Surjective (algebraMap R (R ⧸ J)))
+
+/-- If every positive adic quotient is flat over its coefficient quotient and the first
+quotient is finite projective, the raw completion is projective over the completed ring.
+The ideal is arbitrary, and the completed-module action is the canonical one. -/
+theorem moduleProjective_of_flat_pow_quotients
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))]
+    (hflat : ∀ k : ℕ, 0 < k →
+      Module.Flat (R ⧸ I ^ k) (M ⧸ (I ^ k • (⊤ : Submodule R M)))) :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  classical
+  obtain ⟨d, p, j, _, _, hpj⟩ :=
+    Module.Finite.exists_comp_eq_id_of_projective (R ⧸ I)
+      (M ⧸ (I • (⊤ : Submodule R M)))
+  let e₁ := LinearMap.toMatrix' (j.comp p)
+  have he₁map : e₁.toLin' = j.comp p := Matrix.toLin'_toMatrix' _
+  have he₁ : IsIdempotentElem e₁ := by
+    have hcomp : (j.comp p).comp (j.comp p) = j.comp p := by
+      apply LinearMap.ext
+      intro x
+      change j (p (j (p x))) = j (p x)
+      simpa only [LinearMap.comp_apply, LinearMap.id_apply] using
+        congrArg j (LinearMap.congr_fun hpj (p x))
+    change LinearMap.toMatrix' (j.comp p) * LinearMap.toMatrix' (j.comp p) =
+      LinearMap.toMatrix' (j.comp p)
+    rw [← LinearMap.toMatrix'_comp]
+    exact congrArg LinearMap.toMatrix' hcomp
+  choose v hv using fun i : Fin d =>
+    Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) (p (Pi.single i 1))
+  have hvp : Fintype.linearCombination (R ⧸ I)
+      (fun i => Submodule.Quotient.mk (p := (I • (⊤ : Submodule R M))) (v i)) = p := by
+    apply (LinearEquiv.piRing (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))
+      (Fin d) (R ⧸ I)).injective
+    funext i
+    simpa only [LinearEquiv.piRing_apply, Fintype.linearCombination_apply_single, one_smul,
+      Submodule.mkQ_apply] using hv i
+  obtain ⟨E, hE, _, hcompat, hfirst⟩ := exists_compatible_idempotent_matrices I e₁ he₁
+  have hres (n : ℕ) (hn : n ≠ 0) :
+      (E n).map (Ideal.Quotient.factor (Ideal.pow_le_self hn)) = e₁ := by
+    ext i k
+    have hnk := congrArg (fun A : Matrix (Fin d) (Fin d) (R ⧸ I ^ 1) => A i k)
+      (hcompat (Nat.one_le_iff_ne_zero.mpr hn))
+    have hbase := congrArg (fun A : Matrix (Fin d) (Fin d) (R ⧸ I) => A i k) hfirst
+    change Ideal.Quotient.factorPow I (Nat.one_le_iff_ne_zero.mpr hn) (E n i k) =
+      E 1 i k at hnk
+    change Ideal.Quotient.factor (show I ^ 1 ≤ I by simp) (E 1 i k) = e₁ i k at hbase
+    change Ideal.Quotient.factor (Ideal.pow_le_self hn) (E n i k) = e₁ i k
+    rw [← hbase, ← hnk]
+    obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (E n i k)
+    rw [← hr]
+    rfl
+  let P n := (E n).toLin'.range
+  apply moduleProjective_of_compatible_stage_bijective I M v P
+  · intro m n hmn a
+    exact (Matrix.rangeReduction (Ideal.Quotient.factorPow I hmn)
+      (E n) (E m) (hcompat hmn) a).property
+  · intro n
+    by_cases hn : n = 0
+    · subst n
+      let : Subsingleton (R ⧸ I ^ 0) := by
+        simpa only [pow_zero, Ideal.one_eq_top] using
+          (inferInstance : Subsingleton (R ⧸ (⊤ : Ideal R)))
+      let : Subsingleton (M ⧸ (I ^ 0 • (⊤ : Submodule R M))) :=
+        Submodule.Quotient.subsingleton_iff.mpr (by simp)
+      exact ⟨fun _ _ _ => Subsingleton.elim _ _, fun y => ⟨0, Subsingleton.elim _ _⟩⟩
+    · let := hflat n (Nat.pos_of_ne_zero hn)
+      let q : (R ⧸ I ^ n) →+* R ⧸ I := Ideal.Quotient.factor (Ideal.pow_le_self hn)
+      let g := Fintype.linearCombination (R ⧸ I ^ n)
+        (fun i : Fin d => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i))
+      change Function.Bijective (g.comp (E n).toLin'.range.subtype)
+      refine LinearMap.bijective_of_reduceModIdeal_bijective_of_isNilpotent
+        (RingHom.ker q) ?_ (g.comp (E n).toLin'.range.subtype) ?_
+      · change IsNilpotent (RingHom.ker (Ideal.Quotient.factor (Ideal.pow_le_self hn)))
+        rw [Ideal.Quotient.factor_ker]
+        exact isNilpotent_ideal_image_pow I n
+      · apply Matrix.bijective_reduceModIdeal_range_of_quotient_square q
+          (Ideal.Quotient.factor_surjective _) (E n) e₁ (hres n hn) (hE n) g p
+          ((Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) :
+            (M ⧸ (I ^ n • (⊤ : Submodule R M))) →ₗ[R]
+              M ⧸ (I • (⊤ : Submodule R M))).toAddMonoidHom)
+        · intro y
+          change Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn)) y = 0 ↔ _
+          change _ ↔ y ∈ (RingHom.ker (Ideal.Quotient.factor (Ideal.pow_le_self hn))) •
+            (⊤ : Submodule (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))))
+          rw [Ideal.Quotient.factor_ker]
+          exact quotient_reduction_eq_zero_iff I M n hn y
+        · intro a
+          change Submodule.factor (Submodule.smul_mono_left (Ideal.pow_le_self hn))
+            (Fintype.linearCombination (R ⧸ I ^ n)
+              (fun i => Submodule.Quotient.mk (p := (I ^ n • ⊤ : Submodule R M)) (v i)) a) =
+            p (fun i => q (a i))
+          rw [linearCombination_quotient_factor M (Ideal.pow_le_self hn) v a, hvp]
+        · rw [he₁map]
+          exact bijective_domRestrict_range_comp p j hpj
+
+/-- A flat module with finite projective first quotient has projective raw completion over
+its canonical completed ring, without a finite-generation assumption on the ideal. -/
+theorem moduleProjective_of_flat_of_finite_projective_quotient
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    (M : Type uM) [AddCommGroup M] [Module R M]
+    [Module.Flat R M]
+    [Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))]
+    [Module.Projective (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M)))] :
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  apply moduleProjective_of_flat_pow_quotients I M
+  intro k _
+  exact Module.Flat.of_linearEquiv (quotTensorEquivQuotSMulLinear M (I ^ k)).symm
+
 /-- An original projective module finite modulo the ideal has projective completion over the
 completed ring, for any ideal. -/
 instance instModuleProjectiveOfFiniteQuotient
     [Module.Finite R (M ⧸ (I • (⊤ : Submodule R M)))] [Module.Projective R M] :
-    Module.Projective (AdicCompletion I R) (AdicCompletion I M) :=
-  Module.Projective.of_equiv' (ofTensorProductEquivOfFiniteQuotientProjective I M)
+    Module.Projective (AdicCompletion I R) (AdicCompletion I M) := by
+  let : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    Module.Finite.of_restrictScalars_finite R (R ⧸ I) _
+  let : Module.Projective (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+    Module.Projective.of_equiv' (quotTensorEquivQuotSMulLinear M I)
+  exact moduleProjective_of_flat_of_finite_projective_quotient I M
 
 /-- For a finite projective module, tensoring with the completed ring gives its adic completion.
 This is the finite-original specialization of the finite-first-quotient comparison. -/

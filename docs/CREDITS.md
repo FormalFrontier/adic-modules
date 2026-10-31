@@ -101,11 +101,35 @@ spanning theorem and Mathlib's canonical completed-ring action and tensor compar
 (Judith Ludwig and Christian Merten). Finite quotient generators use Johan Commelin's
 finiteness API; the chosen-family argument uses Johannes Hölzl's finite linear-combination
 API. Completed projectivity uses Kevin Buzzard and Antoine Labelle's projective base-change
-and equivalence transport. The explicit completed-module finite-presentation theorem uses
+and splitting API, Johan Commelin's finite-projective splitting theorem, and Andrew Yang's
+noncommutative idempotent lifting. The flat-quotient argument also uses Nailin Guan's
+flat-target kernel-intersection theorem, Christian Merten's flat base-change formalization,
+and the quotient–tensor equivalence by Antoine Chambert-Loir and Jujian Zhang. The explicit
+completed-module finite-presentation theorem uses
 Andrew Yang's `Module.finitePresentation_of_projective`. These are arbitrary-ideal raw
 inverse-limit results, not the whole intrinsic-completion assertion of Fujiwara–Kato,
 Proposition 7.2.16, which has a finitely generated ideal setting. The comparison and
 finite-original Mathlib surjectivity declarations, author notices and licenses are preserved.
+
+The precomplete-base bridges combine that same finite-first-quotient comparison
+with Mathlib's canonical-map surjectivity and completeness criteria. Coefficient
+lifting uses Antoine Chambert-Loir's `LinearMap.rTensor_surjective` and Kenny Lau
+and Mario Carneiro's tensor left unitor. Finiteness uses Johan Commelin's quotient,
+scalar-tower, surjective-image and linear-equivalence transport API. Original-module
+projectivity over a complete base uses Kevin Buzzard and Antoine Labelle's semilinear
+projectivity transport and lifting API. The finite-module argument combines the
+split-kernel range formula with Chris Hughes's finite Nakayama theorem; the flat
+specialization reuses quotient base change. These are compositions of existing
+interfaces, without copying their proof bodies or giving original modules a
+completed-ring action; upstream notices remain in Mathlib.
+
+The complete-base conormal criteria use Andrew Yang's canonical ideal cotangent
+module and quotient map in Mathlib, together with Johan Commelin's finite-module
+transport API. The injective-map Hausdorff argument uses Mathlib's adic
+Hausdorff predicate and Kenny Lau's submodule congruence and mapping APIs.
+The Noetherian equivalence applies this library's finitely generated ideal
+criterion, following the mathematical criterion in K. Fujiwara and F. Kato,
+*Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
 
 The tensor-comparison kernel calculation reuses this library's coefficient quotient
 comparison and fixed-stage kernel theorem, whose finite-linear-combination argument follows

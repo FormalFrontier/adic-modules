@@ -20,6 +20,26 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   no ambient separation, completeness or finiteness is required. See the
   [quotient separation API](AdicModules/LinearAlgebra/Quotient/Hausdorff.lean).
 
+- **Modules over precomplete and complete bases.** For any ideal `I` of a
+  commutative ring `R` with `[IsPrecomplete I R]`, finiteness of `M / I M`
+  over `R / I` makes the original module `M` precomplete. If `M` is also
+  `I`-Hausdorff, it is finite over `R`; the base need not be Hausdorff.
+  With `[IsAdicComplete I R]`, finite projective `M / I M` and flat positive
+  power quotients, `M` is projective over `R` if it is either `I`-Hausdorff
+  or finite over `R`. In particular, a finite flat `M` with projective first
+  quotient is projective. The finite branch does not assume Hausdorffness of `M`.
+  No finite generation of `I` or a positive power, Noetherianity, original
+  projectivity or completed-ring action on `M` is required. See the
+  [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
+
+- **Finite conormal over a complete base.** If a commutative ring `R` is fully
+  `I`-adically complete, then `I` is finitely generated exactly when the canonical
+  conormal module `I.Cotangent = I / I²` is finite over `R / I`. Moreover, `R` is
+  Noetherian exactly when `R / I` is Noetherian and this conormal is finite.
+  There is no prior finite-generation hypothesis on `I`, and no Noetherian-base,
+  local-ring or proper-ideal assumption. See the
+  [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
+
 - **Tensor comparison and Hausdorffification.** Put `S = AdicCompletion I R` and
   `J = I.map (algebraMap R S)`. If `0 < n` and `(I ^ n).FG`, the canonical
   comparison `S ⊗[R] M →ₗ[S] AdicCompletion I M` has kernel
@@ -436,10 +456,15 @@ Rings are commutative; modules are additive commutative groups unless specified 
   raw completion over the completed ring. Empty finite families are included.
   The [integer-rational product](AdicModulesTest/CompletionFiniteness.lean) has finite
   nonzero first quotient and completion although the original module is not finite.
-  With original projectivity and finite `M / I M`, the completion is projective over the
-  completed ring; `moduleFinitePresentation_of_finite_quotient_of_projective` then gives
-  finite presentation over that same ring. These results assume no action of the completed
-  ring on original `M`, Noetherianity, finite generation of `I`, completeness or separation.
+  A flat original module whose first quotient is finite projective **over `R / I`**
+  has projective completion over the completed ring, by
+  `moduleProjective_of_flat_of_finite_projective_quotient`. More generally,
+  `moduleProjective_of_flat_pow_quotients` only requires flatness of every positive
+  `M / Iⁿ M` over `R / Iⁿ`, not flatness of original `M`.
+  The original-projective specialization is retained;
+  `moduleFinitePresentation_of_finite_quotient_of_projective` gives finite presentation
+  over the same ring under its unchanged hypotheses. These results assume no action of the
+  completed ring on original `M`, Noetherianity, finite generation of `I`, completeness or separation.
   In particular, finite modules remain finite and finite projective modules remain projective.
 - **Coordinates and scalar restriction** ([coordinates](AdicModules/AdicCompletion/QuotientTorsion.lean),
   [restriction](AdicModules/AdicCompletion/RestrictScalars.lean)): for an additive commutative group `V`, subgroup
@@ -742,6 +767,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
+| [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
 | [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels and finite-power evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |

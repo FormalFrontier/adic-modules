@@ -684,6 +684,25 @@ the completion projective over that same ring. This is the single registered com
 projectivity instance; the old finite-original `instModuleProjective` constant remains
 an explicit specialization. The existing finite-original finiteness instance is unchanged.
 
+More generally, `moduleProjective_of_flat_pow_quotients` assumes that `M / I M` is
+finite projective over `R / I` and that each positive `M / Iⁿ M` is flat over
+`R / Iⁿ`. It gives projectivity of the same raw completion over the same canonical
+completed ring, without assuming that original `M` is flat. The theorem
+`moduleProjective_of_flat_of_finite_projective_quotient` obtains the quotient flatness
+by base change from `[Module.Flat R M]`. Neither result requires finite generation
+of `I` or any positive power, original-module finiteness, separation or completeness,
+Noetherianity, or equality of the ring and module universes. Original projectivity
+is still required by the tensor-comparison equivalences; these projectivity conclusions
+do not give tensor-comparison injectivity for arbitrary flat modules.
+
+The proof lifts a finite residual split projector through the successive raw coefficient
+quotients. At each positive stage the restricted original map is bijective by
+`LinearMap.bijective_of_reduceModIdeal_bijective_of_isNilpotent`: its target is flat,
+its residual map is bijective, and the image of `I` is nilpotent. Compatible inverses
+assemble a retraction into a finite free module over the completed ring. The generic
+[nilpotent criterion](../AdicModules/LinearAlgebra/Quotient/Flat.lean) requires no source
+flatness or finiteness of either module.
+
 The explicit theorem `moduleFinitePresentation_of_finite_quotient_of_projective` in the
 [finite-presentation module](../AdicModules/AdicCompletion/FinitePresentation.lean) consumes
 this completion finiteness and projectivity with `Module.finitePresentation_of_projective`.
@@ -693,8 +712,8 @@ Noetherianity, original-module finiteness, freeness, smallness, flatness, separa
 completeness is required, and original `M` receives no completed-ring action.
 See the [tensor comparison module](../AdicModules/AdicCompletion/TensorProduct.lean)
 and its existing [finite-original clients](../AdicModulesTest/AdicCompletion/TensorProduct.lean).
-The projectivity argument reuses Mathlib's base-change and equivalence APIs; the explicit
-finite-presentation consumer uses Andrew Yang's formalization in
+Original projectivity supplies projective quotient data through Mathlib's base-change and
+equivalence APIs; the explicit finite-presentation consumer uses Andrew Yang's formalization in
 `Mathlib.Algebra.Module.FinitePresentation`.
 
 These conclusions do not weaken the completed-Hom hypotheses: the all-ideal comparison
@@ -851,6 +870,59 @@ Let `R` be a commutative ring and let `M` and `N` be `R`-modules with additive
 commutative group structures. Their type universes may be independent. The
 [completeness API](../AdicModules/AdicCompletion/Completeness.lean) uses the stock
 predicates `IsPrecomplete` and `IsAdicComplete`.
+
+- **Finite first quotient over a precomplete base.** For any ideal `I`, assume
+  `[IsPrecomplete I R]` and that `M / I M` is finite over `R / I`.
+  `IsPrecomplete.of_finite_quotient I M` makes the original `M` precomplete,
+  without Hausdorffness of either `R` or `M`. Adding only `[IsHausdorff I M]`,
+  `IsPrecomplete.moduleFinite_of_isHausdorff_of_finite_quotient I M` gives
+  `Module.Finite R M`. The proofs lift completed coefficients along the
+  surjective canonical map `R → AdicCompletion I R`, then use the canonical
+  tensor comparison and completed finiteness. No finite generation of `I` or
+  a positive power, Noetherianity, original flatness, projectivity or
+  completed-ring action is required.
+- **Projectivity over a complete base.** Assume `[IsAdicComplete I R]`, a finite
+  projective first quotient `M / I M` over `R / I`, and flatness of every positive
+  `M / Iⁿ M` over `R / Iⁿ`. Then
+  `IsAdicComplete.moduleProjective_of_isHausdorff_of_flat_pow_quotients I M`
+  gives original-ring projectivity for a Hausdorff `M`, while
+  `IsAdicComplete.moduleProjective_of_finite_of_flat_pow_quotients I M`
+  does so for a finite `M` without assuming Hausdorffness. In the finite branch,
+  residual finiteness follows from original finiteness. Both use the same
+  completed-projectivity theorem above and semilinear transport along the canonical
+  coefficient isomorphism. The Hausdorff branch uses the canonical completion
+  equivalence; the finite branch splits the completion surjection, makes its kernel
+  finite as a split image, then applies finite Nakayama after projecting
+  `ker(of) ≤ I M` to `ker(of) ≤ I ker(of)`.
+  `IsAdicComplete.moduleProjective_of_finite_of_flat_of_projective_quotient I M`
+  is the finite original-flat specialization with projective first quotient;
+  quotient flatness follows by base change. These criteria require no finite
+  generation of `I` or a positive power, Noetherianity, original projectivity,
+  original completeness or completed-ring action on `M`. Full base completeness
+  is distinct from the weaker precomplete floor of the two lower bridges.
+  Ring and module universes are independent. See the
+  [complete-base module](../AdicModules/AdicCompletion/CompleteBase.lean).
+- **Complete bases and the conormal module.** For an arbitrary ideal `I` in a
+  fully `I`-adically complete commutative ring `R`,
+  `Ideal.fg_iff_finite_cotangent` identifies finite generation of `I` with
+  finiteness of its canonical `R / I`-module `I.Cotangent`.
+  This is the quotient of the original ideal module by `I • ⊤`, with its
+  existing quotient scalar action. The canonical ideal inclusion gives
+  Hausdorffness of that original module, so first-quotient finiteness applies
+  without assuming completeness or finite generation of the ideal module.
+  `IsAdicComplete.isNoetherianRing_iff_quotient_and_finite_cotangent` then gives
+  `R` Noetherian if and only if `R / I` is Noetherian and the conormal is finite.
+  Its reverse direction first derives `I.FG`, then uses the finitely generated
+  ideal Noetherian criterion. Both the zero and unit ideals are included; no
+  locality, properness or nontriviality is required. See
+  [CompleteBase](../AdicModules/AdicCompletion/CompleteBase.lean).
+
+  The support theorem `IsHausdorff.of_injective` in
+  [Completeness](../AdicModules/AdicCompletion/Completeness.lean) transfers
+  adic Hausdorffness along any injective linear map for the same ideal.
+  The ring, source and target universes are independent. It uses only the
+  inclusion of the source power filtration in the inverse image of the target
+  power filtration, not strictness, a closed-image condition or completeness.
 
 - **Sums of ideals.** `IsPrecomplete.sup` says that precompleteness of `M` for
   arbitrary ideals `I` and `J` implies precompleteness for `I ⊔ J`.

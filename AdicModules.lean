@@ -30,6 +30,7 @@ public import AdicModules.Polynomial.ResultantPerturbation
 public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
+public import AdicModules.AdicCompletion.CompleteBase
 public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.FinitePresentation
@@ -54,6 +55,7 @@ public import AdicModules.LinearAlgebra.Descent
 public import AdicModules.LinearAlgebra.LocalizedModule
 public import AdicModules.LinearAlgebra.Pi
 public import AdicModules.LinearAlgebra.Quotient.End
+public import AdicModules.LinearAlgebra.Quotient.Flat
 public import AdicModules.LinearAlgebra.Quotient.Hausdorff
 public import AdicModules.LinearAlgebra.SModEq.Pow
 public import AdicModules.LinearAlgebra.Span.Basic

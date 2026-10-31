@@ -20,7 +20,12 @@ import Mathlib.Tactic.Choose
 set_option warningAsError true
 
 /-!
-# Adic completeness and sums of ideals
+# Adic separation, completeness and sums of ideals
+
+Hausdorffness transfers along injective linear maps. Every linear map takes the
+intrinsic ideal-power filtration into the target filtration; target Hausdorffness
+and injectivity then give source Hausdorffness. No strictness or closed-image
+condition is required.
 
 Finite generation of a positive power of `I` makes `AdicCompletion I M` intrinsically
 `I`-adically complete for its original `R`-module structure. The all-stage evaluation-kernel
@@ -61,6 +66,27 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
 @[expose] public section
 
 universe u v
+universe uR uM uN
+
+/-- A module admitting an injective linear map into an adically Hausdorff module
+is adically Hausdorff for the same ideal. -/
+theorem IsHausdorff.of_injective
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    [IsHausdorff I N]
+    (f : M →ₗ[R] N) (hf : Function.Injective f) :
+    IsHausdorff I M := by
+  constructor
+  intro x hx
+  apply hf
+  rw [map_zero]
+  apply (inferInstance : IsHausdorff I N).haus
+  intro n
+  simpa only [map_zero] using
+    ((hx n).map f).mono
+      (Submodule.map_le_iff_le_comap.mpr
+        (Submodule.smul_top_le_comap_smul_top (I ^ n) f))
 
 namespace AdicCompletion
 
