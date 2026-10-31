@@ -12,6 +12,9 @@ public import Mathlib.Data.ZMod.Basic
 public import Mathlib.RingTheory.Int.Basic
 public import Mathlib.RingTheory.PrincipalIdealDomain
 
+import AdicModules.AdicCompletion.Cotangent
+import AdicModules.Noetherian
+
 /-!
 # Completion and tensor products for the integer residue module
 
@@ -22,7 +25,10 @@ induced/intrinsic adic cofinality, and its completed sequence is exact.
 
 The canonical completion–tensor comparison is bijective by the finite-presentation
 comparison applied to Artin–Rees finite-free cofinality over `ℤ`. Its forward map is the
-completed-ring-linear `AdicCompletion.ofTensorProduct`.
+completed-ring-linear `AdicCompletion.ofTensorProduct`. The Noetherian-completed-ring
+consumer also supplies its stock `LinearEquiv.ofBijective` equivalence. The final check uses
+both inverse laws on arbitrary inputs, computes the inverse of the canonical generator, and
+identifies this equivalence with the finite-presentation comparison by its whole forward map.
 
 ## Implementation notes
 
@@ -40,6 +46,8 @@ and Mathlib's finite-presentation and Artin–Rees inputs.
 -/
 
 set_option warningAsError true
+
+open scoped TensorProduct
 
 namespace IntegerResidue
 
@@ -146,5 +154,41 @@ private theorem canonical_comparison_bijective :
     Function.Bijective (AdicCompletion.ofTensorProduct (Ideal.span {(2 : ℤ)}) (ZMod 2)) := by
   let : Module.FinitePresentation ℤ (ZMod 2) := finitePresentation
   exact AdicCompletion.ofTensorProduct_bijective_of_finitePresentation _ _ finite_free_cofinality
+
+section NoetherianComparison
+
+local notation "I₂" => Ideal.span {(2 : ℤ)}
+local notation "S₂" => AdicCompletion I₂ ℤ
+
+local instance : IsNoetherianRing S₂ :=
+  AdicCompletion.isNoetherianRing_of_fg I₂ (Submodule.fg_span_singleton (2 : ℤ))
+
+local instance : Module.FinitePresentation ℤ (ZMod 2) := finitePresentation
+
+/-- The Noetherian completed-ring consumer supplies canonical equivalence data for the
+nonprojective residue module. It agrees with the finite-presentation construction on the
+whole tensor product, not just on original elements. -/
+private theorem noetherian_comparison_data
+    (t : S₂ ⊗[ℤ] ZMod 2) (x : AdicCompletion I₂ (ZMod 2)) :
+    let E := LinearEquiv.ofBijective (AdicCompletion.ofTensorProduct I₂ (ZMod 2))
+      (AdicCompletion.ofTensorProduct_bijective_of_isNoetherianRing_of_finite I₂ (ZMod 2))
+    E.toLinearMap = AdicCompletion.ofTensorProduct I₂ (ZMod 2) ∧
+      E.symm (AdicCompletion.ofTensorProduct I₂ (ZMod 2) t) = t ∧
+      AdicCompletion.ofTensorProduct I₂ (ZMod 2) (E.symm x) = x ∧
+      E.symm (AdicCompletion.of I₂ (ZMod 2) 1) = (1 : S₂) ⊗ₜ[ℤ] (1 : ZMod 2) ∧
+      E = AdicCompletion.ofTensorProductEquivOfFinitePresentation
+        I₂ (ZMod 2) finite_free_cofinality := by
+  let E := LinearEquiv.ofBijective (AdicCompletion.ofTensorProduct I₂ (ZMod 2))
+    (AdicCompletion.ofTensorProduct_bijective_of_isNoetherianRing_of_finite I₂ (ZMod 2))
+  refine ⟨rfl, LinearEquiv.ofBijective_symm_apply_apply _ t,
+    LinearEquiv.apply_ofBijective_symm_apply _ x, ?_, ?_⟩
+  · have h := E.symm_apply_apply ((1 : S₂) ⊗ₜ[ℤ] (1 : ZMod 2))
+    change E.symm (AdicCompletion.ofTensorProduct I₂ (ZMod 2)
+      ((1 : S₂) ⊗ₜ[ℤ] (1 : ZMod 2))) = _ at h
+    simpa only [AdicCompletion.ofTensorProduct_tmul, one_smul] using h
+  · exact AdicCompletion.ofTensorProductEquivOfFinitePresentation_unique
+      I₂ (ZMod 2) finite_free_cofinality E rfl
+
+end NoetherianComparison
 
 end IntegerResidue

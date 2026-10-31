@@ -56,10 +56,11 @@ completed-ring-linear equivalence from the source's Hausdorffification to the co
 module. Its whole-map and representative laws describe the forward and inverse maps.
 The bijectivity criterion uses this equivalence and its quotient projection.
 
-If the tensor source is Noetherian over the completed ring, that same positive-power
-hypothesis makes the comparison an equivalence. Finiteness of the tensor source already
-implies finiteness of the original first quotient over `R / I`, for every ideal, by base
-change along first evaluation. A Noetherian tensor source is separated by Krull separation
+If the tensor source is Noetherian over the completed ring, cofinal containment of the
+scalar evaluation kernels in the extended ideal powers makes the comparison bijective.
+The positive-FG-power result is a specialization of this criterion. Finiteness of the tensor
+source already implies finiteness of the original first quotient over `R / I`, for every ideal,
+by base change along first evaluation. A Noetherian tensor source is separated by Krull separation
 over the quotient of the completed ring by its module annihilator. In particular, a
 finitely generated `I`, Noetherian `R / I`, and finite original `M` suffice, without
 Noetherianity of original `R`.
@@ -1441,10 +1442,12 @@ end Hausdorffification
 variable {R : Type uR} [CommRing R] (I : Ideal R)
 variable (M : Type uM) [AddCommGroup M] [Module R M]
 
-/-- If a positive ideal power is finitely generated and the canonical completed scalar
-extension is Noetherian, the canonical tensor comparison is bijective. -/
-theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_fg_pow
-    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+/-- Cofinal containment of scalar evaluation kernels in extended ideal powers
+makes the canonical tensor comparison bijective for a Noetherian tensor source. -/
+theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_ker_eval_cofinal
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      RingHom.ker (evalₐ I m).toRingHom ≤
+        (I.map (algebraMap R (AdicCompletion I R))) ^ n)
     [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
     Function.Bijective (ofTensorProduct I M) := by
   have : Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
@@ -1458,10 +1461,39 @@ theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_fg_pow
     apply le_trans ?_ (ker_evalOne_le_jacobson I)
     rw [Ideal.map_le_iff_le_comap, RingHom.comap_ker,
       evalOneₐ_comp_algebraMap_eq_mk, Ideal.mk_ker]
-  apply (ofTensorProduct_bijective_iff_isHausdorff_of_fg_pow I M hn hI).mpr
-  apply (IsHausdorff.map_algebraMap_iff (I := I) (S := AdicCompletion I R)).mp
-  exact IsHausdorff.of_le_jacobson_annihilator _ _
-    (hJ.trans (Ideal.jacobson_mono bot_le))
+  have hHaus : IsHausdorff (I.map (algebraMap R (AdicCompletion I R)))
+      (AdicCompletion I R ⊗[R] M) :=
+    IsHausdorff.of_le_jacobson_annihilator _ _
+      (hJ.trans (Ideal.jacobson_mono bot_le))
+  refine ⟨?_, ofTensorProduct_surjective_of_finite_quotient I M⟩
+  apply LinearMap.ker_eq_bot.mp
+  rw [ker_ofTensorProduct_eq_iInf_ker_eval_smul I M]
+  apply eq_bot_iff.mpr
+  intro t ht
+  have ht' : t ∈ ⨅ n : ℕ,
+      (I.map (algebraMap R (AdicCompletion I R))) ^ n •
+        (⊤ : Submodule (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)) := by
+    apply (Submodule.mem_iInf _).mpr
+    intro n
+    obtain ⟨m, hm⟩ := hcofinal n
+    exact Submodule.smul_mono_left hm ((Submodule.mem_iInf _).mp ht m)
+  rw [hHaus.iInf_pow_smul] at ht'
+  exact ht'
+
+/-- If a positive ideal power is finitely generated and the canonical completed scalar
+extension is Noetherian, the canonical tensor comparison is bijective. -/
+theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_fg_pow
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  apply ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_ker_eval_cofinal I M
+  intro k
+  have hfg : (I ^ (n * k)).FG := by
+    rw [pow_mul]
+    exact hI.pow
+  refine ⟨n * k, ?_⟩
+  rw [← map_pow_eq_ker_evalₐ I (n * k) (pow_smul_top_eq_ker_eval_of_fg_pow hfg)]
+  exact Ideal.pow_le_pow_right (Nat.le_mul_of_pos_left k hn)
 
 /-- The canonical completed-ring-linear tensor equivalence when a positive ideal power
 is finitely generated and the completed scalar extension is Noetherian. -/

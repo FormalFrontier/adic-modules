@@ -29,6 +29,17 @@ Equivalently, at any exponent at least two, the original power quotient is Noeth
 The pure ideal cotangent-finiteness bridge and unconditional evaluation surjectivity
 reduce this criterion to the residue-and-cotangent criterion.
 
+If the completed scalar extension `AdicCompletion I R ⊗[R] M` is Noetherian over the
+completed ring, finite original cotangent for any positive power of `I` makes the canonical
+tensor comparison bijective. Original `M` has only its `R`-module structure and need not be
+finite, flat, projective, separated or complete. In particular, a finite completed scalar
+extension over a Noetherian completed ring suffices, with no separate cotangent premise;
+finite original modules give a further specialization. The equivalence is the stock
+`LinearEquiv.ofBijective` applied to the canonical comparison, so its forward map and
+naturality are unchanged. At the positive-power cotangent floor, the evaluation kernels
+agree with the extended ideal powers at every stage. Specializing the module kernel identity
+to the original coefficient ring supplies the scalar cofinality for the tensor comparison.
+
 The structural argument chooses a finitely generated ideal `H ≤ I` with
 `I = H ⊔ I ^ 2`. The shared fixed-stage kernel theorem in
 `AdicModules.AdicCompletion.Kernel` identifies its completed scalar span with the
@@ -49,7 +60,7 @@ The forward Noetherian implication uses the finitely generated ideal criterion i
 
 @[expose] public section
 
-universe uR uι
+universe uR uι uM
 
 namespace AdicCompletion
 
@@ -166,5 +177,58 @@ theorem isNoetherianRing_iff_quotient_pow
     let : Module.Finite (R ⧸ I) I.Cotangent :=
       Ideal.finite_cotangent_of_isNoetherianRing_quotient_pow I hn
     exact isNoetherianRing_of_finite_cotangent I
+
+section TensorProduct
+
+open scoped TensorProduct
+
+variable (I : Ideal R)
+variable (M : Type uM) [AddCommGroup M] [Module R M]
+
+/-- Finite original cotangent for some positive ideal power makes the canonical
+tensor comparison bijective when the completed scalar extension is Noetherian. -/
+theorem ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_finite_cotangent_pow
+    (hI : ∃ p : ℕ, 0 < p ∧
+      Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent)
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  obtain ⟨p, hp, hcot⟩ := hI
+  let : Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent := hcot
+  apply ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_ker_eval_cofinal I M
+  intro n
+  refine ⟨n, ?_⟩
+  exact (map_pow_eq_ker_evalₐ I n
+    (pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I R hp n)).ge
+
+/-- Finite original cotangent and a Noetherian completed scalar extension make
+the canonical tensor comparison bijective. -/
+theorem ofTensorProduct_bijective_of_finite_cotangent_of_isNoetherian_tensorProduct
+    [Module.Finite (R ⧸ I) I.Cotangent]
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  apply ofTensorProduct_bijective_of_isNoetherian_tensorProduct_of_finite_cotangent_pow I M
+  have hcot (J : Ideal R) (hJ : J = I) : Module.Finite (R ⧸ J) J.Cotangent := by
+    subst J
+    infer_instance
+  exact ⟨1, Nat.one_pos, hcot (I ^ 1) (pow_one I)⟩
+
+/-- A finite completed scalar extension over a Noetherian completed ring gives
+a bijective canonical tensor comparison. -/
+theorem ofTensorProduct_bijective_of_isNoetherianRing_of_finite_tensorProduct
+    [IsNoetherianRing (AdicCompletion I R)]
+    [Module.Finite (AdicCompletion I R) (AdicCompletion I R ⊗[R] M)] :
+    Function.Bijective (ofTensorProduct I M) := by
+  let : Module.Finite (R ⧸ I) I.Cotangent := finite_cotangent_of_isNoetherianRing I
+  exact ofTensorProduct_bijective_of_finite_cotangent_of_isNoetherian_tensorProduct I M
+
+/-- A finite original module has a bijective canonical tensor comparison when
+the completed coefficient ring is Noetherian. -/
+theorem ofTensorProduct_bijective_of_isNoetherianRing_of_finite
+    [IsNoetherianRing (AdicCompletion I R)] [Module.Finite R M] :
+    Function.Bijective (ofTensorProduct I M) := by
+  let : Module.Finite (AdicCompletion I R) (AdicCompletion I R ⊗[R] M) := inferInstance
+  exact ofTensorProduct_bijective_of_isNoetherianRing_of_finite_tensorProduct I M
+
+end TensorProduct
 
 end AdicCompletion
