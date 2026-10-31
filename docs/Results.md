@@ -5,6 +5,9 @@ The [Guide](Guide.md) gives usage and a selected current module map;
 [CREDITS](CREDITS.md) records project and upstream provenance.
 These are statements about the current library, not the historical API inventory.
 
+The [expanded headline results](HeadlineResults.md) retain the full detailed catalogue
+behind the concise README overview, including hypotheses, examples and boundary cases.
+
 ## Headline results
 
 - **Iterated ideal-power congruences.** For a commutative ring `R`, an ideal `I`,
@@ -290,14 +293,29 @@ These are statements about the current library, not the historical API inventory
   additive commutative group structures, `[IsAdicComplete I N]` gives the
   canonical extension `AdicCompletion.extend I : (M →ₗ[R] N) →
   (AdicCompletion I M →ₗ[R] N)`. Its canonical-image, quotient, lift and
-  naturality laws require no finite generation of `I`. For `0 < n` and `(I ^ n).FG`,
-  `AdicCompletion.ext_of_fg_pow` gives uniqueness for a Hausdorff target
-  `[IsHausdorff I N]`, without completeness. With `I.FG` and a complete target,
-  `AdicCompletion.precompOfLinearEquiv I` is an `R`-linear equivalence
+  naturality laws require no finite generation of `I`. If the source satisfies
+  `hM : ∀ n, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (AdicCompletion.eval I M n).ker`,
+  `AdicCompletion.ext_of_ker_eval I hM` gives uniqueness for a Hausdorff target
+  `[IsHausdorff I N]`, without completeness. For a complete target,
+  `AdicCompletion.precompOfLinearEquivOfKernel I hM` is an `R`-linear equivalence
   `(AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N)`, whose forward map is
   `LinearMap.lcomp R N (AdicCompletion.of I M)` and whose inverse is `extend I`.
-  Ring, source and target universes are independent; no Noetherian, finite-module
-  or projectivity hypothesis is imposed. See the
+  Its `_apply`, `_symm_apply`, `_symm_apply_of` and `_toLinearMap` laws describe
+  restriction, extension and evaluation on canonical original images.
+  Finite generation over `R` of the image of `I M` in the original `M / I² M`
+  supplies `hM`; `precompOfLinearEquivOfFGFirstLayer I` packages that specialization
+  with the same four laws. A given `0 < n` with `(I ^ n).FG` also supplies `hM`,
+  so `ext_of_fg_pow` retains its Hausdorff-target uniqueness statement. With `I.FG`,
+  `precompOfLinearEquiv I` retains its signature and agrees with the source-kernel
+  equivalence. No Noetherianity, finite-module or projectivity hypothesis is imposed
+  on these families. Separately, if the source completion is Noetherian over
+  `AdicCompletion I R`, `pow_smul_top_eq_ker_eval_of_isNoetherian` supplies `hM` and
+  [`existsUnique_extension_of_isNoetherian`](../AdicModules/Noetherian.lean) gives
+  `∃! F : AdicCompletion I M →ₗ[R] N, F.comp (AdicCompletion.of I M) = f`
+  for each `f : M →ₗ[R] N` and complete target `N`; this is the same canonical
+  `extend I f`. No Noetherianity of the completed ring is assumed.
+  Ring, source and target universes are independent throughout, and the target
+  needs no completed-ring action. See the
   [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean) and its
   [nonzero integer free-module example](../AdicModulesTest/AdicCompletion/LinearMap.lean).
 
@@ -315,12 +333,37 @@ These are statements about the current library, not the historical API inventory
   finiteness or projectivity, and all carrier universes are independent.
   The finitely generated ideal APIs, including `AdicCompletion.ext_of` and
   `AdicCompletion.restrictScalarsHomEquiv`, are the `n = 1` specializations.
-  Uniqueness uses the fixed-stage evaluation-kernel theorem at `n * k` and
-  cofinal Hausdorff separation, including stage zero. No completion along a
-  different ideal or new action is introduced. These are sufficient hypotheses,
+  Uniqueness uses original representatives at every precision, the source
+  evaluation-kernel identities and target Hausdorff separation. Finite generation
+  of a positive power supplies these source identities, including stage zero.
+  No completion along a different ideal or new action is introduced. These are sufficient hypotheses,
   not a necessity criterion for individual ideals; allowing `n = 0` would not
   give a valid theorem for all ideals. See the
   [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean).
+
+- **Source-only scalar linearity between canonical raw completions.**
+  For any ideal `I` of a commutative ring `R` and original additive commutative
+  group `R`-modules `M`, `N`, put `H_M = AdicCompletion I M`,
+  `H_N = AdicCompletion I N` and `S = AdicCompletion I R`. If
+  `hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R H_M) = (AdicCompletion.eval I M n).ker`,
+  `LinearMap.map_smul_adicCompletion_of_ker_eval I hM` makes every
+  `R`-linear map `H_M → H_N` linear for the canonical `S`-actions.
+  `AdicCompletion.restrictScalarsHomEquivOfKernel I hM` is the `S`-linear
+  equivalence `(H_M →ₗ[S] H_N) ≃ₗ[S] (H_M →ₗ[R] H_N)`, with pointwise target
+  actions. Its forward map is `LinearMap.restrictScalarsₗ`; its inverse retains
+  the original function and additive map. The `_toLinearMap`, `_apply`,
+  `_symm_apply`, `_symm_apply_restrictScalars` and `_symm_restrictScalars` laws
+  specify both directions. Original `N` is arbitrary: neither `N` nor `H_N`
+  needs intrinsic completeness; no target or coefficient kernel equality,
+  finitely generated ideal power or Noetherianity is required. The ring and
+  module universes are independent. On canonical raw modules this equivalence
+  agrees with `restrictScalarsHomEquivOfFGPow` whenever its positive-power
+  hypothesis also holds. The proof uses coefficient representatives,
+  unconditional target power-to-kernel containment and source-kernel uniqueness,
+  not completeness of the raw target. The earlier arbitrary-target extension
+  and arbitrary given-action scalar-linearity routes keep their own hypotheses.
+  See the [linear-map API](../AdicModules/AdicCompletion/LinearMap.lean) and
+  [argument and usage](Guide.md#linear-maps-between-canonical-raw-completions).
 
 - **Fibres and submodules under completed scalars.**
   Let `R` be a commutative ring, `I` an ideal, `0 < n` with `(I ^ n).FG`, and
@@ -657,6 +700,42 @@ These are statements about the current library, not the historical API inventory
   included. See the [quotient API](../AdicModules/AdicCompletion/Quotient.lean)
   and [representative and inverse formulas](Guide.md#finite-power-quotients-of-completions).
 
+- **Two-stage power quotients and evaluation kernels.** For any ideal `I` of a
+  commutative ring `R`, any original `R`-module `M` and `m ≤ n`, put
+  `C = AdicCompletion I R` and `H = AdicCompletion I M`.
+  `AdicCompletion.powQuotientEquivKerEvalQuotient I M` identifies the original
+  two-stage quotient `I^m M / I^n M` with `ker(evalₘ) / ker(evalₙ)`, linearly over
+  `R`. Here each denominator is pulled back to the indicated numerator submodule.
+  The forward map is induced by `AdicCompletion.of`; its inverse is computed by
+  an original representative of the higher evaluation, and composing that inverse
+  with the original quotient inclusion recovers higher evaluation. No finite
+  generation, Noetherianity, separation or completeness is assumed, and the ring
+  and module universes are independent. For the canonical completed action,
+  `smul_mem_ker_eval_add` gives `ker(evalₚ on C) • ker(eval_q on H) ≤ ker(eval_(p+q) on H)`.
+  The law `powQuotientEquivKerEvalQuotient_symm_mk_smul` preserves leading scalar
+  products of original representatives; the factors need only agree with their
+  representatives at their respective next precisions. All natural indices,
+  including zero, occur. These statements do not identify evaluation kernels with
+  intrinsic ideal-power submodules of the completion. See the
+  [quotient API](../AdicModules/AdicCompletion/Quotient.lean).
+
+- **Noetherianity descends to original quotients.** Put `C = AdicCompletion I R`
+  and `H = AdicCompletion I M` for any ideal of a commutative ring and any
+  original additive commutative group `R`-module, with independent universes.
+  Under `[IsNoetherian C H]`,
+  [`AdicCompletion.isNoetherian_quotient_pow I M n`](../AdicModules/Noetherian.lean)
+  gives `IsNoetherian (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))` for
+  **every** `n : ℕ`, including zero, with the canonical quotient-ring action on
+  the original module quotient. The proof descends along the surjective semilinear
+  evaluation `evalₛₗ I M n`. Neither `R` nor `C` need be Noetherian, and no finite
+  generation of `I` or finiteness of `M` is assumed. This is necessity only for
+  Noetherianity of `H`, not an iff, a sufficiency claim or Noetherianity of `C`.
+  Finite generation of a positive ideal power alone does not imply this conclusion.
+  The separate [original-quotient criterion](../AdicModules/LinearAlgebra/Quotient/Noetherian.lean)
+  concerns Noetherianity over original `R` of `M / Iⁿ M` for `n ≥ 2`, equivalent
+  to Noetherianity of `M / I M` and finite generation of the original acted first
+  layer; it does not assert Noetherianity of the raw completion.
+
 ## Finite and projective modules over the completed ring
 
 For any ideal `I` of a commutative ring `R`, a specified finite family in an
@@ -691,9 +770,11 @@ completed ring, without assuming that original `M` is flat. The theorem
 `moduleProjective_of_flat_of_finite_projective_quotient` obtains the quotient flatness
 by base change from `[Module.Flat R M]`. Neither result requires finite generation
 of `I` or any positive power, original-module finiteness, separation or completeness,
-Noetherianity, or equality of the ring and module universes. Original projectivity
-is still required by the tensor-comparison equivalences; these projectivity conclusions
-do not give tensor-comparison injectivity for arbitrary flat modules.
+Noetherianity, or equality of the ring and module universes. The original-projective tensor-comparison specializations retain their original
+projectivity hypotheses. The completed-projective-tensor comparison has its separate
+projectivity premise on `AdicCompletion I R ⊗[R] M`, not on original `M`. These
+projectivity conclusions for the raw completion do not by themselves give
+tensor-comparison injectivity for arbitrary flat modules.
 
 The proof lifts a finite residual split projector through the successive raw coefficient
 quotients. At each positive stage the restricted original map is bijective by
@@ -719,6 +800,21 @@ equivalence APIs; the explicit finite-presentation consumer uses Andrew Yang's f
 These conclusions do not weaken the completed-Hom hypotheses: the all-ideal comparison
 still requires a finite **original** projective source, while its arbitrary-projective
 arm still requires `I.FG`. Completion finiteness or projectivity is not a substitute.
+
+If the **original** source `M` is finite projective over `R` and its completion
+satisfies `hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) =
+(AdicCompletion.eval I M n).ker`,
+[`AdicCompletion.existsUnique_homComparison_of_ker_eval`](../AdicModules/AdicCompletion/Hom.lean)
+gives, for every `F : AdicCompletion I M →ₗ[R] AdicCompletion I N`, a unique
+`z : AdicCompletion I (M →ₗ[R] N)` with
+`(AdicCompletion.homComparison I M N z).restrictScalars R = F`.
+It composes `homEquivOfFiniteProjective` with `restrictScalarsHomEquivOfKernel`.
+This does not replace original finite projectivity by finite presentation.
+The ideal and original target are arbitrary: no finiteness, projectivity,
+flatness, completeness or separatedness of `N`, intrinsic completeness of its
+raw completion, target or coefficient kernel equality, finitely generated ideal
+power, or Noetherianity of `R` is assumed. See the
+[guide](Guide.md#recovering-a-completed-original-hom-element).
 
 ## Henselian lifting and uniqueness
 

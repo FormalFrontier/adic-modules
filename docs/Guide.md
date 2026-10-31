@@ -26,6 +26,10 @@ Witt vectors have characteristic zero. Separately, the
 describes the kernel coefficientwise and makes `p` regular exactly when the
 coefficient ring is reduced.
 
+For the concise overview, see the [README headline results](../README.md#headline-results).
+The [expanded headline results](HeadlineResults.md) retain the detailed statements,
+hypotheses, examples and boundary cases.
+
 ## Endomorphisms congruent to the identity
 
 Import [`AdicModules.AdicCompletion.Endomorphism`](../AdicModules/AdicCompletion/Endomorphism.lean)
@@ -271,6 +275,22 @@ The separately imported [integer `(2)` model](../AdicModulesTest/AdicCompletionQ
 compares the level-one quotient with `ZMod 2` and includes inverse formulas and
 the degree-zero boundary.
 
+## Original quotients of a Noetherian completed module
+
+Import [`AdicModules.Noetherian`](../AdicModules/Noetherian.lean) or the public root.
+For any ideal `I` of a commutative ring `R` and an additive commutative group
+`R`-module `M`, put `C = AdicCompletion I R` and `H = AdicCompletion I M`.
+With `[IsNoetherian C H]`, `AdicCompletion.isNoetherian_quotient_pow I M n` gives
+`IsNoetherian (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M)))` for every `n : ℕ`.
+The action is the canonical quotient action on the **original** module quotient;
+at `n = 0` that quotient is zero. The ring and module universes are independent.
+No Noetherianity of `R` or `C`, finite generation of `I` or finiteness of `M`
+is required. This is a necessary consequence of `[IsNoetherian C H]`, not a
+sufficiency criterion; a finitely generated positive ideal power alone is not
+enough. The separate [original-quotient criterion](HeadlineResults.md)
+characterizes Noetherianity over `R` of `M / Iⁿ M` for `n ≥ 2` by its original
+first quotient and acted first layer, without asserting Noetherianity of `H`.
+
 ## Scalar-ideal quotients of algebras
 
 Import [`AdicModules.RingTheory.Ideal.Quotient.SMulTop`](../AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean)
@@ -354,11 +374,73 @@ and the Lean source describe the current scalar-restriction API.
 ## Linear maps from an adic completion
 
 Import [`AdicModules.AdicCompletion.LinearMap`](../AdicModules/AdicCompletion/LinearMap.lean)
-for canonical extension, Hausdorff uniqueness and the structured Hom equivalence;
-see the [Results reference](Results.md#linear-maps-from-an-adic-completion) for
+or the public root for canonical extension, Hausdorff uniqueness and the structured
+Hom equivalence. The source condition is
+`∀ n, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (AdicCompletion.eval I M n).ker`.
+For an intrinsically complete target `N`, use `precompOfLinearEquivOfKernel` with
+this condition, or `precompOfLinearEquivOfFGFirstLayer` when the image of `I M`
+in the original `M / I² M` is finitely generated over `R`. Under
+`[IsNoetherian (AdicCompletion I R) (AdicCompletion I M)]`, import
+[`AdicModules.Noetherian`](../AdicModules/Noetherian.lean) for
+`existsUnique_extension_of_isNoetherian`. All these names are in namespace
+`AdicCompletion`; the inverse Hom map is `extend I`, with no completed-ring
+action required on `N`. See the [Results reference](Results.md#linear-maps-from-an-adic-completion) for
 their distinct hypotheses and characteristic laws. Import the
 [integer free-module model](../AdicModulesTest/AdicCompletion/LinearMap.lean)
 separately for the independent nonzero `(2)`-adic example with source `ℕ →₀ ℤ`.
+
+## Linear maps between canonical raw completions
+
+Import [`AdicModules.AdicCompletion.LinearMap`](../AdicModules/AdicCompletion/LinearMap.lean)
+or the public root. For an ideal `I` of a commutative ring `R` and additive
+commutative group `R`-modules `M`, `N`, put `H_M = AdicCompletion I M`,
+`H_N = AdicCompletion I N` and `S = AdicCompletion I R`. Assume only the source
+identities
+`hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R H_M) = (AdicCompletion.eval I M n).ker`.
+Then `LinearMap.map_smul_adicCompletion_of_ker_eval I hM F` says that every
+`F : H_M →ₗ[R] H_N` respects the canonical `S`-actions.
+
+`AdicCompletion.restrictScalarsHomEquivOfKernel I hM` packages this as
+`(H_M →ₗ[S] H_N) ≃ₗ[S] (H_M →ₗ[R] H_N)`, with the pointwise `S`-action on both
+Hom targets. The forward map is canonical scalar restriction; the inverse keeps
+exactly the same function and additive map. Its `_toLinearMap`, `_apply`,
+`_symm_apply`, `_symm_apply_restrictScalars` and `_symm_restrictScalars` laws give
+these descriptions and both inverse identities without unfolding a constructor.
+Ring, source and target universes are independent. The original target `N` is
+arbitrary: no intrinsic completeness of `N` or `H_N`, target or coefficient
+kernel equality, finite generation of an ideal power, or Noetherianity is assumed.
+
+For the argument, fix a completed scalar and a precision, and choose an original
+coefficient with that scalar's residue. On an original source vector, `hM` puts
+the difference of the two scalar multiples in the source ideal-power submodule.
+Linearity sends it into the target ideal-power submodule, which is always
+contained in the target evaluation kernel. Coordinatewise equality follows.
+The source uniqueness theorem `ext_of_ker_eval`, applied to the two fixed-scalar
+orbit maps, extends this equality to every completed source vector. This uses
+the raw target's Hausdorffness, not its intrinsic completeness or a target
+power-to-kernel equality.
+
+This is distinct from [extension to an intrinsically complete target](#linear-maps-from-an-adic-completion).
+It is also distinct from `restrictScalarsHomEquivOfFGPow`, which allows arbitrary
+modules with given compatible `R`- and `S`-actions but assumes a finitely generated
+positive ideal power and a Hausdorff target. On canonical raw modules the two
+scalar-restriction equivalences agree whenever both sets of hypotheses hold,
+by `restrictScalarsHomEquivOfFGPow_eq_restrictScalarsHomEquivOfKernel`.
+
+### Recovering a completed original Hom element
+
+Import [`AdicModules.AdicCompletion.Hom`](../AdicModules/AdicCompletion/Hom.lean)
+or the public root. If original `M` is **finite projective over `R`**, the public
+`AdicCompletion.homEquivOfFiniteProjective I M N` identifies the completed
+original Hom with `H_M →ₗ[S] H_N` for every ideal and arbitrary original target.
+With the same source condition `hM`,
+`AdicCompletion.existsUnique_homComparison_of_ker_eval I M N hM F` gives a unique
+`z : AdicCompletion I (M →ₗ[R] N)` such that
+`(AdicCompletion.homComparison I M N z).restrictScalars R = F`.
+The proof composes the finite-projective Hom equivalence with the source-kernel
+scalar-restriction equivalence. Finite presentation of original `M` alone is
+not this hypothesis; no finiteness, projectivity, flatness, completeness or
+separatedness of `N`, or Noetherianity of `R`, is required.
 
 ## Dependent products and completeness models
 
