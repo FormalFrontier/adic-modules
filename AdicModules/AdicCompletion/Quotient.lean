@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import Mathlib.RingTheory.AdicCompletion.Algebra
+public import Mathlib.Algebra.Module.Torsion.Basic
 public import Mathlib.RingTheory.Ideal.Quotient.Operations
 public import AdicModules.AdicCompletion.Kernel
 
@@ -13,6 +14,9 @@ import Mathlib.LinearAlgebra.Quotient.Basic
 
 /-!
 # Quotients of adic completions
+
+The coordinate projections are semilinear over the corresponding coefficient
+evaluations, including the normalized first projection to the residue quotient.
 
 For an ideal `I` in a commutative ring, finite generation of one specified
 positive power identifies every ideal-power quotient of the raw `I`-adic
@@ -32,6 +36,12 @@ hypothesis.
 
 ## References
 
+The semilinear projections bundle the coordinate evaluation and completed-module
+scalar laws from Mathlib's `RingTheory/AdicCompletion/Basic.lean` and `Algebra.lean`,
+by Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang. Their targets use
+the quotient module action from Pierre-Alexandre Bazin's
+`Algebra/Module/Torsion/Basic.lean`.
+
 The construction uses Mathlib's quotient equivalence for equal ideals and its
 first isomorphism theorems for linear maps and algebras. The inverses are
 described using Mathlib's
@@ -45,6 +55,88 @@ universe u v w
 namespace AdicCompletion
 
 variable {R : Type u} [CommRing R]
+
+/-- Evaluation at precision `n`, semilinear over the canonical coefficient evaluation. -/
+noncomputable def evalₛₗ (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M] (n : ℕ) :
+    AdicCompletion I M →ₛₗ[(evalₐ I n).toRingHom]
+      M ⧸ (I ^ n • (⊤ : Submodule R M)) where
+  toFun := eval I M n
+  map_add' := (eval I M n).map_add
+  map_smul' s x := val_smul_eq_evalₐ_smul I n s (x.val n)
+
+/-- The semilinear projection has the original-ring-linear evaluation as its
+underlying function. -/
+@[simp]
+theorem evalₛₗ_apply (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (n : ℕ) (x : AdicCompletion I M) :
+    evalₛₗ I M n x = eval I M n x := rfl
+
+/-- The projection sends an original element to its residue class. -/
+@[simp]
+theorem evalₛₗ_of (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (n : ℕ) (m : M) :
+    evalₛₗ I M n (of I M m) = (I ^ n • (⊤ : Submodule R M)).mkQ m :=
+  eval_of I M n m
+
+/-- Every stage projection is surjective. -/
+theorem evalₛₗ_surjective (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (n : ℕ) :
+    Function.Surjective (evalₛₗ I M n) := eval_surjective I M n
+
+/-- The semilinear projections commute with the precision transitions. -/
+theorem transitionMap_evalₛₗ (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M] {m n : ℕ} (hmn : m ≤ n)
+    (x : AdicCompletion I M) :
+    transitionMap I M hmn (evalₛₗ I M n x) = evalₛₗ I M m x :=
+  transitionMap_comp_eval_apply I M hmn x
+
+/-- First evaluation with codomain the original first quotient and coefficient
+map to the residue ring `R ⧸ I`. -/
+noncomputable def evalOneₛₗ (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M] :
+    AdicCompletion I M →ₛₗ[(evalOneₐ I).toRingHom]
+      M ⧸ (I • (⊤ : Submodule R M)) where
+  toFun x :=
+    Submodule.factor
+      (show (I ^ 1 • (⊤ : Submodule R M)) ≤ I • (⊤ : Submodule R M) by simp)
+      (evalₛₗ I M 1 x)
+  map_add' x y := by simp only [map_add]
+  map_smul' s x := by
+    induction s using induction_on I R with | _ s =>
+    induction x using induction_on I M with | _ x =>
+    rfl
+
+/-- First semilinear evaluation agrees with original-ring-linear evaluation,
+followed by the canonical first-quotient factor. -/
+@[simp]
+theorem evalOneₛₗ_apply (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (x : AdicCompletion I M) :
+    evalOneₛₗ I M x =
+      Submodule.factor
+        (show (I ^ 1 • (⊤ : Submodule R M)) ≤ I • (⊤ : Submodule R M) by simp)
+        (eval I M 1 x) := rfl
+
+/-- The normalized projection takes an original element to its first residue. -/
+@[simp]
+theorem evalOneₛₗ_of (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (m : M) :
+    evalOneₛₗ I M (of I M m) = (I • (⊤ : Submodule R M)).mkQ m := rfl
+
+/-- Normalization to the first quotient preserves surjectivity. -/
+theorem evalOneₛₗ_surjective (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M] :
+    Function.Surjective (evalOneₛₗ I M) := by
+  intro q
+  obtain ⟨m, rfl⟩ := Submodule.mkQ_surjective (I • (⊤ : Submodule R M)) q
+  exact ⟨of I M m, evalOneₛₗ_of I M m⟩
+
+/-- For the coefficient module, normalized semilinear evaluation is the canonical
+algebra evaluation after the class-preserving ideal quotient factor. -/
+theorem factor_evalOneₛₗ_eq_evalOneₐ (I : Ideal R) (x : AdicCompletion I R) :
+    Ideal.Quotient.factor (show (I • ⊤ : Ideal R) ≤ I by simp)
+      (evalOneₛₗ I R x) = evalOneₐ I x := by
+  rw [evalOneₛₗ_apply, ← factorₐ_evalₐ_one,
+    ← factor_eval_eq_evalₐ I x (le_of_eq (Ideal.mul_top _))]
+  exact Quotient.inductionOn' (eval I R 1 x) (fun _ ↦ rfl)
 
 /-- The quotient of a completed module by an ideal power is the corresponding
 quotient of the original module, if one positive ideal power is finitely generated. -/

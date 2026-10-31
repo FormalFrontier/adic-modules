@@ -4,7 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
-public import Mathlib.RingTheory.AdicCompletion.Algebra
+public import AdicModules.AdicCompletion.Quotient
 public import Mathlib.RingTheory.Ideal.Quotient.Nilpotent
 public import Mathlib.RingTheory.LocalRing.RingHom.Basic
 
@@ -52,16 +52,6 @@ namespace AdicCompletion
 
 variable {R : Type u} [CommRing R] (I : Ideal R)
 
--- Relate the normalized first reduction to the module quotient used by compatible families.
-private lemma evalOne_eq_factor_eval (x : AdicCompletion I R) :
-    evalOneₐ I x =
-      Ideal.Quotient.factor
-        (show (I ^ 1 • ⊤ : Ideal R) ≤ I by simp)
-        (eval I R 1 x) := by
-  rw [← factorₐ_evalₐ_one,
-    ← factor_eval_eq_evalₐ I x (le_of_eq (Ideal.mul_top _))]
-  exact Quotient.inductionOn' (eval I R 1 x) (fun _ ↦ rfl)
-
 private lemma isUnit_val_of_isUnit_evalOne (x : AdicCompletion I R)
     (hx : IsUnit (evalOneₐ I x)) (n : ℕ) : IsUnit (x.val n) := by
   by_cases hn : n = 0
@@ -78,7 +68,9 @@ private lemma isUnit_val_of_isUnit_evalOne (x : AdicCompletion I R)
       _ = Ideal.Quotient.mk (I ^ 1 • ⊤ : Ideal R) r :=
         congrArg (transitionMap I R (Nat.one_le_iff_ne_zero.mpr hn)) hr.symm
   have hred : evalOneₐ I x = Ideal.Quotient.mk I r := by
-    simp only [evalOne_eq_factor_eval I x, eval_apply, h1, Ideal.Quotient.factor_mk]
+    rw [← factor_evalOneₛₗ_eq_evalOneₐ I x, evalOneₛₗ_apply]
+    simp only [eval_apply, h1]
+    rfl
   have hu : IsUnit (Ideal.Quotient.mk (I ^ n) r) :=
     (Ideal.Quotient.isUnit_mk_pow_iff_isUnit_mk I hn).mpr (hred ▸ hx)
   have hraw : I ^ n ≤ (I ^ n • ⊤ : Ideal R) :=

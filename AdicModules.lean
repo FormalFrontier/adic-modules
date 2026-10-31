@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModules.Ideal.Cotangent
 public import AdicModules.Noetherian
 public import AdicModules.LinearAlgebra.Matrix.DeterminantPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation
@@ -31,6 +32,7 @@ public import AdicModules.PrimaryComponent
 public import AdicModules.AdicCompletion
 public import AdicModules.AdicCompletion.Completeness
 public import AdicModules.AdicCompletion.CompleteBase
+public import AdicModules.AdicCompletion.Cotangent
 public import AdicModules.AdicCompletion.DFinsupp
 public import AdicModules.AdicCompletion.Endomorphism
 public import AdicModules.AdicCompletion.Exactness

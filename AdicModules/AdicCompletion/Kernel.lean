@@ -11,9 +11,12 @@ Authors: Bingyu Xia
 module
 
 public import Mathlib.RingTheory.AdicCompletion.Completeness
+public import AdicModules.Ideal.Cotangent
 
 import Mathlib.Algebra.Exact.Basic
 import Mathlib.Algebra.Module.Submodule.Equiv
+import Mathlib.LinearAlgebra.Finsupp.Span
+import Mathlib.RingTheory.Finiteness.Ideal
 
 /-!
 # Kernels under adic completion and reduction
@@ -26,6 +29,11 @@ and module may lie in independent universes.
 Finite generation of one positive power additionally gives this equality at every degree,
 without assuming `I.FG`. The proof lifts a higher coordinate to the original module and
 applies the fixed-stage equality to the residual.
+
+Finiteness of the original cotangent module `I.Cotangent` over `R ⧸ I` is another sufficient
+condition for the equality at every degree, for every original module `M`. A finitely generated
+ideal `H` generating `I ^ n` modulo `I ^ (n + 1)` already computes the evaluation kernel at `n`.
+Neither the original module nor its first quotient nor its completion is assumed finite.
 
 For any ideal, completion of the kernel of an original split surjection is canonically
 isomorphic to the kernel of the completed map, linearly over the completed ring. The forward
@@ -45,8 +53,14 @@ The ring and the two original modules may lie in independent universes.
 
 Bingyu Xia's `AdicCompletion.pow_smul_top_eq_ker_eval` in Mathlib's
 `RingTheory/AdicCompletion/Completeness.lean` assumes `I.FG`. The proof here adapts its
-finite-linear-combination argument to use finite generation only of `I ^ n`: completion
-preserves the surjection onto `I ^ n • ⊤`, and finite direct sums commute with completion.
+finite-linear-combination argument to a finitely generated coefficient ideal generating
+`I ^ n` modulo `I ^ (n + 1)`. The original coefficient map need only be surjective after the first
+reduction of `I ^ n • ⊤`; Mathlib's first-reduction surjectivity theorem and finite direct-sum
+comparison then compute its completed range. The single-power finite-generation theorem
+is a specialization of this argument.
+
+The cotangent argument uses Mathlib's ideal cotangent formalization by Andrew Yang and the
+span-modulo-square bridge in `AdicModules.Ideal.Cotangent`.
 
 The split-kernel comparison reuses Mathlib's completion formalizations by Kenny Lau, Judith
 Ludwig, Christian Merten and Jiedong Jiang, the exact-sequence splitting formalization by
@@ -86,42 +100,170 @@ private lemma lsum_smul_comp_finsuppLEquivDirectSum_symm (I : Ideal R)
     sumEquivOfFintype_apply, sum_lof, map_mk, AdicCauchySequence.map_apply_coe, map_smul]
   rw [← Ideal.Quotient.algebraMap_eq, algebraMap_smul]
 
+/-- A finite coefficient family whose map is onto the first target reduction computes
+an evaluation kernel after completion. -/
+private theorem span_smul_top_eq_ker_eval_of_mkQ_comp_surjective
+    {n : ℕ} {ι : Type*} [Finite ι] (a : ι → R)
+    (f : (ι →₀ M) →ₗ[R] ↥(I ^ n • (⊤ : Submodule R M)))
+    (hfactor : (I ^ n • (⊤ : Submodule R M)).subtype.comp f =
+      lsum R (fun i : ι => a i • (LinearMap.id : M →ₗ[R] M)))
+    (hmodI : Function.Surjective
+      ((I • (⊤ : Submodule R ↥(I ^ n • (⊤ : Submodule R M)))).mkQ.comp f)) :
+    (Ideal.span (Set.range a)) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (eval I M n).ker := by
+  classical
+  let := Fintype.ofFinite ι
+  let g₀ : (ι →₀ M) →ₗ[R] M :=
+    lsum R (fun i : ι => a i • (LinearMap.id : M →ₗ[R] M))
+  let g : (ι →₀ AdicCompletion I M) →ₗ[AdicCompletion I R] AdicCompletion I M :=
+    lsum (AdicCompletion I R) (fun i : ι =>
+      algebraMap R (AdicCompletion I R) (a i) •
+        (LinearMap.id : AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I M))
+  have hspan : (Ideal.span (Set.range a)) •
+      (⊤ : Submodule R (AdicCompletion I M)) = g.range.restrictScalars R := by
+    rw [span_smul_eq,
+      ← restrictScalars_top R (AdicCompletion I R) (AdicCompletion I M),
+      ← restrictScalars_image_smul_eq (R := AdicCompletion I R), ← Set.range_comp]
+    apply congrArg (fun P : Submodule (AdicCompletion I R) (AdicCompletion I M) =>
+      P.restrictScalars R)
+    simpa only [g, Function.comp_def, LinearMap.range_id] using
+      (range_lsum_smul
+        (LinearMap.id : AdicCompletion I M →ₗ[AdicCompletion I R] AdicCompletion I M)
+        ((algebraMap R (AdicCompletion I R)) ∘ a)).symm
+  have hsum : Function.Surjective
+      (map I (finsuppLEquivDirectSum R M ι).symm.toLinearMap) :=
+    Function.RightInverse.surjective (g := map I (finsuppLEquivDirectSum R M ι))
+      (fun _ ↦ by simp [← LinearMap.comp_apply, map_comp])
+  have hg : g.range = (map I g₀).range := by
+    dsimp only [g, g₀]
+    rw [← LinearMap.range_comp_of_range_eq_top
+        (f := (finsuppLEquivDirectSum (AdicCompletion I R)
+          (AdicCompletion I M) ι).symm.toLinearMap) _ (by simp),
+      lsum_smul_comp_finsuppLEquivDirectSum_symm,
+      LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range _),
+      LinearMap.range_comp_of_range_eq_top _
+        (LinearMap.range_eq_top_of_surjective _ hsum)]
+  have hsurj : Function.Surjective (map I f) :=
+    map_surjective_of_mkQ_comp_surjective hmodI
+  have hfactor' : (I ^ n • (⊤ : Submodule R M)).subtype.comp f = g₀ := hfactor
+  have hcompleted : (map I g₀).range = (ofPowSMul I M n).range := by
+    calc
+      (map I g₀).range =
+          ((map I (I ^ n • (⊤ : Submodule R M)).subtype).comp (map I f)).range := by
+        rw [map_comp, hfactor']
+      _ = (ofPowSMul I M n).range :=
+        LinearMap.range_comp_of_range_eq_top _
+          (LinearMap.range_eq_top_of_surjective _ hsurj)
+  calc
+    (Ideal.span (Set.range a)) • (⊤ : Submodule R (AdicCompletion I M)) =
+        g.range.restrictScalars R := hspan
+    _ = (map I g₀).range.restrictScalars R := by rw [hg]
+    _ = (ofPowSMul I M n).range.restrictScalars R := by rw [hcompleted]
+    _ = (eval I M n).ker := restrictScalars_range_ofPowSMul_eq_ker_eval I
+
+/-- A finitely generated ideal generating an original power modulo the next power computes its
+completed evaluation kernel. -/
+theorem smul_top_eq_ker_eval_of_fg_sup_pow
+    (I H : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (n : ℕ) (hH : H.FG) (hpow : H ⊔ I ^ (n + 1) = I ^ n) :
+    H • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
+  classical
+  have hHI : H ≤ I ^ n := le_sup_left.trans hpow.le
+  obtain ⟨k, a, ha⟩ := Submodule.fg_iff_exists_fin_generating_family.mp hH
+  rw [Ideal.submodule_span_eq] at ha
+  let N : Submodule R M := I ^ n • ⊤
+  let f₀ : (Fin k →₀ M) →ₗ[R] M :=
+    lsum R (fun i : Fin k => a i • (LinearMap.id : M →ₗ[R] M))
+  have hfRange : f₀.range = H • (⊤ : Submodule R M) := by
+    dsimp only [f₀]
+    rw [range_lsum_smul, LinearMap.range_id, ← span_smul_eq, ha]
+  have hf : ∀ x, f₀ x ∈ N := by
+    intro x
+    exact (Submodule.smul_mono_left hHI)
+      (hfRange ▸ LinearMap.mem_range_self f₀ x)
+  let f : (Fin k →₀ M) →ₗ[R] N := f₀.codRestrict N hf
+  have hfactor : N.subtype.comp f = f₀ :=
+    LinearMap.subtype_comp_codRestrict _ _ _
+  have hfr : f.range.map N.subtype = H • (⊤ : Submodule R M) := by
+    rw [← LinearMap.range_comp, hfactor, hfRange]
+  have hsmul : (I • (⊤ : Submodule R N)).map N.subtype =
+      I ^ (n + 1) • (⊤ : Submodule R M) := by
+    rw [Submodule.map_smul'', Submodule.map_subtype_top]
+    dsimp only [N]
+    rw [← Submodule.smul_assoc, Ideal.smul_eq_mul, ← pow_succ']
+  have hsup : I • (⊤ : Submodule R N) ⊔ f.range = ⊤ := by
+    apply Submodule.map_injective_of_injective N.injective_subtype
+    rw [Submodule.map_sup, hsmul, hfr, Submodule.map_subtype_top]
+    change I ^ (n + 1) • (⊤ : Submodule R M) ⊔ H • ⊤ = I ^ n • ⊤
+    rw [sup_comm, ← Submodule.sup_smul, hpow]
+  have hmodI : Function.Surjective ((I • (⊤ : Submodule R N)).mkQ.comp f) := by
+    apply LinearMap.range_eq_top.mp
+    rw [LinearMap.range_comp, Submodule.map_mkQ_eq_top]
+    exact hsup
+  have heq := span_smul_top_eq_ker_eval_of_mkQ_comp_surjective
+    (I := I) (M := M) (n := n) a f hfactor hmodI
+  simpa only [ha] using heq
+
 /-- If `I ^ n` is finitely generated, its scalar multiple of the whole completed module is
 exactly the kernel of evaluation at `n`. This replaces the hypothesis `I.FG` in Mathlib's
 `AdicCompletion.pow_smul_top_eq_ker_eval` by finite generation of the single power, following
 its finite-linear-combination proof. -/
 theorem pow_smul_top_eq_ker_eval_of_fg_pow {n : ℕ} (h : (I ^ n).FG) :
     (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) = (AdicCompletion.eval I M n).ker := by
+  exact smul_top_eq_ker_eval_of_fg_sup_pow I (I ^ n) M n h
+    (sup_eq_left.mpr (Ideal.pow_le_pow_right (Nat.le_succ n)))
+
+/-- An ideal congruence modulo the square gives the corresponding congruence at every degree. -/
+private theorem pow_eq_sup_next (I H : Ideal R) (hI : I = H ⊔ I ^ 2) (n : ℕ) :
+    I ^ n = H ^ n ⊔ I ^ (n + 1) := by
+  have hHI : H ≤ I := le_sup_left.trans hI.ge
+  refine le_antisymm ?_
+    (sup_le (Ideal.pow_right_mono hHI n) (Ideal.pow_le_pow_right (Nat.le_succ n)))
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hnext : H ^ n * I ^ 2 ≤ I ^ (n + 2) := by
+      calc
+        H ^ n * I ^ 2 ≤ I ^ n * I ^ 2 :=
+          Ideal.mul_mono_left (Ideal.pow_right_mono hHI n)
+        _ = I ^ (n + 2) := (pow_add I n 2).symm
+    have hHI' : H ^ n * I ≤ H ^ (n + 1) ⊔ I ^ (n + 2) := by
+      calc
+        H ^ n * I = H ^ n * (H ⊔ I ^ 2) :=
+          congrArg (fun K : Ideal R => H ^ n * K) hI
+        _ = H ^ n * H ⊔ H ^ n * I ^ 2 := Ideal.mul_sup _ _ _
+        _ ≤ H ^ (n + 1) ⊔ I ^ (n + 2) :=
+          sup_le_sup (le_of_eq (pow_succ H n).symm) hnext
+    calc
+      I ^ (n + 1) = I ^ n * I := pow_succ I n
+      _ ≤ (H ^ n ⊔ I ^ (n + 1)) * I := Ideal.mul_mono_left ih
+      _ = H ^ n * I ⊔ I ^ (n + 1) * I := Ideal.sup_mul _ _ _
+      _ ≤ H ^ (n + 1) ⊔ I ^ (n + 2) := sup_le hHI' (by
+        rw [← pow_succ]
+        exact le_sup_right)
+
+/-- Finite cotangent identifies the ideal-power filtration on every completed module
+with the kernels of evaluation. -/
+theorem pow_smul_top_eq_ker_eval_of_finite_cotangent
+    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    [Module.Finite (R ⧸ I) I.Cotangent] (n : ℕ) :
+    (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
   classical
-  refine le_antisymm (pow_smul_top_le_ker_eval ..) ?_
-  rcases h with ⟨s, hs⟩
-  simp only [← hs, span_smul_eq]
-  rw [← restrictScalars_top R (AdicCompletion I R) (AdicCompletion I M),
-    ← restrictScalars_image_smul_eq (R := AdicCompletion I R),
-    ← restrictScalars_range_ofPowSMul_eq_ker_eval, restrictScalars_le,
-    image_smul_top_eq_range_lsum]
-  simp only [SetLike.coe_sort_coe]
-  rw [← LinearMap.range_comp_of_range_eq_top
-      (f := (finsuppLEquivDirectSum ..).symm.toLinearMap) _ (by simp),
-    lsum_smul_comp_finsuppLEquivDirectSum_symm,
-    LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range _),
-    LinearMap.range_comp_of_range_eq_top _ (LinearMap.range_eq_top_of_surjective _ <|
-      Function.RightInverse.surjective (g := map I (finsuppLEquivDirectSum R M s)) (fun _ ↦ by
-        simp [← LinearMap.comp_apply, map_comp]))]
-  rintro _ ⟨x, rfl⟩
-  let f : (s →₀ M) →ₗ[R] M := lsum R fun i : s ↦ i.val • (LinearMap.id : M →ₗ[R] M)
-  have hfRange : f.range = I ^ n • (⊤ : Submodule R M) := by
-    rw [← hs, span_smul_eq, smul_top_eq_range_lsum]
-    rfl
-  have hf : ∀ x, f x ∈ I ^ n • (⊤ : Submodule R M) := by
-    intro x
-    rw [← hfRange]
-    exact LinearMap.mem_range_self f x
-  have : Function.Surjective (f.codRestrict (I ^ n • ⊤) hf) := by
-    rw [← LinearMap.range_eq_top, LinearMap.range_codRestrict, hfRange]
-    simp
-  rcases map_surjective I this x with ⟨x, rfl⟩
-  exact ⟨x, by rw [← LinearMap.comp_apply, map_comp, LinearMap.subtype_comp_codRestrict]⟩
+  obtain ⟨k, w, hw⟩ := Module.Finite.exists_fin (R := R ⧸ I) (M := I.Cotangent)
+  choose v hv using fun i : Fin k => I.toCotangent_surjective (w i)
+  have hvspan : Submodule.span (R ⧸ I)
+      (Set.range (fun i : Fin k => I.toCotangent (v i))) = ⊤ := by
+    simpa only [hv] using hw
+  let H : Ideal R := Ideal.span (Set.range (fun i : Fin k => (v i : R)))
+  have hI : I = H ⊔ I ^ 2 :=
+    Ideal.eq_span_sup_sq_of_span_toCotangent_eq_top I v hvspan
+  have hHI : H ≤ I := le_sup_left.trans hI.ge
+  have hH : H.FG := Submodule.fg_span (Set.finite_range _)
+  have hstage := smul_top_eq_ker_eval_of_fg_sup_pow I (H ^ n) M n hH.pow
+    (pow_eq_sup_next I H hI n).symm
+  refine le_antisymm (pow_smul_top_le_ker_eval (I := I) (M := M) n) ?_
+  rw [← hstage]
+  exact Submodule.smul_mono_left (Ideal.pow_right_mono hHI n)
 
 section SplitSurjection
 

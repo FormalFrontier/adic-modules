@@ -12,6 +12,7 @@ module
 
 public import Mathlib.Algebra.Module.Projective
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
+public import AdicModules.Ideal.Cotangent
 
 import AdicModules.AdicCompletion.Kernel
 import Mathlib.Algebra.Module.Submodule.Pointwise
@@ -32,9 +33,13 @@ condition is required.
 Projective modules over an `I`-Hausdorff coefficient ring are `I`-Hausdorff,
 without finite-generation or completeness assumptions.
 
-Finite generation of a positive power of `I` makes `AdicCompletion I M` intrinsically
-`I`-adically complete for its original `R`-module structure. The all-stage evaluation-kernel
-identity turns the compatible diagonal family of a Cauchy sequence into an intrinsic limit.
+Equality of the intrinsic ideal-power filtration with the evaluation kernels makes
+`AdicCompletion I M` intrinsically `I`-adically complete for its original `R`-module
+structure. Finite generation of a positive power of `I` supplies this equality.
+The all-stage evaluation-kernel identity turns the compatible diagonal family of a Cauchy
+sequence into an intrinsic limit. Finite generation of the original cotangent module
+over the original residue ring also gives intrinsic completeness, for the extended ideal
+acting on every completed module.
 
 Precompleteness for two arbitrary ideals implies precompleteness for their sum.
 The proof splits successive differences of an even subsequence into two sequences
@@ -67,7 +72,10 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
   for projective modules of arbitrary rank.
 * Bingyu Xia's `AdicCompletion.isAdicComplete` in Mathlib's
   `RingTheory/AdicCompletion/Completeness.lean` supplies the diagonal completeness argument;
-  here finite generation of one positive ideal power replaces `I.FG`.
+  here equality of the intrinsic filtration with the evaluation kernels suffices.
+  Finite generation of one positive ideal power supplies this equality.
+* The finite-cotangent conclusion uses Mathlib's original cotangent module and the shared
+  finite-coefficient kernel argument in `AdicModules.AdicCompletion.Kernel`.
 -/
 
 @[expose] public section
@@ -97,13 +105,13 @@ theorem IsHausdorff.of_injective
 
 namespace AdicCompletion
 
-/-- The adic completion is complete for its ideal-power filtration if a positive power of the
-ideal is finitely generated. This generalizes Mathlib's `AdicCompletion.isAdicComplete`,
-following Bingyu Xia's diagonal completeness argument. -/
-theorem isAdicComplete_of_fg_pow
-    {R : Type u} [CommRing R] {I : Ideal R}
-    {M : Type v} [AddCommGroup M] [Module R M]
-    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) :
+/-- Evaluation kernels equal to the intrinsic filtration give intrinsic completeness.
+This follows Bingyu Xia's diagonal completeness argument. -/
+theorem isAdicComplete_of_pow_smul_top_eq_ker_eval
+    {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M]
+    (h : ∀ n : ℕ,
+      (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
     IsAdicComplete I (AdicCompletion I M) := by
   refine { toIsHausdorff := inferInstance, toIsPrecomplete := ⟨?_⟩ }
   intro x hx
@@ -116,9 +124,29 @@ theorem isAdicComplete_of_fg_pow
       exact hmem.symm
   }
   refine ⟨L, fun k => ?_⟩
-  rw [SModEq.sub_mem, pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI k,
-    LinearMap.mem_ker, map_sub, sub_eq_zero]
+  rw [SModEq.sub_mem, h k, LinearMap.mem_ker, map_sub, sub_eq_zero]
   rfl
+
+/-- The adic completion is complete for its ideal-power filtration if a positive power of the
+ideal is finitely generated. This generalizes Mathlib's `AdicCompletion.isAdicComplete`,
+following Bingyu Xia's diagonal completeness argument. -/
+theorem isAdicComplete_of_fg_pow
+    {R : Type u} [CommRing R] {I : Ideal R}
+    {M : Type v} [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) :
+    IsAdicComplete I (AdicCompletion I M) :=
+  isAdicComplete_of_pow_smul_top_eq_ker_eval I M
+    (pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI)
+
+/-- Finite cotangent makes every completed module complete for the extended ideal. -/
+theorem isAdicComplete_map_of_finite_cotangent
+    {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M] [Module.Finite (R ⧸ I) I.Cotangent] :
+    IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
+      (AdicCompletion I M) :=
+  (IsAdicComplete.map_algebraMap_iff I (AdicCompletion I M)).mpr
+    (isAdicComplete_of_pow_smul_top_eq_ker_eval I M
+      (pow_smul_top_eq_ker_eval_of_finite_cotangent I M))
 
 end AdicCompletion
 

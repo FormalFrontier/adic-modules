@@ -71,8 +71,10 @@ and original lifts. The chosen-family spanning theorem below makes those same co
 lifts span the raw completion; each lies in the range of the canonical comparison.
 No Noetherian hypothesis on the ring or finite-generation hypothesis on the ideal is needed.
 
-Finiteness of `M / I M` also gives finiteness of the raw completion over the canonical
-completed ring. If `M / I M` is finite projective over `R / I` and every positive quotient
+Finiteness of `M / I M` is equivalent to finiteness of the raw completion over the
+canonical completed ring. In the reverse direction, every original quotient `M / Iⁿ M`
+is finite over `R / Iⁿ`, by semilinear evaluation with the quotient module action.
+If `M / I M` is finite projective over `R / I` and every positive quotient
 `M / Iⁿ M` is flat over `R / Iⁿ`, the completion is projective over that ring. In particular,
 this applies when the original `M` is flat. The proof lifts the residual split projector
 through the coefficient quotients, proves that the restricted maps are isomorphisms by a
@@ -681,6 +683,27 @@ theorem moduleFinite_of_finite_quotient
     Module.Finite.equiv e.symm
   exact Module.Finite.of_surjective (map I f)
     (map_surjective_of_mkQ_comp_surjective hsurj)
+
+/-- A finite completed module has finite original quotients at every precision. -/
+theorem moduleFinite_quotient_pow_of_finite
+    [Module.Finite (AdicCompletion I R) (AdicCompletion I M)] (n : ℕ) :
+    Module.Finite (R ⧸ I ^ n) (M ⧸ (I ^ n • (⊤ : Submodule R M))) :=
+  Module.Finite.of_surjective (evalₛₗ I M n) (evalₛₗ_surjective I M n)
+
+/-- Raw completed finiteness is equivalent to finiteness of the original
+first quotient over the original residue ring. -/
+theorem moduleFinite_iff_finite_quotient :
+    Module.Finite (AdicCompletion I R) (AdicCompletion I M) ↔
+      Module.Finite (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) := by
+  constructor
+  · intro h
+    exact Module.Finite.of_surjective (evalOneₛₗ I M) (evalOneₛₗ_surjective I M)
+  · intro h
+    let : IsScalarTower R (R ⧸ I) (M ⧸ (I • (⊤ : Submodule R M))) :=
+      (Module.isTorsionBySet_quotient_ideal_smul M I).isScalarTower
+    let : Module.Finite R (M ⧸ (I • (⊤ : Submodule R M))) :=
+      Module.Finite.trans (R ⧸ I) _
+    exact moduleFinite_of_finite_quotient I M
 
 section SplitKernel
 

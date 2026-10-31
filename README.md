@@ -12,6 +12,21 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   `I`-adic completion is Noetherian without assuming that `R` itself is complete
   or Noetherian. See the [Noetherian criterion](AdicModules/Noetherian.lean).
 
+- **Raw completion and finite original cotangent.** For any ideal `I` of a
+  commutative ring `R`, the raw completion `S = AdicCompletion I R` is Noetherian
+  exactly when `R / I` is Noetherian and the original cotangent module
+  `I.Cotangent = I / I²` is finite over `R / I`. Finite cotangent alone makes
+  `J = I.map (algebraMap R S)` finitely generated, identifies every `J ^ n`
+  with the kernel of coefficient evaluation, and makes `S` intrinsically
+  `J`-adically complete. Specified original cotangent generators generate `J`.
+  No finite generation of original `I`, Noetherianity or completeness of `R`,
+  separation, locality or properness is assumed.
+  For every original `R`-module `M`, finite original cotangent also identifies
+  `I^n • ⊤` in `AdicCompletion I M` with the evaluation kernel at every `n`,
+  including zero, and makes `AdicCompletion I M` intrinsically complete for `J`
+  under its canonical `S`-action. No finiteness, flatness or completeness of `M` is assumed.
+  See the [cotangent criterion](AdicModules/AdicCompletion/Cotangent.lean).
+
 - **Adic separation of quotients.** For any ideal `I` and submodule `N` of an
   `R`-module over a commutative ring, `M / N` is `I`-Hausdorff exactly when
   `⨅ n, N ⊔ I ^ n • ⊤ = N`. Membership is detected by congruence to `N` at
@@ -481,8 +496,12 @@ Rings are commutative; modules are additive commutative groups unless specified 
   (supplied by Artin–Rees over Noetherian rings).
   `AdicCompletion.moduleFinite_of_finite_quotient` gives a finite module over the
   **canonical completed ring** whenever `M / I M` is finite over the original ring,
-  for arbitrary `I`; no finiteness or projectivity of `M` is needed. This concerns
-  the raw inverse limit, not intrinsic completeness for arbitrary ideals.
+  for arbitrary `I`; no finiteness or projectivity of `M` is needed. Conversely,
+  a finite raw completion has finite original quotients over `R / Iⁿ` at every
+  precision. Thus raw completed finiteness is equivalent to finiteness of `M / I M`
+  over `R / I`. The [semilinear projections](AdicModules/AdicCompletion/Quotient.lean)
+  use the canonical coefficient evaluations and the original quotient actions.
+  This concerns the raw inverse limit, not intrinsic completeness for arbitrary ideals.
   `AdicCompletion.span_range_eq_top_of_span_mkQ_eq_top` retains the chosen generators:
   the completed images of the same given finite family spanning `M / I M` span the
   raw completion over the completed ring. Empty finite families are included.
@@ -800,10 +819,12 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
+| [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and raw Noetherianity) | — |
+| [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (original cotangent generators and ideal span modulo the square) | — |
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
-| [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels and finite-power evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
+| [AdicCompletion.Kernel](AdicModules/AdicCompletion/Kernel.lean) (split-surjection kernels, finite-power and finite-cotangent evaluation kernels) | [AdicCompletionKernel](AdicModulesTest/AdicCompletionKernel.lean) (private integer `(2)` kernel calibration, degree-zero boundary, finite-generation recovery and separate fixed-power use) |
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
