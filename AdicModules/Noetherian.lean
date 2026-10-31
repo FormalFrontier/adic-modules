@@ -13,6 +13,7 @@ import Mathlib.RingTheory.AdicCompletion.Noetherian
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Abel
 import Mathlib.RingTheory.ReesAlgebra
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
@@ -28,6 +29,15 @@ the original ring to be complete or Noetherian. A Noetherian module is separated
 ideal contained in the Jacobson radical of its annihilator; this follows by applying
 Mathlib's Krull separation theorem over the quotient by the annihilator.
 
+The coefficient-reconstruction theorem `Submodule.fg_of_adic_approximation` applies
+to a separated decreasing filtration on an arbitrary module. Its successive
+corrections use original-ring coefficients; their limits lie in the adic completion
+of the coefficient ring. Only compatibility of the completed coefficient action
+with the filtration is required, not completeness of the target module.
+Applied to the kernels of the canonical semilinear evaluations, it gives finite
+generation of submodules of an arbitrary module's adic completion from successive
+approximations.
+
 ## References
 
 * Mathlib's `RingTheory/AdicCompletion/Noetherian.lean`, by Andrew Yang, supplies
@@ -42,7 +52,7 @@ Mathlib's Krull separation theorem over the quotient by the annihilator.
 
 @[expose] public section
 
-universe u v
+universe u v w z
 
 variable {R : Type u} [CommRing R]
 
@@ -94,65 +104,96 @@ section Reconstruction
 
 open scoped BigOperators
 
-variable (I : Ideal R) [IsAdicComplete I R] (K : Ideal R)
-  {ι : Type v} [Fintype ι]
+variable (I : Ideal R) {T : Type w} [Semiring T]
+  {V : Type z} [AddCommGroup V] [Module T V] {ι : Type v} [Fintype ι]
 
-private theorem ideal_fg_of_adic_approximation
-    (g : ι → R) (d : ι → ℕ)
-    (hg : ∀ i, g i ∈ K)
-    (happrox : ∀ (m : ℕ) {x : R}, x ∈ K → x ∈ I ^ m →
+/-- A submodule is finitely generated if a fixed finite family gives successive
+approximations with original-ring coefficients of increasing adic order.
+
+The filtration is decreasing and separated, and every completed coefficient with
+zero evaluation at level `q` acts into `F q`. The coefficient limits are constructed
+in `AdicCompletion I R`; no completeness of `T` or `V`, closedness of `N`, finite
+generation of `I`, or filtration-degree condition on the generators is required. -/
+theorem Submodule.fg_of_adic_approximation
+    (σ : AdicCompletion I R →+* T) (F : ℕ → Submodule T V)
+    (hF : Antitone F) (hsep : (⨅ q, F q) = ⊥)
+    (haction : ∀ (q : ℕ) (a : AdicCompletion I R),
+      AdicCompletion.evalₐ I q a = 0 → ∀ y : V, σ a • y ∈ F q)
+    (N : Submodule T V) (g : ι → V) (d : ι → ℕ)
+    (hg : ∀ i, g i ∈ N)
+    (happrox : ∀ (m : ℕ) {x : V}, x ∈ N → x ∈ F m →
       ∃ c : ι → R, (∀ i, c i ∈ I ^ (m - d i)) ∧
-        x - ∑ i, c i * g i ∈ I ^ (m + 1)) : K.FG := by
+        x - ∑ i, σ (AdicCompletion.of I R (c i)) • g i ∈ F (m + 1)) : N.FG := by
   classical
+  -- Use additive action maps, so the target coefficient semiring needs no subtraction.
+  let act (y : V) : AdicCompletion I R →+ V :=
+    ((smulAddHom T V).flip y).comp σ.toAddMonoidHom
+  let f (y : V) : R →+ V := (act y).comp (AdicCompletion.of I R).toAddMonoidHom
+  have hFzero (y : V) : y ∈ F 0 := by
+    have h := haction 0 1 (by
+      rw [map_one]
+      change Ideal.Quotient.mk (I ^ 0) (1 : R) = 0
+      apply Ideal.Quotient.eq_zero_iff_mem.mpr
+      simp) y
+    simpa only [map_one, one_smul] using h
   refine ⟨Finset.univ.image g, le_antisymm ?_ ?_⟩
   · refine Submodule.span_le.mpr ?_
     intro y hy
     obtain ⟨i, _, rfl⟩ := Finset.mem_image.mp hy
     exact hg i
   · intro x hx
-    have hchoose : ∀ (m : ℕ) (y : R), ∃ c : ι → R,
-        y ∈ K → y ∈ I ^ m →
+    have hchoose : ∀ (m : ℕ) (y : V), ∃ c : ι → R,
+        y ∈ N → y ∈ F m →
           (∀ i, c i ∈ I ^ (m - d i)) ∧
-            y - ∑ i, c i * g i ∈ I ^ (m + 1) := by
+            y - ∑ i, f (g i) (c i) ∈ F (m + 1) := by
       intro m y
-      by_cases hyK : y ∈ K
-      · by_cases hyI : y ∈ I ^ m
-        · obtain ⟨c, hc⟩ := happrox m hyK hyI
+      by_cases hyN : y ∈ N
+      · by_cases hyF : y ∈ F m
+        · obtain ⟨c, hc⟩ := happrox m hyN hyF
           exact ⟨c, fun _ _ => hc⟩
-        · exact ⟨0, fun _ hy => (hyI hy).elim⟩
-      · exact ⟨0, fun hy _ => (hyK hy).elim⟩
+        · exact ⟨0, fun _ hy => (hyF hy).elim⟩
+      · exact ⟨0, fun hy _ => (hyN hy).elim⟩
     choose c hc using hchoose
     let a : ℕ → ι → R := Nat.rec (fun _ => 0)
-      (fun m b i => b i + c m (x - ∑ j, b j * g j) i)
-    have hresK (b : ι → R) : x - ∑ i, b i * g i ∈ K := by
-      exact K.sub_mem hx (K.sum_mem fun i _ => K.mul_mem_left _ (hg i))
-    have hres (m : ℕ) : x - ∑ i, a m i * g i ∈ I ^ m := by
+      (fun m b i => b i + c m (x - ∑ j, f (g j) (b j)) i)
+    have hresN (b : ι → R) : x - ∑ i, f (g i) (b i) ∈ N := by
+      -- Negative corrections still come from the original coefficient ring.
+      rw [sub_eq_add_neg, ← Finset.sum_neg_distrib]
+      refine N.add_mem hx ?_
+      apply N.sum_mem
+      intro i _
+      rw [← map_neg (f (g i)) (b i)]
+      change σ (AdicCompletion.of I R (-b i)) • g i ∈ N
+      exact N.smul_mem _ (hg i)
+    have hres (m : ℕ) : x - ∑ i, f (g i) (a m i) ∈ F m := by
       induction m with
-      | zero => simp
+      | zero =>
+        change x - ∑ i, f (g i) (0 : R) ∈ F 0
+        simpa only [map_zero, Finset.sum_const_zero, sub_zero] using hFzero x
       | succ m ih =>
-        change x - ∑ i, (a m i + c m (x - ∑ j, a m j * g j) i) * g i ∈
-          I ^ (m + 1)
-        simpa only [add_mul, Finset.sum_add_distrib, sub_sub] using
-          (hc m (x - ∑ j, a m j * g j) (hresK (a m)) ih).2
+        change x - ∑ i, f (g i) (a m i + c m (x - ∑ j, f (g j) (a m j)) i) ∈
+          F (m + 1)
+        simpa only [map_add, Finset.sum_add_distrib, sub_sub] using
+          (hc m (x - ∑ j, f (g j) (a m j)) (hresN (a m)) ih).2
     have hstep (m : ℕ) (i : ι) : a (m + 1) i - a m i ∈ I ^ (m - d i) := by
-      change a m i + c m (x - ∑ j, a m j * g j) i - a m i ∈ I ^ (m - d i)
+      change a m i + c m (x - ∑ j, f (g j) (a m j)) i - a m i ∈ I ^ (m - d i)
       simpa only [add_sub_cancel_left] using
-        (hc m (x - ∑ j, a m j * g j) (hresK (a m)) (hres m)).1 i
+        (hc m (x - ∑ j, f (g j) (a m j)) (hresN (a m)) (hres m)).1 i
     let D := Finset.univ.sup d
     have hd (i : ι) : d i ≤ D := Finset.le_sup (Finset.mem_univ i)
-    -- After shifting by the largest degree, every coefficient sequence is adic Cauchy.
-    have htail (N m n : ℕ) (hm : N + D ≤ m) (hmn : m ≤ n) (i : ι) :
-        a n i - a m i ∈ I ^ N := by
+    -- Shifting by the largest degree makes all coefficient sequences adic Cauchy.
+    have htail (q m n : ℕ) (hm : q + D ≤ m) (hmn : m ≤ n) (i : ι) :
+        a n i - a m i ∈ I ^ q := by
       induction n, hmn using Nat.le_induction with
       | base => simp
       | succ n hmn ih =>
-        have hn : N ≤ n - d i := by
-          have hsum : N + d i ≤ n :=
-            (Nat.add_le_add_left (hd i) N).trans (hm.trans hmn)
+        have hn : q ≤ n - d i := by
+          have hsum : q + d i ≤ n :=
+            (Nat.add_le_add_left (hd i) q).trans (hm.trans hmn)
           simpa only [Nat.add_sub_cancel] using Nat.sub_le_sub_right hsum (d i)
-        have hs : a (n + 1) i - a n i ∈ I ^ N :=
+        have hs : a (n + 1) i - a n i ∈ I ^ q :=
           Ideal.pow_le_pow_right hn (hstep n i)
-        convert (I ^ N).add_mem hs ih using 1
+        convert (I ^ q).add_mem hs ih using 1
         ring
     have hcauchy (i : ι) : ∀ {m n : ℕ}, m ≤ n →
         a (m + D) i ≡ a (n + D) i [SMOD (I ^ m • ⊤ : Submodule R R)] := by
@@ -160,33 +201,130 @@ private theorem ideal_fg_of_adic_approximation
       rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
       simpa only [neg_sub] using (I ^ m).neg_mem
         (htail m (m + D) (n + D) le_rfl (Nat.add_le_add_right hmn D) i)
-    have hlim (i : ι) : ∃ L : R, ∀ n : ℕ,
-        a (n + D) i ≡ L [SMOD (I ^ n • ⊤ : Submodule R R)] :=
-      IsPrecomplete.prec (I := I) (M := R) inferInstance (hcauchy i)
-    choose l hl using hlim
-    have herr (n : ℕ) : x - ∑ i, l i * g i ∈ I ^ n := by
-      have hr : x - ∑ i, a (n + D) i * g i ∈ I ^ n :=
-        Ideal.pow_le_pow_right (Nat.le_add_right n D) (hres (n + D))
-      have hs : (∑ i, (a (n + D) i - l i) * g i) ∈ I ^ n := by
-        apply (I ^ n).sum_mem
+    let s (i : ι) : AdicCompletion.AdicCauchySequence I R :=
+      AdicCompletion.AdicCauchySequence.mk I R (fun n => a (n + D) i)
+        (fun n => hcauchy i (Nat.le_succ n))
+    let l (i : ι) : AdicCompletion I R := AdicCompletion.mk I R (s i)
+    have hl (i : ι) (n : ℕ) :
+        AdicCompletion.evalₐ I n (l i) = Ideal.Quotient.mk (I ^ n) (a (n + D) i) :=
+      AdicCompletion.evalₐ_mk I n (s i)
+    have herr (n : ℕ) : x - ∑ i, act (g i) (l i) ∈ F n := by
+      have hr : x - ∑ i, f (g i) (a (n + D) i) ∈ F n :=
+        hF (Nat.le_add_right n D) (hres (n + D))
+      have hs : (∑ i, (f (g i) (a (n + D) i) - act (g i) (l i))) ∈ F n := by
+        apply (F n).sum_mem
         intro i _
-        apply Ideal.mul_mem_right (g i) (I ^ n)
-        simpa only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] using hl i n
-      convert (I ^ n).add_mem hr hs using 1
-      simp only [sub_mul, Finset.sum_sub_distrib]
-      ring
-    have hzero : x - ∑ i, l i * g i = 0 := by
-      apply IsHausdorff.haus (I := I) (M := R) inferInstance
-      intro n
-      simpa only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, sub_zero] using herr n
+        have hk : AdicCompletion.evalₐ I n
+            (AdicCompletion.of I R (a (n + D) i) - l i) = 0 := by
+          simp only [map_sub, AdicCompletion.evalₐ_of, hl, sub_self]
+        have ht := haction n _ hk (g i)
+        change act (g i) (AdicCompletion.of I R (a (n + D) i) - l i) ∈ F n at ht
+        change act (g i) (AdicCompletion.of I R (a (n + D) i)) -
+          act (g i) (l i) ∈ F n
+        simpa only [map_sub] using ht
+      convert (F n).add_mem hr hs using 1
+      simp only [Finset.sum_sub_distrib]
+      abel
+    have hzero : x - ∑ i, act (g i) (l i) = 0 := by
+      have hmem : x - ∑ i, act (g i) (l i) ∈ ⨅ n, F n :=
+        (Submodule.mem_iInf F).mpr herr
+      simpa only [hsep, Submodule.mem_bot] using hmem
     rw [sub_eq_zero.mp hzero]
     apply Submodule.sum_mem
     intro i _
-    have hi : g i ∈ Submodule.span R (↑(Finset.univ.image g) : Set R) :=
+    have hi : g i ∈ Submodule.span T (↑(Finset.univ.image g) : Set V) :=
       Submodule.subset_span (Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩)
-    simpa only [smul_eq_mul] using Submodule.smul_mem _ (l i) hi
+    exact Submodule.smul_mem _ (σ (l i)) hi
+
+variable [IsAdicComplete I R] (K : Ideal R)
+
+private theorem ideal_fg_of_adic_approximation
+    (g : ι → R) (d : ι → ℕ)
+    (hg : ∀ i, g i ∈ K)
+    (happrox : ∀ (m : ℕ) {x : R}, x ∈ K → x ∈ I ^ m →
+      ∃ c : ι → R, (∀ i, c i ∈ I ^ (m - d i)) ∧
+        x - ∑ i, c i * g i ∈ I ^ (m + 1)) : K.FG := by
+  let σ : AdicCompletion I R →+* R :=
+    (AdicCompletion.ofAlgEquiv I).symm.toRingEquiv.toRingHom
+  refine Submodule.fg_of_adic_approximation I σ (fun q => (I ^ q : Submodule R R))
+    (fun _ _ h => Ideal.pow_le_pow_right h) ?_ ?_ K g d hg ?_
+  · simpa only [smul_eq_mul, Ideal.mul_top] using
+      IsHausdorff.iInf_pow_smul (I := I) (M := R) inferInstance
+  · intro q a ha y
+    have hmem : σ a ∈ I ^ q := by
+      apply Ideal.Quotient.eq_zero_iff_mem.mp
+      change Ideal.Quotient.mk (I ^ q) ((AdicCompletion.ofAlgEquiv I).symm a) = 0
+      rw [AdicCompletion.mk_ofAlgEquiv_symm]
+      exact ha
+    exact (I ^ q).mul_mem_right y hmem
+  · intro m x hxK hxI
+    obtain ⟨c, hc, hr⟩ := happrox m hxK hxI
+    refine ⟨c, hc, ?_⟩
+    change x - ∑ i, (AdicCompletion.ofAlgEquiv I).symm
+      (AdicCompletion.of I R (c i)) * g i ∈ I ^ (m + 1)
+    simpa only [AdicCompletion.ofAlgEquiv_symm_of] using hr
 
 end Reconstruction
+
+section CompletionApproximation
+
+open scoped BigOperators
+
+variable (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+  {ι : Type w} [Fintype ι]
+
+/-- A submodule of an adic completion is finitely generated over the completed
+coefficient ring if a fixed finite family gives successive approximations with
+original-ring coefficients of increasing adic order.
+
+The approximation condition is expressed through the canonical semilinear evaluations.
+No finite generation of `I`, completeness, separation or finiteness of the original
+module, closedness of the submodule, or filtration-degree condition on the generators
+is required. -/
+theorem AdicCompletion.fg_of_eval_approximation
+    (N : Submodule (AdicCompletion I R) (AdicCompletion I M))
+    (g : ι → AdicCompletion I M) (d : ι → ℕ)
+    (hg : ∀ i, g i ∈ N)
+    (happrox : ∀ (m : ℕ) {x : AdicCompletion I M}, x ∈ N →
+      AdicCompletion.evalₛₗ I M m x = 0 →
+      ∃ c : ι → R, (∀ i, c i ∈ I ^ (m - d i)) ∧
+        AdicCompletion.evalₛₗ I M (m + 1)
+          (x - ∑ i, AdicCompletion.of I R (c i) • g i) = 0) : N.FG := by
+  refine Submodule.fg_of_adic_approximation I
+    (RingHom.id (AdicCompletion I R))
+    (fun q => LinearMap.ker (AdicCompletion.evalₛₗ I M q))
+    ?_ ?_ ?_ N g d hg ?_
+  · intro m n hmn x hx
+    apply LinearMap.mem_ker.mpr
+    have hx0 : AdicCompletion.evalₛₗ I M n x = 0 := LinearMap.mem_ker.mp hx
+    calc
+      AdicCompletion.evalₛₗ I M m x =
+          AdicCompletion.transitionMap I M hmn (AdicCompletion.evalₛₗ I M n x) :=
+        (AdicCompletion.transitionMap_evalₛₗ I M hmn x).symm
+      _ = 0 := by
+        rw [hx0]
+        exact (AdicCompletion.transitionMap I M hmn).map_zero
+  · refine le_antisymm ?_ bot_le
+    intro x hx
+    rw [Submodule.mem_bot]
+    apply AdicCompletion.ext
+    intro q
+    have hxq : AdicCompletion.evalₛₗ I M q x = 0 :=
+      LinearMap.mem_ker.mp ((Submodule.mem_iInf _).mp hx q)
+    simpa only [AdicCompletion.evalₛₗ_apply, AdicCompletion.eval_apply,
+      AdicCompletion.val_zero_apply] using hxq
+  · intro q a ha x
+    apply LinearMap.mem_ker.mpr
+    calc
+      AdicCompletion.evalₛₗ I M q ((RingHom.id (AdicCompletion I R)) a • x) =
+          AdicCompletion.evalₐ I q a • AdicCompletion.evalₛₗ I M q x :=
+        (AdicCompletion.evalₛₗ I M q).map_smulₛₗ a x
+      _ = 0 := by rw [ha, zero_smul]
+  · intro m x hx hxq
+    obtain ⟨c, hc, hres⟩ := happrox m hx (LinearMap.mem_ker.mp hxq)
+    exact ⟨c, hc, LinearMap.mem_ker.mpr hres⟩
+
+end CompletionApproximation
 
 section LeadingGenerators
 

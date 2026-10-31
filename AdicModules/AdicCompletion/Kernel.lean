@@ -13,6 +13,7 @@ module
 public import Mathlib.RingTheory.AdicCompletion.Completeness
 public import AdicModules.Ideal.Cotangent
 
+import AdicModules.LinearAlgebra.Quotient.Coefficients
 import Mathlib.Algebra.Exact.Basic
 import Mathlib.Algebra.Module.Submodule.Equiv
 import Mathlib.LinearAlgebra.Finsupp.Span
@@ -35,6 +36,12 @@ that `H` generates `I ^ n` modulo `I ^ (n + 1)` as ideals.
 Applying this to auxiliary powers gives cofinally many stages;
 lifting a higher coordinate to the original module then descends the equality to any lower stage.
 Neither the original module nor its first quotient nor its completion is assumed finite.
+
+A single finitely generated ideal `J` satisfying `J M ⊔ I² M = I M` computes every
+evaluation kernel through its powers, without requiring `J ≤ I`. In particular, finite
+generation of the image of `I M` in the original quotient `M / I² M` identifies every
+intrinsic `I`-power submodule of the same completion with its evaluation kernel. This is a
+module-specific hypothesis, not finite generation of the whole quotient or of `I / I²`.
 
 For any ideal, completion of the kernel of an original split surjection is canonically
 isomorphic to the kernel of the completed map, linearly over the completed ring. The forward
@@ -64,6 +71,12 @@ The cotangent argument uses Mathlib's ideal cotangent formalization by Andrew Ya
 span-modulo-square bridge in `AdicModules.Ideal.Cotangent`. The positive-power argument
 applies the same bridge to `I ^ p` and reuses the higher-coordinate lifting argument for descent.
 
+The acted first-layer argument propagates an equality of submodules by commuting ideal
+actions, over a commutative semiring and an arbitrary submodule. Its completion consequences
+reuse the fixed-stage kernel theorem above. Finite generation of the original quotient image
+supplies a finite coefficient ideal through `Ideal.exists_fg_subideal_cover` and
+`Ideal.moduleSpan_eq_smul_top` in `AdicModules.LinearAlgebra.Quotient.Coefficients`.
+
 The split-kernel comparison reuses Mathlib's completion formalizations by Kenny Lau, Judith
 Ludwig, Christian Merten and Jiedong Jiang, the exact-sequence splitting formalization by
 Antoine Chambert-Loir, and the submodule-equivalence API by Johannes Hölzl, Mario Carneiro,
@@ -77,6 +90,68 @@ Frontier Agents, including Prism and Iris.
 universe u v
 
 namespace AdicCompletion
+
+/-- An acted congruence modulo the square propagates to every degree. Ideal containment
+is not required: the original acted containment propagates by commuting ideal actions. -/
+private theorem pow_eq_sup_next
+    {R : Type u} [CommSemiring R] {M : Type v} [AddCommMonoid M] [Module R M]
+    (I J : Ideal R) (P : Submodule R M)
+    (h : J • P ⊔ I ^ 2 • P = I • P) (n : ℕ) :
+    J ^ n • P ⊔ I ^ (n + 1) • P = I ^ n • P := by
+  have hJP : J • P ≤ I • P := le_sup_left.trans h.le
+  have hpow_le (k : ℕ) : J ^ k • P ≤ I ^ k • P := by
+    induction k with
+    | zero => exact le_rfl
+    | succ k ih =>
+      calc
+        J ^ (k + 1) • P = J • (J ^ k • P) := by
+          rw [pow_succ', Submodule.mul_smul]
+        _ ≤ J • (I ^ k • P) := Submodule.smul_mono le_rfl ih
+        _ = I ^ k • (J • P) := by
+          rw [← Submodule.mul_smul, mul_comm J, Submodule.mul_smul]
+        _ ≤ I ^ k • (I • P) := Submodule.smul_mono le_rfl hJP
+        _ = I ^ (k + 1) • P := by rw [← Submodule.mul_smul, ← pow_succ]
+  refine le_antisymm
+    (sup_le (hpow_le n)
+      (Submodule.smul_mono_left (Ideal.pow_le_pow_right (Nat.le_succ n)))) ?_
+  induction n with
+  | zero =>
+    simp only [pow_zero, Ideal.one_eq_top, Submodule.top_smul]
+    exact le_sup_left
+  | succ n ih =>
+    have hnext : J ^ n • (I ^ 2 • P) ≤ I ^ (n + 2) • P := by
+      calc
+        J ^ n • (I ^ 2 • P) = I ^ 2 • (J ^ n • P) := by
+          rw [← Submodule.mul_smul, mul_comm, Submodule.mul_smul]
+        _ ≤ I ^ 2 • (I ^ n • P) := Submodule.smul_mono le_rfl (hpow_le n)
+        _ = I ^ (n + 2) • P := by
+          rw [← Submodule.mul_smul, ← pow_add, Nat.add_comm 2 n]
+    have hJI : J ^ n • (I • P) ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := by
+      calc
+        J ^ n • (I • P) = J ^ n • (J • P ⊔ I ^ 2 • P) := by rw [h]
+        _ = J ^ (n + 1) • P ⊔ J ^ n • (I ^ 2 • P) := by
+          rw [Submodule.smul_sup, ← Submodule.mul_smul, ← pow_succ]
+        _ ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := sup_le_sup le_rfl hnext
+    calc
+      I ^ (n + 1) • P = I • (I ^ n • P) := by
+        rw [pow_succ', Submodule.mul_smul]
+      _ ≤ I • (J ^ n • P ⊔ I ^ (n + 1) • P) := Submodule.smul_mono le_rfl ih
+      _ = J ^ n • (I • P) ⊔ I ^ (n + 2) • P := by
+        rw [Submodule.smul_sup]
+        congr 1
+        · rw [← Submodule.mul_smul, mul_comm I (J ^ n), Submodule.mul_smul]
+        · rw [← Submodule.mul_smul, ← pow_succ']
+      _ ≤ J ^ (n + 1) • P ⊔ I ^ (n + 2) • P := sup_le hJI le_sup_right
+
+/-- The ideal congruence is the regular-module specialization of acted propagation. -/
+private theorem ideal_pow_eq_sup_next
+    {R : Type u} [CommSemiring R] (I J : Ideal R)
+    (h : I = J ⊔ I ^ 2) (n : ℕ) : I ^ n = J ^ n ⊔ I ^ (n + 1) := by
+  have hact : J • (⊤ : Submodule R R) ⊔ I ^ 2 • (⊤ : Submodule R R) =
+      I • (⊤ : Submodule R R) := by
+    simpa only [Ideal.smul_eq_mul, Ideal.mul_top] using h.symm
+  simpa only [Ideal.smul_eq_mul, Ideal.mul_top] using
+    (pow_eq_sup_next I J (⊤ : Submodule R R) hact n).symm
 
 variable {R : Type u} [CommRing R] {I : Ideal R}
 variable {M : Type v} [AddCommGroup M] [Module R M]
@@ -228,34 +303,51 @@ theorem pow_smul_top_eq_ker_eval_of_fg_pow {n : ℕ} (h : (I ^ n).FG) :
   exact smul_top_eq_ker_eval_of_fg_sup_pow I (I ^ n) M n h
     (sup_eq_left.mpr (Ideal.pow_le_pow_right (Nat.le_succ n)))
 
-/-- An ideal congruence modulo the square gives the corresponding congruence at every degree. -/
-private theorem pow_eq_sup_next (I H : Ideal R) (hI : I = H ⊔ I ^ 2) (n : ℕ) :
-    I ^ n = H ^ n ⊔ I ^ (n + 1) := by
-  have hHI : H ≤ I := le_sup_left.trans hI.ge
-  refine le_antisymm ?_
-    (sup_le (Ideal.pow_right_mono hHI n) (Ideal.pow_le_pow_right (Nat.le_succ n)))
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    have hnext : H ^ n * I ^ 2 ≤ I ^ (n + 2) := by
-      calc
-        H ^ n * I ^ 2 ≤ I ^ n * I ^ 2 :=
-          Ideal.mul_mono_left (Ideal.pow_right_mono hHI n)
-        _ = I ^ (n + 2) := (pow_add I n 2).symm
-    have hHI' : H ^ n * I ≤ H ^ (n + 1) ⊔ I ^ (n + 2) := by
-      calc
-        H ^ n * I = H ^ n * (H ⊔ I ^ 2) :=
-          congrArg (fun K : Ideal R => H ^ n * K) hI
-        _ = H ^ n * H ⊔ H ^ n * I ^ 2 := Ideal.mul_sup _ _ _
-        _ ≤ H ^ (n + 1) ⊔ I ^ (n + 2) :=
-          sup_le_sup (le_of_eq (pow_succ H n).symm) hnext
+/-- A finitely generated ideal whose action generates the original first layer computes
+all evaluation kernels through its powers. No containment `J ≤ I` is assumed. -/
+theorem pow_smul_top_eq_ker_eval_of_fg_sup_sq_smul
+    (I J : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (hJ : J.FG)
+    (h : J • (⊤ : Submodule R M) ⊔ I ^ 2 • (⊤ : Submodule R M) =
+      I • (⊤ : Submodule R M)) (n : ℕ) :
+    J ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker :=
+  smul_top_eq_ker_eval_of_fg_sup_pow_smul I (J ^ n) M n hJ.pow
+    (pow_eq_sup_next I J ⊤ h n)
+
+/-- Finite generation of the image of `I M` in the original quotient `M / I² M`
+identifies every intrinsic ideal-power submodule of the completion with its evaluation kernel.
+This requires neither finite generation of the whole quotient nor finite cotangent of `I`. -/
+theorem pow_smul_top_eq_ker_eval_of_fg_first_layer
+    (I : Ideal R) (M : Type v) [AddCommGroup M] [Module R M]
+    (h : ((I • (⊤ : Submodule R M)).map
+      (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG) (n : ℕ) :
+    I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker := by
+  let Q : Submodule R M := I ^ 2 • ⊤
+  have hmap (K : Ideal R) : (K • (⊤ : Submodule R M)).map Q.mkQ =
+      K • (⊤ : Submodule R (M ⧸ Q)) := by
+    rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ]
+  have hfinite : (I • (⊤ : Submodule R (M ⧸ Q))).FG := by
+    rw [← hmap I]
+    exact h
+  obtain ⟨J, hJ, hJI, hcover⟩ := Ideal.exists_fg_subideal_cover hfinite
+    (by rw [Ideal.moduleSpan_eq_smul_top])
+  rw [Ideal.moduleSpan_eq_smul_top, ← hmap I, ← hmap J] at hcover
+  have hle : I • (⊤ : Submodule R M) ≤ J • (⊤ : Submodule R M) ⊔ Q := by
     calc
-      I ^ (n + 1) = I ^ n * I := pow_succ I n
-      _ ≤ (H ^ n ⊔ I ^ (n + 1)) * I := Ideal.mul_mono_left ih
-      _ = H ^ n * I ⊔ I ^ (n + 1) * I := Ideal.sup_mul _ _ _
-      _ ≤ H ^ (n + 1) ⊔ I ^ (n + 2) := sup_le hHI' (by
-        rw [← pow_succ]
-        exact le_sup_right)
+      I • (⊤ : Submodule R M) ≤ Q ⊔ I • (⊤ : Submodule R M) := le_sup_right
+      _ = ((I • (⊤ : Submodule R M)).map Q.mkQ).comap Q.mkQ :=
+        (Submodule.comap_map_mkQ _ _).symm
+      _ ≤ ((J • (⊤ : Submodule R M)).map Q.mkQ).comap Q.mkQ :=
+        Submodule.comap_mono hcover
+      _ = J • (⊤ : Submodule R M) ⊔ Q := by
+        rw [Submodule.comap_map_mkQ, sup_comm]
+  have hacted : J • (⊤ : Submodule R M) ⊔ I ^ 2 • (⊤ : Submodule R M) =
+      I • (⊤ : Submodule R M) :=
+    le_antisymm (sup_le (Submodule.smul_mono_left hJI)
+      (Submodule.smul_mono_left (Ideal.pow_le_self (by decide)))) hle
+  refine le_antisymm (pow_smul_top_le_ker_eval (I := I) (M := M) n) ?_
+  rw [← pow_smul_top_eq_ker_eval_of_fg_sup_sq_smul I J M hJ hacted n]
+  exact Submodule.smul_mono_left (Ideal.pow_right_mono hJI n)
 
 /-- An evaluation-kernel equality descends from a higher precision. -/
 theorem pow_smul_top_eq_ker_eval_of_le
@@ -316,7 +408,7 @@ theorem pow_smul_top_eq_ker_eval_of_finite_cotangent_pow
         (sup_le hHpow (Ideal.pow_le_pow_right (Nat.le_succ (p * k)))) ?_
       calc
         I ^ (p * k) = (I ^ p) ^ k := pow_mul I p k
-        _ = H ^ k ⊔ (I ^ p) ^ (k + 1) := pow_eq_sup_next (I ^ p) H hP k
+        _ = H ^ k ⊔ (I ^ p) ^ (k + 1) := ideal_pow_eq_sup_next (I ^ p) H hP k
         _ ≤ H ^ k ⊔ I ^ (p * k + 1) := sup_le_sup le_rfl hnext
     have hstage := smul_top_eq_ker_eval_of_fg_sup_pow I (H ^ k) M (p * k) hH.pow hpow
     refine le_antisymm (pow_smul_top_le_ker_eval (I := I) (M := M) (p * k)) ?_

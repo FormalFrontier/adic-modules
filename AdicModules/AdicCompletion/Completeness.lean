@@ -41,6 +41,13 @@ sequence into an intrinsic limit. Finiteness of the cotangent of one positive or
 power over its quotient ring also gives intrinsic completeness, for the extended ideal acting
 on every completed module. In particular, finite original cotangent suffices.
 
+For a particular original module `M`, finite generation of the image of `I M` in `M / I² M`
+also makes its stock completion intrinsically `I`-adically complete. This uses the original
+`R`-action and requires neither finite generation of the whole quotient nor finiteness of
+`I / I²`. The canonical completed-ring action gives the equivalent formulation for the
+extended ideal; no completeness conclusion about the coefficient ring is inferred from
+these module-specific data.
+
 Precompleteness for two arbitrary ideals implies precompleteness for their sum.
 The proof splits successive differences of an even subsequence into two sequences
 of increasingly small terms, then applies precompleteness to their finite partial sums.
@@ -76,6 +83,10 @@ Precompleteness for a finite family of ideals implies precompleteness for their 
   Finite generation of one positive ideal power supplies this equality.
 * The finite-cotangent conclusion uses Mathlib's original cotangent module and the shared
   finite-coefficient kernel argument in `AdicModules.AdicCompletion.Kernel`.
+* The finite original first-layer conclusion reuses the acted kernel identities in the same
+  module and hence the finite coefficient cover in
+  `AdicModules.LinearAlgebra.Quotient.Coefficients`; its completeness proof is the same
+  diagonal criterion, not a separate construction.
 -/
 
 @[expose] public section
@@ -126,6 +137,30 @@ theorem isAdicComplete_of_pow_smul_top_eq_ker_eval
   refine ⟨L, fun k => ?_⟩
   rw [SModEq.sub_mem, h k, LinearMap.mem_ker, map_sub, sub_eq_zero]
   rfl
+
+/-- Finite generation of the image of `I M` in the original quotient `M / I² M`
+makes the completion intrinsically complete for the original `R`-action of `I`.
+The proof uses the first-layer kernel identities and the diagonal completeness criterion. -/
+theorem isAdicComplete_of_fg_first_layer
+    {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M]
+    (h : ((I • (⊤ : Submodule R M)).map
+      (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG) :
+    IsAdicComplete I (AdicCompletion I M) :=
+  isAdicComplete_of_pow_smul_top_eq_ker_eval I M
+    (pow_smul_top_eq_ker_eval_of_fg_first_layer I M h)
+
+/-- Finite generation of the original acted first layer makes the completed module
+complete for the canonically extended ideal of the completed ring. -/
+theorem isAdicComplete_map_of_fg_first_layer
+    {R : Type u} [CommRing R] (I : Ideal R) (M : Type v)
+    [AddCommGroup M] [Module R M]
+    (h : ((I • (⊤ : Submodule R M)).map
+      (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG) :
+    IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
+      (AdicCompletion I M) :=
+  (IsAdicComplete.map_algebraMap_iff I (AdicCompletion I M)).mpr
+    (isAdicComplete_of_fg_first_layer I M h)
 
 /-- The adic completion is complete for its ideal-power filtration if a positive power of the
 ideal is finitely generated. This generalizes Mathlib's `AdicCompletion.isAdicComplete`,

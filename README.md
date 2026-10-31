@@ -49,6 +49,18 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   See the [cotangent criterion](AdicModules/AdicCompletion/Cotangent.lean) and
   [quotient comparisons](AdicModules/AdicCompletion/Quotient.lean).
 
+- **Finite first layer of an original module.** For an arbitrary ideal `I` of a
+  commutative ring `R` and an `R`-module `M`, suppose the image of `I M` in the
+  original quotient `M / I² M` is finitely generated over `R`. Then, for
+  `H = AdicCompletion I M`, every `Iⁿ H` is the kernel of evaluation at `n`,
+  including zero, and `H` is intrinsically `I`-adically complete. Completeness
+  also holds for the canonically extended ideal under the completed-ring action.
+  No finite generation of `I`, ring Noetherianity or finiteness of `M` is assumed.
+  More generally, a finitely generated `J` with `J M + I² M = I M` computes these
+  kernels through `Jⁿ H`, without requiring `J ≤ I`. See the
+  [kernel identities](AdicModules/AdicCompletion/Kernel.lean) and
+  [completeness criteria](AdicModules/AdicCompletion/Completeness.lean).
+
 - **Stationary adic evaluation.** For every ideal `I` of a commutative ring `R`,
   every `R`-module `M` and every `n ≥ 0`, evaluation on the whole completion at `n`
   is injective exactly when `I^(n+1) M = I^n M`. Under this equality,
