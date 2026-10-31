@@ -8,6 +8,7 @@ public import AdicModules.AdicCompletion.Quotient
 public import Mathlib.RingTheory.AdicCompletion.LocalRing
 public import Mathlib.RingTheory.Noetherian.Basic
 import AdicModules.AdicCompletion.Completeness
+import AdicModules.AdicCompletion.LinearMap
 import CoherentModules.RingTheory.Noetherian
 import Mathlib.Algebra.Module.Torsion.Basic
 import Mathlib.LinearAlgebra.Isomorphisms
@@ -45,6 +46,9 @@ intrinsically complete for the original ideal action, and every original ideal-p
 submodule is an evaluation kernel. No Noetherianity of the completed ring is required.
 The proof descends Noetherianity to the original second quotient, restricts its canonical
 quotient-ring action, and applies the finite-generation criterion for the original first layer.
+Consequently every original linear map to an intrinsically complete target has a unique
+extension from this source completion, given by `AdicCompletion.extend`. The target
+needs no action of the completed coefficient ring.
 
 ## References
 
@@ -97,6 +101,25 @@ theorem pow_smul_top_eq_ker_eval_of_isNoetherian
     I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker :=
   pow_smul_top_eq_ker_eval_of_fg_first_layer I M
     (fg_first_layer_of_isNoetherian I M) n
+
+/-- Every linear map to an adically complete target extends uniquely from the original
+module when the source completion is Noetherian over the completed coefficient ring.
+The extension is `AdicCompletion.extend`; the target needs no completed-ring action. -/
+theorem existsUnique_extension_of_isNoetherian
+    (I : Ideal R) {M : Type v} [AddCommGroup M] [Module R M]
+    {N : Type w} [AddCommGroup N] [Module R N] [IsAdicComplete I N]
+    [IsNoetherian (AdicCompletion I R) (AdicCompletion I M)] (f : M →ₗ[R] N) :
+    ∃! F : AdicCompletion I M →ₗ[R] N, F.comp (of I M) = f := by
+  let hM := pow_smul_top_eq_ker_eval_of_isNoetherian I M
+  let E := precompOfLinearEquivOfKernel I (N := N) hM
+  refine ⟨E.symm f, ?_, ?_⟩
+  · rw [show E.symm f = extend I f from precompOfLinearEquivOfKernel_symm_apply I hM f]
+    exact extend_comp_of I f
+  · intro F hF
+    apply E.injective
+    calc
+      E F = f := (precompOfLinearEquivOfKernel_apply I hM F).trans hF
+      _ = E (E.symm f) := (E.apply_symm_apply f).symm
 
 /-- A completed module that is Noetherian over the completed coefficient ring is
 intrinsically complete for the original ideal action. No Noetherianity or completeness

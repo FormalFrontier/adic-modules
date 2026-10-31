@@ -63,6 +63,11 @@ See [results and models](docs/Results.md) and the [usage guide](docs/Guide.md).
   These conclusions also hold whenever `H` is Noetherian over `AdicCompletion I R`,
   without Noetherianity of that completed ring; see the
   [module Noetherian criterion](AdicModules/Noetherian.lean).
+  Under either source hypothesis, restriction along `of I M` gives an `R`-linear
+  Hom equivalence from maps `H →ₗ[R] N` to maps `M →ₗ[R] N` for every intrinsically
+  `I`-adically complete target `N`, with inverse the existing canonical extension.
+  The target needs no completed-ring action; see the
+  [Hom-out equivalence](AdicModules/AdicCompletion/LinearMap.lean).
 
 - **Noetherian original module power quotients.** For any ideal `I` of a
   commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original
@@ -590,8 +595,10 @@ Rings are commutative; modules are additive commutative groups unless specified 
 - **Products, maps and quotients** ([products](AdicModules/AdicCompletion/Pi.lean),
   [maps](AdicModules/AdicCompletion/LinearMap.lean)): `I.FG` gives the canonical
   completed-ring-linear equivalence for arbitrary dependent products. Any ideal admits
-  map extension to complete targets; finite generation of a positive power gives
-  uniqueness for Hausdorff targets, while `I.FG` gives a Hom equivalence for complete targets.
+  map extension to complete targets. If every source ideal-power submodule is its
+  evaluation kernel, restriction determines maps to Hausdorff targets and is a Hom
+  equivalence for complete targets. Finite generation of a positive ideal power supplies
+  this source condition; the original `I.FG` Hom equivalence is retained.
   Finite generation of **only `I^n`** gives evaluation kernel `(I^n) • ⊤` and
   `C / (I.map (algebraMap R C))^n ≃ₐ[R] R / I^n`, for `C = AdicCompletion I R`,
   including zero precision ([kernels](AdicModules/AdicCompletion/Kernel.lean), [quotients](AdicModules/AdicCompletion/Quotient.lean)).

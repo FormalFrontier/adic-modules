@@ -8,7 +8,7 @@ public import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.Span.Basic
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 import Mathlib.RingTheory.AdicCompletion.Completeness
-import AdicModules.AdicCompletion.Kernel
+public import AdicModules.AdicCompletion.Kernel
 
 /-!
 # Linear maps and adic completion
@@ -40,13 +40,17 @@ every quotient, and agreement with `IsAdicComplete.lift`. Extension is natural i
 both modules and is `R`-linear in the map being extended. These laws require no
 finite generation assumption on the ideal.
 
-If a given positive power `I ^ n` is finitely generated, `ext_of_fg_pow` gives
-uniqueness for a Hausdorff target, without assuming target completeness. The
-finitely generated ideal theorem `ext_of` is its `n = 1` specialization. For a
-complete target and finitely generated `I`, `precompOfLinearEquiv` packages
-restriction along `of I M` and extension as an `R`-linear equivalence of Hom
-modules. These finite-generation conditions are sufficient; no necessity
-assertion is made.
+If every original-`R` ideal-power submodule of the source completion is the
+corresponding evaluation kernel, `ext_of_ker_eval` gives uniqueness for a
+Hausdorff target, without assuming target completeness. For a complete target,
+`precompOfLinearEquivOfKernel` packages restriction along `of I M` and the existing
+extension as an `R`-linear equivalence of Hom modules. The target needs no
+completed-ring action. Finite generation of the image of `I M` in the original
+quotient `M / I² M` supplies these source kernel identities and gives
+`precompOfLinearEquivOfFGFirstLayer`, without finite generation of `I` or `M`.
+A finitely generated positive ideal power also supplies the identities:
+`ext_of_fg_pow`, `ext_of` and `precompOfLinearEquiv` retain the corresponding
+finite-generation specializations.
 
 For original modules with given compatible `R`- and `AdicCompletion I R`-actions,
 `LinearMap.map_smul_adicCompletion_of_fg_pow` shows that an `R`-linear map
@@ -61,15 +65,16 @@ this equivalence to upgrade a specified retraction with Hausdorff target.
 The corresponding finitely generated ideal APIs are the `n = 1` specializations.
 
 The extension reuses Mathlib's `map` and `ofLinearEquiv`, and agrees with
-`IsAdicComplete.lift`. Uniqueness reuses
-`pow_smul_top_eq_ker_eval_of_fg_pow` at the cofinal stages `n * k`, with finite
-generation supplied by `Ideal.FG.pow`, and Mathlib's
-`IsHausdorff.StrictMono.funext`. Stage zero uses the finitely generated unit
-ideal. Automatic scalar linearity applies `ext_of_fg_pow` to the scalar-orbit
-maps built with Mathlib's `LinearMap.toSpanSingleton` and scalar restriction.
+`IsAdicComplete.lift`. Uniqueness approximates a completed source element by an
+original representative at every precision, uses the source kernel identity to
+control its difference, and applies Mathlib's `IsHausdorff.funext` to the target.
+The first-layer and positive-power specializations reuse the public kernel
+suppliers. Automatic scalar linearity applies `ext_of_fg_pow` to the scalar-orbit
+maps out of the completed coefficient ring, built with Mathlib's
+`LinearMap.toSpanSingleton` and scalar restriction; its hypotheses are unchanged.
 All completions remain `I`-adic. There is no new inverse-limit construction,
-topology, or scalar action. Positivity is needed for this uniform uniqueness
-statement; finite generation of `I ^ 0` alone does not suffice.
+topology, or scalar action. Finite generation of `I ^ 0` alone does not suffice
+for uniform uniqueness.
 
 ## References
 
@@ -266,31 +271,36 @@ theorem extend_eq_lift [IsAdicComplete I N] (f : M →ₗ[R] N) :
   change eval I N n (of I N (extend I f z)) = eval I N n (map I f z)
   rw [of_extend]
 
+/-- Linear maps from the completion to a Hausdorff module agree on the whole
+completion if they agree on the canonical image and every source ideal-power
+submodule is an evaluation kernel. -/
+theorem ext_of_ker_eval
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    [IsHausdorff I N] (F G : AdicCompletion I M →ₗ[R] N)
+    (h : ∀ m : M, F (of I M m) = G (of I M m)) : F = G := by
+  apply DFunLike.coe_injective
+  apply IsHausdorff.funext I
+  intro n z
+  obtain ⟨m, hm⟩ :=
+    Submodule.mkQ_surjective (I ^ n • ⊤ : Submodule R M) (eval I M n z)
+  have hz : z - of I M m ∈ (I ^ n • ⊤ : Submodule R (AdicCompletion I M)) := by
+    rw [hM n, LinearMap.mem_ker, (eval I M n).map_sub, eval_of, hm, sub_self]
+  have hmap (L : AdicCompletion I M →ₗ[R] N) :
+      L z ≡ L (of I M m) [SMOD (I ^ n • ⊤ : Submodule R N)] := by
+    apply SModEq.sub_mem.mpr
+    rw [← L.map_sub]
+    exact Submodule.smul_top_le_comap_smul_top (I ^ n) L hz
+  have hF := hmap F
+  rw [h m] at hF
+  exact hF.trans (hmap G).symm
+
 /-- Linear maps from the completion to a Hausdorff module agree if they agree
 on the canonical image, when a given positive power of the ideal is finitely generated. -/
 theorem ext_of_fg_pow {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) [IsHausdorff I N]
     (F G : AdicCompletion I M →ₗ[R] N)
-    (h : ∀ m : M, F (of I M m) = G (of I M m)) : F = G := by
-  apply DFunLike.coe_injective
-  apply IsHausdorff.StrictMono.funext I (a := fun k ↦ n * k)
-    (fun _ _ hkl ↦ Nat.mul_lt_mul_of_pos_left hkl hn)
-  intro k z
-  have hpow : (I ^ (n * k)).FG := by
-    simpa only [pow_mul] using (hI.pow (n := k))
-  obtain ⟨m, hm⟩ :=
-    Submodule.mkQ_surjective (I ^ (n * k) • ⊤ : Submodule R M) (eval I M (n * k) z)
-  have hz : z - of I M m ∈
-      (I ^ (n * k) • ⊤ : Submodule R (AdicCompletion I M)) := by
-    rw [pow_smul_top_eq_ker_eval_of_fg_pow (I := I) (M := M) hpow,
-      LinearMap.mem_ker, (eval I M (n * k)).map_sub, eval_of, hm, sub_self]
-  have hmap (L : AdicCompletion I M →ₗ[R] N) :
-      L z ≡ L (of I M m) [SMOD (I ^ (n * k) • ⊤ : Submodule R N)] := by
-    apply SModEq.sub_mem.mpr
-    rw [← L.map_sub]
-    exact Submodule.smul_top_le_comap_smul_top (I ^ (n * k)) L hz
-  have hF := hmap F
-  rw [h m] at hF
-  exact hF.trans (hmap G).symm
+    (h : ∀ m : M, F (of I M m) = G (of I M m)) : F = G :=
+  ext_of_ker_eval I (pow_smul_top_eq_ker_eval_of_fg_pos_pow (I := I) (M := M) hn hI)
+    F G h
 
 /-- Linear maps from the completion to a Hausdorff module agree if they agree
 on the canonical image, when the ideal is finitely generated. -/
@@ -299,25 +309,127 @@ theorem ext_of (hI : I.FG) [IsHausdorff I N]
     (h : ∀ m : M, F (of I M m) = G (of I M m)) : F = G := by
   exact ext_of_fg_pow I (n := 1) Nat.zero_lt_one (by simpa only [pow_one] using hI) F G h
 
+/-- A map to a complete target is recovered by extending its restriction when
+all source ideal-power submodules are evaluation kernels. -/
+theorem extend_precomp_of_ker_eval [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] N) :
+    extend I (F.comp (of I M)) = F := by
+  apply ext_of_ker_eval I hM
+  intro m
+  exact extend_of I (F.comp (of I M)) m
+
+/-- Restriction along the canonical map is an `R`-linear equivalence of Hom modules
+when every source ideal-power submodule is an evaluation kernel and the target is
+adically complete. Its inverse is the canonical extension `extend`. -/
+noncomputable def precompOfLinearEquivOfKernel [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    (AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N) where
+  toLinearMap := LinearMap.lcomp R N (of I M)
+  invFun := extend I
+  left_inv F := extend_precomp_of_ker_eval I hM F
+  right_inv f := extend_comp_of I f
+
+/-- The linear map underlying the source-kernel Hom equivalence is precomposition
+with the canonical map. -/
+@[simp]
+theorem precompOfLinearEquivOfKernel_toLinearMap [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    (precompOfLinearEquivOfKernel I (N := N) hM).toLinearMap =
+      LinearMap.lcomp R N (of I M) :=
+  rfl
+
+/-- The source-kernel Hom equivalence restricts a map to the original module. -/
+@[simp]
+theorem precompOfLinearEquivOfKernel_apply [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (F : AdicCompletion I M →ₗ[R] N) :
+    precompOfLinearEquivOfKernel I hM F = F.comp (of I M) :=
+  rfl
+
+/-- The inverse source-kernel Hom equivalence is canonical extension. -/
+@[simp]
+theorem precompOfLinearEquivOfKernel_symm_apply [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (f : M →ₗ[R] N) :
+    (precompOfLinearEquivOfKernel I hM).symm f = extend I f :=
+  rfl
+
+/-- On the canonical image, the inverse source-kernel Hom equivalence evaluates
+the original map. -/
+theorem precompOfLinearEquivOfKernel_symm_apply_of [IsAdicComplete I N]
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker)
+    (f : M →ₗ[R] N) (m : M) :
+    (precompOfLinearEquivOfKernel I hM).symm f (of I M m) = f m := by
+  rw [precompOfLinearEquivOfKernel_symm_apply, extend_of]
+
+/-- Restriction and canonical extension give a Hom equivalence for a complete target
+if the image of `I M` in the original quotient `M / I² M` is finitely generated.
+No finite generation of the ideal or of the original module is required. -/
+noncomputable def precompOfLinearEquivOfFGFirstLayer [IsAdicComplete I N]
+    (h : ((I • (⊤ : Submodule R M)).map (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG) :
+    (AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N) :=
+  precompOfLinearEquivOfKernel I (pow_smul_top_eq_ker_eval_of_fg_first_layer I M h)
+
+/-- The linear map underlying the first-layer Hom equivalence is precomposition
+with the canonical map. -/
+@[simp]
+theorem precompOfLinearEquivOfFGFirstLayer_toLinearMap [IsAdicComplete I N]
+    (h : ((I • (⊤ : Submodule R M)).map (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG) :
+    (precompOfLinearEquivOfFGFirstLayer I (N := N) h).toLinearMap =
+      LinearMap.lcomp R N (of I M) :=
+  rfl
+
+/-- The first-layer Hom equivalence restricts a map to the original module. -/
+@[simp]
+theorem precompOfLinearEquivOfFGFirstLayer_apply [IsAdicComplete I N]
+    (h : ((I • (⊤ : Submodule R M)).map (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG)
+    (F : AdicCompletion I M →ₗ[R] N) :
+    precompOfLinearEquivOfFGFirstLayer I h F = F.comp (of I M) :=
+  rfl
+
+/-- The inverse first-layer Hom equivalence is canonical extension. -/
+@[simp]
+theorem precompOfLinearEquivOfFGFirstLayer_symm_apply [IsAdicComplete I N]
+    (h : ((I • (⊤ : Submodule R M)).map (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG)
+    (f : M →ₗ[R] N) :
+    (precompOfLinearEquivOfFGFirstLayer I h).symm f = extend I f :=
+  rfl
+
+/-- On the canonical image, the inverse first-layer Hom equivalence evaluates
+the original map. -/
+theorem precompOfLinearEquivOfFGFirstLayer_symm_apply_of [IsAdicComplete I N]
+    (h : ((I • (⊤ : Submodule R M)).map (I ^ 2 • (⊤ : Submodule R M)).mkQ).FG)
+    (f : M →ₗ[R] N) (m : M) :
+    (precompOfLinearEquivOfFGFirstLayer I h).symm f (of I M m) = f m := by
+  rw [precompOfLinearEquivOfFGFirstLayer_symm_apply, extend_of]
+
 /-- A map to a complete target is recovered by extending its restriction to the
 original module, when the ideal is finitely generated. -/
 @[simp]
 theorem extend_precomp_of [IsAdicComplete I N] (hI : I.FG)
     (F : AdicCompletion I M →ₗ[R] N) :
-    extend I (F.comp (of I M)) = F := by
-  apply ext_of I hI
-  intro m
-  exact extend_of I (F.comp (of I M)) m
+    extend I (F.comp (of I M)) = F :=
+  extend_precomp_of_ker_eval I
+    (pow_smul_top_eq_ker_eval_of_fg_pos_pow (I := I) (M := M) (n := 1) Nat.zero_lt_one
+      (by simpa only [pow_one] using hI)) F
 
 /-- Restriction along the canonical map is an `R`-linear equivalence of Hom
 modules for a finitely generated ideal and a complete target. Its inverse is
 canonical extension. -/
 noncomputable def precompOfLinearEquiv [IsAdicComplete I N] (hI : I.FG) :
-    (AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N) where
-  toLinearMap := LinearMap.lcomp R N (of I M)
-  invFun := extend I
-  left_inv F := extend_precomp_of I hI F
-  right_inv f := extend_comp_of I f
+    (AdicCompletion I M →ₗ[R] N) ≃ₗ[R] (M →ₗ[R] N) :=
+  precompOfLinearEquivOfKernel I
+    (pow_smul_top_eq_ker_eval_of_fg_pos_pow (I := I) (M := M) (n := 1) Nat.zero_lt_one
+      (by simpa only [pow_one] using hI))
+
+/-- The finitely generated ideal Hom equivalence agrees with the source-kernel
+Hom equivalence for any proof of the source kernel identities. -/
+theorem precompOfLinearEquiv_eq_precompOfLinearEquivOfKernel [IsAdicComplete I N]
+    (hI : I.FG)
+    (hM : ∀ n : ℕ, I ^ n • (⊤ : Submodule R (AdicCompletion I M)) = (eval I M n).ker) :
+    precompOfLinearEquiv I (N := N) hI = precompOfLinearEquivOfKernel I hM :=
+  rfl
 
 /-- The linear map underlying the Hom equivalence is precomposition with `of`. -/
 @[simp]
