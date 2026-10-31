@@ -8,31 +8,156 @@ public import Mathlib.RingTheory.AdicCompletion.Algebra
 public import Mathlib.RingTheory.Ideal.Quotient.Operations
 public import AdicModules.AdicCompletion.Kernel
 
+import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.LinearAlgebra.Quotient.Basic
+
 /-!
 # Quotients of adic completions
 
-For an ideal `I` in a commutative ring and a natural number `n`, finite generation
-of `I ^ n` is the hypothesis for comparing the quotient of the `I`-adic completion
-by the `n`th power of the extended ideal with `R ⧸ I ^ n`.
+For an ideal `I` in a commutative ring, finite generation of one specified
+positive power identifies every ideal-power quotient of the raw `I`-adic
+completion of an arbitrary module with the corresponding quotient of the original
+module. The comparisons are linear over the original ring, natural in original
+linear maps, and compatible with the precision transitions.
 
-The forward comparison is induced by evaluation at level `n`. Its inverse is the
-quotient map induced by the algebra map from `R` to its completion. The degree
-`n = 0` and trivial rings are included.
+For coefficients the comparison is an algebra equivalence from the quotient by
+the power of the extended ideal to `R ⧸ I ^ k`. It agrees with the module comparison
+through the class-preserving ideal/submodule quotient identifications.
+
+The forward maps are induced by evaluation; their inverses are induced by the
+original maps to the completion. Degree zero and trivial rings are included.
+The fixed-stage coefficient comparison also remains available assuming only
+finite generation of that stage's ideal power, independently of any positive-power
+hypothesis.
 
 ## References
 
 The construction uses Mathlib's quotient equivalence for equal ideals and its
-first isomorphism theorem for algebras. The inverse is described using Mathlib's
+first isomorphism theorems for linear maps and algebras. The inverses are
+described using Mathlib's
 algebra homomorphism induced on ideal quotients.
 -/
 
 @[expose] public section
 
-universe u
+universe u v w
 
 namespace AdicCompletion
 
 variable {R : Type u} [CommRing R]
+
+/-- The quotient of a completed module by an ideal power is the corresponding
+quotient of the original module, if one positive ideal power is finitely generated. -/
+noncomputable def quotientPowLinearEquivOfFGPow (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) :
+    (AdicCompletion I M ⧸ (I ^ k • (⊤ : Submodule R (AdicCompletion I M)))) ≃ₗ[R]
+      M ⧸ (I ^ k • (⊤ : Submodule R M)) :=
+  (Submodule.quotEquivOfEq _ _
+    (pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI k)).trans
+      ((eval I M k).quotKerEquivOfSurjective (eval_surjective I M k))
+
+/-- The module comparison sends every completed representative to its evaluation. -/
+@[simp]
+theorem quotientPowLinearEquivOfFGPow_mk (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (x : AdicCompletion I M) :
+    quotientPowLinearEquivOfFGPow I M hn hI k (Submodule.Quotient.mk x) =
+      eval I M k x := by
+  simp [quotientPowLinearEquivOfFGPow]
+
+/-- The module comparison preserves the residue of every original element. -/
+theorem quotientPowLinearEquivOfFGPow_of (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (m : M) :
+    quotientPowLinearEquivOfFGPow I M hn hI k
+        (Submodule.Quotient.mk (of I M m)) = Submodule.Quotient.mk m := by
+  rw [quotientPowLinearEquivOfFGPow_mk, eval_of]
+  rfl
+
+/-- The inverse module comparison is induced by the original map to the completion. -/
+@[simp]
+theorem quotientPowLinearEquivOfFGPow_symm_mk (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (m : M) :
+    (quotientPowLinearEquivOfFGPow I M hn hI k).symm (Submodule.Quotient.mk m) =
+      Submodule.Quotient.mk (of I M m) := by
+  apply (quotientPowLinearEquivOfFGPow I M hn hI k).injective
+  rw [LinearEquiv.apply_symm_apply, quotientPowLinearEquivOfFGPow_of]
+
+/-- The inverse module comparison recovers the class of every completed element
+from its evaluation. -/
+theorem quotientPowLinearEquivOfFGPow_symm_eval (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (x : AdicCompletion I M) :
+    (quotientPowLinearEquivOfFGPow I M hn hI k).symm (eval I M k x) =
+      Submodule.Quotient.mk x := by
+  rw [← quotientPowLinearEquivOfFGPow_mk I M hn hI k x,
+    LinearEquiv.symm_apply_apply]
+
+/-- Quotient comparisons commute with the quotient maps induced by every original
+linear map. -/
+theorem quotientPowLinearEquivOfFGPow_natural (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {N : Type w} [AddCommGroup N] [Module R N]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (f : M →ₗ[R] N)
+    (z : AdicCompletion I M ⧸ (I ^ k • (⊤ : Submodule R (AdicCompletion I M)))) :
+    quotientPowLinearEquivOfFGPow I N hn hI k
+        ((((map I f).restrictScalars R).reduceModIdeal (I ^ k)).restrictScalars R z) =
+      ((f.reduceModIdeal (I ^ k)).restrictScalars R)
+        (quotientPowLinearEquivOfFGPow I M hn hI k z) := by
+  obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective _ z
+  simpa only [LinearMap.restrictScalars_apply, LinearMap.reduceModIdeal_apply,
+    Submodule.mkQ_apply, quotientPowLinearEquivOfFGPow_mk, eval_apply] using map_val_apply I f x
+
+/-- Quotient comparisons commute with the intrinsic precision projections on the
+completion and the precision projections on the original module. -/
+theorem quotientPowLinearEquivOfFGPow_transitionMap (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) {j k : ℕ} (hjk : j ≤ k)
+    (z : AdicCompletion I M ⧸ (I ^ k • (⊤ : Submodule R (AdicCompletion I M)))) :
+    quotientPowLinearEquivOfFGPow I M hn hI j
+        (transitionMap I (AdicCompletion I M) hjk z) =
+      transitionMap I M hjk (quotientPowLinearEquivOfFGPow I M hn hI k z) := by
+  obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective _ z
+  rw [Submodule.factor_mk, Submodule.mkQ_apply, Submodule.mkQ_apply,
+    quotientPowLinearEquivOfFGPow_mk, quotientPowLinearEquivOfFGPow_mk]
+  exact (transitionMap_comp_eval_apply I M hjk x).symm
+
+/-- The linear evaluation kernel determines the coefficient evaluation kernel. -/
+private theorem map_pow_eq_ker_evalₐ (I : Ideal R) (n : ℕ)
+    (h : (I ^ n) • (⊤ : Submodule R (AdicCompletion I R)) = (eval I R n).ker) :
+    (I.map (algebraMap R (AdicCompletion I R))) ^ n =
+      RingHom.ker (evalₐ I n).toRingHom := by
+  have hpow :
+      ((I.map (algebraMap R (AdicCompletion I R))) ^ n).restrictScalars R =
+        (eval I R n).ker := by
+    rw [← Ideal.map_pow, ← Ideal.smul_top_eq_map]
+    exact h
+  have htop : (I ^ n • ⊤ : Ideal R) = I ^ n := by
+    rw [Ideal.smul_eq_mul, Ideal.mul_top]
+  ext x
+  change x ∈ ((I.map (algebraMap R (AdicCompletion I R))) ^ n).restrictScalars R ↔
+    evalₐ I n x = 0
+  rw [hpow, LinearMap.mem_ker]
+  constructor
+  · intro hx
+    rw [← factor_eval_eq_evalₐ I x htop.le, hx]
+    rfl
+  · intro hx
+    rw [← factor_evalₐ_eq_eval I x htop.ge, hx]
+    rfl
+
+private theorem quotientPowAlgEquiv_mk_of_kernel (I : Ideal R) (n : ℕ)
+    (h : (I ^ n) • (⊤ : Submodule R (AdicCompletion I R)) = (eval I R n).ker)
+    (x : AdicCompletion I R) :
+    ((Ideal.quotientEquivAlgOfEq R (map_pow_eq_ker_evalₐ I n h)).trans
+        (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I n)))
+          (Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ n) x) =
+      evalₐ I n x := by
+  change (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I n))
+      (Ideal.Quotient.mk (RingHom.ker (evalₐ I n).toRingHom) x) = _
+  exact Ideal.quotientKerAlgEquivOfSurjective_mk (surjective_evalₐ I n) x
 
 /-- Evaluation identifies the quotient of the adic completion by the `n`th power
 of the extended ideal with `R ⧸ I ^ n`, assuming only that `I ^ n` is finitely
@@ -40,28 +165,9 @@ generated. -/
 noncomputable def quotientPowAlgEquiv (I : Ideal R) (n : ℕ) (h : (I ^ n).FG) :
     (AdicCompletion I R ⧸ (I.map (algebraMap R (AdicCompletion I R))) ^ n) ≃ₐ[R]
       R ⧸ I ^ n :=
-  have hker : (I.map (algebraMap R (AdicCompletion I R))) ^ n =
-      RingHom.ker (evalₐ I n).toRingHom := by
-    have hpow :
-        ((I.map (algebraMap R (AdicCompletion I R))) ^ n).restrictScalars R =
-          (eval I R n).ker := by
-      rw [← Ideal.map_pow, ← Ideal.smul_top_eq_map]
-      exact pow_smul_top_eq_ker_eval_of_fg_pow h
-    have htop : (I ^ n • ⊤ : Ideal R) = I ^ n := by
-      rw [Ideal.smul_eq_mul, Ideal.mul_top]
-    ext x
-    change x ∈ ((I.map (algebraMap R (AdicCompletion I R))) ^ n).restrictScalars R ↔
-      evalₐ I n x = 0
-    rw [hpow, LinearMap.mem_ker]
-    constructor
-    · intro hx
-      rw [← factor_eval_eq_evalₐ I x htop.le, hx]
-      rfl
-    · intro hx
-      rw [← factor_evalₐ_eq_eval I x htop.ge, hx]
-      rfl
-  (Ideal.quotientEquivAlgOfEq R hker).trans
-    (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I n))
+  (Ideal.quotientEquivAlgOfEq R (by
+    exact map_pow_eq_ker_evalₐ I n (pow_smul_top_eq_ker_eval_of_fg_pow h))).trans
+      (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I n))
 
 /-- The quotient comparison sends a completion representative to its evaluation. -/
 @[simp]
@@ -70,10 +176,7 @@ theorem quotientPowAlgEquiv_mk (I : Ideal R) (n : ℕ) (h : (I ^ n).FG)
     quotientPowAlgEquiv I n h
         (Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ n) x) =
       evalₐ I n x := by
-  unfold quotientPowAlgEquiv
-  change (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I n))
-      (Ideal.Quotient.mk (RingHom.ker (evalₐ I n).toRingHom) x) = _
-  exact Ideal.quotientKerAlgEquivOfSurjective_mk (surjective_evalₐ I n) x
+  exact quotientPowAlgEquiv_mk_of_kernel I n (pow_smul_top_eq_ker_eval_of_fg_pow h) x
 
 /-- The inverse comparison sends a residue class to the class of its image in
 the adic completion. -/
@@ -104,5 +207,114 @@ theorem quotientPowAlgEquiv_symm_toAlgHom (I : Ideal R) (n : ℕ) (h : (I ^ n).F
   simpa only [AlgEquiv.toAlgHom_apply, Ideal.quotient_map_mkₐ,
     Ideal.Quotient.mkₐ_eq_mk, Algebra.ofId_apply] using
     quotientPowAlgEquiv_symm_mk I n h r
+
+/-- If one positive ideal power is finitely generated, evaluation identifies every
+quotient of the completed coefficient ring with the corresponding original quotient. -/
+noncomputable def quotientPowAlgEquivOfFGPow (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) :
+    (AdicCompletion I R ⧸ (I.map (algebraMap R (AdicCompletion I R))) ^ k) ≃ₐ[R]
+      R ⧸ I ^ k :=
+  (Ideal.quotientEquivAlgOfEq R (by
+    exact map_pow_eq_ker_evalₐ I k (pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI k))).trans
+      (Ideal.quotientKerAlgEquivOfSurjective (surjective_evalₐ I k))
+
+/-- The positive-power coefficient comparison sends every representative to its evaluation. -/
+@[simp]
+theorem quotientPowAlgEquivOfFGPow_mk (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (x : AdicCompletion I R) :
+    quotientPowAlgEquivOfFGPow I hn hI k
+        (Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ k) x) =
+      evalₐ I k x := by
+  exact quotientPowAlgEquiv_mk_of_kernel I k
+    (pow_smul_top_eq_ker_eval_of_fg_pos_pow hn hI k) x
+
+/-- The inverse positive-power coefficient comparison is induced by the algebra map
+to the completion. -/
+@[simp]
+theorem quotientPowAlgEquivOfFGPow_symm_mk (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (r : R) :
+    (quotientPowAlgEquivOfFGPow I hn hI k).symm (Ideal.Quotient.mk (I ^ k) r) =
+      Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ k)
+        (algebraMap R (AdicCompletion I R) r) := by
+  apply (quotientPowAlgEquivOfFGPow I hn hI k).injective
+  simpa only [AlgEquiv.apply_symm_apply, quotientPowAlgEquivOfFGPow_mk,
+    Ideal.Quotient.algebraMap_eq] using ((evalₐ I k).commutes r).symm
+
+/-- The whole inverse of the positive-power coefficient comparison is the induced
+algebra homomorphism on ideal quotients. -/
+theorem quotientPowAlgEquivOfFGPow_symm_toAlgHom (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) :
+    (quotientPowAlgEquivOfFGPow I hn hI k).symm.toAlgHom =
+      Ideal.quotientMapₐ ((I.map (algebraMap R (AdicCompletion I R))) ^ k)
+        (Algebra.ofId R (AdicCompletion I R))
+        (by
+          change I ^ k ≤
+            ((I.map (algebraMap R (AdicCompletion I R))) ^ k).comap
+              (algebraMap R (AdicCompletion I R))
+          rw [← Ideal.map_pow (algebraMap R (AdicCompletion I R)) I k]
+          exact Ideal.le_comap_map) := by
+  apply AlgHom.ext
+  intro q
+  obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective q
+  simpa only [AlgEquiv.toAlgHom_apply, Ideal.quotient_map_mkₐ,
+    Ideal.Quotient.mkₐ_eq_mk, Algebra.ofId_apply] using
+    quotientPowAlgEquivOfFGPow_symm_mk I hn hI k r
+
+/-- The positive-power and fixed-stage coefficient comparisons agree wherever both
+finite-generation hypotheses are available. -/
+theorem quotientPowAlgEquivOfFGPow_eq (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ) (h : (I ^ k).FG) :
+    quotientPowAlgEquivOfFGPow I hn hI k = quotientPowAlgEquiv I k h :=
+  rfl
+
+/-- The coefficient comparisons commute with the algebra projections between
+ideal-power quotients. -/
+theorem quotientPowAlgEquivOfFGPow_factor (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) {j k : ℕ} (hjk : j ≤ k)
+    (z : AdicCompletion I R ⧸ (I.map (algebraMap R (AdicCompletion I R))) ^ k) :
+    quotientPowAlgEquivOfFGPow I hn hI j
+        (Ideal.Quotient.factorₐ R (Ideal.pow_le_pow_right hjk) z) =
+      Ideal.Quotient.factorₐ R (Ideal.pow_le_pow_right hjk)
+        (quotientPowAlgEquivOfFGPow I hn hI k z) := by
+  obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (quotientPowAlgEquivOfFGPow I hn hI k z)
+  have hz := congrArg (quotientPowAlgEquivOfFGPow I hn hI k).symm hr
+  rw [AlgEquiv.symm_apply_apply, quotientPowAlgEquivOfFGPow_symm_mk] at hz
+  rw [← hz]
+  change quotientPowAlgEquivOfFGPow I hn hI j
+      (Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ j)
+        (algebraMap R (AdicCompletion I R) r)) = _
+  rw [quotientPowAlgEquivOfFGPow_mk, quotientPowAlgEquivOfFGPow_mk,
+    (evalₐ I j).commutes, (evalₐ I k).commutes]
+  exact ((Ideal.Quotient.factorₐ R
+    (show I ^ k ≤ I ^ j from Ideal.pow_le_pow_right hjk)).commutes r).symm
+
+/-- The coefficient comparison agrees with the original-ring-linear module comparison
+through the explicit class-preserving ideal/submodule quotient identifications. -/
+theorem quotientPowAlgEquivOfFGPow_toLinearEquiv (I : Ideal R)
+    {n : ℕ} (hn : 0 < n) (hI : (I ^ n).FG) (k : ℕ)
+    (z : AdicCompletion I R ⧸ (I ^ k • (⊤ : Submodule R (AdicCompletion I R)))) :
+    (quotientPowAlgEquivOfFGPow I hn hI k).toLinearEquiv
+        (((Submodule.quotEquivOfEq _ _ (show
+            (I ^ k • (⊤ : Submodule R (AdicCompletion I R))) =
+              ((I.map (algebraMap R (AdicCompletion I R))) ^ k).restrictScalars R by
+            rw [← Ideal.map_pow, ← Ideal.smul_top_eq_map])).trans
+          (Submodule.Quotient.restrictScalarsEquiv R
+            ((I.map (algebraMap R (AdicCompletion I R))) ^ k))) z) =
+      Submodule.quotEquivOfEq _ _ (show (I ^ k • ⊤ : Ideal R) = I ^ k by
+        rw [Ideal.smul_eq_mul, Ideal.mul_top])
+          (quotientPowLinearEquivOfFGPow I R hn hI k z) := by
+  obtain ⟨x, rfl⟩ := Submodule.mkQ_surjective _ z
+  simp only [Submodule.mkQ_apply, LinearEquiv.trans_apply, Submodule.quotEquivOfEq_mk,
+    Submodule.Quotient.restrictScalarsEquiv_mk, AlgEquiv.toLinearEquiv_apply,
+    quotientPowLinearEquivOfFGPow_mk]
+  change quotientPowAlgEquivOfFGPow I hn hI k
+      (Ideal.Quotient.mk ((I.map (algebraMap R (AdicCompletion I R))) ^ k) x) = _
+  rw [quotientPowAlgEquivOfFGPow_mk]
+  have htop : (I ^ k • ⊤ : Ideal R) = I ^ k := by
+    rw [Ideal.smul_eq_mul, Ideal.mul_top]
+  rw [← factor_eval_eq_evalₐ I x htop.le]
+  obtain ⟨r, hr⟩ := Submodule.mkQ_surjective (I ^ k • (⊤ : Submodule R R)) (eval I R k x)
+  rw [← hr]
+  rfl
 
 end AdicCompletion
