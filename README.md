@@ -19,6 +19,26 @@ further result families, examples and boundary cases.
   of `I` or Noetherianity of `R` is required.
   See [cotangent modules](AdicModules/Ideal/Cotangent.lean).
 
+- **Finite modules over complete APf bases.** Suppose `I` has finite-submodule
+  adic cofinality: the intrinsic filtration on each finitely generated submodule
+  of each finite module is cofinal with the induced filtration. If original `R`
+  is intrinsically `I`-adically complete, every finite original `R`-module `M`
+  is intrinsically complete, and its canonical `M → AdicCompletion I M` is
+  bijective. More generally, such finite `M` is `I`-Hausdorff whenever
+  `I ≤ jac(ann_R M)`. No finite generation of `I`, original finite presentation,
+  Noetherianity, flatness or prior module separation is required; ring and module
+  universes are independent. See the
+  [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
+
+- **Adically closed submodules with finite quotient.** If `I` has finite-submodule
+  adic cofinality and `M / N` is finite over original `R`, then
+  `I ≤ jac(ann_R(M / N))` makes `N` closed in the canonical `I`-adic module topology
+  of `M`. Neither ambient `M` nor `N` needs to be finite. No finite generation
+  of `I`, Noetherianity, completeness or ambient separation is assumed; ring
+  and module universes are independent. This is a closedness result, not an
+  intrinsic-completeness assertion for `N`. See
+  [module-adic topologies](AdicModules/Topology/Algebra/Module/AdicTopology.lean).
+
 - **Noetherian raw completion.** For any ideal `I`, `C` is Noetherian iff
   `R / I` is Noetherian and `I / I²` is finitely generated over `R / I`;
   equivalently, iff `R / I^n` is Noetherian for any chosen `n ≥ 2`.
@@ -96,6 +116,15 @@ further result families, examples and boundary cases.
   not be injective. No ring Noetherianity, ideal finiteness, flatness, faithfulness,
   separation or completeness is assumed; all four universes are independent.
   See [completion exactness](AdicModules/AdicCompletion/Exactness.lean).
+
+- **Middle exactness from two pointwise range bounds.** For any ideal `I`, an
+  original exact pair `M →ₗ[R] N →ₗ[R] P` remains middle exact under the canonical
+  completed maps if, separately for each original range `K` in its ambient module
+  `X`, every `n` admits some `m` with `K ⊓ I^m X ≤ I^n K`. The two bounds may
+  have different witnesses. Neither map needs to be injective or surjective.
+  No finiteness or Noetherianity of the ring, ideal or modules, flatness, separation
+  or completeness is assumed; all four universes are independent. See
+  [completion exactness](AdicModules/AdicCompletion/Exactness.lean).
 
 - **Middle exactness for Noetherian original pairs.** For any ideal `I`, an
   original exact pair `M →ₗ[R] N →ₗ[R] P` remains middle exact under the canonical
@@ -209,6 +238,13 @@ further result families, examples and boundary cases.
   See [torsion](AdicModules/BoundedIdealPowerTorsion.lean) and
   [powers](AdicModules/RingTheory/Ideal/PowerCompression.lean).
 
+- **Maximal ideals in the adic topology.** For any ideal `I` of a commutative
+  ring, a maximal ideal `m` is closed in the `I`-adic topology iff `I ≤ m`.
+  Thus every maximal ideal is closed iff `I` lies in the Jacobson radical.
+  No APf, finiteness, Noetherianity, completeness or separation is assumed;
+  the global criterion includes the zero ring. See
+  [ideal topologies](AdicModules/Topology/Algebra/Ideal.lean).
+
 - **Compactness and valuation completeness.** For a given compatible additive
   uniformity with `IsAdic I`, a ring is compact iff it is uniformly complete and all
   `R/I^n` are finite; under `I.FG`, finiteness of `R/I` suffices.
@@ -318,7 +354,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Submodule](AdicModules/AdicCompletion/Submodule.lean) (intrinsic precompleteness for closed cofinal submodules; completed-scalar fibres and spans) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) (the canonical map of a cofinal submodule in a complete ambient module is bijective) |
 | [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and power-quotient Noetherianity) | — |
 | [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (finite cotangents of all powers, finiteness from power quotients and lifted generators) | — |
-| [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
+| [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (APf finite-module completeness; precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
 | [AdicCompletion.Flat.Noetherian](AdicModules/AdicCompletion/Flat/Noetherian.lean) (intrinsic complete-module flatness and raw-completion flatness over a Noetherian completed ring) | — |
@@ -354,7 +390,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [RingTheory.Ideal.Quotient.Finite](AdicModules/RingTheory/Ideal/Quotient/Finite.lean) | [RingTheory.Ideal.Quotient.Finite](AdicModulesTest/RingTheory/Ideal/Quotient/Finite.lean) (integer quotient and boundary calculations), [RingTheory.Ideal.Quotient.FiniteEquivalence](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteEquivalence.lean) (equivalence client), [RingTheory.Ideal.Quotient.FinitePowers](AdicModulesTest/RingTheory/Ideal/Quotient/FinitePowers.lean) (powers-surjectivity client), [RingTheory.Ideal.Quotient.FiniteInverse](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteInverse.lean) (inverse and representatives client), [RingTheory.Ideal.Quotient.FiniteLinear](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteLinear.lean) (linear definition and integer client), [RingTheory.Ideal.Quotient.FiniteReduction](AdicModulesTest/RingTheory/Ideal/Quotient/FiniteReduction.lean) (precision-reduction client), [RingTheory.Ideal.Quotient.Matrix](AdicModulesTest/RingTheory/Ideal/Quotient/Matrix.lean) (two-sided matrix examples), [RingTheory.Ideal.Quotient.LeftIdeal](AdicModulesTest/RingTheory/Ideal/Quotient/LeftIdeal.lean) (left-ideal counterexample) |
 | [RingTheory.Ideal.Quotient.SMulTop](AdicModules/RingTheory/Ideal/Quotient/SMulTop.lean) | [RingTheory.Ideal.Quotient.SMulTop](AdicModulesTest/RingTheory/Ideal/Quotient/SMulTop.lean) (noncommutative integer matrices at the bottom ideal, level one) |
 | [Topology.Algebra.Ideal](AdicModules/Topology/Algebra/Ideal.lean) | [Topology.Algebra.Ideal.Int](AdicModulesTest/Topology/Algebra/Ideal/Int.lean), [Topology.Algebra.Ideal.Matrix](AdicModulesTest/Topology/Algebra/Ideal/Matrix.lean), [Topology.Algebra.Ideal.Boundary](AdicModulesTest/Topology/Algebra/Ideal/Boundary.lean) (independent original calculations; additional private density application in Int) |
-| [Topology.Algebra.Module.AdicTopology](AdicModules/Topology/Algebra/Module/AdicTopology.lean) | [Topology.Algebra.Module.AdicTopology](AdicModulesTest/Topology/Algebra/Module/AdicTopology.lean) (integer-pair projection and quotient descent) |
+| [Topology.Algebra.Module.AdicTopology](AdicModules/Topology/Algebra/Module/AdicTopology.lean) (semilinear continuity and openness; APf closedness with finite quotient) | [Topology.Algebra.Module.AdicTopology](AdicModulesTest/Topology/Algebra/Module/AdicTopology.lean) (integer-pair projection and quotient descent) |
 | [Topology.Algebra.Submodule](AdicModules/Topology/Algebra/Submodule.lean) | [Topology.Algebra.SubmoduleClosure](AdicModulesTest/Topology/Algebra/SubmoduleClosure.lean) |
 | [Topology.Algebra.PadicInt](AdicModules/Topology/Algebra/PadicInt.lean) | [Topology.Algebra.PadicInt](AdicModulesTest/Topology/Algebra/PadicInt.lean) |
 | [Topology.Algebra.AdicTopology](AdicModules/Topology/Algebra/AdicTopology.lean) | [AdicCompletion.PadicInt](AdicModulesTest/AdicCompletion/PadicInt.lean) (module-to-mapped-ideal topology application) |
@@ -410,7 +446,8 @@ and the scalar-torsion and total-boundedness interfaces from
 Taylor remainder theorem from
 [Multivariate Polynomials](https://github.com/FormalFrontier/multivariate-polynomials)
 and the semilinear flatness transport, finite faithful flat-base-change,
-annihilator-comap, Noetherian annihilator-quotient and module Artin–Rees interfaces from
+annihilator-comap, Noetherian annihilator-quotient, module Artin–Rees and APf Krull
+intersection interfaces from
 [Coherent Modules](https://github.com/FormalFrontier/coherent-modules).
 The completed coordinate-idempotent construction follows the stock `single`/`map`
 transport pattern also used in

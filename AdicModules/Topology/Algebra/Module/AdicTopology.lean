@@ -4,28 +4,44 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import CoherentModules.RingTheory.Ideal.AdicKrull
 public import Mathlib.Topology.Algebra.Nonarchimedean.AdicTopology
 public import Mathlib.Topology.Maps.OpenQuotient
 
+import AdicModules.Topology.Algebra.Submodule
 import Mathlib.Algebra.Algebra.RestrictScalars
 import Mathlib.Topology.Algebra.Group.Neighborhood
 
 /-!
-# Functoriality of adic module topologies
+# Adic module topologies
 
 Semilinear maps respect the module topologies defined by powers of ideals. Forward
 containment of the extended source ideal gives continuity. For a surjective map,
 reverse containment gives openness, and equality gives an open quotient map.
-The scalar rings and modules have independent universes. No finite-generation,
-Noetherian, separation, or scalar-homomorphism-surjectivity hypothesis is imposed.
+The scalar rings and modules have independent universes. These map results impose
+no finite-generation, Noetherian, separation, or scalar-homomorphism-surjectivity
+hypothesis.
 
 All topologies are Mathlib's existing `Ideal.adicModuleTopology` constructions.
 The ring case retains Mathlib's `WithIdeal.uniformContinuous_of_map_le` API.
 
+For an ideal satisfying finite-submodule adic cofinality, a submodule is closed
+when its quotient is finite and the ideal lies in the Jacobson radical of the
+quotient's annihilator. The ambient module and the submodule need not be finite.
+This follows by combining the submodule closure formula with the corresponding
+algebraic intersection equality; it does not assert completeness of the submodule.
+
 ## References
 
+* Kazuhiro Fujiwara and Fumiharu Kato, *Foundations of Rigid Geometry I*,
+  arXiv:1308.4734v5, Proposition 0.7.4.16. The closedness theorem generalizes its
+  closedness consequence to finite quotients and relative-annihilator bounds.
+* The finite-quotient intersection theorem in
+  `CoherentModules.RingTheory.Ideal.AdicKrull` and the submodule closure formula
+  in `AdicModules.Topology.Algebra.Submodule`.
 * Mathlib's adic topology construction by Patrick Massot.
-* Mathlib's additive-group neighborhood, filter-basis, and open-quotient-map APIs.
+* Mathlib's additive-group neighborhood, pointwise-closure, filter-basis, and
+  open-quotient-map APIs.
 -/
 
 @[expose] public section
@@ -132,3 +148,34 @@ theorem isOpenQuotientMap_adicModuleTopology
     f.isOpenMap_adicModuleTopology_of_le_map hIJ.ge hf⟩
 
 end LinearMap
+
+universe uR uM
+
+namespace Submodule
+
+/-- For an ideal satisfying finite-submodule adic cofinality, a submodule with
+finite quotient is closed in the adic module topology when the ideal is contained
+in the Jacobson radical of the quotient's annihilator. Neither the ambient module
+nor the submodule needs to be finite.
+
+This generalizes the closedness consequence of Fujiwara--Kato,
+*Foundations of Rigid Geometry I*, Proposition 0.7.4.16. -/
+theorem isClosed_adicModuleTopology_of_hasFiniteSubmoduleAdicCofinality
+    {R : Type uR} [CommRing R] {I : Ideal R}
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    (N : Submodule R M) [Module.Finite R (M ⧸ N)]
+    (hAPf : I.HasFiniteSubmoduleAdicCofinality)
+    (hJ : I ≤ (Module.annihilator R (M ⧸ N)).jacobson) :
+    @IsClosed M (I.adicModuleTopology M) (N : Set M) := by
+  let : TopologicalSpace R := I.adicTopology
+  let : TopologicalSpace M := I.adicModuleTopology M
+  have hclosure : N.topologicalClosure =
+      ⨅ n : ℕ, N ⊔ (I ^ n) • (⊤ : Submodule R M) := by
+    simpa only [iInf_const] using
+      N.topologicalClosure_eq_iInf_sup (I.hasBasis_nhds_zero_adicModuleTopology M)
+  apply closure_eq_iff_isClosed.mp
+  rw [← Submodule.topologicalClosure_coe, hclosure,
+    Submodule.iInf_sup_pow_smul_top_eq_self_of_le_jacobson_annihilator_quotient
+      (R := R) (M := M) (I := I) N hAPf hJ]
+
+end Submodule

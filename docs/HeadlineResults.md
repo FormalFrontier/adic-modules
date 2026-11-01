@@ -241,6 +241,24 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   allows an arbitrary extra factor in the first source and identifies the completed
   quotient kernel with the completed first map's image.
 
+- **Middle exactness from two pointwise range bounds.** For every ideal `I` of a
+  commutative ring `R`, let `f : M →ₗ[R] N` and `g : N →ₗ[R] P` be an original
+  exact pair. Suppose separately that
+  ```text
+  ∀ n, ∃ m, f.range ⊓ (I^m • ⊤ : Submodule R N) ≤ I^n • f.range
+  ∀ n, ∃ m, g.range ⊓ (I^m • ⊤ : Submodule R P) ≤ I^n • g.range.
+  ```
+  Then [`AdicCompletion.map_exact_of_ranges_cofinal`](../AdicModules/AdicCompletion/Exactness.lean)
+  gives `LinearMap.ker (AdicCompletion.map I g) =
+  LinearMap.range (AdicCompletion.map I f)` over `AdicCompletion I R`.
+  The two witnesses may differ, and neither a uniform shift nor a same-stage
+  equality is required. Neither original nor completed map needs to be injective
+  or surjective. No finiteness, Noetherianity, flatness, separation or completeness
+  hypothesis is imposed on the ring, ideal or modules; all four universes are
+  independent. Factoring original `g` through its range reuses the right-surjective
+  criterion with the first bound; the second bound makes completion of its range
+  inclusion injective. All maps, carriers and scalar actions are the canonical ones.
+
 - **Middle exactness for Noetherian original pairs.** For every ideal `I` of a
   commutative ring `R`, let `f : M →ₗ[R] N` and `g : N →ₗ[R] P` be an original
   exact pair with both original `N` and original `P` Noetherian over original `R`.
@@ -250,9 +268,8 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   source `M` is arbitrary and `f` need not be injective. No Noetherianity of `R`,
   `R / I` or the completed ring, finite generation of `I` or a positive power,
   source finiteness, flatness, faithfulness, separation or completeness is required;
-  the ring and all three module universes are independent. Factoring `g` through
-  its original range reduces to the right-surjective result, and completion
-  preserves injectivity of the original range inclusion into Noetherian `P`.
+  the ring and all three module universes are independent. Module Artin–Rees
+  supplies the two separate range bounds for `map_exact_of_ranges_cofinal`.
   A [kernel-inclusion client](../AdicModulesTest/AdicCompletion/Exactness.lean)
   identifies the kernel of any completed map between such modules with the image
   of the completed original kernel inclusion, without a surjectivity premise.
@@ -314,6 +331,39 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   with no finite-generation or completeness assumption. The existing canonical
   map into adic completion is therefore injective. See
   [`IsHausdorff.of_projective`](../AdicModules/AdicCompletion/Completeness.lean).
+
+- **Finite modules over complete APf bases.** For an ideal `I` with
+  finite-submodule adic cofinality, every finite original `R`-module `M` is
+  `I`-Hausdorff whenever `I ≤ jac(ann_R M)`. This relative-annihilator form
+  generalizes the separation implication of Fujiwara–Kato, Proposition 0.7.4.16.
+  If original `R` is intrinsically `I`-adically complete, its Jacobson bound
+  supplies module Hausdorffness, while finiteness of the canonical first quotient
+  supplies precompleteness. Thus every finite original `M` is intrinsically
+  `I`-adically complete, as in Corollary 0.7.4.17. The canonical
+  `AdicCompletion.of I M` is bijective, and the existing
+  `AdicCompletion.ofLinearEquiv I M` gives the original-`R`-linear equivalence.
+  No finite generation of `I`, original finite presentation, Noetherianity,
+  flatness, projectivity, prior module separation or completed-ring action on
+  original `M` is assumed; ring and module universes are independent. See the
+  [complete-base criteria](../AdicModules/AdicCompletion/CompleteBase.lean).
+
+- **Adically closed submodules with finite quotient.** Let `I` have
+  finite-submodule adic cofinality, and let `N` be any submodule of an original
+  `R`-module `M` with finite quotient `M / N`. If
+  `I ≤ jac(ann_R(M / N))`, then
+  `Submodule.isClosed_adicModuleTopology_of_hasFiniteSubmoduleAdicCofinality`
+  makes `N` closed in exactly `I.adicModuleTopology M`. The proof combines the
+  generic submodule closure formula with the finite-quotient Krull intersection
+  equality in Coherent Modules. Neither ambient `M` nor `N` needs to be finite;
+  no finite generation of `I`, original finite presentation, Noetherianity,
+  completeness or ambient separation is assumed. Ring and module universes are
+  independent, and all actions are the original or canonical quotient actions.
+  This generalizes the closedness consequence of Fujiwara–Kato, Proposition
+  0.7.4.16, to finite quotients and relative-annihilator bounds. In particular,
+  every submodule of a finite module is closed if `I ≤ jac(0)`; a complete
+  original base supplies this bound. No induced-versus-intrinsic topology
+  identification or intrinsic completeness of arbitrary submodules is asserted.
+  See [module-adic topologies](../AdicModules/Topology/Algebra/Module/AdicTopology.lean).
 
 - **Modules over precomplete and complete bases.** For any ideal `I` of a
   commutative ring `R` with `[IsPrecomplete I R]`, finiteness of `M / I M`
@@ -1013,6 +1063,23 @@ Rings are commutative; modules are additive commutative groups unless specified 
   or reducedness. The constant-coefficient kernel is `(p)` iff Frobenius is surjective;
   `(p)` is prime iff coefficients are a domain with surjective Frobenius. A zero prefix
   alone is insufficient over nonperfect rings ([ideals](../AdicModules/RingTheory/WittVector/Complete.lean)).
+- **Maximal ideals and the Jacobson radical in the adic topology.** For any
+  ideal `I` of a commutative ring `R` and maximal ideal `m`,
+  `Ideal.isClosed_adicTopology_iff_le_of_isMaximal` gives
+  `@IsClosed R I.adicTopology (m : Set R) ↔ I ≤ m`.
+  An ideal containing `I` is open and closed as an additive subgroup; a maximal
+  ideal not containing `I` is dense and proper, hence not closed.
+  `Ideal.le_jacobson_bot_iff_forall_isClosed_adicTopology` consequently identifies
+  `I ≤ (⊥ : Ideal R).jacobson` with closedness of every maximal ideal.
+  No APf, finiteness, Noetherianity, completeness, separation or nontriviality
+  assumption is made. In the zero ring the universal condition is vacuous and
+  the Jacobson radical is top. This isolates the ring-only reverse implication
+  of Fujiwara–Kato, *Foundations of Rigid Geometry I*,
+  [arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5), Proposition 0.7.4.16,
+  removing APf only for that implication, not establishing the whole equivalence
+  or the finite-module completeness statements.
+  See [ideal topologies](../AdicModules/Topology/Algebra/Ideal.lean).
+
 - **Torsion, spans, closure and CRT** ([torsion](../AdicModules/BoundedIdealPowerTorsion.lean),
   [primary exactness](../AdicModules/PrimaryComponent.lean), [spans and closure](Results.md#headline-results)):
   for finite modules, uniform ideal-power annihilation iff the primary component is top.

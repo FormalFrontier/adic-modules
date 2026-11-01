@@ -135,6 +135,32 @@ specialization reuses quotient base change. These are compositions of existing
 interfaces, without copying their proof bodies or giving original modules a
 completed-ring action; upstream notices remain in Mathlib.
 
+Finite-module completeness under finite-submodule adic cofinality follows
+Fujiwara–Kato, *Foundations of Rigid Geometry I*, arXiv:1308.4734v5,
+Corollary 0.7.4.17. Its separation step uses the relative-annihilator Krull
+intersection theorem in Formal Frontier Agents' Coherent Modules library,
+generalizing the separation implication of Proposition 0.7.4.16 and Andrew Yang's
+Noetherian Krull formalization in Mathlib. The completeness argument composes
+that theorem with the precomplete-base bridge above and Mathlib's complete-base
+Jacobson bound, intrinsic completeness predicates and canonical completion
+equivalence. First-quotient finiteness uses the canonical quotient action and
+finite-module instance in Pierre-Alexandre Bazin's module torsion formalization.
+No new completion object, original-module scalar action or precompleteness
+argument is introduced.
+
+Adic closedness for a submodule with finite quotient combines Rudder's generic
+submodule-closure formula in this library with Formal Frontier Agents' pure
+finite-quotient Krull intersection theorem in Coherent Modules. It generalizes
+the closedness consequence of Fujiwara–Kato, *Foundations of Rigid Geometry I*,
+arXiv:1308.4734v5, Proposition 0.7.4.16, to finite quotients and a Jacobson bound
+relative to the quotient's annihilator. The ambient module and the submodule
+need not be finite. The canonical adic basis is Patrick Massot's Mathlib
+construction; the pointwise-closure and submodule-carrier interfaces and their
+contributors are credited below. These are applications of the existing closure
+and algebraic intersection APIs, without copying their proof bodies, choosing a
+new scalar action or asserting the whole proposition or intrinsic completeness
+of arbitrary submodules. Upstream author and license notices remain unchanged.
+
 The Noetherian complete-module flatness criterion combines the standard
 Artin–Rees lemma with the equational criterion for flatness
 ([Stacks Project, Tag 00HK](https://stacks.math.columbia.edu/tag/00HK)). It uses
@@ -166,10 +192,11 @@ library's range-cofinality theorem, which follows Judith Ludwig and Christian
 Merten's Cauchy-sequence exactness argument. No second reconstruction proof or
 quotient scalar action on the arbitrary original first source is introduced.
 
-Middle exactness for a pair with Noetherian original middle and target modules
-factors the last original map through its range. It reuses the right-surjective
-criterion above and the library's injectivity theorem for Noetherian original
-targets, together with Mathlib's range-restriction, kernel and functoriality APIs.
+Middle exactness under two pointwise range bounds factors the last original map
+through its range. It reuses the right-surjective criterion above and the library's
+pointwise-cofinal completed-subtype injectivity criterion, together with Mathlib's
+range-restriction, kernel and functoriality APIs. For Noetherian original middle
+and target modules, module Artin–Rees supplies the two bounds separately.
 Exactness under injective postcomposition and the original kernel-inclusion
 exact pair are from Antoine Chambert-Loir's `Mathlib.Algebra.Exact.Basic`.
 The canonical completion and completed-map formalizations of Judith Ludwig and
@@ -573,6 +600,27 @@ calculation APIs. See the [finite-quotient guide](FiniteQuotient.md) for the
 mathematical scope and the distinction between ring CRT and arbitrary
 left-ideal module diagonals. These reuse and adaptation credits supplement,
 not replace, the upstream and project author notices above.
+
+## Maximal ideals in the adic topology
+
+The maximal-ideal closedness and Jacobson-radical criteria isolate the ring-only
+reverse implication of Fujiwara–Kato, *Foundations of Rigid Geometry I*,
+[arXiv:1308.4734v5](https://arxiv.org/abs/1308.4734v5), Proposition 0.7.4.16.
+The APf hypothesis is removed for this implication only; the whole equivalence
+and the finite-module completeness statements are not asserted here.
+
+The proof uses this library's `Ideal.dense_iff_sup_eq_top_of_hasBasis` and its
+comaximal-powers provider, rather than reconstructing a density argument.
+Mathlib supplies Patrick Massot's canonical adic power basis and filter-basis
+topological-ring structure; the maximal-ideal formalization of Kenny Lau,
+Chris Hughes and Mario Carneiro; the open-subgroup formalization of
+Johan Commelin, Nailin Guan, Yi Song and Xuchun Li; and the Jacobson-radical
+formalization of Kenny Lau, Devon Tuma and Wojciech Nawrocki. The global theorem
+uses the existing infimum-of-maximal-ideals characterization, including the
+empty family in the zero ring. These interfaces and formalization approaches
+are reused, without copying upstream proof bodies or introducing a new
+closure, field or quotient-topology construction. Their Apache-2.0 author,
+copyright and license notices remain in Mathlib.
 
 ## Scalar-ideal quotients and the matrix example
 

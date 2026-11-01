@@ -111,8 +111,10 @@ related_formalizations:
       The raw-completion flatness criterion over a Noetherian completed
       coefficient ring uses the released CoherentModules.RingTheory.Flat.Equiv
       interface for semilinear flatness transport, retaining the canonical
-      quotient actions. Coherent Modules is also reached through Multivariate
-      Polynomials; an explicit root pin selects the shared public release
+      quotient actions. Its APf Krull intersection API is used for relative
+      finite-module separation and finite-quotient adic closedness. Coherent
+      Modules is also reached through Multivariate Polynomials; an explicit
+      root pin selects the shared public release
       recorded in lake-manifest.json.
   - id: "https://github.com/leanprover-community/mathlib4"
     relationship: "builds-on"
@@ -141,8 +143,9 @@ status:
     torsion-source pairs over Dedekind domains; raw inverse-limit completions
     and scalar restriction along commutative algebras with compatible actions.
     Abstract uniform-completion comparisons require finitely generated ideals.
-    A right-surjective exact pair remains middle exact after completion under
-    induced/intrinsic range cofinality. The tensor comparison is surjective for a finite first
+    An exact pair remains middle exact after completion under separate pointwise
+    induced/intrinsic cofinality bounds on both ranges; for a right-surjective pair,
+    the first range bound suffices. The tensor comparison is surjective for a finite first
     original quotient and injective for a projective completed scalar extension.
     For finitely presented original modules, bijectivity follows from finite-free
     cofinality.
@@ -159,6 +162,15 @@ status:
     Separated principal-adic valuation-ring comparisons require a nonzero
     generator; local and localization results retain their maximal-ideal,
     radical-disjointness and nonzero-prime hypotheses.
+    For ideals with finite-submodule adic cofinality, a relative-annihilator
+    Jacobson bound separates finite original modules; over an intrinsically
+    complete original base, every finite original module is intrinsically
+    complete. A submodule with finite quotient is closed in the canonical adic
+    module topology under the corresponding quotient-annihilator bound, without
+    assuming that the ambient module or submodule is finite. A maximal ideal is closed
+    in the ring-adic topology exactly when it contains the defining ideal;
+    all maximal ideals are closed exactly when that ideal lies in the Jacobson
+    radical, without an APf hypothesis on these ring-only criteria.
     Submodule closure uses a supplied compatible additive-group topology and
     continuous fixed-scalar actions. Dense-subsemiring span closure uses
     separately continuous addition and coefficient continuity at the generators.

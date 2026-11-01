@@ -1096,7 +1096,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
 | [AdicCompletion.Endomorphism](../AdicModules/AdicCompletion/Endomorphism.lean) | Units from pointwise congruence to the identity on an adically complete module, for arbitrary ideals |
-| [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under induced/intrinsic range cofinality; no injectivity assumption |
+| [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under pointwise induced/intrinsic cofinality on both ranges; no injectivity or surjectivity assumption |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Completed finite presentation for projective modules finite modulo the ideal; canonical tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
 | [AdicCompletion.LinearMap](../AdicModules/AdicCompletion/LinearMap.lean) | Canonical extension, Hausdorff uniqueness and the linear Hom equivalence |

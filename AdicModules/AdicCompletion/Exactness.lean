@@ -39,9 +39,13 @@ exact pair whose original middle module is Noetherian. The original first source
 is arbitrary and the first map need not be injective. The ring and all three module
 universes are independent.
 
-If both the original middle and target modules are Noetherian over the original
-ring, completion preserves middle exactness without surjectivity of the last map.
-The original first source remains arbitrary, and all four universes are independent.
+If the induced ideal-power filtration on each of the two original ranges is
+pointwise cofinal with its intrinsic filtration, `map_exact_of_ranges_cofinal`
+preserves middle exactness without injectivity or surjectivity of either map.
+No finiteness or Noetherian hypothesis is required, and all four universes are
+independent. If both the original middle and target modules are Noetherian over
+the original ring, module Artin–Rees supplies the two bounds. The original first
+source remains arbitrary.
 
 For an original map `g : N →ₗ[R] P` between Noetherian original modules,
 `kerEquivOfIsNoetherian` identifies intrinsic completion of its original kernel
@@ -51,10 +55,9 @@ ambient inclusion equation and gives the kernel universal property for maps from
 arbitrary modules over the completed ring. The comparison agrees with
 `kerEquivOfRightInverse` whenever original split data are also supplied.
 
-Adic completion also preserves middle exactness when the topology induced on the
-range of the first map is cofinal with its intrinsic adic topology. Neither
-injectivity of the first map nor finiteness or Noetherian hypotheses are required
-for this range-cofinality criterion.
+For a right-surjective original exact pair, cofinality on the first range alone
+suffices for middle exactness. Neither injectivity of the first map nor finiteness
+or Noetherian hypotheses are required for this range-cofinality criterion.
 
 ## Implementation notes
 
@@ -78,13 +81,13 @@ required ideal power. The change need not equal the difference of the original l
 first map need not be injective. No intrinsic adic completeness of a completion
 is assumed.
 
-For a Noetherian original middle module, module Artin–Rees supplies range
-cofinality, without imposing a quotient scalar action on the first source.
-For a possibly nonsurjective last map with Noetherian original target, factor it
-through its original range. The right-surjective criterion applies to the range
-restriction, and the target-injectivity criterion applies to the range inclusion.
-Mathlib's exactness-under-injective-postcomposition and completion-functoriality
-APIs then recover the canonical completed pair.
+For a possibly nonsurjective last map, factor it through its original range.
+The right-surjective criterion uses cofinality on the first range, and the subtype
+injectivity criterion uses the separate bound on the second range. Mathlib's
+exactness-under-injective-postcomposition and completion-functoriality APIs then
+recover the canonical completed pair. For Noetherian original middle and target
+modules, module Artin–Rees supplies the two bounds separately, without imposing
+a quotient scalar action on the first source.
 
 The kernel comparison completes the ambient-element-preserving equivalence
 between the original kernel and the range of its inclusion, then composes the
@@ -108,9 +111,11 @@ codomain-restriction and linear-equivalence APIs.
 
 The Noetherian-middle criterion uses CoherentModules' module Artin–Rees theorem,
 which generalizes Andrew Yang's formalization in `Mathlib.RingTheory.Filtration`.
-The Noetherian-pair criterion also uses Mathlib's original range factorization
+The two-range criterion also uses Mathlib's original range factorization,
+the pointwise subtype criterion from `AdicModules.AdicCompletion.LinearMap`,
 and Antoine Chambert-Loir's exactness-under-injective-postcomposition API in
-`Mathlib.Algebra.Exact.Basic`.
+`Mathlib.Algebra.Exact.Basic`. Module Artin–Rees supplies both bounds for the
+Noetherian-pair specialization.
 
 The original-kernel comparison also reuses the original-image comparison above
 and Mathlib's submodule linear equivalences and codomain restrictions, with the
@@ -365,6 +370,40 @@ theorem map_exact_of_range_cofinal
       rw [Submodule.Quotient.eq]
       exact (Submodule.smul_mono_left (Ideal.pow_le_pow_right (he_bound n))) (a n).property
 
+/-- Adic completion preserves middle exactness when the induced ideal-power
+filtrations on both original ranges are pointwise cofinal with their intrinsic
+adic filtrations.
+
+The two bounds are independent. Neither map needs to be injective or surjective,
+and no finiteness, Noetherianity, flatness, separation or completeness hypothesis
+is required. The ring and all three module universes are independent; the completed
+maps and actions are the canonical ones.
+
+This extends `map_exact_of_range_cofinal`, which follows Judith Ludwig and
+Christian Merten's Cauchy-sequence proof, by factoring the last original map
+through its range and using injectivity of the completed range inclusion. -/
+theorem map_exact_of_ranges_cofinal
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    {f : M →ₗ[R] N} {g : N →ₗ[R] P}
+    (hExact : Function.Exact f g)
+    (hfcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      f.range ⊓ (I ^ m • (⊤ : Submodule R N)) ≤ I ^ n • f.range)
+    (hgcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      g.range ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • g.range) :
+    Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g) := by
+  have hExactQ : Function.Exact f g.rangeRestrict := by
+    rw [LinearMap.exact_iff, LinearMap.ker_rangeRestrict]
+    exact hExact.linearMap_ker_eq
+  have hCompleted : Function.Exact (map I f) (map I g.rangeRestrict) :=
+    map_exact_of_range_cofinal hExactQ (LinearMap.surjective_rangeRestrict g) hfcofinal
+  have hi : Function.Injective (map I g.range.subtype) :=
+    map_subtype_injective_of_cofinal I g.range hgcofinal
+  simpa only [← LinearMap.coe_comp, map_comp, LinearMap.subtype_comp_rangeRestrict] using
+    hCompleted.comp_injective (map I g.range.subtype) hi (_root_.map_zero _)
+
 /-- Adic completion preserves middle exactness of a right-surjective exact pair
 whose original middle module is Noetherian over the original scalar ring.
 
@@ -402,8 +441,8 @@ of the ideal, source finiteness, flatness, faithfulness, separation or completen
 is assumed.
 
 This extends the middle-exactness result of Mathlib's `AdicCompletion.map_exact`,
-formalized by Judith Ludwig and Christian Merten, by factoring the last original
-map through its range. -/
+formalized by Judith Ludwig and Christian Merten. Module Artin–Rees supplies both
+bounds for `map_exact_of_ranges_cofinal`. -/
 theorem map_exact_of_isNoetherian
     {R : Type uR} [CommRing R] (I : Ideal R)
     {M : Type uM} [AddCommGroup M] [Module R M]
@@ -413,16 +452,17 @@ theorem map_exact_of_isNoetherian
     {f : M →ₗ[R] N} {g : N →ₗ[R] P}
     (hExact : Function.Exact f g) :
     Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g) := by
-  have hExactQ : Function.Exact f g.rangeRestrict := by
-    rw [LinearMap.exact_iff, LinearMap.ker_rangeRestrict]
-    exact hExact.linearMap_ker_eq
-  have hCompleted : Function.Exact (map I f) (map I g.rangeRestrict) :=
-    map_exact_of_isNoetherian_middle I hExactQ (LinearMap.surjective_rangeRestrict g)
-  have hi : Function.Injective (map I g.range.subtype) :=
-    map_injective_of_isNoetherian_target I g.range.subtype
-      (Submodule.injective_subtype g.range)
-  simpa only [← LinearMap.coe_comp, map_comp, LinearMap.subtype_comp_rangeRestrict] using
-    hCompleted.comp_injective (map I g.range.subtype) hi (_root_.map_zero _)
+  apply map_exact_of_ranges_cofinal I hExact
+  · intro n
+    obtain ⟨c, hc⟩ := Ideal.exists_pow_inf_eq_pow_smul_of_isNoetherian I f.range
+    refine ⟨n + c, ?_⟩
+    rw [inf_comm, hc (n + c) (Nat.le_add_left c n), Nat.add_sub_cancel]
+    exact smul_mono_right _ inf_le_right
+  · intro n
+    obtain ⟨c, hc⟩ := Ideal.exists_pow_inf_eq_pow_smul_of_isNoetherian I g.range
+    refine ⟨n + c, ?_⟩
+    rw [inf_comm, hc (n + c) (Nat.le_add_left c n), Nat.add_sub_cancel]
+    exact smul_mono_right _ inf_le_right
 
 /-- Completion of the original kernel is the kernel of the completed map when
 both original modules are Noetherian over the original coefficient ring.

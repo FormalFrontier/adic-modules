@@ -14,10 +14,12 @@ public import Mathlib.RingTheory.Int.Basic
 public import Mathlib.Tactic.NormNum
 
 import AdicModules.AdicCompletion.Kernel
+import AdicModules.AdicCompletion.CompleteBase
 import AdicModules.AdicCompletion.Submodule
+import CoherentModules.RingTheory.Filtration
 
 /-!
-# Examples of completeness theorems
+# Adic completeness examples and Noetherian specializations
 
 The canonical completion of `ℤ` at `(2)` is complete by finite generation of `(2)`.
 Its canonical map from `ℤ` is injective, so this is a nonzero module. The ideals
@@ -37,6 +39,11 @@ Hausdorffification for its generated ideal, without Hausdorffness of the source.
 The original integer module `ZMod 8` is complete for `(2)`: the ideal `(2)^3 = (8)`
 annihilates its canonical integer action. The original integer module `ZMod 1`
 illustrates annihilation at exponent zero. Neither application changes the module data.
+
+The finite-module separation criterion `IsHausdorff.of_le_jacobson` from Andrew
+Yang's Mathlib formalization is recovered from finite-submodule adic cofinality.
+The Noetherian cofinality provider also gives intrinsic completeness of every
+finite original module over a complete Noetherian base.
 
 The canonical map from a closed, pointwise-cofinal submodule of a complete module
 to its completion is bijective: precompleteness descends by cofinality, while
@@ -168,6 +175,26 @@ private theorem completion_kernel_and_intrinsic_completeness_of_finite_reduction
     (Ideal.finite_cotangent_pow_iff_finite_quotient_smul_top I p).mpr inferInstance
   exact ⟨AdicCompletion.pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M hp,
     AdicCompletion.isAdicComplete_map_of_finite_cotangent_pow I M hp⟩
+
+/-- Finite-submodule cofinality separation recovers Mathlib's
+`IsHausdorff.of_le_jacobson` under its Noetherian-ring and finite-module hypotheses. -/
+private theorem isHausdorff_of_le_jacobson_of_isNoetherianRing
+    {R : Type u} [CommRing R] (I : Ideal R)
+    (M : Type v) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing R] [Module.Finite R M]
+    (hJ : I ≤ (⊥ : Ideal R).jacobson) : IsHausdorff I M :=
+  IsHausdorff.of_hasFiniteSubmoduleAdicCofinality
+    (Ideal.hasFiniteSubmoduleAdicCofinality_of_isNoetherianRing I)
+    (hJ.trans (Ideal.jacobson_mono bot_le))
+
+/-- The cofinality completeness theorem specializes to finite original modules
+over complete Noetherian rings, using the Noetherian cofinality provider. -/
+private theorem isAdicComplete_of_finite_of_isNoetherianRing
+    {R : Type u} [CommRing R] (I : Ideal R) [IsAdicComplete I R]
+    (M : Type v) [AddCommGroup M] [Module R M]
+    [IsNoetherianRing R] [Module.Finite R M] : IsAdicComplete I M :=
+  IsAdicComplete.of_hasFiniteSubmoduleAdicCofinality I M
+    (Ideal.hasFiniteSubmoduleAdicCofinality_of_isNoetherianRing I)
 
 example (I : Ideal R) [IsAdicComplete I M] (N : Submodule R M)
     [IsHausdorff I (M ⧸ N)]

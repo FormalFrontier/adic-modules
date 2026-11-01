@@ -6,6 +6,7 @@ module
 
 public import AdicModules.AdicCompletion.TensorProduct
 public import AdicModules.Ideal.Cotangent
+public import CoherentModules.RingTheory.Ideal.AdicKrull
 
 import AdicModules.AdicCompletion.Completeness
 import AdicModules.Noetherian
@@ -17,6 +18,13 @@ import Mathlib.RingTheory.Nakayama
 Let `I` be any ideal of a commutative ring `R` that is `I`-adically precomplete.
 If the original quotient `M / I M` is finite over `R / I`, then `M` is precomplete.
 If `M` is also `I`-Hausdorff, then it is finite over `R`.
+
+If `I` satisfies finite-submodule adic cofinality, every finite original module is
+`I`-Hausdorff when `I` lies in the Jacobson radical of its annihilator. Over a fully
+`I`-adically complete base, the Jacobson bound follows from base completeness, so
+all finite original modules are intrinsically `I`-adically complete. Their canonical
+maps to `AdicCompletion I M` are bijective; the existing `AdicCompletion.ofLinearEquiv`
+gives the corresponding original-`R`-linear equivalence.
 
 When the base is fully `I`-adically complete, a module with finite projective first
 quotient and flat positive power quotients is projective over `R` if it is Hausdorff
@@ -61,6 +69,14 @@ Andrew Yang's `RingTheory/Ideal/Cotangent.lean` supplies the canonical conormal 
 its quotient action and its quotient map. The Noetherian consequence uses this library's
 formalization of the finitely generated ideal criterion from K. Fujiwara and F. Kato,
 *Foundations of Rigid Geometry I*, arXiv:1308.4734v5.
+
+The finite-submodule cofinality separation theorem uses
+`CoherentModules.RingTheory.Ideal.AdicKrull`, whose relative-annihilator theorem
+generalizes the separation implication of Fujiwara--Kato, Proposition 0.7.4.16,
+and Andrew Yang's Noetherian Krull formalization in Mathlib. Combining it with
+`IsPrecomplete.of_finite_quotient` gives Corollary 0.7.4.17 for original finite
+modules. The complete-base Jacobson bound, intrinsic predicates and canonical
+completion equivalence are from the Mathlib adic-completion API credited above.
 -/
 
 set_option warningAsError true
@@ -98,6 +114,37 @@ theorem IsPrecomplete.of_finite_quotient
       TensorProduct.lid_symm_apply, LinearMap.rTensor_tmul, hone] using hm
   refine ⟨m, ?_⟩
   rw [← ht, ← hm', AdicCompletion.ofTensorProduct_tmul, one_smul]
+
+/-- A finite module is adically Hausdorff if the ideal satisfies finite-submodule
+adic cofinality and lies in the Jacobson radical of the module's annihilator.
+This relative-annihilator form generalizes the separation implication of
+Fujiwara--Kato, *Foundations of Rigid Geometry I*, Proposition 0.7.4.16. -/
+theorem IsHausdorff.of_hasFiniteSubmoduleAdicCofinality
+    {R : Type uR} [CommRing R] {I : Ideal R}
+    {M : Type uM} [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (hAPf : I.HasFiniteSubmoduleAdicCofinality)
+    (hJ : I ≤ (Module.annihilator R M).jacobson) :
+    IsHausdorff I M := by
+  refine isHausdorff_iff.mpr ?_
+  intro x hx
+  apply (Submodule.mem_bot R).mp
+  rw [← hAPf.iInf_pow_smul_top_eq_bot_of_le_jacobson_annihilator hJ]
+  exact (Submodule.mem_iInf _).mpr fun n => SModEq.zero.mp (hx n)
+
+/-- Every finite original module over an adically complete commutative ring is
+intrinsically adically complete if the ideal satisfies finite-submodule adic
+cofinality. This is Fujiwara--Kato, *Foundations of Rigid Geometry I*,
+Corollary 0.7.4.17. Hausdorffness of the module follows from the hypotheses. -/
+theorem IsAdicComplete.of_hasFiniteSubmoduleAdicCofinality
+    {R : Type uR} [CommRing R] (I : Ideal R) [IsAdicComplete I R]
+    (M : Type uM) [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (hAPf : I.HasFiniteSubmoduleAdicCofinality) :
+    IsAdicComplete I M := by
+  have hJ : I ≤ (Module.annihilator R M).jacobson :=
+    (IsAdicComplete.le_jacobson_bot I).trans (Ideal.jacobson_mono bot_le)
+  exact
+    { toIsHausdorff := IsHausdorff.of_hasFiniteSubmoduleAdicCofinality hAPf hJ
+      toIsPrecomplete := IsPrecomplete.of_finite_quotient I M }
 
 /-- Over an adically precomplete commutative ring, a Hausdorff module finite modulo the
 ideal is finite over the original ring. No Hausdorffness of the base is required. -/
