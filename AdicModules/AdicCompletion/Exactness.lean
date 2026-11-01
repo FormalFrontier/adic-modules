@@ -13,18 +13,18 @@ public import Mathlib.RingTheory.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.LinearMap
 
 import Mathlib.Algebra.Module.Submodule.Equiv
-import AdicModules.AdicCompletion.RestrictScalars
-import AdicModules.AdicCompletion.TensorProduct
 import CoherentModules.RingTheory.Filtration
-import CoherentModules.RingTheory.Noetherian
-import Mathlib.Algebra.Module.Torsion.Basic
 
 /-!
 # Images, injectivity and exactness of adic completion
 
-For every ideal, adic completion preserves injectivity of an original linear map
-whose original target is Noetherian over the original ring. The original ring need
-not be Noetherian, and the ring, source and target universes are independent.
+Pointwise cofinality of the induced and intrinsic ideal-power filtrations makes
+completion of a submodule inclusion injective, by
+`map_subtype_injective_of_cofinal` in `AdicModules.AdicCompletion.LinearMap`.
+For every ideal, module Artin–Rees supplies this cofinality for a Noetherian
+original target. Thus completion preserves injectivity of an original linear map
+with such a target. The original ring need not be Noetherian, and the ring,
+source and target universes are independent.
 
 For an arbitrary original map `f : M →ₗ[R] N` with original Noetherian target,
 `rangeEquivOfIsNoetherianTarget` identifies completion of the original `f.range`,
@@ -58,16 +58,19 @@ for this range-cofinality criterion.
 
 ## Implementation notes
 
-For injectivity, the quotient by the original target's annihilator is Noetherian.
-Over this quotient, the existing finite-module tensor comparisons and flatness of
-the completed ring give injectivity. Naturality of the existing restriction-of-scalars
-comparison returns to the original ideal and the canonical completed map.
+For injectivity, module Artin–Rees supplies the pointwise cofinality bound for
+the original range in its Noetherian ambient target. The subtype criterion gives
+injectivity of the completed range inclusion. Completion of
+`LinearEquiv.ofInjective` identifies the original source completion with completion
+of that original range; functoriality recovers the canonical completed map.
 
 The image equivalence uses this injectivity criterion only for the original range
 inclusion. The unconditional `range_map_range_subtype` gives its range and hence
 surjectivity of its codomain restriction. Mathlib's `LinearEquiv.ofBijective`
 then supplies the equivalence and its choice-based inverse; no quotient of the
-completed source or new completed-map construction is involved.
+completed source or new completed-map construction is involved. The resulting
+Noetherian-target comparison agrees as a whole equivalence with
+`rangeEquivOfRangeCofinal` for every proof of the pointwise cofinality bound.
 
 The range-cofinality proof uses the existing Cauchy-sequence and completion maps.
 At each step, cofinality allows a change of a chosen lift by an element in the
@@ -95,13 +98,13 @@ The construction follows the Cauchy-sequence proof of `AdicCompletion.map_exact`
 by Judith Ludwig and Christian Merten in
 `Mathlib.RingTheory.AdicCompletion.Exactness`. Pointwise range cofinality replaces
 its Artin–Rees bound, and chosen small changes replace its use of injectivity.
-The injectivity criterion reuses their canonical tensor comparison, its naturality
-and flatness of Noetherian ring completions from
-`Mathlib.RingTheory.AdicCompletion.AsTensorProduct`, together with CoherentModules'
-annihilator-quotient Noetherianity theorem and the independent-universe tensor and
-restriction-of-scalars APIs of this library. The image comparison also uses
-Ludwig and Merten's all-ideal completion-surjectivity theorem and Mathlib's
-generic range, codomain-restriction and linear-equivalence APIs.
+The Noetherian-target injectivity criterion uses the pointwise subtype criterion
+from `AdicModules.AdicCompletion.LinearMap`, completion functoriality and Mathlib's
+`LinearEquiv.ofInjective`. Its cofinality bound comes from CoherentModules' module
+Artin–Rees theorem, generalizing Andrew Yang's formalization in
+`Mathlib.RingTheory.Filtration`. The image comparison also uses Ludwig and Merten's
+all-ideal completion-surjectivity theorem and Mathlib's generic range,
+codomain-restriction and linear-equivalence APIs.
 
 The Noetherian-middle criterion uses CoherentModules' module Artin–Rees theorem,
 which generalizes Andrew Yang's formalization in `Mathlib.RingTheory.Filtration`.
@@ -122,25 +125,6 @@ namespace AdicCompletion
 
 open LinearMap
 
-private theorem map_injective_of_finite_of_isNoetherian
-    {R : Type uR} [CommRing R] [IsNoetherianRing R] (I : Ideal R)
-    {M : Type uM} [AddCommGroup M] [Module R M] [Module.Finite R M]
-    {N : Type uN} [AddCommGroup N] [Module R N] [Module.Finite R N]
-    (f : M →ₗ[R] N) (hf : Function.Injective f) :
-    Function.Injective (map I f) := by
-  have ht : Function.Injective
-      (TensorProduct.AlgebraTensorModule.map
-        (LinearMap.id : AdicCompletion I R →ₗ[AdicCompletion I R] AdicCompletion I R) f) :=
-    Module.Flat.lTensor_preserves_injective_linearMap (M := AdicCompletion I R) f hf
-  intro x y hxy
-  obtain ⟨a, rfl⟩ := (ofTensorProduct_bijective I M).2 x
-  obtain ⟨b, rfl⟩ := (ofTensorProduct_bijective I M).2 y
-  apply congrArg (ofTensorProduct I M)
-  apply ht
-  apply (ofTensorProduct_bijective I N).1
-  exact (LinearMap.congr_fun (ofTensorProduct_naturality I f) a).symm.trans
-    (hxy.trans (LinearMap.congr_fun (ofTensorProduct_naturality I f) b))
-
 /-- Completion preserves injectivity of a linear map whose original target is
 Noetherian over the original ring, for every ideal. No Noetherianity of the original
 ring, finite generation of the ideal, source finiteness, flatness, separation or
@@ -148,8 +132,9 @@ completeness is assumed.
 
 This generalizes Mathlib's `AdicCompletion.map_injective`, formalized by Judith Ludwig
 and Christian Merten, to arbitrary original rings and independent ring, source and
-target universes. The proof passes to the quotient by the target's annihilator and
-uses the existing tensor comparison and restriction-of-scalars naturality. -/
+target universes. Module Artin–Rees supplies pointwise cofinality for the original
+range inclusion, and completion of `LinearEquiv.ofInjective` gives the result for
+the original map. -/
 theorem map_injective_of_isNoetherian_target
     {R : Type uR} [CommRing R] (I : Ideal R)
     {M : Type uM} [AddCommGroup M] [Module R M]
@@ -157,40 +142,24 @@ theorem map_injective_of_isNoetherian_target
     [IsNoetherian R N]
     (f : M →ₗ[R] N) (hf : Function.Injective f) :
     Function.Injective (AdicCompletion.map I f) := by
-  have : IsNoetherian R M := isNoetherian_of_injective f hf
-  let K := Module.annihilator R N
-  let B := R ⧸ K
-  have hM : Module.IsTorsionBySet R M K :=
-    (Module.isTorsionBySet_iff_subset_annihilator R M).mpr
-      (f.annihilator_le_of_injective hf)
-  let : Module B M := hM.module
-  let : Module B N := Module.quotientAnnihilator
-  let : IsScalarTower R B M := hM.isScalarTower
-  let : IsScalarTower R B N := (Module.isTorsionBySet_annihilator R N).isScalarTower
-  have : IsNoetherianRing B := isNoetherianRing_quotient_annihilator N
-  have : Module.Finite B M := Module.Finite.of_restrictScalars_finite R B M
-  have : Module.Finite B N := Module.Finite.of_restrictScalars_finite R B N
-  let fB : M →ₗ[B] N :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := by
-        intro b m
-        refine Quotient.inductionOn' b (fun r => ?_)
-        change f (Ideal.Quotient.mk K r • m) = Ideal.Quotient.mk K r • f m
-        rw [hM.mk_smul, (Module.isTorsionBySet_annihilator R N).mk_smul]
-        exact f.map_smul r m }
-  have hfB : fB.restrictScalars R = f := by
-    ext m
-    rfl
-  let J := I.map (algebraMap R B)
-  have hJ : Function.Injective (map J fB) :=
-    map_injective_of_finite_of_isNoetherian J fB hf
-  intro x y hxy
-  apply (restrictScalarsSemilinearMap_bijective (S := B) I M).1
-  apply hJ
-  rw [← hfB] at hxy
-  simpa only [restrictScalarsSemilinearMap_map] using
-    congrArg (restrictScalarsSemilinearMap (S := B) I N) hxy
+  have hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      f.range ⊓ (I ^ m • (⊤ : Submodule R N)) ≤ I ^ n • f.range := by
+    intro n
+    obtain ⟨c, hc⟩ := Ideal.exists_pow_inf_eq_pow_smul_of_isNoetherian I f.range
+    refine ⟨n + c, ?_⟩
+    rw [inf_comm, hc (n + c) (Nat.le_add_left c n), Nat.add_sub_cancel]
+    exact smul_mono_right _ inf_le_right
+  have hfactor : (map I f.range.subtype).comp
+      (congr I (LinearEquiv.ofInjective f hf)).toLinearMap = map I f := by
+    have h : f.range.subtype.comp (LinearEquiv.ofInjective f hf).toLinearMap = f := by
+      ext x
+      exact LinearEquiv.ofInjective_apply f (h := hf) x
+    change (map I f.range.subtype).comp
+      (map I (LinearEquiv.ofInjective f hf).toLinearMap) = map I f
+    rw [map_comp, h]
+  rw [← hfactor]
+  exact (map_subtype_injective_of_cofinal I f.range hcofinal).comp
+    (congr I (LinearEquiv.ofInjective f hf)).injective
 
 /-- The completion of the original range is the range of the completed map
 when the original target is Noetherian over the original coefficient ring.
@@ -261,6 +230,22 @@ theorem rangeEquivOfIsNoetherianTarget_map_rangeRestrict
   rfl
 
 end RangeEquiv
+
+/-- The Noetherian-target image comparison agrees with the pointwise-cofinal
+comparison for any proof of the induced-filtration bound. -/
+theorem rangeEquivOfIsNoetherianTarget_eq_rangeEquivOfRangeCofinal
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    [IsNoetherian R P] (f : M →ₗ[R] P)
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      f.range ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • f.range) :
+    rangeEquivOfIsNoetherianTarget I f =
+      rangeEquivOfRangeCofinal I f hcofinal := by
+  apply LinearEquiv.ext
+  intro z
+  apply Subtype.ext
+  rw [coe_rangeEquivOfIsNoetherianTarget_apply, coe_rangeEquivOfRangeCofinal_apply]
 
 variable {R : Type uR} [CommRing R] {I : Ideal R}
 variable {P : Type uP} [AddCommGroup P] [Module R P]

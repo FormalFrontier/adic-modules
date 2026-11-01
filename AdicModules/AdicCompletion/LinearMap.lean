@@ -21,6 +21,17 @@ as submodules over `AdicCompletion I R`. This uses only the original range
 factorization and Mathlib's preservation of surjectivity, with no Noetherian,
 finiteness, injectivity, separation or completeness hypothesis.
 
+`map_subtype_injective_of_cofinal` proves injectivity of the completed submodule
+inclusion when the induced ideal-power filtration is pointwise cofinal with the
+intrinsic one. There is no finiteness or Noetherian hypothesis on the ring, ideal,
+submodule or ambient module. `rangeEquivOfRangeCofinal` then identifies completion
+of the original range with the range of the completed map over `AdicCompletion I R`.
+Its forward map is the completed original range inclusion with its codomain
+restricted to that range. The whole forward and inverse maps, their uniqueness,
+and the completed range-factorization square characterize the comparison.
+`rangeEquivOfRangeCofinal_existsUnique` gives its mapping-in universal property
+for any module over the completed ring.
+
 For any ideal `I` of a commutative ring `R` and additive commutative group
 `R`-modules, completion distinguishes linear maps to an `I`-Hausdorff original
 target and reflects injectivity from an `I`-Hausdorff original source. A completed
@@ -99,9 +110,10 @@ for uniform uniqueness.
 
 This file builds on the adic-completion formalizations of Kenny Lau, Judith Ludwig,
 Christian Merten, Jiedong Jiang and Bingyu Xia, and on Mathlib's scalar-tower,
-linear-map and span APIs. The range comparison uses Ludwig and Merten's all-ideal
-`AdicCompletion.map_surjective` in `Mathlib.RingTheory.AdicCompletion.Exactness`
-and Mathlib's generic range-factorization API.
+linear-map and span APIs. The pointwise-cofinal criterion uses Mathlib's quotient
+coordinates, transition maps and ideal-smul/submodule interfaces. The range comparison
+uses Ludwig and Merten's all-ideal `AdicCompletion.map_surjective` in
+`Mathlib.RingTheory.AdicCompletion.Exactness` and Mathlib's generic range-factorization API.
 -/
 
 @[expose] public section
@@ -109,7 +121,7 @@ and Mathlib's generic range-factorization API.
 noncomputable section
 
 universe u v w x y
-universe uR uM uN
+universe uR uM uN uP uX
 
 namespace AdicCompletion
 
@@ -128,6 +140,223 @@ theorem range_map_range_subtype
   simpa only [AdicCompletion.map_comp, LinearMap.subtype_comp_rangeRestrict] using
     (LinearMap.range_comp_of_range_eq_top
       (AdicCompletion.map I f.range.subtype) hq).symm
+
+/-- Pointwise cofinality of the induced and intrinsic ideal-power filtrations
+makes completion of the submodule inclusion injective. -/
+theorem map_subtype_injective_of_cofinal
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    (K : Submodule R P)
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      K ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • K) :
+    Function.Injective (AdicCompletion.map I K.subtype) := by
+  apply LinearMap.ker_eq_bot.mp
+  apply LinearMap.ker_eq_bot'.mpr
+  intro z hz
+  apply AdicCompletion.ext
+  intro n
+  change z.val n = 0
+  obtain ⟨m, hm⟩ := hcofinal n
+  -- A representative at a common deeper stage controls intrinsic precision `n`.
+  obtain ⟨a, ha⟩ := Submodule.mkQ_surjective
+    (I ^ (max n m) • (⊤ : Submodule R K)) (z.val (max n m))
+  have haP : (a : P) ∈ I ^ (max n m) • (⊤ : Submodule R P) := by
+    apply (Submodule.Quotient.mk_eq_zero _).mp
+    have hz' := congrArg (fun w : AdicCompletion I P ↦ w.val (max n m)) hz
+    rw [map_val_apply, ← ha] at hz'
+    exact hz'
+  have han : a ∈ I ^ n • (⊤ : Submodule R K) := by
+    apply (Submodule.mem_smul_top_iff (I := I ^ n) K a).mpr
+    exact hm ⟨a.property,
+      Submodule.smul_mono_left (Ideal.pow_le_pow_right (Nat.le_max_right n m)) haP⟩
+  calc
+    z.val n = transitionMap I K (Nat.le_max_left n m) (z.val (max n m)) :=
+      (transitionMap_comp_eval_apply I K (Nat.le_max_left n m) z).symm
+    _ = (I ^ n • (⊤ : Submodule R K)).mkQ a :=
+      (congrArg (transitionMap I K (Nat.le_max_left n m)) ha).symm.trans
+        (Submodule.factor_mk _ a)
+    _ = 0 := (Submodule.Quotient.mk_eq_zero _).mpr han
+
+/-- Completion of the original range is the range of the completed map when
+its induced ideal-power filtration is pointwise cofinal with its intrinsic one.
+The forward map is completion of the original range inclusion. -/
+noncomputable def rangeEquivOfRangeCofinal
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    (f : M →ₗ[R] P)
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      f.range ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • f.range) :
+    AdicCompletion I (LinearMap.range f) ≃ₗ[AdicCompletion I R]
+      LinearMap.range (AdicCompletion.map I f) :=
+  LinearEquiv.ofBijective
+    ((AdicCompletion.map I f.range.subtype).codRestrict
+      (LinearMap.range (AdicCompletion.map I f))
+      (fun z ↦ (AdicCompletion.range_map_range_subtype I f).le
+        (LinearMap.mem_range_self _ z)))
+    (by
+      constructor
+      · intro x y hxy
+        apply map_subtype_injective_of_cofinal I f.range hcofinal
+        exact congrArg Subtype.val hxy
+      · intro y
+        have hy : (y : AdicCompletion I P) ∈
+            LinearMap.range (AdicCompletion.map I f.range.subtype) :=
+          (AdicCompletion.range_map_range_subtype I f).ge y.property
+        obtain ⟨x, hx⟩ := hy
+        exact ⟨x, Subtype.ext hx⟩)
+
+section RangeCofinal
+
+variable {R : Type uR} [CommRing R] (I : Ideal R)
+variable {M : Type uM} [AddCommGroup M] [Module R M]
+variable {P : Type uP} [AddCommGroup P] [Module R P]
+variable (f : M →ₗ[R] P)
+variable (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+  f.range ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • f.range)
+
+/-- The whole ambient forward map is the completed original range inclusion. -/
+theorem subtype_comp_rangeEquivOfRangeCofinal :
+    (LinearMap.range (map I f)).subtype.comp
+      (rangeEquivOfRangeCofinal I f hcofinal).toLinearMap =
+      map I f.range.subtype :=
+  rfl
+
+/-- The forward linear map is the canonical codomain restriction, independently
+of the proof of range membership. -/
+theorem rangeEquivOfRangeCofinal_toLinearMap_eq_codRestrict
+    (hmem : ∀ z : AdicCompletion I (LinearMap.range f),
+      map I f.range.subtype z ∈ LinearMap.range (map I f)) :
+    (rangeEquivOfRangeCofinal I f hcofinal).toLinearMap =
+      (map I f.range.subtype).codRestrict (LinearMap.range (map I f)) hmem := by
+  apply LinearMap.ext
+  intro z
+  apply Subtype.ext
+  exact LinearMap.congr_fun (subtype_comp_rangeEquivOfRangeCofinal I f hcofinal) z
+
+/-- Coercing the image comparison to the ambient completion gives the
+completed original range inclusion. -/
+@[simp]
+theorem coe_rangeEquivOfRangeCofinal_apply
+    (z : AdicCompletion I (LinearMap.range f)) :
+    (rangeEquivOfRangeCofinal I f hcofinal z : AdicCompletion I P) =
+      map I f.range.subtype z :=
+  LinearMap.congr_fun (subtype_comp_rangeEquivOfRangeCofinal I f hcofinal) z
+
+/-- An original range element maps to its canonical image in the ambient completion. -/
+theorem coe_rangeEquivOfRangeCofinal_apply_of (y : LinearMap.range f) :
+    (rangeEquivOfRangeCofinal I f hcofinal
+      (of I (LinearMap.range f) y) : AdicCompletion I P) =
+      of I P (y : P) := by
+  rw [coe_rangeEquivOfRangeCofinal_apply, map_of]
+  rfl
+
+/-- The comparison identifies the two completed range factorizations. -/
+@[simp]
+theorem rangeEquivOfRangeCofinal_map_rangeRestrict (x : AdicCompletion I M) :
+    rangeEquivOfRangeCofinal I f hcofinal (map I f.rangeRestrict x) =
+      (map I f).rangeRestrict x := by
+  apply Subtype.ext
+  rw [coe_rangeEquivOfRangeCofinal_apply, map_comp_apply,
+    LinearMap.subtype_comp_rangeRestrict]
+  rfl
+
+/-- The inverse comparison recovers the completed original range preimage. -/
+@[simp]
+theorem map_range_subtype_rangeEquivOfRangeCofinal_symm_apply
+    (y : LinearMap.range (map I f)) :
+    map I f.range.subtype ((rangeEquivOfRangeCofinal I f hcofinal).symm y) =
+      (y : AdicCompletion I P) := by
+  rw [← coe_rangeEquivOfRangeCofinal_apply I f hcofinal, LinearEquiv.apply_symm_apply]
+
+/-- The whole inverse is a right inverse to the completed range inclusion
+on the range of the completed map. -/
+theorem map_range_subtype_comp_rangeEquivOfRangeCofinal_symm :
+    (map I f.range.subtype).comp
+      (rangeEquivOfRangeCofinal I f hcofinal).symm.toLinearMap =
+      (LinearMap.range (map I f)).subtype := by
+  apply LinearMap.ext
+  intro y
+  exact map_range_subtype_rangeEquivOfRangeCofinal_symm_apply I f hcofinal y
+
+/-- The inverse is uniquely characterized by its ambient inclusion equation. -/
+theorem rangeEquivOfRangeCofinal_symm_toLinearMap_eq_iff
+    (v : LinearMap.range (map I f) →ₗ[AdicCompletion I R]
+      AdicCompletion I (LinearMap.range f)) :
+    v = (rangeEquivOfRangeCofinal I f hcofinal).symm.toLinearMap ↔
+      (map I f.range.subtype).comp v =
+        (LinearMap.range (map I f)).subtype := by
+  constructor
+  · rintro rfl
+    exact map_range_subtype_comp_rangeEquivOfRangeCofinal_symm I f hcofinal
+  · intro hv
+    apply LinearMap.ext
+    intro y
+    apply (rangeEquivOfRangeCofinal I f hcofinal).injective
+    apply Subtype.ext
+    rw [LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply,
+      coe_rangeEquivOfRangeCofinal_apply]
+    exact LinearMap.congr_fun hv y
+
+/-- The image comparison is uniquely characterized by its whole ambient forward map. -/
+theorem rangeEquivOfRangeCofinal_eq_iff
+    (e : AdicCompletion I (LinearMap.range f) ≃ₗ[AdicCompletion I R]
+      LinearMap.range (map I f)) :
+    e = rangeEquivOfRangeCofinal I f hcofinal ↔
+      (LinearMap.range (map I f)).subtype.comp e.toLinearMap =
+        map I f.range.subtype := by
+  constructor
+  · rintro rfl
+    exact subtype_comp_rangeEquivOfRangeCofinal I f hcofinal
+  · intro he
+    apply LinearEquiv.ext
+    intro z
+    apply Subtype.ext
+    calc
+      (e z : AdicCompletion I P) = map I f.range.subtype z :=
+        LinearMap.congr_fun he z
+      _ = (rangeEquivOfRangeCofinal I f hcofinal z : AdicCompletion I P) :=
+        (coe_rangeEquivOfRangeCofinal_apply I f hcofinal z).symm
+
+include hcofinal
+
+/-- Every completed-ring-linear map into the completed image factors uniquely
+through completion of the original range. The factor is the inverse comparison
+composed with the stock codomain restriction, for any module over the completed ring. -/
+theorem rangeEquivOfRangeCofinal_existsUnique
+    {X : Type uX} [AddCommMonoid X] [Module (AdicCompletion I R) X]
+    (u : X →ₗ[AdicCompletion I R] AdicCompletion I P)
+    (hu : LinearMap.range u ≤ LinearMap.range (map I f)) :
+    ∃! v : X →ₗ[AdicCompletion I R] AdicCompletion I (LinearMap.range f),
+      (map I f.range.subtype).comp v = u := by
+  refine ⟨(rangeEquivOfRangeCofinal I f hcofinal).symm.toLinearMap.comp
+    (u.codRestrict (LinearMap.range (map I f))
+      (fun x ↦ hu (LinearMap.mem_range_self u x))), ?_, ?_⟩
+  · change (map I f.range.subtype).comp
+        ((rangeEquivOfRangeCofinal I f hcofinal).symm.toLinearMap.comp
+          (u.codRestrict (LinearMap.range (map I f))
+            (fun x ↦ hu (LinearMap.mem_range_self u x)))) = u
+    rw [← LinearMap.comp_assoc, map_range_subtype_comp_rangeEquivOfRangeCofinal_symm,
+      LinearMap.subtype_comp_codRestrict]
+  · intro v hv
+    apply LinearMap.ext
+    intro x
+    apply (rangeEquivOfRangeCofinal I f hcofinal).injective
+    apply Subtype.ext
+    calc
+      (rangeEquivOfRangeCofinal I f hcofinal (v x) : AdicCompletion I P) =
+          map I f.range.subtype (v x) :=
+        coe_rangeEquivOfRangeCofinal_apply I f hcofinal (v x)
+      _ = u x := LinearMap.congr_fun hv x
+      _ = (rangeEquivOfRangeCofinal I f hcofinal
+          (((rangeEquivOfRangeCofinal I f hcofinal).symm.toLinearMap.comp
+            (u.codRestrict (LinearMap.range (map I f))
+              (fun x ↦ hu (LinearMap.mem_range_self u x)))) x) :
+            AdicCompletion I P) := by
+        simp only [LinearMap.comp_apply, LinearEquiv.coe_coe,
+          LinearEquiv.apply_symm_apply, LinearMap.codRestrict_apply]
+
+end RangeCofinal
 
 variable {R : Type u} [CommRing R] (I : Ideal R)
 variable {M : Type v} [AddCommGroup M] [Module R M]

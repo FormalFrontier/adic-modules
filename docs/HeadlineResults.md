@@ -127,6 +127,23 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   algebra. No completed-coefficient algebra structure on that target is needed.
   Zero modules, zero rings and bottom and top ideals are included.
 
+- **Completion of pointwise-cofinal submodule inclusions.** Let `I` be any ideal
+  of a commutative ring `R`, and `K` a submodule of an additive commutative group
+  `R`-module `N`. Suppose
+  `∀ n : ℕ, ∃ m : ℕ, K ⊓ (I ^ m • (⊤ : Submodule R N)) ≤ I ^ n • K`.
+  Then the canonical completed-ring-linear map
+  `AdicCompletion.map I K.subtype : AdicCompletion I K →ₗ[AdicCompletion I R] AdicCompletion I N`
+  is injective, by
+  [`AdicCompletion.map_subtype_injective_of_cofinal`](../AdicModules/AdicCompletion/LinearMap.lean).
+  The ambient submodule `I ^ n • K` is the image of the intrinsic ideal-power
+  submodule of `K`; the source completion uses that intrinsic filtration, not
+  the filtration induced from `N`. No monotone choice of stages or uniform shift
+  is assumed. There is no finiteness or Noetherianity hypothesis on the ring,
+  ideal, submodule or ambient module, and no flatness, separation, completeness,
+  faithfulness or smallness hypothesis. Ring and module universes are independent.
+  In particular, every direct summand satisfies the bound with `m = n`, including
+  infinite-rank summands over rings with non-finitely-generated ideals.
+
 - **Completion preserves injections into Noetherian original targets.** For
   every ideal `I` of an arbitrary commutative ring `R`, if the original target
   `N` is Noetherian over original `R`, every injective `R`-linear map `f : M → N`
@@ -135,10 +152,11 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   generation of `I`, source finiteness, flatness, separation or completeness is
   assumed; source Noetherianity follows from the original injection. See
   [`AdicCompletion.map_injective_of_isNoetherian_target`](../AdicModules/AdicCompletion/Exactness.lean).
-  The proof uses the Noetherian quotient `R / ann_R N`, the canonical finite-module
-  tensor comparison and flatness of its completed ring, then the naturality law
-  [`restrictScalarsSemilinearMap_map`](../AdicModules/AdicCompletion/RestrictScalars.lean)
-  to return to the original ideal. No new completed action is needed.
+  Module Artin–Rees supplies the pointwise-cofinality bound for `f.range` in `N`.
+  The subtype criterion gives injectivity of the completed original range inclusion,
+  and completion of `LinearEquiv.ofInjective f hf` supplies the source equivalence.
+  Their whole composite is `AdicCompletion.map I f` by functoriality and the
+  original range factorization. All maps retain the canonical completed actions.
   In particular, multiplication by two remains injective on the `(2)`-adic
   completion of `ℤ`, although its reduction modulo two is zero on a nonzero
   quotient; a [test](../AdicModulesTest/AdicCompletion/LinearMap.lean) uses this
@@ -156,17 +174,31 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   `C = AdicCompletion I R`. This core has no Noetherian, finiteness, injectivity,
   separation or completeness hypothesis: it uses preservation of surjectivity
   for the original range restriction and the completed range factorization.
-  If the original target `N` is Noetherian over original `R`,
-  [`AdicCompletion.rangeEquivOfIsNoetherianTarget`](../AdicModules/AdicCompletion/Exactness.lean)
+  If `K = f.range` satisfies the pointwise-cofinality bound above,
+  [`AdicCompletion.rangeEquivOfRangeCofinal`](../AdicModules/AdicCompletion/LinearMap.lean)
   gives `AdicCompletion I (LinearMap.range f) ≃ₗ[C] LinearMap.range (AdicCompletion.map I f)`.
   The left side completes the original range with its intrinsic original-ideal
   filtration; the right side is the canonical `C`-submodule of the target
-  completion. The forward map is completion of the original inclusion, and the
-  characteristic laws include its commuting square with completion of
-  `f.rangeRestrict`. The source `M` is arbitrary and `f` need not be injective;
-  ring, source and target universes are independent. No Noetherianity of `R` or
-  `C`, finite generation of `I`, source finiteness, flatness, separation or
-  completeness is required.
+  completion, not a closure or a quotient of the completed source.
+  The forward map is the completed original inclusion restricted to this range,
+  and the inverse is its unique preimage map. The characteristic laws describe
+  both whole ambient maps, original elements, the square with completion of
+  `f.rangeRestrict`, and uniqueness of the whole equivalence. For every additive
+  commutative monoid module `X` over `C`, any `C`-linear `u : X →ₗ[C] AdicCompletion I N`
+  whose range lies in the completed image factors uniquely through the completed
+  original range inclusion, by `rangeEquivOfRangeCofinal_existsUnique`.
+  The source `M` is arbitrary and `f` need not be injective or surjective; ring,
+  source, target and the universal property's `X` have independent universes.
+  No finiteness or Noetherianity of the ring, ideal or original modules,
+  flatness, separation or completeness is required beyond the displayed bound.
+
+  If the original target `N` is Noetherian over original `R`, module Artin–Rees
+  supplies the bound. The Noetherian-target application
+  [`AdicCompletion.rangeEquivOfIsNoetherianTarget`](../AdicModules/AdicCompletion/Exactness.lean)
+  retains its forward map and inverse from `LinearEquiv.ofBijective` of the same
+  codomain restriction. For every proof of cofinality, the whole equivalences
+  agree by `rangeEquivOfIsNoetherianTarget_eq_rangeEquivOfRangeCofinal`; therefore
+  their underlying linear maps and inverses also agree.
 
 - **Middle exactness with a Noetherian original middle module.** For every ideal
   `I` of a commutative ring `R`, let `f : M →ₗ[R] N` and `g : N →ₗ[R] P` be an

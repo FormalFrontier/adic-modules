@@ -401,16 +401,38 @@ Mathlib's original linear quotient equivalence; the kernel-intersection proof
 is used through its existing API, not copied. Upstream author, copyright and
 Apache-2.0 notices remain in Mathlib.
 
-The original-image completion comparison reuses Mathlib's raw completion,
-canonical completed actions, functoriality and all-ideal preservation of
-surjectivity, in particular the formalizations of Judith Ludwig and Christian
-Merten. It combines the generic range-factorization, codomain-restriction and
-`LinearEquiv.ofBijective` APIs with this library's injectivity theorem for
-Noetherian original targets. The range argument and characteristic laws are
-original project expression assembled from those interfaces, without copying
-upstream proof bodies or introducing a new completion, quotient or scalar action.
-The submodule and linear-equivalence contributors are credited above, and all
-upstream author, copyright and Apache-2.0 notices remain in Mathlib.
+The pointwise-cofinal submodule-inclusion criterion uses the canonical completion,
+completed-ring actions, quotient coordinates and completed maps formalized in
+Mathlib by Kenny Lau, Judith Ludwig, Christian Merten, Jiedong Jiang and Bingyu Xia.
+It combines those interfaces with Mathlib's submodule map/comap, ideal-smul and
+quotient APIs: an ambient representative at a sufficiently deep stage is
+intrinsically small by cofinality, so compatibility detects each intrinsic
+quotient coordinate. It assumes no finite generation or Noetherianity of the
+ring, ideal or modules. The argument is original Formal Frontier Agent expression
+assembled from these interfaces, not a copied inverse-limit proof.
+
+The injectivity theorem for Noetherian original targets applies this criterion
+using the module Artin–Rees theorem from Formal Frontier Agents'
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules), which
+generalizes Andrew Yang's Mathlib formalization. Mathlib's `LinearEquiv.ofInjective`
+and completion congruence give the original-range factorization for an arbitrary
+injective original map. This recovers Judith Ludwig and Christian Merten's
+`AdicCompletion.map_injective` on the same canonical map under its Noetherian-ring
+and finite-target hypotheses, without copying its tensor argument.
+
+The original-image completion comparison combines the pointwise-cofinal
+criterion with this library's unconditional completed-range equality. That equality
+reuses Mathlib's all-ideal preservation of surjectivity and range factorization,
+in particular Ludwig and Merten's formalization. Mathlib's codomain restriction
+and `LinearEquiv.ofBijective` supply the equivalence and its inverse. The
+characteristic equations, whole-map uniqueness and mapping-in universal property
+use stock subtype extensionality and inverse laws, with an arbitrary module over
+the completed ring as source. The Noetherian-target comparison retains the same
+constructor and agrees with the cofinal comparison as a whole equivalence.
+These range arguments and characteristic laws are original project expression,
+without copying upstream proof bodies or introducing a new completion, quotient
+or scalar action. The submodule and linear-equivalence contributors are credited
+above, and all upstream author, copyright and Apache-2.0 notices remain in Mathlib.
 
 ## Other deliverable interfaces
 
