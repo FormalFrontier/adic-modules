@@ -100,6 +100,7 @@ public import AdicModules.Topology.Algebra.Submodule
 public import AdicModules.Topology.Algebra.Ideal
 public import AdicModules.Topology.Algebra.Module.Span
 public import AdicModules.Topology.Algebra.Module.AdicTopology
+public import AdicModules.Topology.Algebra.Module.SeparationCriteria
 public import AdicModules.Topology.Algebra.PadicInt
 public import AdicModules.Topology.Algebra.AdicCompactness
 public import AdicModules.Topology.Algebra.PrincipalUnits
