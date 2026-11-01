@@ -66,6 +66,25 @@ further result families, examples and boundary cases.
   separation or completeness is assumed; all four universes are independent.
   See [completion exactness](AdicModules/AdicCompletion/Exactness.lean).
 
+- **Middle exactness for Noetherian original pairs.** For any ideal `I`, an
+  original exact pair `M →ₗ[R] N →ₗ[R] P` remains middle exact under the canonical
+  completed maps if both original `N` and `P` are Noetherian over original `R`.
+  The last map need not be surjective, the first map need not be injective, and
+  `M` is arbitrary. No ring Noetherianity, ideal finiteness, flatness, faithfulness,
+  separation or completeness is assumed; all four universes are independent.
+  See [completion exactness](AdicModules/AdicCompletion/Exactness.lean).
+
+- **Completion of original kernels.** For every ideal `I` and original linear
+  map `g : N →ₗ[R] P` with both original modules Noetherian over original `R`,
+  `AdicCompletion I (LinearMap.ker g) ≃ₗ[C] LinearMap.ker (AdicCompletion.map I g)`.
+  The forward map is completion of the original kernel inclusion, using the
+  intrinsic filtration on that kernel. No surjectivity or injectivity of `g`,
+  ring Noetherianity, ideal finiteness, flatness, faithfulness, separation or
+  completeness is assumed; ring and module universes are independent. The
+  inverse gives unique factorization of maps into the completed-map kernel
+  and agrees with the split comparison on overlap. See
+  [kernel comparison](AdicModules/AdicCompletion/Exactness.lean).
+
 - **Noetherian original module quotients.** For any ideal and `n ≥ 2`, the
   original `M / IⁿM` is Noetherian over `R` iff `M / IM` is Noetherian over `R`
   and the image of `IM` in `M / I²M` is finitely generated over original `R`.

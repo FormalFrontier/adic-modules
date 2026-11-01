@@ -166,6 +166,28 @@ library's range-cofinality theorem, which follows Judith Ludwig and Christian
 Merten's Cauchy-sequence exactness argument. No second reconstruction proof or
 quotient scalar action on the arbitrary original first source is introduced.
 
+Middle exactness for a pair with Noetherian original middle and target modules
+factors the last original map through its range. It reuses the right-surjective
+criterion above and the library's injectivity theorem for Noetherian original
+targets, together with Mathlib's range-restriction, kernel and functoriality APIs.
+Exactness under injective postcomposition and the original kernel-inclusion
+exact pair are from Antoine Chambert-Loir's `Mathlib.Algebra.Exact.Basic`.
+The canonical completion and completed-map formalizations of Judith Ludwig and
+Christian Merten are unchanged. This argument assembles existing interfaces
+without copying their proof bodies or introducing a new completion or scalar action.
+
+The original-kernel completion comparison composes this library's original-image
+comparison with Noetherian-pair exactness at the original kernel inclusion.
+Its two equal-submodule transports, completion congruence and equivalence
+composition use Mathlib's submodule and completion interfaces credited above.
+The characteristic equations and kernel universal property use stock subtype
+extensionality, inverse laws and codomain restriction, rather than a new lift
+construction. The overlap with the split-kernel comparison follows from their
+common whole forward map; no split-projector proof is copied. These arguments
+are original Formal Frontier Agent expression assembled from existing APIs,
+without new scalar actions or copied upstream proof bodies. The upstream
+Apache-2.0 author, copyright and license notices remain in their libraries.
+
 The complete-base conormal criteria use Andrew Yang's canonical ideal cotangent
 module and quotient map in Mathlib, together with Johan Commelin's finite-module
 transport API. The injective-map Hausdorff argument uses Mathlib's adic

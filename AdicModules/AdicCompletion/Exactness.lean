@@ -39,6 +39,18 @@ exact pair whose original middle module is Noetherian. The original first source
 is arbitrary and the first map need not be injective. The ring and all three module
 universes are independent.
 
+If both the original middle and target modules are Noetherian over the original
+ring, completion preserves middle exactness without surjectivity of the last map.
+The original first source remains arbitrary, and all four universes are independent.
+
+For an original map `g : N →ₗ[R] P` between Noetherian original modules,
+`kerEquivOfIsNoetherian` identifies intrinsic completion of its original kernel
+with the kernel of `map I g`, linearly over `AdicCompletion I R`. Its forward map
+is the completed original kernel inclusion. The inverse is characterized by its
+ambient inclusion equation and gives the kernel universal property for maps from
+arbitrary modules over the completed ring. The comparison agrees with
+`kerEquivOfRightInverse` whenever original split data are also supplied.
+
 Adic completion also preserves middle exactness when the topology induced on the
 range of the first map is cofinal with its intrinsic adic topology. Neither
 injectivity of the first map nor finiteness or Noetherian hypotheses are required
@@ -65,6 +77,17 @@ is assumed.
 
 For a Noetherian original middle module, module Artin–Rees supplies range
 cofinality, without imposing a quotient scalar action on the first source.
+For a possibly nonsurjective last map with Noetherian original target, factor it
+through its original range. The right-surjective criterion applies to the range
+restriction, and the target-injectivity criterion applies to the range inclusion.
+Mathlib's exactness-under-injective-postcomposition and completion-functoriality
+APIs then recover the canonical completed pair.
+
+The kernel comparison completes the ambient-element-preserving equivalence
+between the original kernel and the range of its inclusion, then composes the
+existing original-image equivalence with the range-to-kernel equality supplied
+by Noetherian-pair exactness. Only stock equivalence composition and submodule
+transport are used; no new comparison map or kernel-lift construction is needed.
 
 ## References
 
@@ -82,6 +105,13 @@ generic range, codomain-restriction and linear-equivalence APIs.
 
 The Noetherian-middle criterion uses CoherentModules' module Artin–Rees theorem,
 which generalizes Andrew Yang's formalization in `Mathlib.RingTheory.Filtration`.
+The Noetherian-pair criterion also uses Mathlib's original range factorization
+and Antoine Chambert-Loir's exactness-under-injective-postcomposition API in
+`Mathlib.Algebra.Exact.Basic`.
+
+The original-kernel comparison also reuses the original-image comparison above
+and Mathlib's submodule linear equivalences and codomain restrictions, with the
+canonical completed-module actions.
 -/
 
 @[expose] public section
@@ -376,5 +406,220 @@ theorem map_exact_of_isNoetherian_middle
   refine ⟨k + c, ?_⟩
   rw [inf_comm, hc (k + c) (Nat.le_add_left c k), Nat.add_sub_cancel]
   exact smul_mono_right _ inf_le_right
+
+/-- Adic completion preserves middle exactness of a pair whose original middle
+and target modules are Noetherian over the original scalar ring.
+
+The ideal and original first source are arbitrary; the first map need not be
+injective and the last map need not be surjective. All completed maps and actions
+are the canonical ones. No Noetherianity of the original ring, finite generation
+of the ideal, source finiteness, flatness, faithfulness, separation or completeness
+is assumed.
+
+This extends the middle-exactness result of Mathlib's `AdicCompletion.map_exact`,
+formalized by Judith Ludwig and Christian Merten, by factoring the last original
+map through its range. -/
+theorem map_exact_of_isNoetherian
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    [IsNoetherian R N] [IsNoetherian R P]
+    {f : M →ₗ[R] N} {g : N →ₗ[R] P}
+    (hExact : Function.Exact f g) :
+    Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g) := by
+  have hExactQ : Function.Exact f g.rangeRestrict := by
+    rw [LinearMap.exact_iff, LinearMap.ker_rangeRestrict]
+    exact hExact.linearMap_ker_eq
+  have hCompleted : Function.Exact (map I f) (map I g.rangeRestrict) :=
+    map_exact_of_isNoetherian_middle I hExactQ (LinearMap.surjective_rangeRestrict g)
+  have hi : Function.Injective (map I g.range.subtype) :=
+    map_injective_of_isNoetherian_target I g.range.subtype
+      (Submodule.injective_subtype g.range)
+  simpa only [← LinearMap.coe_comp, map_comp, LinearMap.subtype_comp_rangeRestrict] using
+    hCompleted.comp_injective (map I g.range.subtype) hi (_root_.map_zero _)
+
+/-- Completion of the original kernel is the kernel of the completed map when
+both original modules are Noetherian over the original coefficient ring.
+The forward map is completion of the original kernel inclusion. -/
+noncomputable def kerEquivOfIsNoetherian
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    [IsNoetherian R N] [IsNoetherian R P]
+    (g : N →ₗ[R] P) :
+    AdicCompletion I (LinearMap.ker g) ≃ₗ[AdicCompletion I R]
+      LinearMap.ker (AdicCompletion.map I g) := by
+  let K := LinearMap.ker g
+  let s := K.subtype
+  let eK := LinearEquiv.ofEq K (LinearMap.range s) (Submodule.range_subtype K).symm
+  let J := map I s
+  let L := LinearMap.ker (map I g)
+  have hRange : LinearMap.range J = L :=
+    (map_exact_of_isNoetherian I (LinearMap.exact_subtype_ker_map g)).linearMap_ker_eq.symm
+  exact (congr I eK).trans
+    ((rangeEquivOfIsNoetherianTarget I s).trans
+      (LinearEquiv.ofEq (LinearMap.range J) L hRange))
+
+section KerEquiv
+
+variable (I : Ideal R) [IsNoetherian R N] [IsNoetherian R P] (g : N →ₗ[R] P)
+
+/-- The whole ambient forward map is completion of the original kernel inclusion. -/
+theorem subtype_comp_kerEquivOfIsNoetherian :
+    (LinearMap.ker (map I g)).subtype.comp (kerEquivOfIsNoetherian I g).toLinearMap =
+      map I (LinearMap.ker g).subtype := by
+  let K := LinearMap.ker g
+  let eK := LinearEquiv.ofEq K (LinearMap.range K.subtype)
+    (Submodule.range_subtype K).symm
+  have hs : (LinearMap.range K.subtype).subtype.comp eK.toLinearMap = K.subtype := by
+    apply LinearMap.ext
+    intro k
+    rfl
+  apply LinearMap.ext
+  intro z
+  change (kerEquivOfIsNoetherian I g z : AdicCompletion I N) =
+    map I (LinearMap.ker g).subtype z
+  simpa only [kerEquivOfIsNoetherian, LinearEquiv.trans_apply,
+    LinearEquiv.coe_ofEq_apply, coe_rangeEquivOfIsNoetherianTarget_apply,
+    congr_apply, map_comp_apply] using
+      congrArg (fun t : K →ₗ[R] N ↦ map I t z) hs
+
+/-- Coercing any completed original-kernel element gives its completed inclusion. -/
+@[simp]
+theorem coe_kerEquivOfIsNoetherian_apply (z : AdicCompletion I (LinearMap.ker g)) :
+    (kerEquivOfIsNoetherian I g z : AdicCompletion I N) =
+      map I (LinearMap.ker g).subtype z :=
+  LinearMap.congr_fun (subtype_comp_kerEquivOfIsNoetherian I g) z
+
+/-- The forward map is the codomain restriction of the completed kernel inclusion,
+independently of the proof of kernel membership. -/
+theorem kerEquivOfIsNoetherian_toLinearMap_eq_codRestrict
+    (hmem : ∀ z : AdicCompletion I (LinearMap.ker g),
+      map I (LinearMap.ker g).subtype z ∈ LinearMap.ker (map I g)) :
+    (kerEquivOfIsNoetherian I g).toLinearMap =
+      (map I (LinearMap.ker g).subtype).codRestrict (LinearMap.ker (map I g)) hmem := by
+  apply LinearMap.ext
+  intro z
+  apply Subtype.ext
+  exact coe_kerEquivOfIsNoetherian_apply I g z
+
+/-- An original kernel element maps to its canonical image in the ambient completion. -/
+theorem coe_kerEquivOfIsNoetherian_of (k : LinearMap.ker g) :
+    (kerEquivOfIsNoetherian I g (of I (LinearMap.ker g) k) : AdicCompletion I N) =
+      of I N (k : N) := by
+  rw [coe_kerEquivOfIsNoetherian_apply, map_of]
+  rfl
+
+/-- The inverse sends a completed-map kernel element to its unique completed
+original-kernel preimage under the completed inclusion. -/
+@[simp]
+theorem map_ker_subtype_kerEquivOfIsNoetherian_symm_apply
+    (y : LinearMap.ker (map I g)) :
+    map I (LinearMap.ker g).subtype ((kerEquivOfIsNoetherian I g).symm y) =
+      (y : AdicCompletion I N) := by
+  rw [← coe_kerEquivOfIsNoetherian_apply, LinearEquiv.apply_symm_apply]
+
+/-- The inverse recovers every completed original-kernel element from its
+completed inclusion. Kernel membership follows from completion functoriality. -/
+@[simp]
+theorem kerEquivOfIsNoetherian_symm_apply_map_ker_subtype
+    (z : AdicCompletion I (LinearMap.ker g)) :
+    (kerEquivOfIsNoetherian I g).symm
+      ⟨map I (LinearMap.ker g).subtype z, by
+        have hzero : (map I g).comp (map I (LinearMap.ker g).subtype) = 0 := by
+          rw [map_comp, LinearMap.comp_ker_subtype, AdicCompletion.map_zero]
+        exact LinearMap.mem_ker.mpr (LinearMap.congr_fun hzero z)⟩ = z := by
+  apply (kerEquivOfIsNoetherian I g).injective
+  rw [LinearEquiv.apply_symm_apply]
+  apply Subtype.ext
+  exact (coe_kerEquivOfIsNoetherian_apply I g z).symm
+
+/-- The whole inverse map is a right inverse to the completed kernel inclusion
+on the completed-map kernel. -/
+theorem map_ker_subtype_comp_kerEquivOfIsNoetherian_symm :
+    (map I (LinearMap.ker g).subtype).comp (kerEquivOfIsNoetherian I g).symm.toLinearMap =
+      (LinearMap.ker (map I g)).subtype := by
+  apply LinearMap.ext
+  intro y
+  exact map_ker_subtype_kerEquivOfIsNoetherian_symm_apply I g y
+
+/-- The inverse is uniquely characterized by its whole ambient inclusion equation. -/
+theorem kerEquivOfIsNoetherian_symm_toLinearMap_eq_iff
+    (v : LinearMap.ker (map I g) →ₗ[AdicCompletion I R]
+      AdicCompletion I (LinearMap.ker g)) :
+    v = (kerEquivOfIsNoetherian I g).symm.toLinearMap ↔
+      (map I (LinearMap.ker g).subtype).comp v = (LinearMap.ker (map I g)).subtype := by
+  constructor
+  · rintro rfl
+    exact map_ker_subtype_comp_kerEquivOfIsNoetherian_symm I g
+  · intro hv
+    apply LinearMap.ext
+    intro y
+    apply (kerEquivOfIsNoetherian I g).injective
+    apply Subtype.ext
+    rw [LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply,
+      coe_kerEquivOfIsNoetherian_apply]
+    exact LinearMap.congr_fun hv y
+
+/-- The inverse recovers the canonical completed class of an original kernel element. -/
+theorem kerEquivOfIsNoetherian_symm_of (k : LinearMap.ker g) :
+    (kerEquivOfIsNoetherian I g).symm
+      ⟨of I N (k : N), by
+        rw [LinearMap.mem_ker, map_of, LinearMap.mem_ker.mp k.property, _root_.map_zero]⟩ =
+      of I (LinearMap.ker g) k := by
+  apply (kerEquivOfIsNoetherian I g).injective
+  rw [LinearEquiv.apply_symm_apply]
+  apply Subtype.ext
+  exact (coe_kerEquivOfIsNoetherian_of I g k).symm
+
+/-- On an original split surjection, the Noetherian-kernel comparison agrees
+with the split-kernel comparison as a whole linear equivalence. -/
+theorem kerEquivOfIsNoetherian_eq_kerEquivOfRightInverse
+    (r : P →ₗ[R] N) (h : g.comp r = LinearMap.id) :
+    kerEquivOfIsNoetherian I g = kerEquivOfRightInverse I g r h := by
+  apply LinearEquiv.ext
+  intro z
+  apply Subtype.ext
+  rw [coe_kerEquivOfIsNoetherian_apply, coe_kerEquivOfRightInverse_apply]
+
+universe uX
+
+/-- Every completed-ring-linear map annihilated by the completed map factors
+uniquely through completion of the original kernel. The factor is the inverse
+kernel comparison composed with the stock codomain restriction. The source is
+an arbitrary module over the completed ring. -/
+theorem kerEquivOfIsNoetherian_existsUnique
+    {X : Type uX} [AddCommMonoid X] [Module (AdicCompletion I R) X]
+    (u : X →ₗ[AdicCompletion I R] AdicCompletion I N)
+    (hu : (map I g).comp u = 0) :
+    ∃! v : X →ₗ[AdicCompletion I R] AdicCompletion I (LinearMap.ker g),
+      (map I (LinearMap.ker g).subtype).comp v = u := by
+  have hmem : ∀ x, u x ∈ LinearMap.ker (map I g) :=
+    fun x ↦ LinearMap.mem_ker.mpr (LinearMap.congr_fun hu x)
+  refine ⟨(kerEquivOfIsNoetherian I g).symm.toLinearMap.comp
+    (u.codRestrict (LinearMap.ker (map I g)) hmem), ?_, ?_⟩
+  · change (map I (LinearMap.ker g).subtype).comp
+        ((kerEquivOfIsNoetherian I g).symm.toLinearMap.comp
+          (u.codRestrict (LinearMap.ker (map I g)) hmem)) = u
+    rw [← LinearMap.comp_assoc, map_ker_subtype_comp_kerEquivOfIsNoetherian_symm,
+      LinearMap.subtype_comp_codRestrict]
+  · intro v hv
+    apply LinearMap.ext
+    intro x
+    apply (kerEquivOfIsNoetherian I g).injective
+    apply Subtype.ext
+    calc
+      (kerEquivOfIsNoetherian I g (v x) : AdicCompletion I N) =
+          map I (LinearMap.ker g).subtype (v x) :=
+        coe_kerEquivOfIsNoetherian_apply I g (v x)
+      _ = u x := LinearMap.congr_fun hv x
+      _ = (kerEquivOfIsNoetherian I g
+          (((kerEquivOfIsNoetherian I g).symm.toLinearMap.comp
+            (u.codRestrict (LinearMap.ker (map I g)) hmem)) x) : AdicCompletion I N) := by
+        simp only [LinearMap.comp_apply, LinearEquiv.coe_coe,
+          LinearEquiv.apply_symm_apply, LinearMap.codRestrict_apply]
+
+end KerEquiv
 
 end AdicCompletion

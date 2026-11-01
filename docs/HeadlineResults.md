@@ -173,6 +173,46 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   allows an arbitrary extra factor in the first source and identifies the completed
   quotient kernel with the completed first map's image.
 
+- **Middle exactness for Noetherian original pairs.** For every ideal `I` of a
+  commutative ring `R`, let `f : M →ₗ[R] N` and `g : N →ₗ[R] P` be an original
+  exact pair with both original `N` and original `P` Noetherian over original `R`.
+  Then the canonical completed maps are exact at `AdicCompletion I N`, by
+  [`AdicCompletion.map_exact_of_isNoetherian`](../AdicModules/AdicCompletion/Exactness.lean).
+  Neither the original nor the completed last map need be surjective. The first
+  source `M` is arbitrary and `f` need not be injective. No Noetherianity of `R`,
+  `R / I` or the completed ring, finite generation of `I` or a positive power,
+  source finiteness, flatness, faithfulness, separation or completeness is required;
+  the ring and all three module universes are independent. Factoring `g` through
+  its original range reduces to the right-surjective result, and completion
+  preserves injectivity of the original range inclusion into Noetherian `P`.
+  A [kernel-inclusion client](../AdicModulesTest/AdicCompletion/Exactness.lean)
+  identifies the kernel of any completed map between such modules with the image
+  of the completed original kernel inclusion, without a surjectivity premise.
+
+- **Completion of original kernels.** For every ideal `I` of an arbitrary
+  commutative ring `R` and every original map `g : N →ₗ[R] P` with both original
+  `N` and `P` Noetherian over original `R`,
+  [`AdicCompletion.kerEquivOfIsNoetherian`](../AdicModules/AdicCompletion/Exactness.lean)
+  gives `AdicCompletion I (LinearMap.ker g) ≃ₗ[AdicCompletion I R]
+  LinearMap.ker (AdicCompletion.map I g)`. The source uses the intrinsic adic
+  filtration of the original kernel, not a closure or a completed-source
+  quotient. The target is the kernel as a submodule over the canonical completed
+  coefficient ring. The forward map is completion of the original kernel
+  inclusion on every completed element; its inverse is uniquely determined
+  by the ambient inclusion equation and recovers original kernel classes.
+  Every map from an arbitrary additive commutative monoid module over the
+  completed ring, annihilated by the completed map, factors uniquely through
+  this completed original inclusion. No finiteness or completion structure
+  on that source is required. Given an original right inverse to `g`, the
+  comparison agrees with `kerEquivOfRightInverse` as a whole linear equivalence.
+  Neither original nor completed `g` need be surjective. No Noetherianity of
+  `R`, `R / I` or its completion, finite generation of `I` or a positive power,
+  flatness, faithfulness, separation or completeness is assumed; ring and both
+  module universes are independent. The
+  [factorization client](../AdicModulesTest/AdicCompletion/Exactness.lean)
+  compares completion of the original factor through the kernel with the
+  kernel restriction of the completed map on the whole completed first source.
+
 - **Noetherian original module power quotients.** For any ideal `I` of a
   commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original
   quotient `M / Iⁿ M` is Noetherian over `R` exactly when `M / I M` is
