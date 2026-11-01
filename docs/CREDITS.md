@@ -458,6 +458,18 @@ library's existing interfaces. Their upstream and project credits above remain
 applicable. The kernel formula is an auxiliary commutative-algebra result; no
 exact passage of Fujiwara–Kato is identified for it and no book coverage is claimed.
 
+The effective coefficient-ring equivalence reuses that kernel formula and this
+library's restriction-of-scalars comparison. Surjectivity is Mathlib's completed
+linear-map surjectivity theorem (Judith Ludwig and Christian Merten), applied to
+the original quotient map. The equivalence and its mapping-out application compose
+Mathlib's equal-ideal quotient transport, algebra first-isomorphism theorem and
+quotient universal property, from the quotient formalizations of Kenny Lau,
+Chris Hughes, Mario Carneiro, Anne Baanen and Patrick Massot. They retain the
+existing original-ring algebra structures and canonical completed module action.
+This identifies the quotient by the completed annihilator, not by the possibly
+smaller algebraic extension of the original annihilator. No upstream proof body
+is copied and no book correspondence is asserted.
+
 ## Fibres and submodules under completed scalars
 
 The fibre-stability and separated-quotient span results reuse the library's

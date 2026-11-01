@@ -114,9 +114,18 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   flatness of that ring's completion, preservation of a finite faithful action
   under flat base change, and the existing canonical tensor and semilinear
   restriction comparisons. It does not identify the kernel with the algebraic
-  extension of `K`, which can be strictly smaller, or require a surjective map
-  between the completed coefficient rings. Zero modules, zero rings and bottom
-  and top ideals are included.
+  extension of `K`, which can be strictly smaller. The completed coefficient
+  map is surjective: completion of the original quotient linear map is surjective,
+  and the restriction-of-scalars comparison identifies its target. Consequently
+  `AdicCompletion.quotientAnnihilatorEquiv` identifies the quotient by the completed
+  annihilator with `AdicCompletion J B`, as an algebra over original `R`. Its
+  forward and inverse formulas hold on every completed coefficient, and its
+  whole-map contracts factor the completed coefficient map and the annihilator
+  quotient map. The [mapping-out application](../AdicModulesTest/AdicCompletionQuotient.lean)
+  factors arbitrary original-`R` algebra maps killing this annihilator uniquely
+  through `AdicCompletion J B`, with an independently sized commutative target
+  algebra. No completed-coefficient algebra structure on that target is needed.
+  Zero modules, zero rings and bottom and top ideals are included.
 
 - **Completion preserves injections into Noetherian original targets.** For
   every ideal `I` of an arbitrary commutative ring `R`, if the original target
