@@ -9,6 +9,7 @@ public import AdicModules.Ideal.Cotangent
 public import CoherentModules.RingTheory.Ideal.AdicKrull
 
 import AdicModules.AdicCompletion.Completeness
+import AdicModules.AdicCompletion.Pi
 import AdicModules.AdicCompletion.Submodule
 import AdicModules.Noetherian
 import Mathlib.RingTheory.Nakayama
@@ -19,6 +20,8 @@ import Mathlib.RingTheory.Nakayama
 Let `I` be any ideal of a commutative ring `R` that is `I`-adically precomplete.
 If the original quotient `M / I M` is finite over `R / I`, then `M` is precomplete.
 If `M` is also `I`-Hausdorff, then it is finite over `R`.
+More precisely, a specified finite family spanning `M / I M` already spans `M`
+when `M` is `I`-Hausdorff. The family may be empty, and the base need not be Hausdorff.
 
 If `I` satisfies finite-submodule adic cofinality, every finite original module is
 `I`-Hausdorff when `I` lies in the Jacobson radical of its annihilator. Over a fully
@@ -92,7 +95,7 @@ set_option warningAsError true
 
 @[expose] public section
 
-universe uR uM
+universe uR uM uι
 
 open TensorProduct
 
@@ -178,6 +181,40 @@ theorem IsAdicComplete.submodule_of_hasSubmoduleAdicCofinality
       toIsPrecomplete :=
         Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal I N
           (fun n => hAP.cofinal N n) }
+
+/-- A finite family whose images span the first adic quotient of a Hausdorff module
+already spans the original module over an adically precomplete commutative ring.
+The given family may be empty, and the base need not be Hausdorff. -/
+theorem Submodule.span_range_eq_top_of_span_mkQ_eq_top
+    {R : Type uR} [CommRing R] (I : Ideal R) [IsPrecomplete I R]
+    {M : Type uM} [AddCommGroup M] [Module R M] [IsHausdorff I M]
+    {ι : Type uι} [Finite ι] (x : ι → M)
+    (hx : Submodule.span R
+      (Set.range (fun i : ι =>
+        (I • (⊤ : Submodule R M)).mkQ (x i))) = ⊤) :
+    Submodule.span R (Set.range x) = ⊤ := by
+  classical
+  let := Fintype.ofFinite ι
+  have hsurj :=
+    (span_range_eq_top_iff_surjective_fintypeLinearCombination (AdicCompletion I R) _).mp
+      (AdicCompletion.span_range_eq_top_of_span_mkQ_eq_top I x hx)
+  apply (span_range_eq_top_iff_surjective_fintypeLinearCombination R x).mpr
+  intro m
+  obtain ⟨a, ha⟩ := hsurj (AdicCompletion.of I M m)
+  choose r hr using fun i : ι => AdicCompletion.of_surjective I R (a i)
+  refine ⟨r, (AdicCompletion.of_injective I M) ?_⟩
+  have he : (AdicCompletion.piEquivOfFintype I (fun _ : ι => R)).symm a =
+      AdicCompletion.of I (ι → R) r := by
+    apply (AdicCompletion.piEquivOfFintype I (fun _ : ι => R)).injective
+    rw [LinearEquiv.apply_symm_apply, AdicCompletion.piEquivOfFintype_apply,
+      AdicCompletion.pi_of]
+    exact (funext hr).symm
+  have hmap := LinearMap.congr_fun
+    (AdicCompletion.map_linearCombination_piEquivOfFintype_symm I M x) a
+  change AdicCompletion.map I (Fintype.linearCombination R x)
+    ((AdicCompletion.piEquivOfFintype I (fun _ : ι => R)).symm a) = _ at hmap
+  rw [he, AdicCompletion.map_of] at hmap
+  exact hmap.trans ha
 
 /-- Over an adically precomplete commutative ring, a Hausdorff module finite modulo the
 ideal is finite over the original ring. No Hausdorffness of the base is required. -/
