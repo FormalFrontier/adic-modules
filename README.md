@@ -13,6 +13,12 @@ Mathlib's raw inverse-limit completion, not a new construction of completion.
 The linked [catalogue](docs/HeadlineResults.md) contains the full statements,
 further result families, examples and boundary cases.
 
+- **Finite cotangents of ideal powers.** For any ideal `I`, finite generation of
+  `I / I²` over `R / I` implies finite generation of `Iⁿ / I²ⁿ` over `R / Iⁿ`
+  for every `n ≥ 0`, with the canonical quotient-ring action. No finite generation
+  of `I` or Noetherianity of `R` is required.
+  See [cotangent modules](AdicModules/Ideal/Cotangent.lean).
+
 - **Noetherian raw completion.** For any ideal `I`, `C` is Noetherian iff
   `R / I` is Noetherian and `I / I²` is finitely generated over `R / I`;
   equivalently, iff `R / I^n` is Noetherian for any chosen `n ≥ 2`.
@@ -231,7 +237,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
 | [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and power-quotient Noetherianity) | — |
-| [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (original cotangent finiteness from power quotients and lifted generators) | — |
+| [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (finite cotangents of all powers, finiteness from power quotients and lifted generators) | — |
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
