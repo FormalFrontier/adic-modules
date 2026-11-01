@@ -30,6 +30,17 @@ further result families, examples and boundary cases.
   universes are independent. See the
   [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
 
+- **Intrinsic completeness of arbitrary submodules over complete AP bases.** Full
+  submodule adic cofinality asks for the same intrinsic/induced filtration comparison
+  for every submodule of each finite module, without finite generation of the
+  submodule. Over an intrinsically `I`-adically complete original ring `R`, every
+  original `R`-submodule `N` of a finite `R`-module is intrinsically `I`-adically
+  complete. No finite generation of `N` or `I`, Noetherianity, finite presentation,
+  flatness or additional Jacobson-radical assumption is required. The conclusion
+  concerns the intrinsic ideal-power topology on `N`, separately from ambient
+  closedness. See the
+  [complete-base criteria](AdicModules/AdicCompletion/CompleteBase.lean).
+
 - **Adically closed submodules with finite quotient.** If `I` has finite-submodule
   adic cofinality and `M / N` is finite over original `R`, then
   `I ≤ jac(ann_R(M / N))` makes `N` closed in the canonical `I`-adic module topology
@@ -364,7 +375,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Submodule](AdicModules/AdicCompletion/Submodule.lean) (intrinsic precompleteness for closed cofinal submodules; completed-scalar fibres and spans) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) (the canonical map of a cofinal submodule in a complete ambient module is bijective) |
 | [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and power-quotient Noetherianity) | — |
 | [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (finite cotangents of all powers, finiteness from power quotients and lifted generators) | — |
-| [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (APf finite-module completeness; precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
+| [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (APf finite-module completeness; full-AP arbitrary-submodule completeness; precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |
 | [AdicCompletion.Endomorphism](AdicModules/AdicCompletion/Endomorphism.lean) | [IdentityCongruence](AdicModulesTest/IdentityCongruence.lean) (private nonscalar `ZMod 4` shear and criterion application) |
 | [AdicCompletion.Flat](AdicModules/AdicCompletion/Flat.lean) (middle exactness with flat original last module) | [AdicCompletion.Flat](AdicModulesTest/AdicCompletion/Flat.lean) (canonical submodule inclusion and quotient projection) |
 | [AdicCompletion.Flat.Noetherian](AdicModules/AdicCompletion/Flat/Noetherian.lean) (intrinsic complete-module flatness and raw-completion flatness over a Noetherian completed ring) | — |

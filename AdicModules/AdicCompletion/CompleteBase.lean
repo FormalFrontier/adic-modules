@@ -9,6 +9,7 @@ public import AdicModules.Ideal.Cotangent
 public import CoherentModules.RingTheory.Ideal.AdicKrull
 
 import AdicModules.AdicCompletion.Completeness
+import AdicModules.AdicCompletion.Submodule
 import AdicModules.Noetherian
 import Mathlib.RingTheory.Nakayama
 
@@ -25,6 +26,11 @@ If `I` satisfies finite-submodule adic cofinality, every finite original module 
 all finite original modules are intrinsically `I`-adically complete. Their canonical
 maps to `AdicCompletion I M` are bijective; the existing `AdicCompletion.ofLinearEquiv`
 gives the corresponding original-`R`-linear equivalence.
+
+If the ideal satisfies full submodule adic cofinality, every submodule of a finite
+original module is intrinsically complete as well. The submodule need not be
+finitely generated: full cofinality compares its intrinsic filtration with the
+induced filtration, and quotient separation lets precompleteness descend.
 
 When the base is fully `I`-adically complete, a module with finite projective first
 quotient and flat positive power quotients is projective over `R` if it is Hausdorff
@@ -77,6 +83,9 @@ and Andrew Yang's Noetherian Krull formalization in Mathlib. Combining it with
 `IsPrecomplete.of_finite_quotient` gives Corollary 0.7.4.17 for original finite
 modules. The complete-base Jacobson bound, intrinsic predicates and canonical
 completion equivalence are from the Mathlib adic-completion API credited above.
+The full-submodule cofinality clause of Corollary 0.7.4.18 combines this finite-module
+completeness with the intrinsic precompleteness descent from
+`AdicModules.AdicCompletion.Submodule` and inherited Hausdorffness.
 -/
 
 set_option warningAsError true
@@ -145,6 +154,30 @@ theorem IsAdicComplete.of_hasFiniteSubmoduleAdicCofinality
   exact
     { toIsHausdorff := IsHausdorff.of_hasFiniteSubmoduleAdicCofinality hAPf hJ
       toIsPrecomplete := IsPrecomplete.of_finite_quotient I M }
+
+/-- Every submodule of a finite original module over an adically complete commutative
+ring is intrinsically adically complete if the ideal satisfies full submodule adic
+cofinality. No finite generation of the submodule is assumed. This is the
+intrinsic-completeness clause of Fujiwara--Kato, *Foundations of Rigid Geometry I*,
+Corollary 0.7.4.18. -/
+theorem IsAdicComplete.submodule_of_hasSubmoduleAdicCofinality
+    {R : Type uR} [CommRing R] (I : Ideal R) [IsAdicComplete I R]
+    (M : Type uM) [AddCommGroup M] [Module R M] [Module.Finite R M]
+    (N : Submodule R M) (hAP : I.HasSubmoduleAdicCofinality) :
+    IsAdicComplete I N := by
+  have hAPf := hAP.hasFiniteSubmoduleAdicCofinality
+  let : IsAdicComplete I M :=
+    IsAdicComplete.of_hasFiniteSubmoduleAdicCofinality I M hAPf
+  have hJ : I ≤ (Module.annihilator R (M ⧸ N)).jacobson :=
+    (IsAdicComplete.le_jacobson_bot I).trans (Ideal.jacobson_mono bot_le)
+  let : IsHausdorff I (M ⧸ N) :=
+    IsHausdorff.of_hasFiniteSubmoduleAdicCofinality hAPf hJ
+  exact
+    { toIsHausdorff :=
+        IsHausdorff.of_injective I N.subtype (Submodule.injective_subtype N)
+      toIsPrecomplete :=
+        Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal I N
+          (fun n => hAP.cofinal N n) }
 
 /-- Over an adically precomplete commutative ring, a Hausdorff module finite modulo the
 ideal is finite over the original ring. No Hausdorffness of the base is required. -/

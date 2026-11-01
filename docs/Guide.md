@@ -316,6 +316,26 @@ The images of `E₀₁` and `E₁₀` do not commute, and their nonzero commutat
 uses the retained integer scalar action. The bottom-quotient equivalence and
 the projection compatibility identify these classes with their matrix representatives.
 
+## Submodules over complete bases
+
+Import [`AdicModules.AdicCompletion.CompleteBase`](../AdicModules/AdicCompletion/CompleteBase.lean).
+Let `I : Ideal R`, suppose the original commutative ring `R` is intrinsically
+`I`-adically complete, and let `M` be a finite original `R`-module. If
+`hAP : I.HasSubmoduleAdicCofinality`, then for any `N : Submodule R M`,
+`IsAdicComplete.submodule_of_hasSubmoduleAdicCofinality I M N hAP` supplies
+`IsAdicComplete I N`. The ring and module universes are independent, and `N`
+need not be finitely generated. Once this completeness is installed as a local
+instance, the existing `AdicCompletion.ofLinearEquiv I N` identifies `N` with
+its canonical completion over the original ring.
+
+Full submodule cofinality means that for every finite original module, every
+submodule `N` and every `n`, some `m` satisfies
+`N ⊓ (I ^ m • ⊤) ≤ I ^ n • N`. The weaker finite-submodule property suffices
+for completeness of `M`, but the arbitrary-submodule conclusion uses full
+cofinality to recover completeness for the intrinsic ideal-power filtration
+on `N`. This conclusion is stated separately from ambient closedness. No extra
+Jacobson, Noetherian, finite-ideal, finite-presentation or flatness hypothesis is needed.
+
 ## Restricting scalars in adic completions
 
 Import [`AdicModules.AdicCompletion.RestrictScalars`](../AdicModules/AdicCompletion/RestrictScalars.lean)
@@ -1094,6 +1114,7 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Polynomial.Evaluation](../AdicModules/Polynomial/Evaluation.lean) | Association of nearby polynomial values for a Jacobson-contained ideal, including nonunit derivatives |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
+| [AdicCompletion.CompleteBase](../AdicModules/AdicCompletion/CompleteBase.lean) | Finite-module completeness under APf and arbitrary-submodule intrinsic completeness under full AP over complete original bases; finiteness and projectivity criteria |
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
 | [AdicCompletion.Endomorphism](../AdicModules/AdicCompletion/Endomorphism.lean) | Units from pointwise congruence to the identity on an adically complete module, for arbitrary ideals |
 | [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under pointwise induced/intrinsic cofinality on both ranges; no injectivity or surjectivity assumption |
