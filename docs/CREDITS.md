@@ -500,6 +500,23 @@ This identifies the quotient by the completed annihilator, not by the possibly
 smaller algebraic extension of the original annihilator. No upstream proof body
 is copied and no book correspondence is asserted.
 
+## Intrinsic precompleteness of cofinal submodules
+
+Intrinsic precompleteness descent combines the library's completed-subtype
+injection criterion with Mathlib's canonical completion map and functoriality,
+its precompleteness/surjectivity and separation/injectivity characterizations,
+and the original submodule quotient projection. The completion formalizations
+credit Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang; the
+submodule and quotient contributors are credited below, with their upstream
+Apache-2.0 notices unchanged.
+
+The argument lifts a completed-submodule element to the original ambient module,
+detects membership through the separated original quotient, and reflects equality
+through the completed inclusion. It uses neither a separate inverse-limit
+construction nor an inverse to the ambient completion map. The complete-ambient
+application combines this precomplete core with the existing Hausdorffness
+inheritance theorem, without changing the original scalar action.
+
 ## Fibres and submodules under completed scalars
 
 The fibre-stability and separated-quotient span results reuse the library's

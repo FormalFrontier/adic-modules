@@ -156,6 +156,21 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   In particular, every direct summand satisfies the bound with `m = n`, including
   infinite-rank summands over rings with non-finitely-generated ideals.
 
+- **Intrinsic precompleteness of closed pointwise-cofinal submodules.** Let `I`
+  be an arbitrary ideal of a commutative ring `R`, `M` an original `R`-module
+  with `[IsPrecomplete I M]`, and `N : Submodule R M`. Assume
+  `[IsHausdorff I (M ⧸ N)]` and
+  `∀ n : ℕ, ∃ m : ℕ, N ⊓ (I ^ m • (⊤ : Submodule R M)) ≤ I ^ n • N`.
+  Then [`Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal`](../AdicModules/AdicCompletion/Submodule.lean)
+  gives `IsPrecomplete I N` for the intrinsic filtration and the original
+  `R`-action. Ambient Hausdorffness or completeness is not required; neither
+  are finite generation or Noetherianity of the ring, ideal or modules,
+  flatness, or a uniform choice of precision. Ring and module universes are
+  independent. When the ambient module is complete, existing Hausdorffness
+  inheritance along `N.subtype` combines with this result to make `N` complete.
+  The [canonical-map application](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean)
+  obtains a bijection from that original submodule to its completion.
+
 - **Completion preserves injections into Noetherian original targets.** For
   every ideal `I` of an arbitrary commutative ring `R`, if the original target
   `N` is Noetherian over original `R`, every injective `R`-linear map `f : M → N`

@@ -57,6 +57,15 @@ further result families, examples and boundary cases.
   are independent. See the
   [cofinality criterion](AdicModules/AdicCompletion/LinearMap.lean).
 
+- **Intrinsic precompleteness of closed cofinal submodules.** If the original
+  `R`-module `M` is `I`-precomplete, `M / N` is `I`-Hausdorff, and the induced
+  filtration on `N` is pointwise cofinal with its intrinsic one, then `N` is
+  intrinsically `I`-precomplete. Ambient separation or completeness is not
+  needed, and there is no finiteness or Noetherianity assumption on the ring,
+  ideal or modules. The scalar action remains the original `R`-action. For a
+  complete ambient module, existing separation inheritance gives completeness
+  of `N`. See [submodules](AdicModules/AdicCompletion/Submodule.lean).
+
 - **Injections into Noetherian original targets.** For every ideal `I`, an
   injective original linear map `f : M →ₗ[R] N` induces an injective canonical
   map on raw completions if `N` is Noetherian over original `R`. The ring,
@@ -306,6 +315,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |
+| [AdicCompletion.Submodule](AdicModules/AdicCompletion/Submodule.lean) (intrinsic precompleteness for closed cofinal submodules; completed-scalar fibres and spans) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) (the canonical map of a cofinal submodule in a complete ambient module is bijective) |
 | [AdicCompletion.Cotangent](AdicModules/AdicCompletion/Cotangent.lean) (finite original cotangent, intrinsic completeness and power-quotient Noetherianity) | — |
 | [Ideal.Cotangent](AdicModules/Ideal/Cotangent.lean) (finite cotangents of all powers, finiteness from power quotients and lifted generators) | — |
 | [AdicCompletion.CompleteBase](AdicModules/AdicCompletion/CompleteBase.lean) (precomplete-base finiteness; complete-base projectivity and finite conormal criteria) | — |

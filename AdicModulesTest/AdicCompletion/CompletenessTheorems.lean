@@ -14,9 +14,10 @@ public import Mathlib.RingTheory.Int.Basic
 public import Mathlib.Tactic.NormNum
 
 import AdicModules.AdicCompletion.Kernel
+import AdicModules.AdicCompletion.Submodule
 
 /-!
-# Two-adic examples of completeness theorems
+# Examples of completeness theorems
 
 The canonical completion of `ℤ` at `(2)` is complete by finite generation of `(2)`.
 Its canonical map from `ℤ` is injective, so this is a nonzero module. The ideals
@@ -36,6 +37,10 @@ Hausdorffification for its generated ideal, without Hausdorffness of the source.
 The original integer module `ZMod 8` is complete for `(2)`: the ideal `(2)^3 = (8)`
 annihilates its canonical integer action. The original integer module `ZMod 1`
 illustrates annihilation at exponent zero. Neither application changes the module data.
+
+The canonical map from a closed, pointwise-cofinal submodule of a complete module
+to its completion is bijective: precompleteness descends by cofinality, while
+Hausdorffness is inherited along the original inclusion.
 -/
 
 set_option warningAsError true
@@ -163,3 +168,13 @@ private theorem completion_kernel_and_intrinsic_completeness_of_finite_reduction
     (Ideal.finite_cotangent_pow_iff_finite_quotient_smul_top I p).mpr inferInstance
   exact ⟨AdicCompletion.pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M hp,
     AdicCompletion.isAdicComplete_map_of_finite_cotangent_pow I M hp⟩
+
+example (I : Ideal R) [IsAdicComplete I M] (N : Submodule R M)
+    [IsHausdorff I (M ⧸ N)]
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      N ⊓ (I ^ m • (⊤ : Submodule R M)) ≤ I ^ n • N) :
+    Function.Bijective (AdicCompletion.of I N) := by
+  let : IsPrecomplete I N :=
+    Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal I N hcofinal
+  let : IsHausdorff I N := IsHausdorff.of_injective I N.subtype N.subtype_injective
+  exact ⟨AdicCompletion.of_injective I N, AdicCompletion.of_surjective I N⟩

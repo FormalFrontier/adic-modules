@@ -8,7 +8,12 @@ public import AdicModules.AdicCompletion.LinearMap
 public import Mathlib.LinearAlgebra.Quotient.Basic
 
 /-!
-# Fibres and submodules under completed scalars
+# Precompleteness and submodules under completed scalars
+
+An original `R`-submodule is intrinsically `I`-precomplete if its ambient module
+is `I`-precomplete, its original quotient is `I`-Hausdorff, and its induced
+ideal-power filtration is pointwise cofinal with its intrinsic filtration.
+No ambient separation or finite-generation assumption is required.
 
 If a given positive power `I ^ n` is finitely generated, fibres of an `R`-linear
 map to an `I`-Hausdorff module are stable under a compatible action of `AdicCompletion I R`
@@ -17,10 +22,16 @@ of the completed ring or target completeness is required.
 
 Consequently, an original `R`-submodule with `I`-Hausdorff original quotient
 coincides with the restriction to `R` of its span over the completed ring.
-Neither result requires source separation, completeness or finiteness. The
-finitely generated ideal results are the `n = 1` specializations.
+These scalar-stability results require neither source separation, completeness
+nor finiteness. The finitely generated ideal results are the `n = 1` specializations.
 
 ## Implementation notes
+
+Precompleteness descent uses surjectivity of the canonical map into the ambient
+completion. Naturality and quotient separation put an ambient lift in the original
+submodule; `AdicCompletion.map_subtype_injective_of_cofinal` then reflects equality
+in its completion. This reuses Mathlib's canonical maps and completeness criteria,
+without constructing a completed-ring action on the original modules.
 
 The scalar-orbit maps use Mathlib's `LinearMap.smulRight`. Their equality follows
 from `AdicCompletion.ext_of_fg_pow`, applied with original module `R`. The submodule
@@ -32,7 +43,33 @@ quotient and span formalizations; see the library credits for their authors.
 
 @[expose] public section
 
-universe uR uP uT
+universe uR uM uP uT
+
+/-- A submodule of an `I`-precomplete module is intrinsically `I`-precomplete if its
+quotient is `I`-Hausdorff and the induced ideal-power filtration is pointwise
+cofinal with its intrinsic filtration. No ambient Hausdorffness or finite-generation
+assumption is required; all original modules retain their given `R`-actions. -/
+theorem Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    [IsPrecomplete I M] (N : Submodule R M)
+    [IsHausdorff I (M ⧸ N)]
+    (hcofinal : ∀ n : ℕ, ∃ m : ℕ,
+      N ⊓ (I ^ m • (⊤ : Submodule R M)) ≤ I ^ n • N) : IsPrecomplete I N := by
+  apply AdicCompletion.of_surjective_iff.mp
+  intro z
+  obtain ⟨x, hx⟩ :=
+    AdicCompletion.of_surjective I M (AdicCompletion.map I N.subtype z)
+  have hzero : N.mkQ.comp N.subtype = 0 :=
+    LinearMap.ext fun y ↦ (Submodule.Quotient.mk_eq_zero N).mpr y.property
+  have hxN : x ∈ N := by
+    apply (Submodule.Quotient.mk_eq_zero N).mp
+    apply AdicCompletion.of_injective I (M ⧸ N)
+    rw [map_zero, ← Submodule.mkQ_apply, ← AdicCompletion.map_of I N.mkQ x, hx,
+      AdicCompletion.map_comp_apply, hzero, AdicCompletion.map_zero, LinearMap.zero_apply]
+  refine ⟨⟨x, hxN⟩, ?_⟩
+  apply AdicCompletion.map_subtype_injective_of_cofinal I N hcofinal
+  exact (AdicCompletion.map_of I N.subtype ⟨x, hxN⟩).trans hx
 
 /-- Fibres of an R-linear map to an I-Hausdorff module are stable under
 completed scalars acting compatibly on its source, if a positive ideal power is
