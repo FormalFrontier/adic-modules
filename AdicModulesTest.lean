@@ -13,6 +13,7 @@ public import AdicModulesTest.AdicCompletion.ChineseRemainder
 public import AdicModulesTest.AdicCompletion.Completeness
 public import AdicModulesTest.AdicCompletion.CompletenessTheorems
 public import AdicModulesTest.AdicCompletion.DependentPi
+public import AdicModulesTest.AdicCompletion.Exactness
 public import AdicModulesTest.AdicCompletion.FiniteNoetherian
 public import AdicModulesTest.AdicCompletion.FinitePresentation
 public import AdicModulesTest.AdicCompletion.Flat

@@ -27,7 +27,7 @@ rev = "5d58abb977f3281238ee5b4f37303a275b1b2426"
 [[require]]
 name = "coherent-modules"
 git = "https://github.com/FormalFrontier/coherent-modules.git"
-rev = "e913badf012b23e5b6bac019a5e593549c874878"
+rev = "c1c0d82c702cd121e13fa0580a1e8013fc221b88"
 
 [[require]]
 name = "graded-rings"

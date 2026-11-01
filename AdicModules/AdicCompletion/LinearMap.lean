@@ -6,12 +6,20 @@ module
 
 public import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.Algebra.Module.Submodule.Range
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 import Mathlib.RingTheory.AdicCompletion.Completeness
+import Mathlib.RingTheory.AdicCompletion.Exactness
 public import AdicModules.AdicCompletion.Kernel
 
 /-!
 # Linear maps and adic completion
+
+For every ideal and original linear map `f`, `range_map_range_subtype` identifies
+the range of the completed original range inclusion with the range of `map I f`,
+as submodules over `AdicCompletion I R`. This uses only the original range
+factorization and Mathlib's preservation of surjectivity, with no Noetherian,
+finiteness, injectivity, separation or completeness hypothesis.
 
 For any ideal `I` of a commutative ring `R` and additive commutative group
 `R`-modules, completion distinguishes linear maps to an `I`-Hausdorff original
@@ -91,7 +99,9 @@ for uniform uniqueness.
 
 This file builds on the adic-completion formalizations of Kenny Lau, Judith Ludwig,
 Christian Merten, Jiedong Jiang and Bingyu Xia, and on Mathlib's scalar-tower,
-linear-map and span APIs.
+linear-map and span APIs. The range comparison uses Ludwig and Merten's all-ideal
+`AdicCompletion.map_surjective` in `Mathlib.RingTheory.AdicCompletion.Exactness`
+and Mathlib's generic range-factorization API.
 -/
 
 @[expose] public section
@@ -99,8 +109,25 @@ linear-map and span APIs.
 noncomputable section
 
 universe u v w x y
+universe uR uM uN
 
 namespace AdicCompletion
+
+/-- The completed inclusion of the original range and the completed original map
+have the same range, over the completed coefficient ring, for every ideal. -/
+theorem range_map_range_subtype
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    (f : M →ₗ[R] N) :
+    LinearMap.range (AdicCompletion.map I f.range.subtype) =
+      LinearMap.range (AdicCompletion.map I f) := by
+  have hq : LinearMap.range (AdicCompletion.map I f.rangeRestrict) = ⊤ :=
+    LinearMap.range_eq_top.mpr
+      (AdicCompletion.map_surjective I f.surjective_rangeRestrict)
+  simpa only [AdicCompletion.map_comp, LinearMap.subtype_comp_rangeRestrict] using
+    (LinearMap.range_comp_of_range_eq_top
+      (AdicCompletion.map I f.range.subtype) hq).symm
 
 variable {R : Type u} [CommRing R] (I : Ideal R)
 variable {M : Type v} [AddCommGroup M] [Module R M]

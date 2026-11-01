@@ -46,6 +46,26 @@ further result families, examples and boundary cases.
   generation of `I`, source finiteness, flatness, separation or completeness is
   assumed. See [completion injectivity](AdicModules/AdicCompletion/Exactness.lean).
 
+- **Completion of original images.** For every ideal `I` and original linear
+  map `f : M →ₗ[R] N`, completion of the original range inclusion has the same
+  `C`-submodule range as the completed map, without Noetherian hypotheses.
+  If original `N` is Noetherian over original `R`,
+  `AdicCompletion I (LinearMap.range f) ≃ₗ[C] LinearMap.range (AdicCompletion.map I f)`
+  via that completed inclusion. The original range uses its intrinsic `I`-adic
+  filtration; `M` is arbitrary and `f` need not be injective. No Noetherianity
+  of `R` or `C`, finite generation of `I`, flatness, separation or completeness
+  is assumed. See the
+  [range comparison](AdicModules/AdicCompletion/LinearMap.lean) and
+  [image equivalence](AdicModules/AdicCompletion/Exactness.lean).
+
+- **Middle exactness with a Noetherian original middle module.** For any ideal
+  `I`, an original exact pair `M →ₗ[R] N →ₗ[R] P` remains middle exact under the
+  canonical completed maps if `N` is Noetherian over original `R` and the original
+  last map is surjective. The first source is arbitrary and the first map need
+  not be injective. No ring Noetherianity, ideal finiteness, flatness, faithfulness,
+  separation or completeness is assumed; all four universes are independent.
+  See [completion exactness](AdicModules/AdicCompletion/Exactness.lean).
+
 - **Noetherian original module quotients.** For any ideal and `n ≥ 2`, the
   original `M / IⁿM` is Noetherian over `R` iff `M / IM` is Noetherian over `R`
   and the image of `IM` in `M / I²M` is finitely generated over original `R`.

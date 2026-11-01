@@ -139,6 +139,40 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   completed target would not suffice: `ℤ → ℤ[1/2]` completes at `(2)` to the
   noninjective map `ℤ₂ → 0`.
 
+- **Completion of original images.** For every ideal `I` of an arbitrary
+  commutative ring `R` and every original linear map `f : M →ₗ[R] N`,
+  [`AdicCompletion.range_map_range_subtype`](../AdicModules/AdicCompletion/LinearMap.lean)
+  identifies the range of the completed original inclusion `f.range.subtype`
+  with the range of `AdicCompletion.map I f`, as submodules over
+  `C = AdicCompletion I R`. This core has no Noetherian, finiteness, injectivity,
+  separation or completeness hypothesis: it uses preservation of surjectivity
+  for the original range restriction and the completed range factorization.
+  If the original target `N` is Noetherian over original `R`,
+  [`AdicCompletion.rangeEquivOfIsNoetherianTarget`](../AdicModules/AdicCompletion/Exactness.lean)
+  gives `AdicCompletion I (LinearMap.range f) ≃ₗ[C] LinearMap.range (AdicCompletion.map I f)`.
+  The left side completes the original range with its intrinsic original-ideal
+  filtration; the right side is the canonical `C`-submodule of the target
+  completion. The forward map is completion of the original inclusion, and the
+  characteristic laws include its commuting square with completion of
+  `f.rangeRestrict`. The source `M` is arbitrary and `f` need not be injective;
+  ring, source and target universes are independent. No Noetherianity of `R` or
+  `C`, finite generation of `I`, source finiteness, flatness, separation or
+  completeness is required.
+
+- **Middle exactness with a Noetherian original middle module.** For every ideal
+  `I` of a commutative ring `R`, let `f : M →ₗ[R] N` and `g : N →ₗ[R] P` be an
+  original exact pair with original `g` surjective and `N` Noetherian over `R`.
+  Then the canonical completed maps are exact at `AdicCompletion I N`, by
+  [`AdicCompletion.map_exact_of_isNoetherian_middle`](../AdicModules/AdicCompletion/Exactness.lean).
+  The original source `M` is arbitrary and `f` need not be injective. No
+  Noetherianity of `R`, `R / I` or the completed ring, finite generation of `I` or
+  a positive power, source finiteness, flatness, faithfulness, separation or
+  completeness is required. The ring and all three module universes are independent.
+  Module Artin–Rees at `range f` supplies the existing range-cofinality criterion.
+  The [submodule-quotient client](../AdicModulesTest/AdicCompletion/Exactness.lean)
+  allows an arbitrary extra factor in the first source and identifies the completed
+  quotient kernel with the completed first map's image.
+
 - **Noetherian original module power quotients.** For any ideal `I` of a
   commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original
   quotient `M / Iⁿ M` is Noetherian over `R` exactly when `M / I M` is

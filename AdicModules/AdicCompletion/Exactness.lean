@@ -10,18 +10,34 @@ Authors of that formalization: Judith Ludwig, Christian Merten
 module
 
 public import Mathlib.RingTheory.AdicCompletion.Exactness
+public import AdicModules.AdicCompletion.LinearMap
 
+import Mathlib.Algebra.Module.Submodule.Equiv
 import AdicModules.AdicCompletion.RestrictScalars
 import AdicModules.AdicCompletion.TensorProduct
+import CoherentModules.RingTheory.Filtration
 import CoherentModules.RingTheory.Noetherian
 import Mathlib.Algebra.Module.Torsion.Basic
 
 /-!
-# Injectivity and exactness of adic completion
+# Images, injectivity and exactness of adic completion
 
 For every ideal, adic completion preserves injectivity of an original linear map
 whose original target is Noetherian over the original ring. The original ring need
 not be Noetherian, and the ring, source and target universes are independent.
+
+For an arbitrary original map `f : M →ₗ[R] N` with original Noetherian target,
+`rangeEquivOfIsNoetherianTarget` identifies completion of the original `f.range`,
+with its intrinsic original-ideal filtration, with the range of `map I f` over
+`AdicCompletion I R`. Its forward map is completion of the original inclusion.
+The source need not be Noetherian or finite, and `f` need not be injective.
+The characteristic laws describe all completed range elements, original elements,
+and the completed range-restriction square, using the canonical completed actions.
+
+Adic completion also preserves middle exactness of an original right-surjective
+exact pair whose original middle module is Noetherian. The original first source
+is arbitrary and the first map need not be injective. The ring and all three module
+universes are independent.
 
 Adic completion also preserves middle exactness when the topology induced on the
 range of the first map is cofinal with its intrinsic adic topology. Neither
@@ -35,11 +51,20 @@ Over this quotient, the existing finite-module tensor comparisons and flatness o
 the completed ring give injectivity. Naturality of the existing restriction-of-scalars
 comparison returns to the original ideal and the canonical completed map.
 
+The image equivalence uses this injectivity criterion only for the original range
+inclusion. The unconditional `range_map_range_subtype` gives its range and hence
+surjectivity of its codomain restriction. Mathlib's `LinearEquiv.ofBijective`
+then supplies the equivalence and its choice-based inverse; no quotient of the
+completed source or new completed-map construction is involved.
+
 The range-cofinality proof uses the existing Cauchy-sequence and completion maps.
 At each step, cofinality allows a change of a chosen lift by an element in the
 required ideal power. The change need not equal the difference of the original lifts, so the
 first map need not be injective. No intrinsic adic completeness of a completion
 is assumed.
+
+For a Noetherian original middle module, module Artin–Rees supplies range
+cofinality, without imposing a quotient scalar action on the first source.
 
 ## References
 
@@ -51,7 +76,12 @@ The injectivity criterion reuses their canonical tensor comparison, its naturali
 and flatness of Noetherian ring completions from
 `Mathlib.RingTheory.AdicCompletion.AsTensorProduct`, together with CoherentModules'
 annihilator-quotient Noetherianity theorem and the independent-universe tensor and
-restriction-of-scalars APIs of this library.
+restriction-of-scalars APIs of this library. The image comparison also uses
+Ludwig and Merten's all-ideal completion-surjectivity theorem and Mathlib's
+generic range, codomain-restriction and linear-equivalence APIs.
+
+The Noetherian-middle criterion uses CoherentModules' module Artin–Rees theorem,
+which generalizes Andrew Yang's formalization in `Mathlib.RingTheory.Filtration`.
 -/
 
 @[expose] public section
@@ -131,6 +161,76 @@ theorem map_injective_of_isNoetherian_target
   rw [← hfB] at hxy
   simpa only [restrictScalarsSemilinearMap_map] using
     congrArg (restrictScalarsSemilinearMap (S := B) I N) hxy
+
+/-- The completion of the original range is the range of the completed map
+when the original target is Noetherian over the original coefficient ring.
+The forward map is completion of the original range inclusion. -/
+noncomputable def rangeEquivOfIsNoetherianTarget
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    [IsNoetherian R N]
+    (f : M →ₗ[R] N) :
+    AdicCompletion I (LinearMap.range f) ≃ₗ[AdicCompletion I R]
+      LinearMap.range (AdicCompletion.map I f) :=
+  LinearEquiv.ofBijective
+    ((AdicCompletion.map I f.range.subtype).codRestrict
+      (LinearMap.range (AdicCompletion.map I f))
+      (fun z ↦ (AdicCompletion.range_map_range_subtype I f).le
+        (LinearMap.mem_range_self _ z)))
+    (by
+      constructor
+      · intro x y hxy
+        apply map_injective_of_isNoetherian_target I f.range.subtype
+          (Submodule.injective_subtype f.range)
+        exact congrArg Subtype.val hxy
+      · intro y
+        have hy : (y : AdicCompletion I N) ∈
+            LinearMap.range (AdicCompletion.map I f.range.subtype) :=
+          (AdicCompletion.range_map_range_subtype I f).ge y.property
+        obtain ⟨x, hx⟩ := hy
+        exact ⟨x, Subtype.ext hx⟩)
+
+section RangeEquiv
+
+variable {R : Type uR} [CommRing R] (I : Ideal R)
+variable {M : Type uM} [AddCommGroup M] [Module R M]
+variable {N : Type uN} [AddCommGroup N] [Module R N]
+variable [IsNoetherian R N] (f : M →ₗ[R] N)
+
+/-- In the ambient completion, the image equivalence is completion of the
+original range inclusion. -/
+@[simp]
+theorem coe_rangeEquivOfIsNoetherianTarget_apply
+    (z : AdicCompletion I (LinearMap.range f)) :
+    (rangeEquivOfIsNoetherianTarget I f z : AdicCompletion I N) =
+      AdicCompletion.map I f.range.subtype z := by
+  simp only [rangeEquivOfIsNoetherianTarget, LinearEquiv.ofBijective_apply,
+    LinearMap.codRestrict_apply]
+
+/-- An original range element maps to its canonical image in the target completion. -/
+theorem coe_rangeEquivOfIsNoetherianTarget_apply_of
+    (y : LinearMap.range f) :
+    (rangeEquivOfIsNoetherianTarget I f
+      (AdicCompletion.of I (LinearMap.range f) y) : AdicCompletion I N) =
+      AdicCompletion.of I N (y : N) := by
+  rw [coe_rangeEquivOfIsNoetherianTarget_apply, AdicCompletion.map_of]
+  rfl
+
+/-- The image equivalence identifies the completed original range factorization
+with the range factorization of the completed map. -/
+@[simp]
+theorem rangeEquivOfIsNoetherianTarget_map_rangeRestrict
+    (x : AdicCompletion I M) :
+    rangeEquivOfIsNoetherianTarget I f
+        (AdicCompletion.map I f.rangeRestrict x) =
+      (AdicCompletion.map I f).rangeRestrict x := by
+  apply Subtype.ext
+  rw [coe_rangeEquivOfIsNoetherianTarget_apply, AdicCompletion.map_comp_apply,
+    LinearMap.subtype_comp_rangeRestrict]
+  rfl
+
+end RangeEquiv
 
 variable {R : Type uR} [CommRing R] {I : Ideal R}
 variable {P : Type uP} [AddCommGroup P] [Module R P]
@@ -250,14 +350,29 @@ theorem map_exact_of_range_cofinal
       rw [Submodule.Quotient.eq]
       exact (Submodule.smul_mono_left (Ideal.pow_le_pow_right (he_bound n))) (a n).property
 
-/-- Artin–Rees supplies range cofinality for a finite middle module over a Noetherian ring. -/
-private theorem map_exact_of_finite_of_isNoetherian
-    [IsNoetherianRing R] [Module.Finite R N]
+/-- Adic completion preserves middle exactness of a right-surjective exact pair
+whose original middle module is Noetherian over the original scalar ring.
+
+The ideal and original first source are arbitrary; the first map need not be
+injective. All completed maps and actions are the canonical ones. No
+Noetherianity of the original ring, finite generation of the ideal, source
+finiteness, flatness, faithfulness, separation or completeness is assumed.
+
+This generalizes Mathlib's `AdicCompletion.map_exact`, formalized by Judith
+Ludwig and Christian Merten, using module Artin–Rees and the range-cofinality
+criterion. -/
+theorem map_exact_of_isNoetherian_middle
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    {P : Type uP} [AddCommGroup P] [Module R P]
+    [IsNoetherian R N]
+    {f : M →ₗ[R] N} {g : N →ₗ[R] P}
     (hExact : Function.Exact f g) (hg : Function.Surjective g) :
-    Function.Exact (map I f) (map I g) := by
+    Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g) := by
   apply map_exact_of_range_cofinal hExact hg
   intro k
-  obtain ⟨c, hc⟩ := Ideal.exists_pow_inf_eq_pow_smul I f.range
+  obtain ⟨c, hc⟩ := Ideal.exists_pow_inf_eq_pow_smul_of_isNoetherian I f.range
   refine ⟨k + c, ?_⟩
   rw [inf_comm, hc (k + c) (Nat.le_add_left c k), Nat.add_sub_cancel]
   exact smul_mono_right _ inf_le_right

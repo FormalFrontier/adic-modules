@@ -158,6 +158,14 @@ this library's quotient flatness theorem, whose Mathlib base-change and
 quotient–tensor formalizations are credited above. No upstream proof body is
 copied, and the upstream author and Apache-2.0 notices remain in their libraries.
 
+Middle exactness for a Noetherian original middle module uses the full module
+Artin–Rees theorem from Formal Frontier Agents'
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules), generalizing
+Andrew Yang's Mathlib Artin–Rees formalization. It supplies cofinality to this
+library's range-cofinality theorem, which follows Judith Ludwig and Christian
+Merten's Cauchy-sequence exactness argument. No second reconstruction proof or
+quotient scalar action on the arbitrary original first source is introduced.
+
 The complete-base conormal criteria use Andrew Yang's canonical ideal cotangent
 module and quotient map in Mathlib, together with Johan Commelin's finite-module
 transport API. The injective-map Hausdorff argument uses Mathlib's adic
@@ -370,6 +378,17 @@ argument of Judith Ludwig and Christian Merten. Flatness is transported along
 Mathlib's original linear quotient equivalence; the kernel-intersection proof
 is used through its existing API, not copied. Upstream author, copyright and
 Apache-2.0 notices remain in Mathlib.
+
+The original-image completion comparison reuses Mathlib's raw completion,
+canonical completed actions, functoriality and all-ideal preservation of
+surjectivity, in particular the formalizations of Judith Ludwig and Christian
+Merten. It combines the generic range-factorization, codomain-restriction and
+`LinearEquiv.ofBijective` APIs with this library's injectivity theorem for
+Noetherian original targets. The range argument and characteristic laws are
+original project expression assembled from those interfaces, without copying
+upstream proof bodies or introducing a new completion, quotient or scalar action.
+The submodule and linear-equivalence contributors are credited above, and all
+upstream author, copyright and Apache-2.0 notices remain in Mathlib.
 
 ## Other deliverable interfaces
 
