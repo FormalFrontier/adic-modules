@@ -226,6 +226,17 @@ further result families, examples and boundary cases.
   is also finite projective, the map is uniquely represented by a completed original
   Hom element after restricting the comparison's scalars to `R`.
 
+- **Finite products of coefficient rings.** For a finite family of commutative
+  rings, put `A = Π i, R i` and let `I` be any ideal of `A`. Completion of `A`
+  is canonically `A`-algebra equivalent to the product of the completions at the
+  coordinate-image ideals. For an arbitrary family of original `R i`-modules,
+  the corresponding module comparison is `A`-linear and intertwines the completed
+  coefficient actions. Both comparisons commute with original representatives
+  and every finite reduction, including precision zero. The index, ring and module
+  universes are independent; empty products and zero rings are included, without
+  finite-generation, Noetherianity, completeness or separatedness assumptions.
+  See [coefficient products](AdicModules/AdicCompletion/CoefficientProduct.lean).
+
 - **Maps and changes of ideal.** For every ideal and linear `f : M → N`,
   completion of `f` is onto iff the original `M → N / IN` is onto.
   Mutual containment of powers gives an `R`-linear equivalence of completions,
@@ -383,6 +394,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [AdicCompletion.LinearMap](AdicModules/AdicCompletion/LinearMap.lean) | [AdicCompletion.LinearMap](AdicModulesTest/AdicCompletion/LinearMap.lean) (independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ`) |
 | [AdicCompletion.Hom](AdicModules/AdicCompletion/Hom.lean) | [AdicCompletion.Hom](AdicModulesTest/AdicCompletion/Hom.lean) (recovering arbitrary completed values in an infinite, torsion target) and [AdicCompletion.HomProjective](AdicModulesTest/AdicCompletion/HomProjective.lean) (arbitrary completed coefficient families on the countably infinite free source, finite-vector evaluation and inverse coefficient recovery) |
 | [AdicCompletion.Quotient](AdicModules/AdicCompletion/Quotient.lean) (finite-cotangent semilinear quotients, independent finite-power comparisons and extension from original residues) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (integer `(2)` completion quotient, `ZMod 2`, inverse formulas and degree zero) |
+| [AdicCompletion.CoefficientProduct](AdicModules/AdicCompletion/CoefficientProduct.lean) (finite coefficient-product algebra/module comparisons and all-precision coordinate laws) | — |
 | [AdicCompletion.RestrictScalars](AdicModules/AdicCompletion/RestrictScalars.lean) | [AdicCompletion.RestrictScalars](AdicModulesTest/AdicCompletion/RestrictScalars.lean) |
 | [AdicCompletion.RingHom](AdicModules/AdicCompletion/RingHom.lean) (ring maps and the named completed coefficient algebra) | [AdicCompletion.RingHom](AdicModulesTest/AdicCompletion/RingHom.lean) (stock and named maps/actions on an iterated completion) |
 | [AdicCompletion.Stationary](AdicModules/AdicCompletion/Stationary.lean) (stationary-evaluation criterion and whole-completion equivalences with original power quotients) | — |
