@@ -5,9 +5,11 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.LinearMap
+import AdicModules.AdicCompletion.Exactness
 public import Mathlib.LinearAlgebra.Basis.Cardinality
 public import Mathlib.LinearAlgebra.Finsupp.Defs
 public import Mathlib.RingTheory.AdicCompletion.Completeness
+import Mathlib.RingTheory.Int.Basic
 import Mathlib.Tactic.NormNum
 
 /-!
@@ -21,6 +23,12 @@ The base and directly computed extension values use only the definition of
 `AdicCompletion.extend` and Mathlib's maps and completeness theorem. These
 calculations are independent of the general uniqueness and equivalence theorems.
 The same map also gives a nonzero value through the inverse Hom equivalence.
+
+On the integer completion, multiplication by two remains injective by the
+original-Noetherian-target criterion; applying it to the nonzero image of one
+shows that the image of two is nonzero as well. This integer specialization also
+satisfies Mathlib's older Noetherian-ring and finite-target hypotheses, and uses
+exactly the same canonical completed map.
 -/
 
 @[expose] public section
@@ -96,6 +104,19 @@ theorem precompOfLinearEquiv_symm_coordinateZero_single_ne_zero :
       coordinateZero (of ideal (ℕ →₀ ℤ) (Finsupp.single 0 1)) ≠ 0 := by
   rw [precompOfLinearEquiv_symm_apply]
   exact extend_coordinateZero_single_ne_zero
+
+/-- Multiplication by two induces an injection on the integer `(2)`-adic completion. -/
+private theorem map_two_mul_injective :
+    Function.Injective (map ideal (LinearMap.mulLeft ℤ (2 : ℤ))) :=
+  map_injective_of_isNoetherian_target ideal (LinearMap.mulLeft ℤ (2 : ℤ))
+    (mul_right_injective₀ (by decide : (2 : ℤ) ≠ 0))
+
+/-- Injectivity of completed multiplication by two detects a nonzero completed value. -/
+private theorem of_two_ne_zero : of ideal ℤ 2 ≠ 0 := by
+  intro h
+  apply of_one_ne_zero
+  apply map_two_mul_injective
+  simpa only [map_of, LinearMap.mulLeft_apply, mul_one, _root_.map_zero] using h
 
 end TwoAdicLinearMap
 

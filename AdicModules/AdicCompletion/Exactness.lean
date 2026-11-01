@@ -11,18 +11,33 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.Exactness
 
-/-!
-# Exactness of completion under range cofinality
+import AdicModules.AdicCompletion.RestrictScalars
+import AdicModules.AdicCompletion.TensorProduct
+import CoherentModules.RingTheory.Noetherian
+import Mathlib.Algebra.Module.Torsion.Basic
 
-Adic completion preserves middle exactness when the topology induced on the range
-of the first map is cofinal with its intrinsic adic topology. Neither injectivity
-of the first map nor finiteness or Noetherian hypotheses are required.
+/-!
+# Injectivity and exactness of adic completion
+
+For every ideal, adic completion preserves injectivity of an original linear map
+whose original target is Noetherian over the original ring. The original ring need
+not be Noetherian, and the ring, source and target universes are independent.
+
+Adic completion also preserves middle exactness when the topology induced on the
+range of the first map is cofinal with its intrinsic adic topology. Neither
+injectivity of the first map nor finiteness or Noetherian hypotheses are required
+for this range-cofinality criterion.
 
 ## Implementation notes
 
-The proof uses the existing Cauchy-sequence and completion maps. At each step,
-cofinality allows a change of a chosen lift by an element in the required ideal
-power. The change need not equal the difference of the original lifts, so the
+For injectivity, the quotient by the original target's annihilator is Noetherian.
+Over this quotient, the existing finite-module tensor comparisons and flatness of
+the completed ring give injectivity. Naturality of the existing restriction-of-scalars
+comparison returns to the original ideal and the canonical completed map.
+
+The range-cofinality proof uses the existing Cauchy-sequence and completion maps.
+At each step, cofinality allows a change of a chosen lift by an element in the
+required ideal power. The change need not equal the difference of the original lifts, so the
 first map need not be injective. No intrinsic adic completeness of a completion
 is assumed.
 
@@ -32,6 +47,11 @@ The construction follows the Cauchy-sequence proof of `AdicCompletion.map_exact`
 by Judith Ludwig and Christian Merten in
 `Mathlib.RingTheory.AdicCompletion.Exactness`. Pointwise range cofinality replaces
 its Artin–Rees bound, and chosen small changes replace its use of injectivity.
+The injectivity criterion reuses their canonical tensor comparison, its naturality
+and flatness of Noetherian ring completions from
+`Mathlib.RingTheory.AdicCompletion.AsTensorProduct`, together with CoherentModules'
+annihilator-quotient Noetherianity theorem and the independent-universe tensor and
+restriction-of-scalars APIs of this library.
 -/
 
 @[expose] public section
@@ -41,6 +61,76 @@ universe uR uP uN uM
 namespace AdicCompletion
 
 open LinearMap
+
+private theorem map_injective_of_finite_of_isNoetherian
+    {R : Type uR} [CommRing R] [IsNoetherianRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M] [Module.Finite R M]
+    {N : Type uN} [AddCommGroup N] [Module R N] [Module.Finite R N]
+    (f : M →ₗ[R] N) (hf : Function.Injective f) :
+    Function.Injective (map I f) := by
+  have ht : Function.Injective
+      (TensorProduct.AlgebraTensorModule.map
+        (LinearMap.id : AdicCompletion I R →ₗ[AdicCompletion I R] AdicCompletion I R) f) :=
+    Module.Flat.lTensor_preserves_injective_linearMap (M := AdicCompletion I R) f hf
+  intro x y hxy
+  obtain ⟨a, rfl⟩ := (ofTensorProduct_bijective I M).2 x
+  obtain ⟨b, rfl⟩ := (ofTensorProduct_bijective I M).2 y
+  apply congrArg (ofTensorProduct I M)
+  apply ht
+  apply (ofTensorProduct_bijective I N).1
+  exact (LinearMap.congr_fun (ofTensorProduct_naturality I f) a).symm.trans
+    (hxy.trans (LinearMap.congr_fun (ofTensorProduct_naturality I f) b))
+
+/-- Completion preserves injectivity of a linear map whose original target is
+Noetherian over the original ring, for every ideal. No Noetherianity of the original
+ring, finite generation of the ideal, source finiteness, flatness, separation or
+completeness is assumed.
+
+This generalizes Mathlib's `AdicCompletion.map_injective`, formalized by Judith Ludwig
+and Christian Merten, to arbitrary original rings and independent ring, source and
+target universes. The proof passes to the quotient by the target's annihilator and
+uses the existing tensor comparison and restriction-of-scalars naturality. -/
+theorem map_injective_of_isNoetherian_target
+    {R : Type uR} [CommRing R] (I : Ideal R)
+    {M : Type uM} [AddCommGroup M] [Module R M]
+    {N : Type uN} [AddCommGroup N] [Module R N]
+    [IsNoetherian R N]
+    (f : M →ₗ[R] N) (hf : Function.Injective f) :
+    Function.Injective (AdicCompletion.map I f) := by
+  have : IsNoetherian R M := isNoetherian_of_injective f hf
+  let K := Module.annihilator R N
+  let B := R ⧸ K
+  have hM : Module.IsTorsionBySet R M K :=
+    (Module.isTorsionBySet_iff_subset_annihilator R M).mpr
+      (f.annihilator_le_of_injective hf)
+  let : Module B M := hM.module
+  let : Module B N := Module.quotientAnnihilator
+  let : IsScalarTower R B M := hM.isScalarTower
+  let : IsScalarTower R B N := (Module.isTorsionBySet_annihilator R N).isScalarTower
+  have : IsNoetherianRing B := isNoetherianRing_quotient_annihilator N
+  have : Module.Finite B M := Module.Finite.of_restrictScalars_finite R B M
+  have : Module.Finite B N := Module.Finite.of_restrictScalars_finite R B N
+  let fB : M →ₗ[B] N :=
+    { toFun := f
+      map_add' := f.map_add
+      map_smul' := by
+        intro b m
+        refine Quotient.inductionOn' b (fun r => ?_)
+        change f (Ideal.Quotient.mk K r • m) = Ideal.Quotient.mk K r • f m
+        rw [hM.mk_smul, (Module.isTorsionBySet_annihilator R N).mk_smul]
+        exact f.map_smul r m }
+  have hfB : fB.restrictScalars R = f := by
+    ext m
+    rfl
+  let J := I.map (algebraMap R B)
+  have hJ : Function.Injective (map J fB) :=
+    map_injective_of_finite_of_isNoetherian J fB hf
+  intro x y hxy
+  apply (restrictScalarsSemilinearMap_bijective (S := B) I M).1
+  apply hJ
+  rw [← hfB] at hxy
+  simpa only [restrictScalarsSemilinearMap_map] using
+    congrArg (restrictScalarsSemilinearMap (S := B) I N) hxy
 
 variable {R : Type uR} [CommRing R] {I : Ideal R}
 variable {P : Type uP} [AddCommGroup P] [Module R P]

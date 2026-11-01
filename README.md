@@ -25,6 +25,13 @@ further result families, examples and boundary cases.
   flatness, faithfulness, separation or completeness is assumed; the converse
   fails. See [Noetherian modules](AdicModules/Noetherian.lean).
 
+- **Injections into Noetherian original targets.** For every ideal `I`, an
+  injective original linear map `f : M →ₗ[R] N` induces an injective canonical
+  map on raw completions if `N` is Noetherian over original `R`. The ring,
+  source and target universes are independent. No Noetherianity of `R`, finite
+  generation of `I`, source finiteness, flatness, separation or completeness is
+  assumed. See [completion injectivity](AdicModules/AdicCompletion/Exactness.lean).
+
 - **Noetherian original module quotients.** For any ideal and `n ≥ 2`, the
   original `M / IⁿM` is Noetherian over `R` iff `M / IM` is Noetherian over `R`
   and the image of `IM` in `M / I²M` is finitely generated over original `R`.

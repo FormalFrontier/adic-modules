@@ -26,8 +26,9 @@ are described by the accompanying lemmas. It also intertwines the canonical
 completed scalar actions through the completed coefficient ring map. Its inverse
 is the bijective semilinear map `restrictScalarsSemilinearMap`, with scalar
 compatibility given by `LinearMap.map_smulₛₗ`; the coefficient ring map need not
-be invertible. Under this comparison, the completed coefficient ring map agrees
-with completion of the original coefficient linear map.
+be invertible. The law `restrictScalarsSemilinearMap_map` expresses naturality
+in an original module map. Under this comparison, the completed coefficient ring
+map agrees with completion of the original coefficient linear map.
 
 ## References
 
@@ -39,6 +40,8 @@ credited in `docs/CREDITS.md`.
 -/
 
 @[expose] public section
+
+universe uR uS uM uN
 
 namespace AdicCompletion
 
@@ -235,6 +238,31 @@ theorem restrictScalarsSemilinearMap_bijective (I : Ideal R) (N : Type*)
     [AddCommGroup N] [Module R N] [Module S N] [IsScalarTower R S N] :
     Function.Bijective (restrictScalarsSemilinearMap (S := S) I N) :=
   (restrictScalarsEquiv (S := S) I N).symm.bijective
+
+/-- Restriction of scalars on completions is natural in an original linear map. -/
+theorem restrictScalarsSemilinearMap_map
+    {R : Type uR} [CommRing R]
+    {S : Type uS} [CommRing S] [Algebra R S]
+    {M : Type uM} [AddCommGroup M] [Module R M] [Module S M]
+    [IsScalarTower R S M]
+    {N : Type uN} [AddCommGroup N] [Module R N] [Module S N]
+    [IsScalarTower R S N]
+    (I : Ideal R) (f : M →ₗ[S] N) (x : AdicCompletion I M) :
+    restrictScalarsSemilinearMap (S := S) I N
+        (map I (f.restrictScalars R) x) =
+      map (I.map (algebraMap R S)) f
+        (restrictScalarsSemilinearMap (S := S) I M x) := by
+  simp only [restrictScalarsSemilinearMap_apply]
+  apply AdicCompletion.ext
+  intro n
+  change (restrictScalarsLevelEquiv (S := S) I N n).symm
+      ((f.restrictScalars R).reduceModIdeal (I ^ n) (x.val n)) =
+    f.reduceModIdeal ((I.map (algebraMap R S)) ^ n)
+      ((restrictScalarsLevelEquiv (S := S) I M n).symm (x.val n))
+  induction x.val n using Submodule.Quotient.induction_on with
+  | _ m =>
+    simp only [LinearMap.reduceModIdeal_apply, restrictScalarsLevelEquiv_symm_mk,
+      LinearMap.restrictScalars_apply]
 
 /-- Under restriction of scalars, the completed coefficient ring map is the
 completion of the original coefficient linear map. -/

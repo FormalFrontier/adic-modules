@@ -99,6 +99,27 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   of `ℤ[1/2]` is zero, although `ℤ[1/2]` is not a Noetherian `ℤ`-module. See
   [`AdicCompletion.isNoetherian_of_isNoetherian`](../AdicModules/Noetherian.lean).
 
+- **Completion preserves injections into Noetherian original targets.** For
+  every ideal `I` of an arbitrary commutative ring `R`, if the original target
+  `N` is Noetherian over original `R`, every injective `R`-linear map `f : M → N`
+  induces an injective canonical map `AdicCompletion.map I f`. The ring, source
+  and target universes are independent. No Noetherianity of `R` or `R / I`, finite
+  generation of `I`, source finiteness, flatness, separation or completeness is
+  assumed; source Noetherianity follows from the original injection. See
+  [`AdicCompletion.map_injective_of_isNoetherian_target`](../AdicModules/AdicCompletion/Exactness.lean).
+  The proof uses the Noetherian quotient `R / ann_R N`, the canonical finite-module
+  tensor comparison and flatness of its completed ring, then the naturality law
+  [`restrictScalarsSemilinearMap_map`](../AdicModules/AdicCompletion/RestrictScalars.lean)
+  to return to the original ideal. No new completed action is needed.
+  In particular, multiplication by two remains injective on the `(2)`-adic
+  completion of `ℤ`, although its reduction modulo two is zero on a nonzero
+  quotient; a [test](../AdicModulesTest/AdicCompletion/LinearMap.lean) uses this
+  injectivity to detect the nonzero completed image of two. This specialization
+  also has Mathlib's older Noetherian-ring and finite-target hypotheses on exactly
+  the same canonical map. Noetherianity of only the original source or only the
+  completed target would not suffice: `ℤ → ℤ[1/2]` completes at `(2)` to the
+  noninjective map `ℤ₂ → 0`.
+
 - **Noetherian original module power quotients.** For any ideal `I` of a
   commutative ring `R`, any `R`-module `M`, and every `n ≥ 2`, the original
   quotient `M / Iⁿ M` is Noetherian over `R` exactly when `M / I M` is
