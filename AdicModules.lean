@@ -15,6 +15,7 @@ public import AdicModules.AdicCompletion.Annihilator
 public import AdicModules.AdicCompletion.Basis
 public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.AdicCompletion.ChangeIdealAlgebra
+public import AdicModules.AdicCompletion.ChangeIdealNoetherian
 public import AdicModules.AdicCompletion.ChineseRemainder
 public import AdicModules.AdicCompletion.ChineseRemainderAlgebra
 public import AdicModules.AdicCompletion.ChineseRemainderSemilinear

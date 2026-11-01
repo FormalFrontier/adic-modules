@@ -5,6 +5,8 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.AdicCompletion.ChangeIdeal
+public import AdicModules.AdicCompletion.ChangeIdealNoetherian
+import Mathlib.RingTheory.Int.Basic
 import Mathlib.Tactic.NormNum
 
 /-!
@@ -280,5 +282,42 @@ lemma powEquiv_two_agrees :
     (twoIdeal_sq ▸ powEquiv twoIdeal ℤ 2 (by norm_num)) = completionEquiv :=
   powEquiv_eq_equivOfCofinal twoIdeal fourIdeal ℤ 2 (by norm_num)
     twoIdeal_sq two_to_four four_to_two
+
+/-- The ideals (2) and (4) have equal effective radicals on the integer self-module. -/
+private lemma two_four_effective_radicals :
+    (twoIdeal ⊔ Module.annihilator ℤ ℤ).radical =
+      (fourIdeal ⊔ Module.annihilator ℤ ℤ).radical := by
+  have hann : Module.annihilator ℤ ℤ = ⊥ := by
+    apply le_antisymm
+    · intro r hr
+      have hr0 : r = 0 := by
+        simpa only [smul_eq_mul, mul_one] using
+          (Module.mem_annihilator.mp hr) (1 : ℤ)
+      simpa only [Submodule.mem_bot] using hr0
+    · exact bot_le
+  simp only [hann, sup_bot_eq]
+  apply le_antisymm
+  · rintro r ⟨n, hn⟩
+    refine ⟨n * 2, ?_⟩
+    rw [pow_mul, ← twoIdeal_sq]
+    simpa only [pow_two] using Ideal.mul_mem_mul hn hn
+  · rintro r ⟨n, hn⟩
+    exact ⟨n, fourIdeal_le_twoIdeal hn⟩
+
+/-- The effective-radical constructor recovers the existing integer completion
+equivalence as a whole linear equivalence, not merely on canonical images. -/
+private lemma equivOfRadicalSupAnnihilatorEq_eq_completionEquiv :
+    equivOfRadicalSupAnnihilatorEq twoIdeal fourIdeal ℤ
+      two_four_effective_radicals = completionEquiv := by
+  have hIJ : ∃ a : ℕ, (twoIdeal ^ a • ⊤ : Submodule ℤ ℤ) ≤ fourIdeal • ⊤ := by
+    obtain ⟨a, ha⟩ := two_to_four
+    exact ⟨a, Submodule.smul_mono_left ha⟩
+  have hJI : ∃ b : ℕ, (fourIdeal ^ b • ⊤ : Submodule ℤ ℤ) ≤ twoIdeal • ⊤ := by
+    obtain ⟨b, hb⟩ := four_to_two
+    exact ⟨b, Submodule.smul_mono_left hb⟩
+  exact (equivOfRadicalSupAnnihilatorEq_eq_equivOfCofinalSMul
+    twoIdeal fourIdeal ℤ two_four_effective_radicals hIJ hJI).trans
+    (equivOfCofinalSMul_eq_equivOfCofinal twoIdeal fourIdeal ℤ
+      hIJ hJI two_to_four four_to_two)
 
 end AdicCompletion.IntegerPowerCompletion
