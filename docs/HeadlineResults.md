@@ -99,6 +99,25 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   of `ℤ[1/2]` is zero, although `ℤ[1/2]` is not a Noetherian `ℤ`-module. See
   [`AdicCompletion.isNoetherian_of_isNoetherian`](../AdicModules/Noetherian.lean).
 
+- **Annihilator of a completed Noetherian original module.** For any ideal `I`
+  of a commutative ring `R` and any Noetherian original `R`-module `M`, put
+  `K = Module.annihilator R M`, `B = R/K`, `q : R → B`, and `J = I.map q`.
+  The annihilator of `AdicCompletion I M` under its canonical
+  `AdicCompletion I R`-action equals the kernel of the canonical completed map
+  `AdicCompletion I R → AdicCompletion J B`. The ring and module universes are
+  independent. No Noetherianity of `R`, `R/I` or the completed coefficient ring,
+  finite generation of `I`, a positive power of `I` or `K`, original-module
+  flatness or faithfulness, separation or completeness is required. Noetherianity
+  is a hypothesis on original `M`, not merely its completion.
+  See [`AdicCompletion.annihilator_eq_ker_mapRingHom`](../AdicModules/AdicCompletion/Annihilator.lean).
+  The proof uses the stock action on `M` by its Noetherian annihilator quotient,
+  flatness of that ring's completion, preservation of a finite faithful action
+  under flat base change, and the existing canonical tensor and semilinear
+  restriction comparisons. It does not identify the kernel with the algebraic
+  extension of `K`, which can be strictly smaller, or require a surjective map
+  between the completed coefficient rings. Zero modules, zero rings and bottom
+  and top ideals are included.
+
 - **Completion preserves injections into Noetherian original targets.** For
   every ideal `I` of an arbitrary commutative ring `R`, if the original target
   `N` is Noetherian over original `R`, every injective `R`-linear map `f : M → N`

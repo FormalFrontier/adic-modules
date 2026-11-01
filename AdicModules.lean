@@ -11,6 +11,7 @@ public import AdicModules.MvPolynomial.JacobianPerturbation
 public import AdicModules.MvPolynomial.JacobianPerturbation.Localization
 public import AdicModules.RingTheory.WittVector.Frobenius
 
+public import AdicModules.AdicCompletion.Annihilator
 public import AdicModules.AdicCompletion.Basis
 public import AdicModules.AdicCompletion.ChangeIdeal
 public import AdicModules.AdicCompletion.ChangeIdealAlgebra
@@ -122,6 +123,8 @@ public import AdicModules.RingTheory.HenselianPi
 The public entry point re-exports bounded ideal-power torsion, primary-component exactness,
 abstract adic completions, principal-adic valuation topology, completed valuation integers
 and their local, spectral, localization and composite-valuation interfaces. It also
+identifies the annihilator of a Noetherian original module's completion with the kernel
+of the completed quotient map by its original annihilator, for every ideal. It
 compares adic completions under restriction of scalars, respecting the completed scalar
 actions through canonical maps between completed coefficient rings. A ring map carrying
 one ideal into another induces a ring map on completions. For an algebra, its image-ideal

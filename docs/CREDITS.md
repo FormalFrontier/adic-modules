@@ -395,6 +395,28 @@ a directly imported proof source here. Exact public release pins are recorded
 in [lake-manifest.json](../lake-manifest.json); upstream licensing and contributor
 notices remain in those libraries.
 
+## Annihilators under completed scalars
+
+The completed-annihilator kernel formula composes the canonical tensor comparison
+and restriction-of-scalars comparison already in this library with the released
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules) interfaces
+for Noetherianity of the annihilator quotient, faithfulness of its stock action,
+preservation of finite faithful actions under flat base change, and annihilators
+under bijective semilinear maps. The base-change proof idea embeds the coefficient
+ring into a finite product of the original module using finite generators and
+preserves injectivity by flatness. The semilinear annihilator formula follows
+Mathlib's elementwise injective and surjective annihilator arguments. These proof
+ideas and interfaces are reused, not their proof bodies.
+
+Mathlib supplies Pierre-Alexandre Bazin's canonical annihilator-quotient action,
+Mario Carneiro, Kevin Buzzard and María Inés de Frutos-Fernández's Noetherian
+module APIs, and Judith Ludwig and Christian Merten's completed-ring flatness and
+finite-module tensor comparison. The independent-universe tensor comparison and
+the completed scalar compatibility of the restriction comparison are this
+library's existing interfaces. Their upstream and project credits above remain
+applicable. The kernel formula is an auxiliary commutative-algebra result; no
+exact passage of Fujiwara–Kato is identified for it and no book coverage is claimed.
+
 ## Fibres and submodules under completed scalars
 
 The fibre-stability and separated-quotient span results reuse the library's
