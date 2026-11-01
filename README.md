@@ -31,6 +31,12 @@ further result families, examples and boundary cases.
   flatness, faithfulness, separation or completeness is assumed; the converse
   fails. See [Noetherian modules](AdicModules/Noetherian.lean).
 
+- **Faithful completed scalar action.** For any ideal `I`, if original `M` is
+  Noetherian over `R` and the original `R`-action is faithful, the canonical
+  `C`-action on `H` is faithful by an automatic `FaithfulSMul` instance. Ring
+  and module universes are independent; no ideal finiteness, separation or
+  completeness is assumed. See [faithful actions](AdicModules/AdicCompletion/Annihilator.lean).
+
 - **Annihilator of a completed Noetherian original module.** For any ideal `I`
   and Noetherian original `R`-module `M`, put `K = ann_R M` and let `q : R → R/K`
   be the quotient map. Then `ann_C H` is the kernel of the canonical map
@@ -296,7 +302,7 @@ For the full source inventory, see the checked-in source directories and root mo
 | [RingTheory.WittVector.Frobenius](AdicModules/RingTheory/WittVector/Frobenius.lean) | [WittVector.Frobenius](AdicModulesTest/WittVector/Frobenius.lean) (perfect non-domain product and nonperfect dual numbers) |
 | [PrimaryComponent](AdicModules/PrimaryComponent.lean) | [PrimaryComponent](AdicModulesTest/PrimaryComponent.lean) |
 | [AdicCompletion](AdicModules/AdicCompletion.lean) | [AdicCompletion](AdicModulesTest/AdicCompletion.lean) |
-| [AdicCompletion.Annihilator](AdicModules/AdicCompletion/Annihilator.lean) (completed annihilator kernel and effective coefficient ring for a Noetherian original module) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (unique factorization of coefficient-valued algebra maps through the effective coefficient completion) |
+| [AdicCompletion.Annihilator](AdicModules/AdicCompletion/Annihilator.lean) (faithful completed action, completed annihilator kernel and effective coefficient ring for a Noetherian original module) | [AdicCompletionQuotient](AdicModulesTest/AdicCompletionQuotient.lean) (unique factorization of coefficient-valued algebra maps through the effective coefficient completion) |
 | [AdicCompletion.Functor](AdicModules/AdicCompletion/Functor.lean) | [AdicCompletion.Functor](AdicModulesTest/AdicCompletion/Functor.lean) (completed product inclusion and its nonzero integer boundary) |
 | [AdicCompletion.ChangeIdeal](AdicModules/AdicCompletion/ChangeIdeal.lean) (cofinal ideal powers over the original ring) | [CofinalAdicCompletion](AdicModulesTest/CofinalAdicCompletion.lean) (one original `ℤ`-module with ideals `(2)` and `(4)`, nonzero first two positive quotient stages and zero level `0`) |
 | [AdicCompletion.Completeness](AdicModules/AdicCompletion/Completeness.lean) | [AdicCompletion.CompletenessTheorems](AdicModulesTest/AdicCompletion/CompletenessTheorems.lean) |

@@ -99,6 +99,18 @@ See also the [usage guide](Guide.md), [results reference](Results.md),
   of `ℤ[1/2]` is zero, although `ℤ[1/2]` is not a Noetherian `ℤ`-module. See
   [`AdicCompletion.isNoetherian_of_isNoetherian`](../AdicModules/Noetherian.lean).
 
+- **Faithful completed scalar action.** For any ideal `I` of a commutative ring
+  `R`, if original `M` is Noetherian over `R` and its original action is faithful,
+  the canonical `AdicCompletion I R`-action on `AdicCompletion I M` is faithful.
+  [`AdicCompletion.instFaithfulSMul`](../AdicModules/AdicCompletion/Annihilator.lean)
+  supplies this automatically. The ring and module universes are independent.
+  No finiteness of `I`, flatness of original `M`, separation, completeness or
+  nontriviality is required. Original-module Noetherianity and faithfulness imply
+  Noetherianity of `R` and finiteness of `M`; these are derived, not extra premises.
+  This is faithfulness for completed scalars, not for the original `R`-action on
+  the completion. The annihilator formula below uses the instance over the stock
+  annihilator quotient of `R`.
+
 - **Annihilator of a completed Noetherian original module.** For any ideal `I`
   of a commutative ring `R` and any Noetherian original `R`-module `M`, put
   `K = Module.annihilator R M`, `B = R/K`, `q : R → B`, and `J = I.map q`.

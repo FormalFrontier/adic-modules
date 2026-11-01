@@ -460,6 +460,14 @@ notices remain in those libraries.
 
 ## Annihilators under completed scalars
 
+The faithful completed-action instance uses the same Noetherian
+annihilator-quotient and finite faithful flat-base-change interfaces below,
+Mathlib's zero-annihilator criterion, equal-ideal and zero-ideal quotient
+equivalences, and the library's independent-universe tensor comparison. Mathlib's
+`FaithfulSMul.of_injective` passes faithfulness through the comparison without
+replacing its canonical actions. The kernel formula uses this instance over the
+stock annihilator quotient rather than repeating the tensor-faithfulness argument.
+
 The completed-annihilator kernel formula composes the canonical tensor comparison
 and restriction-of-scalars comparison already in this library with the released
 [Coherent Modules](https://github.com/FormalFrontier/coherent-modules) interfaces
@@ -477,8 +485,8 @@ module APIs, and Judith Ludwig and Christian Merten's completed-ring flatness an
 finite-module tensor comparison. The independent-universe tensor comparison and
 the completed scalar compatibility of the restriction comparison are this
 library's existing interfaces. Their upstream and project credits above remain
-applicable. The kernel formula is an auxiliary commutative-algebra result; no
-exact passage of Fujiwara–Kato is identified for it and no book coverage is claimed.
+applicable. These are auxiliary commutative-algebra results; no exact passage
+of Fujiwara–Kato is identified for them and no book coverage is claimed.
 
 The effective coefficient-ring equivalence reuses that kernel formula and this
 library's restriction-of-scalars comparison. Surjectivity is Mathlib's completed
