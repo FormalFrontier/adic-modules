@@ -13,6 +13,8 @@ public import Mathlib.Data.ZMod.Basic
 public import Mathlib.RingTheory.Int.Basic
 public import Mathlib.Tactic.NormNum
 
+import AdicModules.AdicCompletion.Kernel
+
 /-!
 # Two-adic examples of completeness theorems
 
@@ -147,3 +149,17 @@ example (t : Set R) (ht : t.Finite)
   have : IsPrecomplete (Ideal.span t) M := by
     simpa only [ht.coe_toFinset] using IsPrecomplete.span_finset ht.toFinset hpre
   infer_instance
+
+/-- One finite adjacent reduction gives every completion kernel and intrinsic completeness. -/
+private theorem completion_kernel_and_intrinsic_completeness_of_finite_reduction
+    (I : Ideal R) {p : ℕ} (hp : 0 < p)
+    [Module.Finite (R ⧸ I)
+      ((I ^ p : Ideal R) ⧸ (I • (⊤ : Submodule R (I ^ p : Ideal R))))] :
+    (∀ n : ℕ, (I ^ n) • (⊤ : Submodule R (AdicCompletion I M)) =
+      (AdicCompletion.eval I M n).ker) ∧
+      IsAdicComplete (I.map (algebraMap R (AdicCompletion I R)))
+        (AdicCompletion I M) := by
+  let : Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent :=
+    (Ideal.finite_cotangent_pow_iff_finite_quotient_smul_top I p).mpr inferInstance
+  exact ⟨AdicCompletion.pow_smul_top_eq_ker_eval_of_finite_cotangent_pow I M hp,
+    AdicCompletion.isAdicComplete_map_of_finite_cotangent_pow I M hp⟩

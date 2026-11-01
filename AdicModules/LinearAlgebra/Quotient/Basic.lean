@@ -6,6 +6,10 @@ module
 
 public import Mathlib.RingTheory.AdicCompletion.Functoriality
 
+import Mathlib.LinearAlgebra.Span.Basic
+import Mathlib.RingTheory.Finiteness.Basic
+import Mathlib.Tactic.Choose
+
 /-!
 # Canonical ideal quotients, nilpotent actions and additive squares
 
@@ -21,6 +25,9 @@ The residual groups need not be commutative and carry no scalar action.
 
 The image of an ideal in its power quotient is nilpotent, including at exponent
 zero in the zero quotient ring.
+
+Finite generation lifts from the quotient by an ideal when a uniform power of
+the ideal annihilates the whole module.
 
 ## References
 
@@ -140,3 +147,59 @@ theorem Ideal.isNilpotent_map_quotient_pow
     IsNilpotent (I.map (Ideal.Quotient.mk (I ^ n))) := by
   use n
   simp only [← Ideal.map_pow, Ideal.map_quotient_self, Ideal.zero_eq_bot]
+
+/-- Finite generation lifts from reduction by an ideal whose power annihilates
+the module. No finiteness assumption on the ideal is needed. -/
+theorem Module.finite_iff_quotient_smul_of_pow_smul_top_eq_bot
+    {S : Type uR} [CommRing S]
+    {V : Type uM} [AddCommGroup V] [Module S V]
+    (q : Ideal S) (n : ℕ)
+    (hkill : (q ^ n) • (⊤ : Submodule S V) = ⊥) :
+    Module.Finite S V ↔ Module.Finite S (V ⧸ (q • (⊤ : Submodule S V))) := by
+  classical
+  constructor
+  · intro hV
+    let : Module.Finite S V := hV
+    exact Module.Finite.quotient S (q • (⊤ : Submodule S V))
+  · intro hquot
+    let Q : Submodule S V := q • (⊤ : Submodule S V)
+    let : Module.Finite S (V ⧸ Q) := hquot
+    obtain ⟨m, s, hs⟩ := Module.Finite.exists_fin (R := S) (M := V ⧸ Q)
+    choose t ht using fun i : Fin m => Q.mkQ_surjective (s i)
+    let N : Submodule S V := Submodule.span S (Set.range t)
+    have hNfg : N.FG :=
+      Submodule.fg_def.mpr ⟨Set.range t, Set.finite_range t, rfl⟩
+    have hmap : N.map Q.mkQ = ⊤ := by
+      change (Submodule.span S (Set.range t)).map Q.mkQ = _
+      rw [Submodule.map_span]
+      have himage : Q.mkQ '' Set.range t = Set.range s := by
+        ext y
+        constructor
+        · rintro ⟨x, ⟨i, rfl⟩, rfl⟩
+          exact ⟨i, (ht i).symm⟩
+        · rintro ⟨i, rfl⟩
+          exact ⟨t i, ⟨i, rfl⟩, ht i⟩
+      rw [himage]
+      exact hs
+    have hsup : Q ⊔ N = ⊤ := (Q.map_mkQ_eq_top N).mp hmap
+    have hqmap : (q • (⊤ : Submodule S V)).map N.mkQ = ⊤ :=
+      (N.map_mkQ_eq_top (q • (⊤ : Submodule S V))).mpr (by
+        change N ⊔ Q = ⊤
+        simpa only [sup_comm] using hsup)
+    have hmaptop : (⊤ : Submodule S V).map N.mkQ = ⊤ :=
+      (N.map_mkQ_eq_top ⊤).mpr (by simp only [sup_top_eq])
+    have hqX : (⊤ : Submodule S (V ⧸ N)) ≤
+        q • (⊤ : Submodule S (V ⧸ N)) := by
+      have heq : q • (⊤ : Submodule S (V ⧸ N)) = ⊤ := by
+        simpa only [Submodule.map_smul'', hmaptop] using hqmap
+      exact le_of_eq heq.symm
+    have hkillX : (q ^ n) • (⊤ : Submodule S (V ⧸ N)) = ⊥ := by
+      have hm := congrArg (fun P : Submodule S V => P.map N.mkQ) hkill
+      simpa only [Submodule.map_smul'', hmaptop, Submodule.map_bot] using hm
+    have hX : (⊤ : Submodule S (V ⧸ N)) = ⊥ :=
+      Submodule.eq_bot_of_le_smul_of_pow_smul_eq_bot q n _ hkillX hqX
+    have hNtop : N = ⊤ := by
+      have hbotmap : (⊥ : Submodule S V).map N.mkQ = ⊤ := by
+        simpa only [Submodule.map_bot] using hX.symm
+      simpa only [sup_bot_eq] using (N.map_mkQ_eq_top ⊥).mp hbotmap
+    exact Module.finite_def.mpr (hNtop ▸ hNfg)

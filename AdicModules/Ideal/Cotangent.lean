@@ -7,6 +7,7 @@ module
 public import Mathlib.RingTheory.Ideal.Cotangent
 
 import AdicModules.LinearAlgebra.Quotient.Basic
+import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.RingTheory.Finiteness.Ideal
 import Mathlib.RingTheory.Ideal.Quotient.PowTransition
@@ -25,6 +26,9 @@ modules over their quotient rings. Noetherianity of any power quotient of expone
 also makes the original cotangent finite, without finite generation of the ideal.
 If the original cotangent is finite, every power has finite cotangent over its own
 quotient ring, including the zeroth power.
+
+For an ideal power, finiteness of its cotangent module is equivalent to
+finiteness of its quotient by the original ideal, including exponent zero.
 
 ## References
 
@@ -185,5 +189,131 @@ theorem finite_cotangent_pow (I : Ideal R)
       Module.Finite.equiv (LinearEquiv.ofBijective g ⟨hgInj, hgSurj⟩).symm
     exact Module.Finite.of_restrictScalars_finite R (R ⧸ I ^ (n + 1))
       (I ^ (n + 1)).Cotangent
+
+/-- For `K ≤ I`, reducing `K / K²` by `I` gives `K / IK`. -/
+noncomputable def cotangentQuotientEquiv
+    (I K : Ideal R) (hKI : K ≤ I) :
+    (K.Cotangent ⧸ (I • (⊤ : Submodule R K.Cotangent))) ≃ₗ[R ⧸ I]
+      (K ⧸ (I • (⊤ : Submodule R K))) := by
+  let S : Submodule R K := K • ⊤
+  let T : Submodule R K := I • ⊤
+  let P : Submodule R K.Cotangent := I • ⊤
+  have hkernel : LinearMap.ker K.toCotangent = S := by
+    change LinearMap.ker (Submodule.mkQ S) = S
+    exact Submodule.ker_mkQ S
+  have hkernel_le : LinearMap.ker K.toCotangent ≤ T := by
+    rw [hkernel]
+    change K • (⊤ : Submodule R K) ≤ I • (⊤ : Submodule R K)
+    exact Submodule.smul_le.mpr fun r hr x hx =>
+      Submodule.smul_mem_smul (hKI hr) hx
+  have hST : S ≤ T := hkernel ▸ hkernel_le
+  have htop : (⊤ : Submodule R K).map K.toCotangent = ⊤ := by
+    apply top_unique
+    intro y _
+    obtain ⟨x, rfl⟩ := K.toCotangent_surjective y
+    exact ⟨x, ⟨⟩, rfl⟩
+  have himage : T.map K.toCotangent = P := by
+    dsimp only [T, P]
+    rw [Submodule.map_smul'', htop]
+  let eR : (K.Cotangent ⧸ P) ≃ₗ[R] (K ⧸ T) :=
+    (Submodule.quotEquivOfEq P (T.map K.toCotangent) himage.symm).trans
+      (Submodule.quotientQuotientEquivQuotient S T hST)
+  have heR (x : K) :
+      eR (Submodule.Quotient.mk (K.toCotangent x)) =
+        Submodule.Quotient.mk x := by
+    change (Submodule.quotientQuotientEquivQuotient S T hST)
+        ((Submodule.quotEquivOfEq P (T.map K.toCotangent) himage.symm)
+          (Submodule.Quotient.mk (K.toCotangent x))) =
+      Submodule.Quotient.mk x
+    rw [Submodule.quotEquivOfEq_mk]
+    rfl
+  refine { eR.toAddEquiv with map_smul' := ?_ }
+  intro a z
+  refine Quotient.inductionOn' a ?_
+  intro r
+  refine Submodule.Quotient.induction_on _ z ?_
+  intro y
+  obtain ⟨x, rfl⟩ := K.toCotangent_surjective y
+  change eR ((Ideal.Quotient.mk I r) •
+      Submodule.Quotient.mk (K.toCotangent x)) =
+    (Ideal.Quotient.mk I r) • eR (Submodule.Quotient.mk (K.toCotangent x))
+  calc
+    eR ((Ideal.Quotient.mk I r) •
+        Submodule.Quotient.mk (K.toCotangent x)) =
+        eR (Submodule.Quotient.mk (K.toCotangent (r • x))) := by
+      rw [Module.Quotient.mk_smul_mk, K.toCotangent.map_smul]
+    _ = Submodule.Quotient.mk (r • x) := heR (r • x)
+    _ = (Ideal.Quotient.mk I r) •
+        eR (Submodule.Quotient.mk (K.toCotangent x)) := by
+      rw [heR, Module.Quotient.mk_smul_mk]
+
+/-- The comparison sends the class of an original representative to its class. -/
+@[simp] theorem cotangentQuotientEquiv_mk_toCotangent
+    (I K : Ideal R) (hKI : K ≤ I) (x : K) :
+    cotangentQuotientEquiv I K hKI
+      (Submodule.Quotient.mk (K.toCotangent x)) =
+        Submodule.Quotient.mk x := rfl
+
+/-- Finiteness of the cotangent of an ideal power is equivalent to finiteness
+of the adjacent quotient of that power, including exponent zero. -/
+theorem finite_cotangent_pow_iff_finite_quotient_smul_top
+    (I : Ideal R) (p : ℕ) :
+    Module.Finite (R ⧸ I ^ p) (I ^ p).Cotangent ↔
+      Module.Finite (R ⧸ I)
+        ((I ^ p : Ideal R) ⧸ (I • (⊤ : Submodule R (I ^ p : Ideal R)))) := by
+  by_cases hp : p = 0
+  · subst p
+    rw [pow_zero, Ideal.one_eq_top]
+    constructor
+    · intro _
+      let : Module.Finite R (⊤ : Ideal R) :=
+        Module.Finite.of_fg (Ideal.fg_top R)
+      let : Module.Finite R
+          ((⊤ : Ideal R) ⧸ (I • (⊤ : Submodule R (⊤ : Ideal R)))) :=
+        Module.Finite.quotient R _
+      let : IsScalarTower R (R ⧸ I)
+          ((⊤ : Ideal R) ⧸ (I • (⊤ : Submodule R (⊤ : Ideal R)))) :=
+        (Module.isTorsionBySet_quotient_ideal_smul (⊤ : Ideal R) I).isScalarTower
+      exact Module.Finite.of_restrictScalars_finite R (R ⧸ I) _
+    · intro _
+      let : Subsingleton (⊤ : Ideal R).Cotangent :=
+        (Ideal.cotangent_subsingleton_iff (⊤ : Ideal R)).2 (by
+          change (⊤ : Ideal R) * ⊤ = ⊤
+          simpa only [Ideal.one_eq_top] using (mul_one (⊤ : Ideal R)))
+      exact Module.Finite.of_surjective
+        (0 : (R ⧸ (⊤ : Ideal R)) →ₗ[R ⧸ (⊤ : Ideal R)] (⊤ : Ideal R).Cotangent)
+        (fun x => ⟨0, Subsingleton.elim _ x⟩)
+  · have hKI : I ^ p ≤ I := Ideal.pow_le_self hp
+    have hkill : (I ^ p) • (⊤ : Submodule R (I ^ p).Cotangent) = ⊥ := by
+      apply le_antisymm _ bot_le
+      rw [Submodule.smul_le]
+      intro r hr v _
+      change r • v = 0
+      exact Ideal.Cotangent.smul_eq_zero_of_mem hr v
+    let : Module.Finite R (R ⧸ I ^ p) := Module.Finite.quotient R (I ^ p)
+    let : Module.Finite R (R ⧸ I) := Module.Finite.quotient R I
+    let : IsScalarTower R (R ⧸ I)
+        ((I ^ p).Cotangent ⧸ (I • (⊤ : Submodule R (I ^ p).Cotangent))) :=
+      (Module.isTorsionBySet_quotient_ideal_smul (I ^ p).Cotangent I).isScalarTower
+    have hB := Module.finite_iff_quotient_smul_of_pow_smul_top_eq_bot
+      (V := (I ^ p).Cotangent) I p hkill
+    have hC := Module.Finite.equiv_iff (Ideal.cotangentQuotientEquiv I (I ^ p) hKI)
+    constructor
+    · intro h
+      let := h
+      let : Module.Finite R (I ^ p).Cotangent :=
+        Module.Finite.trans (R ⧸ I ^ p) (I ^ p).Cotangent
+      have hQ := hB.mp (inferInstance : Module.Finite R (I ^ p).Cotangent)
+      let := hQ
+      exact hC.mp (Module.Finite.of_restrictScalars_finite R (R ⧸ I) _)
+    · intro h
+      have hQ := hC.mpr h
+      let := hQ
+      let : Module.Finite R
+          ((I ^ p).Cotangent ⧸ (I • (⊤ : Submodule R (I ^ p).Cotangent))) :=
+        Module.Finite.trans (R ⧸ I) _
+      have hV := hB.mpr inferInstance
+      let := hV
+      exact Module.Finite.of_restrictScalars_finite R (R ⧸ I ^ p) _
 
 end Ideal
