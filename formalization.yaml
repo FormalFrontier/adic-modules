@@ -15,6 +15,17 @@ project:
     - "Formal Frontier source-maintainer team"
   license: "Apache-2.0"
 
+highlights:
+  - title: "Middle exactness of completion for a Noetherian middle module"
+    statement: >-
+      For every ideal I of a commutative ring R and R-linear maps f : M → N
+      and g : N → P, if the image of f is the kernel of g, g is surjective
+      and N is Noetherian over R, then the induced maps on their inverse-limit
+      I-adic completions are exact at the completion of N.
+    declarations:
+      - declaration: "AdicCompletion.map_exact_of_isNoetherian_middle"
+        file: "AdicModules/AdicCompletion/Exactness.lean"
+
 sources:
   - title: "Adic modules and completions of valuation rings"
     type: "folklore"
