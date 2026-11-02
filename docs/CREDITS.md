@@ -7,45 +7,40 @@ review, source-author endorsement or mathematical novelty.
 
 ## Original project expression
 
-Anchor authored the original bounded ideal-power torsion API and its finite-module
-bridge, the abstract and valuation-ring completion developments, localization,
-residue-field and composite-valuation results, examples and subsequent module
-readiness repairs. The initial bounded-torsion implementation adapted Anchor's
-earlier project source-repository research: it changed the scratch namespace and
-names, documented a reusable API, made parameter choices explicit and extracted
-an exponent-sum extension lemma. That research is an expression predecessor,
-not merely a mathematical citation. Anchor's earlier valuation-completion design
-also informed the implementation; its proposed sketches are not substitutes for
-the subsequently generalized Lean statements. Later readiness work exposed
-public module boundaries, added ordinary-import clients and the default test
-target, and repaired proof-local export and simp-normalization issues.
+Formal Frontier Agents developed the bounded ideal-power torsion API and its
+finite-module bridge, abstract and valuation-ring completions, localization,
+residue-field and composite-valuation results, and examples. The bounded-torsion
+implementation adapts earlier Formal Frontier code; its reusable API makes
+parameter choices explicit and extracts an exponent-sum extension lemma.
+That earlier code is an expression predecessor, not merely mathematical
+background. Earlier project design also informed the valuation-completion
+formalization. Interface organization, applications and proof simplifications
+are additional project contributions.
 
-The primary-component exactness contribution has an expression predecessor in
-Formal Frontier's NSW source research by a different agent contributor. A separate
-Formal Frontier agent authored the library adaptation, which adds restricted maps
-on ordinary integer-prime subgroups and transports exactness. These two
-contributions and their authorship are distinct.
+The primary-component exactness formalization adapts earlier Formal Frontier
+work. Its library adaptation adds restricted maps on ordinary integer-prime
+subgroups and transports exactness. The original development and its adaptation
+are distinct contributions within the project's collective authorship.
 
-The restriction-of-scalars equivalence and its ordinary-import client have an
-earlier Formal Frontier implementation as their expression predecessor, proved
-by one agent contributor. A different agent authored the library adaptation,
-changing only the client import and test namespace. The original proof/client
-and the library adaptation have distinct authorship.
+The restriction-of-scalars equivalence and its client likewise reuse an earlier
+Formal Frontier implementation. The original proof and client are distinct
+contributions from their library-specific adaptation.
 
-Rudder authored the bundled submodule-closure theorem and its five applications
+Formal Frontier Agents developed the bundled submodule-closure theorem and its five applications
 in discrete, indiscrete and adic integer topologies. The proof packages
 mathlib's existing set-level closure formula through canonical submodule
 carriers and reindexes the neighborhood basis along `PLift.down`; it does not
 reprove that set-level result or introduce a competing closure construction.
 
-Rudder also authored the unital cyclic-ring integer-cast bridge, its singleton-span
-consequences and integer, cyclic-quotient and matrix clients. The proof evaluates
+The unital cyclic-ring integer-cast bridge is also an original project
+formalization, with its singleton-span consequences and integer, cyclic-quotient
+and matrix clients. The proof evaluates
 mathlib's existing cyclic additive-endomorphism theorem on right multiplication
 at `1`, then uses the existing singleton-span eliminator and contraposition.
 It does not copy or reimplement the cyclic-endomorphism proof, introduce a new
 integer action or assert that this bridge is a theorem from the source book.
 
-Rudder also authored the integer-span density result and the p-adic basis,
+Formal Frontier Agents developed the integer-span density result and the p-adic basis,
 linearity, properness and density chapter, adapting earlier Formal Frontier
 p-adic proof developments. The formulations and proofs retain Mathlib's norm
 topology, integer module and restricted ideal carriers rather than constructing
@@ -100,8 +95,7 @@ The split-kernel completion comparison in
 [`AdicCompletion.Kernel`](../AdicModules/AdicCompletion/Kernel.lean) uses a
 projector on the original modules, following the approach in Formal Frontier Agents'
 [Projective Modules](https://github.com/FormalFrontier/projective-modules) and
-[Stable Range](https://github.com/FormalFrontier/stable-range) formalizations,
-including contributions by Prism and Iris. It combines Mathlib's completion
+[Stable Range](https://github.com/FormalFrontier/stable-range) formalizations. It combines Mathlib's completion
 interfaces by Kenny Lau, Judith Ludwig, Christian Merten and Jiedong Jiang,
 Antoine Chambert-Loir's exact-sequence splitting, and the submodule-equivalence
 API by Johannes Hölzl, Mario Carneiro, Kevin Buzzard, Yury Kudryashov,
@@ -148,8 +142,17 @@ finite-module instance in Pierre-Alexandre Bazin's module torsion formalization.
 No new completion object, original-module scalar action or precompleteness
 argument is introduced.
 
-Adic closedness for a submodule with finite quotient combines Rudder's generic
-submodule-closure formula in this library with Formal Frontier Agents' pure
+The universal finite-module separation and submodule-closedness criteria follow
+Fujiwara–Kato, Proposition 0.7.4.16. They combine Coherent Modules' pure Krull
+criterion, the original-action cyclic quotients by `(1 - a)`, Mathlib's Jacobson
+unit criterion, and this library's canonical power-topology closure and quotient
+interfaces. The universal statements use ring-universe representatives; Mathlib's
+`Module.Finite.reprEquiv` supports transport for independently sized finite
+modules with their original scalar actions. This reuses the original quotient
+and closure constructions rather than defining alternatives.
+
+Adic closedness for a submodule with finite quotient combines this library's
+existing generic submodule-closure formula with Formal Frontier Agents' pure
 finite-quotient Krull intersection theorem in Coherent Modules. It generalizes
 the closedness consequence of Fujiwara–Kato, *Foundations of Rigid Geometry I*,
 arXiv:1308.4734v5, Proposition 0.7.4.16, to finite quotients and a Jacobson bound
@@ -172,7 +175,7 @@ and Christian Merten and this library's ideal-action and product-completeness AP
 The uniform-estimate and successive-correction proof is independently assembled
 Formal Frontier Agent expression, without copying upstream proof bodies.
 
-Tiller authored the raw-completion flatness criterion over a Noetherian completed
+Formal Frontier Agents developed the raw-completion flatness criterion over a Noetherian completed
 coefficient ring and its flat-original-module specialization. These compose that
 complete-module criterion with this library's Noetherian-completion cotangent
 finiteness, intrinsic completeness, semilinear quotient comparisons and forward
@@ -241,6 +244,15 @@ with its existing additive-monoid target interface. These are compositions of
 existing interfaces, not copied upstream proof bodies; their author,
 copyright and Apache-2.0 notices remain in Mathlib.
 
+The ideal-power cotangent finiteness and adjacent-quotient comparison also use
+Andrew Yang's cotangent formalization and Johan Commelin's finite-generation
+APIs, with Mathlib's ideal-map, nilpotence, quotient and scalar-restriction
+infrastructure. The arguments lift original cotangent representatives through
+nilpotent ideal quotients and compare canonical quotient modules. Finite-generation
+lifting under uniform power annihilation uses finite quotient generators, lifted
+representatives and ideal-power iteration; it does not require a finitely generated
+ideal. The quotient and scalar-restriction contributors and notices are credited above.
+
 The tensor-comparison kernel calculation reuses this library's coefficient quotient
 comparison and fixed-stage kernel theorem, whose finite-linear-combination argument follows
 Bingyu Xia's Mathlib formalization. It composes `quotTensorEquivQuotSMul` from Antoine
@@ -277,8 +289,8 @@ semiring filtrations.
 The library uses native Lean and mathlib objects and proof infrastructure at
 the pinned revisions and does not vendor those dependencies. Upstream licenses
 and author notices remain upstream. The primary-component development reuses
-mathlib's Dedekind, abelian torsion and integer-ideal infrastructure. Anchor's
-earlier design consulted mathlib's Laurent-series completion comparison, which
+mathlib's Dedekind, abelian torsion and integer-ideal infrastructure. Earlier project
+design consulted mathlib's Laurent-series completion comparison, which
 credits Aaron Anderson, María Inés de Frutos-Fernández and Filippo A. E. Nuccio
 under Apache-2.0 and bears copyright (c) 2021 Aaron Anderson. The present
 completed-integer comparison instead uses a two-variable density argument via
@@ -461,7 +473,22 @@ without copying upstream proof bodies or introducing a new completion, quotient
 or scalar action. The submodule and linear-equivalence contributors are credited
 above, and all upstream author, copyright and Apache-2.0 notices remain in Mathlib.
 
+The earlier tensor-based injectivity formalization followed Judith Ludwig and
+Christian Merten's tensor-comparison and flat-completion approach in Mathlib's
+`RingTheory/AdicCompletion/AsTensorProduct.lean`. It combined the annihilator-quotient
+Noetherianity interface from Coherent Modules with this library's independent-universe
+tensor comparison and scalar-restriction naturality. This credits that argument and
+its reused formalization interfaces, not authorship of the upstream proofs; their
+author and license notices remain upstream. The cofinality-based criterion above
+instead uses module Artin–Rees.
+
 ## Other deliverable interfaces
+
+The raw-completion Noetherian criteria reuse
+[Graded Rings](https://github.com/FormalFrontier/graded-rings/tree/4e0ced7542375a428d0d87336e9209b031364ef6).
+Its `GradedRings.ReesModule` formalization supplies associated-graded modules,
+coefficient and representative identities, and graded Noetherianity interfaces
+used by [`AdicModules.Noetherian`](../AdicModules/Noetherian.lean).
 
 The completion-coordinate comparison reuses the quotient-torsion equivalence
 from [Group Theory](https://github.com/FormalFrontier/group-theory); the adic
@@ -477,6 +504,16 @@ not by vendoring its proof text.
 [Coherent Modules](https://github.com/FormalFrontier/coherent-modules) is also a
 direct dependency: the raw-completion flatness criterion imports its focused
 `CoherentModules.RingTheory.Flat.Equiv` interface for semilinear flatness transport.
+The module Noetherian criteria and completed-annihilator arguments also use
+[`CoherentModules.RingTheory.Noetherian`](https://github.com/FormalFrontier/coherent-modules/blob/5cc03db3146c93e6ac1ac0647ee930fd16f3dd25/CoherentModules/RingTheory/Noetherian.lean)
+for Noetherianity of the scalar ring modulo a Noetherian module's annihilator;
+the module criteria additionally use its surjective-semilinear descent interface.
+The effective-radical comparison on Noetherian original modules consumes the
+same Coherent Modules interface's modulewise power bounds after adjoining the
+original annihilator. Its maps, equivalences, quotient-stage formulas and
+naturality use this library's existing ideal-change comparisons, rather than
+another completion or comparison construction. This credits the dependency's
+power-bound argument separately from the comparison and its characteristic laws.
 The same package is reached through Multivariate Polynomials; one explicit root
 pin selects the shared revision. The resolved package graph also includes
 [Algebraic Direct Limits](https://github.com/FormalFrontier/algebraic-direct-limits)
@@ -650,31 +687,28 @@ followed as well as interfaces reused. Their upstream Apache-2.0 licenses,
 copyright notices and author notices remain in Mathlib; this library claims no
 authorship of that upstream expression.
 
-## Documentation adapter expression
+## Documentation tooling
 
-The bounded Markdown API generator and its data tests adapt Anchor's earlier
-Apache-2.0 project implementation in `coherent-modules`. The module/site
-inventory, notes, literal-kind controls and recipe are specialized here. Display
-headers and 92 rendered source docstrings in the historical API are from this
-library's pinned native doc-gen run. One further original native docstring is
-verified but presented as a separately authored, labeled editorial API note.
-The ten missing-docstring explanations are also authored API notes, not source
-docstrings. The editorial presentation does not claim a new native run. The tool
-is used as a dependency of reproduction, not vendored.
+The Markdown API generator and its data tests adapt an earlier Apache-2.0
+Formal Frontier implementation in `coherent-modules`; the source inventory,
+literal-kind controls and reproduction recipe are specialized to this library.
+The stored API reference distinguishes 92 native source docstrings from a
+pinned doc-gen run, an additional labeled editorial API note based on a source
+docstring, and ten authored missing-docstring explanations. Editorial notes
+are not presented as newly generated native output. The tool is a reproduction
+dependency, not a vendored implementation.
 
-## Authorization and review limits
+## Licensing and third-party material
 
-Formal Frontier's standing Apache-2.0 authorization covers verified
-original project contributions, including the earlier project research adapted
-above. A historical missing license file is not itself a license grant. Project
-SPDX/author headers do not name an unverified copyright holder; no third-party
-notice is removed.
+Original Formal Frontier project expression, including the earlier project
+work adapted above, is licensed under Apache-2.0. A missing license file is
+not itself a license grant. Project SPDX/author headers do not assert an
+unverified copyright owner or replace authentic third-party notices.
 
-Independent rights/provenance assessments are specific to the files and public
-history examined. A project label, AI generation, Git author field or mathematical
-citation alone does not settle a concrete ownership, copying or redistribution
-concern. Rights/provenance, mathematical correctness, complete proof checking
-and source coverage are distinct matters.
+Credit, AI generation, a Git author field or a mathematical citation alone
+does not establish ownership or permission to copy expression. Original-project
+licensing does not relicense third-party material; mathematical correctness,
+formal proof checking and source coverage are separate from redistribution rights.
 
 ## Flat-target inverse criteria and quotient transport
 

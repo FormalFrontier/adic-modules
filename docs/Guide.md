@@ -285,11 +285,48 @@ With `[IsNoetherian C H]`, `AdicCompletion.isNoetherian_quotient_pow I M n` give
 The action is the canonical quotient action on the **original** module quotient;
 at `n = 0` that quotient is zero. The ring and module universes are independent.
 No Noetherianity of `R` or `C`, finite generation of `I` or finiteness of `M`
-is required. This is a necessary consequence of `[IsNoetherian C H]`, not a
-sufficiency criterion; a finitely generated positive ideal power alone is not
-enough. The separate [original-quotient criterion](HeadlineResults.md)
-characterizes Noetherianity over `R` of `M / Iⁿ M` for `n ≥ 2` by its original
-first quotient and acted first layer, without asserting Noetherianity of `H`.
+is required.
+
+For any chosen `n ≥ 2`, the converse also holds:
+[`AdicCompletion.isNoetherian_iff_quotient_pow`](../AdicModules/Noetherian.lean)
+identifies `[IsNoetherian C H]` with Noetherianity of this one original quotient
+under its canonical `R / Iⁿ`-action. Equivalently,
+[`AdicCompletion.isNoetherian_iff_quotient_sq`](../AdicModules/Noetherian.lean)
+uses Noetherianity of the original `M / I²M` over `R`. These are module forms of
+the adic Noetherian criterion of Fujiwara–Kato, *Foundations of Rigid Geometry I*.
+The bound `n ≥ 2` matters: the zeroth quotient is always zero, and a Noetherian
+first quotient alone does not suffice. Finite generation of a positive ideal
+power alone is not a replacement for quotient Noetherianity. The
+[original-quotient criterion](HeadlineResults.md) describes the equivalent
+condition using the original first quotient and acted first layer.
+
+## Finite cotangents of ideal powers
+
+Import [`AdicModules.Ideal.Cotangent`](../AdicModules/Ideal/Cotangent.lean)
+or the public root. For any ideal `I` of a commutative ring `R`,
+`Ideal.finite_cotangent_pow I n` takes `[Module.Finite (R ⧸ I) I.Cotangent]`
+to `Module.Finite (R ⧸ I ^ n) (I ^ n).Cotangent` for every `n : ℕ`.
+Thus finite generation of `I / I²` over `R / I` propagates to
+`Iⁿ / I²ⁿ` over `R / Iⁿ`, with the canonical quotient action. Neither
+`I.FG` nor Noetherianity of `R` is required; the zeroth cotangent is zero.
+
+For any `p : ℕ`,
+`Ideal.finite_cotangent_pow_iff_finite_quotient_smul_top I p` identifies
+finiteness of this cotangent over `R ⧸ I ^ p` with finiteness of
+`(I ^ p : Ideal R) ⧸ (I • (⊤ : Submodule R (I ^ p : Ideal R)))`
+over `R ⧸ I`. This adjacent quotient uses the ideal power as a subtype module.
+The statement includes `p = 0` as a **finiteness equivalence**, not an
+isomorphism between the cotangent and the adjacent quotient. The separate
+`Ideal.cotangentQuotientEquiv I K hKI` compares the reduction of `K.Cotangent`
+by `I` with `K / IK` over `R / I` only when `hKI : K ≤ I`; applying it to
+`K = I ^ p` uses positive `p`, not the zeroth-power case in general.
+
+The related
+[`Module.finite_iff_quotient_smul_of_pow_smul_top_eq_bot`](../AdicModules/LinearAlgebra/Quotient/Basic.lean)
+identifies finite generation over the original ring of `V` and `V / qV`,
+for an additive commutative group module `V` over a commutative ring, when
+**one power** `q ^ n` annihilates the whole module. No finite generation
+of `q` is needed, and `n = 0` is allowed.
 
 ## Scalar-ideal quotients of algebras
 
@@ -357,6 +394,36 @@ completeness, nontriviality or injectivity/surjectivity of `algebraMap R S`.
 It is neither a module base-change equivalence nor a claim that an arbitrary
 adic completion satisfies a separate completeness predicate.
 
+For completed coefficients, put `C_R = AdicCompletion I R` and
+`C_S = AdicCompletion (I.map (algebraMap R S)) S`. The completed coefficient
+map `ρ : C_R →+* C_S` is induced by `algebraMap R S` via
+`AdicCompletion.mapRingHom`. Under the same hypotheses, write `T` for
+[`AdicCompletion.restrictScalarsSemilinearMap`](../AdicModules/AdicCompletion/RestrictScalars.lean).
+It goes in the **reverse direction**, from `AdicCompletion I M` to
+`AdicCompletion (I.map (algebraMap R S)) M`. With both canonical completed-module
+actions, it satisfies `T (a • x) = ρ(a) • T x`.
+
+[`restrictScalarsSemilinearMap_apply`](../AdicModules/AdicCompletion/RestrictScalars.lean)
+identifies its function with `(restrictScalarsEquiv (S := S) I M).symm`, and
+[`restrictScalarsSemilinearMap_bijective`](../AdicModules/AdicCompletion/RestrictScalars.lean)
+states its bijectivity. Neither injectivity nor surjectivity of `ρ` is needed:
+a bijection on these completed modules does not assert an equivalence of the
+coefficient rings. This API provides a bijective semilinear map, not an inverse
+coefficient homomorphism or a semilinear equivalence requiring one.
+
+The comparison is natural in an original **`S`-linear** map `f : M →ₗ[S] N`,
+where `N` likewise has compatible `R`- and `S`-actions and `IsScalarTower R S N`.
+Write `J = I.map (algebraMap R S)` and `T_M`, `T_N` for the two reverse
+semilinear comparisons. For `x : AdicCompletion I M`,
+[`AdicCompletion.restrictScalarsSemilinearMap_map`](../AdicModules/AdicCompletion/RestrictScalars.lean)
+gives `T_N (AdicCompletion.map I (f.restrictScalars R) x) =
+AdicCompletion.map J f (T_M x)`. Thus one can complete the restricted map
+first or compare first and complete over `S`, keeping both canonical
+completed actions and the same coefficient map `ρ`. The universes of `R`,
+`S`, `M` and `N` are independent. This requires no additional finiteness or
+completeness hypothesis and does not make an arbitrary `R`-linear map
+`S`-linear.
+
 At level `n`, `map_pow_smul_top_restrictScalars I n` identifies the extended
 ideal's power-filtration submodule after restriction of scalars with
 `I ^ n • ⊤`. The `R`-linear `restrictScalarsLevelEquiv I M n` compares the
@@ -387,9 +454,324 @@ example (I : Ideal ℤ) :
 ```
 
 The [ordinary-import client](../AdicModulesTest/AdicCompletion/RestrictScalars.lean)
-exercises these directions and boundary cases. The 103-display-site native
-`docs/API.md` snapshot predates this module and remains historical; this guide
-and the Lean source describe the current scalar-restriction API.
+exercises these directions and boundary cases. The linked Lean module gives the
+complete scalar-restriction API.
+
+## Annihilators under completed scalars
+
+Import [`AdicModules.AdicCompletion.Annihilator`](../AdicModules/AdicCompletion/Annihilator.lean)
+or the public root. Let `R : Type u` be a commutative ring, `M : Type v` an
+additive commutative group with its `R`-module structure and `[IsNoetherian R M]`,
+and `I : Ideal R` any ideal. The ring and module universes are independent.
+Write `C = AdicCompletion I R` and `H = AdicCompletion I M`, with the canonical
+completed-ring action on `H`.
+
+If the original action also satisfies `[FaithfulSMul R M]`, the automatic
+instance `AdicCompletion.instFaithfulSMul I M` gives `FaithfulSMul C H`.
+Original-module Noetherianity and faithfulness imply Noetherianity of `R` and
+finiteness of `M`; these are consequences, not additional premises. This is
+faithfulness of **completed scalars**, not of the original `R`-action on `H`.
+No finiteness of `I`, original-module flatness, separation, completeness or
+nontriviality is required.
+
+For the annihilator formula, no faithfulness of original `M` is required.
+Put `K = Module.annihilator R M`, `q = Ideal.Quotient.mk K`, and `J = I.map q`.
+Use `AdicCompletion.annihilator_eq_ker_mapRingHom I M` for
+
+`Module.annihilator C H = RingHom.ker (AdicCompletion.mapRingHom I J q Ideal.le_comap_map)`.
+
+Noetherianity is required of original `M`, not merely of `H`; no Noetherianity
+of `R` or `C`, finite generation of `I`, original-module flatness or faithfulness,
+separation or completeness is assumed. The proof uses the faithful completed
+scalar-action instance over `R / K`, together with the tensor and
+scalar-restriction comparisons. Its kernel need not equal the ideal generated
+by `K` in `C`. Zero modules, zero rings and bottom or top ideals are included.
+
+The completed coefficient map is surjective, as a consequence of completion
+preserving surjectivity of the original quotient map and the scalar-restriction
+comparison. Thus `AdicCompletion.quotientAnnihilatorEquiv I M` gives
+
+`(C ⧸ Module.annihilator C H) ≃ₐ[R] AdicCompletion J (R ⧸ K)`.
+
+The maps retain their original-`R` algebra structures. The forward and inverse
+formulas commute with the quotient and completed coefficient maps on every
+completed coefficient, not just on original elements. The
+[mapping-out client](../AdicModulesTest/AdicCompletionQuotient.lean) factors
+original-`R` algebra maps killing this completed annihilator uniquely through
+`AdicCompletion J (R ⧸ K)`, without a completed-coefficient algebra structure on
+the independently sized target. This is the quotient by the **completed
+annihilator**, not by the possibly smaller algebraic extension of `K`.
+
+## Comparing ideal-adic filtrations on one module
+
+Import [`AdicModules.AdicCompletion.ChangeIdeal`](../AdicModules/AdicCompletion/ChangeIdeal.lean)
+or the public root. Let `I`, `J` be ideals of a commutative ring `R`, and let
+`M` be an additive commutative group with an `R`-module structure. A uniform bound
+`∃ a : ℕ, (I ^ a • ⊤ : Submodule R M) ≤ J • ⊤` gives
+`AdicCompletion.mapOfPowSMulLE I J M hIJ : AdicCompletion I M →ₗ[R] AdicCompletion J M`.
+The bound concerns the **whole original module** at one exponent, not exponents
+chosen separately for its elements; it need not come from an ambient ideal
+containment `I ^ a ≤ J`. The exponent may be zero. By
+`AdicCompletion.exists_pow_smul_top_le_iff`, such a bound is equivalent to
+cofinality in this direction at every target ideal-power submodule.
+
+`AdicCompletion.eval_mapOfPowSMulLE` computes the comparison at **every** pair
+of stages satisfying `(I ^ m • ⊤ : Submodule R M) ≤ J ^ n • ⊤`: it is the
+canonical quotient factor map from level `m` to level `n`. These equations
+uniquely characterize the comparison, independently of its chosen bound.
+A separate reverse bound gives `AdicCompletion.equivOfCofinalSMul I J M hIJ hJI`.
+The comparisons satisfy identity and composition laws. They are natural for
+original `R`-linear maps when the necessary bounds are supplied separately on
+the source and target modules; no common exponent is assumed.
+
+These are original-`R`-linear maps and equivalences, not identifications of the
+two completed coefficient rings or assertions of completed-scalar linearity.
+Under ambient power containments they agree as whole maps with `mapOfPowLE`
+and `equivOfCofinal`; under `I ≤ J`, the comparison agrees with `mapOfLE` on
+all completed inputs. Adjoining an ideal that annihilates `M` gives a bijective
+comparison, by `AdicCompletion.mapOfPowSMulLE_sup_bijective`. No Noetherianity,
+finite generation, separation or completeness hypothesis is needed. Ring and
+module universes are independent, as are those of the two modules in naturality.
+
+For a **Noetherian original module** `M`, import
+[`AdicModules.AdicCompletion.ChangeIdealNoetherian`](../AdicModules/AdicCompletion/ChangeIdealNoetherian.lean).
+Containment `(I ⊔ Module.annihilator R M).radical ≤
+(J ⊔ Module.annihilator R M).radical` supplies the uniform modulewise power
+bound, through `AdicCompletion.mapOfRadicalSupAnnihilatorLE I J M h`.
+Equality of these effective radicals gives
+`AdicCompletion.equivOfRadicalSupAnnihilatorEq I J M h`. They agree as whole
+maps and equivalences with the comparisons above for every supplied power
+bound. Their quotient-stage formulas hold on arbitrary completed inputs,
+including zero stages; naturality requires the effective-radical conditions
+separately on the original source and target modules. No Noetherianity of `R`
+or finite generation of `I` or `J` is assumed. These are sufficient criteria,
+not assertions of necessity, and the equivalence remains original-`R`-linear:
+it does not identify the two completed coefficient rings.
+
+## Adic separation, closedness and finite-module completeness
+
+Let `I` be an ideal of a commutative ring `R`. Assume finite-submodule adic
+cofinality, expressed by `hAPf : I.HasFiniteSubmoduleAdicCofinality` in
+[Coherent Modules](https://github.com/FormalFrontier/coherent-modules).
+This is an ideal-level hypothesis, distinct from supplying a bound for one
+particular submodule inclusion in the following section.
+
+* Import [`AdicModules.AdicCompletion.CompleteBase`](../AdicModules/AdicCompletion/CompleteBase.lean).
+  For an additive commutative group `R`-module `M` finite over the **original**
+  `R`, `IsHausdorff.of_hasFiniteSubmoduleAdicCofinality hAPf hJ` proves
+  intrinsic `IsHausdorff I M` from
+  `hJ : I ≤ (Module.annihilator R M).jacobson`.
+  The bound is relative to the module's annihilator, not necessarily the
+  Jacobson radical of zero.
+* In the same module, if the original base satisfies `[IsAdicComplete I R]`,
+  `IsAdicComplete.of_hasFiniteSubmoduleAdicCofinality I M hAPf` makes every
+  finite original `M` intrinsically `I`-adically complete. Its Hausdorffness
+  and the relative Jacobson bound follow from the assumptions; they are not
+  extra inputs. The canonical `AdicCompletion.of I M` is then bijective, and
+  the existing `AdicCompletion.ofLinearEquiv` gives the corresponding
+  original-`R`-linear equivalence.
+* Import [`AdicModules.Topology.Algebra.Module.AdicTopology`](../AdicModules/Topology/Algebra/Module/AdicTopology.lean).
+  For `N : Submodule R M`, assume only that the **quotient** `M ⧸ N` is finite
+  and `I ≤ (Module.annihilator R (M ⧸ N)).jacobson`.
+  `Submodule.isClosed_adicModuleTopology_of_hasFiniteSubmoduleAdicCofinality`
+  proves that `N` is closed in the canonical ambient `I.adicModuleTopology M`.
+  Neither `M` nor `N` needs to be finite. This is closedness in that topology,
+  not intrinsic completeness of `N`.
+
+The ring and module universes in these three criteria are independent. No
+additional Noetherianity of the ring, finite generation of the ideal or finite
+presentation of the modules is required. All original modules retain their
+given `R`-actions.
+
+For universal separation tests, import
+[`AdicModules.Topology.Algebra.Module.SeparationCriteria`](../AdicModules/Topology/Algebra/Module/SeparationCriteria.lean).
+Under `hAPf`, the two theorems in namespace
+`Ideal.HasFiniteSubmoduleAdicCofinality`,
+`le_jacobson_bot_iff_forall_isHausdorff` and
+`le_jacobson_bot_iff_forall_isClosed_adicModuleTopology`, identify
+`I ≤ (⊥ : Ideal R).jacobson` with, respectively, Hausdorffness of every finite
+original module and closedness of every submodule of every finite original
+module in its canonical adic topology. No finiteness of the submodule is
+required. In their literal universal statements, `R : Type uR` and the tested
+modules `X : Type uR` share a universe; `Module.Finite.reprEquiv` provides
+representatives for independently sized finite modules with their original
+scalar actions.
+
+There is also a ring-only maximal-ideal test without `hAPf`. In
+[`AdicModules.Topology.Algebra.Ideal`](../AdicModules/Topology/Algebra/Ideal.lean),
+`Ideal.isClosed_adicTopology_iff_le_of_isMaximal` says that a maximal ideal
+`m` is closed in `I.adicTopology` exactly when `I ≤ m`.
+`Ideal.le_jacobson_bot_iff_forall_isClosed_adicTopology` identifies containment
+of `I` in the Jacobson radical of zero with closedness of every maximal ideal.
+No nontriviality assumption is imposed, so the zero ring is included. These
+ring-only tests do not remove `hAPf` from the finite-module criteria above.
+
+## Completing pointwise-cofinal submodule inclusions
+
+Import [`AdicModules.AdicCompletion.LinearMap`](../AdicModules/AdicCompletion/LinearMap.lean)
+or the public root. Let `I` be any ideal of a commutative ring `R`, and `K` a
+submodule of an additive commutative group `R`-module `N`. Suppose
+
+`∀ n : ℕ, ∃ m : ℕ, K ⊓ (I ^ m • (⊤ : Submodule R N)) ≤ I ^ n • K`.
+
+Use `AdicCompletion.map_subtype_injective_of_cofinal I K hcofinal` to obtain
+injectivity of the canonical completed-ring-linear map completing `K.subtype`.
+The source completion uses the **intrinsic** `I`-adic filtration on `K`.
+In the displayed ambient-submodule inequality, `I ^ n • K` is the image of
+that intrinsic power submodule inside `N`. No monotone choice, uniform shift,
+finiteness or Noetherianity of the ring, ideal or modules is assumed; flatness,
+faithfulness, separation and completeness are not required. Ring and module
+universes are independent. Direct summands satisfy the bound with `m = n`.
+
+For intrinsic precompleteness, import
+[`AdicModules.AdicCompletion.Submodule`](../AdicModules/AdicCompletion/Submodule.lean).
+If the original ambient module `N` is `I`-precomplete and the original quotient
+`N ⧸ K` is `I`-Hausdorff, use
+`Submodule.isPrecomplete_of_isHausdorff_quotient_of_cofinal I K hcofinal`
+with the same bound to obtain intrinsic `I`-precompleteness of `K`. Ambient
+Hausdorffness, finite generation and Noetherianity are not required, and the
+original modules keep their given `R`-actions. If `N` is `I`-adically complete,
+existing separation inheritance also makes `AdicCompletion.of I K` bijective,
+as demonstrated in the
+[canonical-map client](../AdicModulesTest/AdicCompletion/CompletenessTheorems.lean).
+
+## Injections into Noetherian original targets
+
+Import [`AdicModules.AdicCompletion.Exactness`](../AdicModules/AdicCompletion/Exactness.lean)
+or the public root. For an arbitrary ideal `I` of a commutative ring `R`,
+additive commutative group `R`-modules `M`, `N`, and `[IsNoetherian R N]`,
+use `AdicCompletion.map_injective_of_isNoetherian_target I f hf` with an
+original `f : M →ₗ[R] N` and `hf : Function.Injective f`. Its conclusion is
+`Function.Injective (AdicCompletion.map I f)`. Ring, source and target
+universes are independent. No Noetherianity of `R` or `R / I`, finite
+generation of `I`, source finiteness, flatness, separatedness or completeness
+is assumed. Source Noetherianity follows from the original injection into `N`.
+
+Module Artin–Rees supplies the pointwise-cofinality bound above for `f.range`
+in Noetherian original `N`. The subtype criterion gives injectivity of its
+completed inclusion, and completion of `LinearEquiv.ofInjective f hf` supplies
+the original source-to-range equivalence. Functoriality identifies their whole
+composite with `AdicCompletion.map I f`, with its canonical completed actions.
+This concerns the **induced map of an original injection**, not an arbitrary
+map between completed modules or the hypotheses for extending a map to an
+intrinsically complete target below. It does not assert unconditional exactness
+of completion or require injectivity at each quotient level.
+
+For example, the [integer client](../AdicModulesTest/AdicCompletion/LinearMap.lean)
+privately applies the criterion to multiplication by two at `(2)`, then uses
+injectivity and the independently nonzero image of one to show that the
+completed image of two is nonzero. This integer case also satisfies Mathlib's
+older Noetherian-ring and finite-target hypotheses for the same canonical map.
+
+## Completing original images
+
+Import [`AdicModules.AdicCompletion.LinearMap`](../AdicModules/AdicCompletion/LinearMap.lean)
+for the unconditional range comparison. For an ideal `I` of a commutative ring
+`R` and an original map `f : M →ₗ[R] N` of additive commutative group modules,
+`AdicCompletion.range_map_range_subtype I f` identifies the range of completion
+of `f.range.subtype` with the range of `AdicCompletion.map I f`, as submodules
+over `C = AdicCompletion I R`. No Noetherianity or injectivity is assumed:
+completion preserves surjectivity of the original range restriction, and the
+completed range factorization gives the equality.
+
+If `K = f.range` satisfies the pointwise-cofinality bound in the preceding
+section, `AdicCompletion.rangeEquivOfRangeCofinal I f hcofinal` gives
+`AdicCompletion I (LinearMap.range f) ≃ₗ[C] LinearMap.range (AdicCompletion.map I f)`.
+The left side uses the original range's **intrinsic** filtration; the right side
+is the completed map's range, not its closure or a quotient of the completed
+source. Its forward map is completion of the original inclusion restricted to
+that range; its inverse is the unique preimage map. Characteristic laws give
+the whole ambient forward and inverse maps, original-element formulas, the
+range-restriction square and uniqueness of the whole equivalence. The theorem
+`rangeEquivOfRangeCofinal_existsUnique` factors every `C`-linear map whose range
+lies in the completed image uniquely through the completed original range
+inclusion. Its source may be any additive commutative monoid module over `C`,
+in an independent universe. No finiteness or Noetherianity is required beyond
+the bound, and original `f` need be neither injective nor surjective.
+
+If the **original target** satisfies `[IsNoetherian R N]`, import
+[`AdicModules.AdicCompletion.Exactness`](../AdicModules/AdicCompletion/Exactness.lean)
+and use `AdicCompletion.rangeEquivOfIsNoetherianTarget I f` for
+`AdicCompletion I (LinearMap.range f) ≃ₗ[C] LinearMap.range (AdicCompletion.map I f)`.
+The left side uses the original range's intrinsic `I`-adic filtration. Its
+forward map is completion of the original inclusion; the characteristic laws
+`coe_rangeEquivOfIsNoetherianTarget_apply`,
+`coe_rangeEquivOfIsNoetherianTarget_apply_of` and
+`rangeEquivOfIsNoetherianTarget_map_rangeRestrict` describe arbitrary completed
+range elements, original elements and the square with the completed range
+restriction, respectively. The original source `M` is arbitrary, and `f` need
+not be injective. No Noetherianity of `R` or `C`, finite generation of `I`,
+source finiteness, flatness, separation or completeness is assumed. Ring,
+source and target universes are independent.
+
+Module Artin–Rees supplies this bound for Noetherian original `N`.
+`rangeEquivOfIsNoetherianTarget_eq_rangeEquivOfRangeCofinal` identifies the two
+whole equivalences for every proof of cofinality, hence also their underlying
+linear maps and inverses.
+
+## Middle exactness of completed maps
+
+Import [`AdicModules.AdicCompletion.Exactness`](../AdicModules/AdicCompletion/Exactness.lean)
+or the public root. For any ideal `I` of a commutative ring `R`, let
+`f : M →ₗ[R] N` and `g : N →ₗ[R] P` be original linear maps of additive
+commutative group modules. Suppose `hExact : Function.Exact f g` and both
+original ranges satisfy their own pointwise bounds:
+
+* `∀ n : ℕ, ∃ m : ℕ, f.range ⊓ (I ^ m • (⊤ : Submodule R N)) ≤ I ^ n • f.range`;
+* `∀ n : ℕ, ∃ m : ℕ, g.range ⊓ (I ^ m • (⊤ : Submodule R P)) ≤ I ^ n • g.range`.
+
+Then `AdicCompletion.map_exact_of_ranges_cofinal I hExact hfcofinal hgcofinal`
+proves `Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g)`.
+The two bounds are independent: no common exponent choice or uniform shift is
+required. Neither map needs to be injective or surjective. Ring and all three
+module universes are independent; no finiteness, Noetherianity, flatness,
+faithfulness, separation or completeness assumption is added. The completed
+maps and scalar actions are the canonical ones. If `g` is surjective, the
+first bound alone suffices by `AdicCompletion.map_exact_of_range_cofinal`.
+
+With `[IsNoetherian R N]`,
+`hExact : Function.Exact f g` and `hg : Function.Surjective g`, use
+`AdicCompletion.map_exact_of_isNoetherian_middle I hExact hg` for
+`Function.Exact (AdicCompletion.map I f) (AdicCompletion.map I g)`.
+Noetherianity belongs to the **original middle module**. The first source is
+arbitrary and the first map need not be injective; the ring and all three
+module universes are independent. No Noetherianity of `R`, `R / I` or the
+completed ring, finite generation of `I`, source finiteness, flatness,
+faithfulness, separation or completeness is assumed. Module Artin–Rees supplies
+the existing range-cofinality criterion rather than a new completion construction.
+
+The [submodule-quotient client](../AdicModulesTest/AdicCompletion/Exactness.lean)
+uses the original pair `X × K → N → N / K`, with first map projection to `K`
+followed by inclusion. Here original `N` is Noetherian, `K` is a submodule,
+and `X` is arbitrary. It identifies the completed quotient kernel with the
+completed first map's image, even though that first map kills the whole
+extra factor `X` and need not be injective.
+
+If **both original `N` and original `P`** are Noetherian over original `R`,
+use `AdicCompletion.map_exact_of_isNoetherian I hExact` without a surjectivity
+hypothesis on `g`. The first source `M` is still arbitrary and `f` need not be
+injective. Module Artin–Rees supplies the two separate range bounds for
+`map_exact_of_ranges_cofinal`. All four universes remain independent; no Noetherianity
+of the ring or ideal finiteness, flatness, faithfulness, separation or
+completeness is added. This is a separate alternative to the
+Noetherian-middle-plus-surjectivity criterion, not permission to drop
+surjectivity under middle-module Noetherianity alone.
+
+For an original `g : N →ₗ[R] P` between Noetherian original modules,
+`AdicCompletion.kerEquivOfIsNoetherian I g` identifies
+`AdicCompletion I (LinearMap.ker g)` with `LinearMap.ker (AdicCompletion.map I g)`,
+linearly over `C = AdicCompletion I R`. Its whole forward ambient map is the
+completed original kernel inclusion, with the kernel's intrinsic filtration.
+The inverse is characterized by its ambient inclusion equation and recovers
+original kernel classes. `kerEquivOfIsNoetherian_existsUnique` factors every
+`C`-linear map annihilated by the completed `g` uniquely through that completed
+inclusion, with an arbitrary independently sized additive commutative monoid
+`C`-module as source. Neither original nor completed `g` needs to be surjective;
+no Noetherianity of `R` or its completion, ideal finiteness, flatness,
+faithfulness, separation or completeness is assumed. Given an original right
+inverse, `kerEquivOfIsNoetherian_eq_kerEquivOfRightInverse` identifies the whole
+comparison with the split one. See the
+[kernel factorization client](../AdicModulesTest/AdicCompletion/Exactness.lean).
 
 ## Linear maps from an adic completion
 
@@ -1114,25 +1496,30 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Polynomial.Evaluation](../AdicModules/Polynomial/Evaluation.lean) | Association of nearby polynomial values for a Jacobson-contained ideal, including nonunit derivatives |
 | [PrimaryComponent](../AdicModules/PrimaryComponent.lean) | Height-one primary exactness and integer-subgroup restricted maps |
 | [AdicCompletion](../AdicModules/AdicCompletion.lean) | Finitely generated adic inverse limit as an abstract completion |
-| [AdicCompletion.CompleteBase](../AdicModules/AdicCompletion/CompleteBase.lean) | Finite-module completeness under APf and arbitrary-submodule intrinsic completeness under full AP over complete original bases; finiteness and projectivity criteria |
+| [AdicCompletion.Annihilator](../AdicModules/AdicCompletion/Annihilator.lean) | Annihilator of a completed Noetherian original module as the kernel of the completed annihilator-quotient map |
+| [AdicCompletion.ChangeIdeal](../AdicModules/AdicCompletion/ChangeIdeal.lean) | Original-ring-linear comparison from uniform module-power bounds, cofinal equivalence and ambient/inclusion specializations |
+| [AdicCompletion.CoefficientProduct](../AdicModules/AdicCompletion/CoefficientProduct.lean) | Finite coefficient-ring-product algebra/module comparisons, canonical completed-coefficient actions and all-precision coordinate laws |
 | [AdicCompletion.Completeness](../AdicModules/AdicCompletion/Completeness.lean) | Finite ideal sums and spans, surjective images of precomplete modules, complete Hausdorffification and principal-ideal completeness |
+| [AdicCompletion.CompleteBase](../AdicModules/AdicCompletion/CompleteBase.lean) | Precomplete-base finiteness; finite-module completeness under finite-submodule cofinality; arbitrary-submodule intrinsic completeness under full cofinality over complete original bases; complete-base projectivity and conormal criteria |
 | [AdicCompletion.Endomorphism](../AdicModules/AdicCompletion/Endomorphism.lean) | Units from pointwise congruence to the identity on an adically complete module, for arbitrary ideals |
-| [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Middle exactness under pointwise induced/intrinsic cofinality on both ranges; no injectivity or surjectivity assumption |
+| [AdicCompletion.Exactness](../AdicModules/AdicCompletion/Exactness.lean) | Injectivity and original-image equivalence for Noetherian original targets; middle exactness under two pointwise range-cofinality bounds, without injectivity or surjectivity; Noetherian specializations |
 | [AdicCompletion.FinitePresentation](../AdicModules/AdicCompletion/FinitePresentation.lean) | Completed finite presentation for projective modules finite modulo the ideal; canonical tensor equivalence for finitely presented modules under finite-free cofinality |
 | [AdicCompletion.Kernel](../AdicModules/AdicCompletion/Kernel.lean) | Evaluation kernel at any degree whose ideal power is finitely generated, with independent ring/module universes |
-| [AdicCompletion.LinearMap](../AdicModules/AdicCompletion/LinearMap.lean) | Canonical extension, Hausdorff uniqueness and the linear Hom equivalence |
+| [AdicCompletion.LinearMap](../AdicModules/AdicCompletion/LinearMap.lean) | Unconditional completed-range factorization; canonical extension, Hausdorff uniqueness and the linear Hom equivalence |
 | [AdicCompletion.LocalRing](../AdicModules/AdicCompletion/LocalRing.lean) | Unit detection, Jacobson kernel and locality from the residue quotient |
 | [AdicCompletion.PadicInt](../AdicModules/AdicCompletion/PadicInt.lean) | Integer prime-adic completion and p-adic integers with residue normalization |
 | [AdicCompletion.PadicIntTopology](../AdicModules/AdicCompletion/PadicIntTopology.lean) | Topology of the integer completion comparison |
 | [AdicCompletion.Pi](../AdicModules/AdicCompletion/Pi.lean) | Naturality of the canonical completion comparison for arbitrary dependent products and every ideal |
 | [AdicCompletion.Quotient](../AdicModules/AdicCompletion/Quotient.lean) | Canonical algebra equivalence between the completion modulo an extended ideal power and the original ring modulo that power, assuming only finite generation of the selected power |
 | [AdicCompletion.QuotientTorsion](../AdicModules/AdicCompletion/QuotientTorsion.lean) | Scalar-power torsion sections and subgroup adic completion with signed coordinates |
-| [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Native adic completion and quotient comparison under scalar restriction |
+| [AdicCompletion.RestrictScalars](../AdicModules/AdicCompletion/RestrictScalars.lean) | Adic completion and quotient comparison under scalar restriction, with completed-scalar compatibility and naturality in original `S`-linear maps |
 | [AdicCompletion.TensorProduct](../AdicModules/AdicCompletion/TensorProduct.lean) | Finite-first-quotient tensor surjectivity, original-projective injectivity and canonical equivalence, completed projectivity and finite-Noetherian comparison |
 | [AdicCompletion.Topology](../AdicModules/AdicCompletion/Topology.lean) | Evaluation neighborhoods in an adic completion |
 | [Algebra.Module.Int](../AdicModules/Algebra/Module/Int.lean) | Cyclic additive rings, integer casts and singleton-span properness |
+| [Ideal.Cotangent](../AdicModules/Ideal/Cotangent.lean) | Finite cotangents of all ideal powers and finiteness equivalence with adjacent quotients, including exponent zero |
 | [LinearAlgebra.Descent](../AdicModules/LinearAlgebra/Descent.lean) | Descent along surjective semilinear maps with additive-monoid targets |
 | [LinearAlgebra.Pi](../AdicModules/LinearAlgebra/Pi.lean) | Finitely generated ideal action on arbitrary dependent products of submodules and the coordinatewise reduction kernel |
+| [LinearAlgebra.Quotient.Basic](../AdicModules/LinearAlgebra/Quotient/Basic.lean) | Canonical quotient squares, action-nilpotent vanishing and finite-generation lifting under uniform power annihilation |
 | [LinearAlgebra.Span.Basic](../AdicModules/LinearAlgebra/Span/Basic.lean) | Kernel pullbacks of submodule images for semilinear maps with additive-monoid targets |
 | [LinearAlgebra.SModEq.Pow](../AdicModules/LinearAlgebra/SModEq/Pow.lean) | Iterated ideal-power congruences from arbitrary positive starting depth |
 | [LinearAlgebra.Correspondence](../AdicModules/LinearAlgebra/Correspondence.lean) | Kernel–range order correspondence for submodules under semilinear maps |
@@ -1152,9 +1539,10 @@ re-exported through `AdicCompletion.PadicIntTopology`.
 | [Topology.Algebra.AdicCompactness](../AdicModules/Topology/Algebra/AdicCompactness.lean) | Ideal-adic compactness for a given uniformity via completeness and finite quotients by all ideal powers; first-quotient criterion for finitely generated ideals |
 | [Topology.Algebra.AdicTopology](../AdicModules/Topology/Algebra/AdicTopology.lean) | Adic module and algebra topologies |
 | [Topology.Algebra.Submodule](../AdicModules/Topology/Algebra/Submodule.lean) | Bundled closure from a submodule zero-neighborhood basis and dense integer spans of units |
-| [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density criterion for a supplied additive-group topology, with a written translated-neighborhood proof |
+| [Topology.Algebra.Ideal](../AdicModules/Topology/Algebra/Ideal.lean) | Left-ideal density in a supplied additive-group topology; maximal-ideal closedness and Jacobson criteria in the canonical commutative-ring adic topology |
 | [Topology.Algebra.Module.Span](../AdicModules/Topology/Algebra/Module/Span.lean) | Set-closure comparison for arbitrary generators over a dense subsemiring with generatorwise coefficient continuity |
-| [Topology.Algebra.Module.AdicTopology](../AdicModules/Topology/Algebra/Module/AdicTopology.lean) | Functoriality of adic module topologies |
+| [Topology.Algebra.Module.AdicTopology](../AdicModules/Topology/Algebra/Module/AdicTopology.lean) | Functoriality of adic module topologies; closedness from finite quotient, finite-submodule cofinality and a relative Jacobson bound |
+| [Topology.Algebra.Module.SeparationCriteria](../AdicModules/Topology/Algebra/Module/SeparationCriteria.lean) | Under finite-submodule cofinality, Jacobson containment iff all finite modules are Hausdorff iff all their submodules are closed |
 | [Topology.Algebra.PadicInt](../AdicModules/Topology/Algebra/PadicInt.lean) | P-adic ideal-power bases, linear topology, proper dense integer spans and top neighborhood suprema |
 | [Topology.Algebra.PrincipalUnits](../AdicModules/Topology/Algebra/PrincipalUnits.lean) | Bijective natural powers over Henselian pairs with unit exponent modulo the ideal; continuous p-adic powers over adically complete rings |
 | [Valuation.Completeness](../AdicModules/Valuation/Completeness.lean) | Valuation-integer principal-adic completeness; equivalence with valued-field completeness for a nonzero separated generator |
@@ -1193,6 +1581,7 @@ by the public root.
 | [AdicCompletionKernel](../AdicModulesTest/AdicCompletionKernel.lean) | Private integer `(2)` degree-one nonzero evaluation, independent kernel and degree-zero calibration, finite-generation recovery and separate fixed-power use |
 | [AdicCompletionQuotient](../AdicModulesTest/AdicCompletionQuotient.lean) | Integer `(2)` completion quotient and `ZMod 2` comparison, inverse representative and quotient-map formulas, and degree-zero boundary |
 | [AdicCompletion.DependentPi](../AdicModulesTest/AdicCompletion/DependentPi.lean) | Private generic product `Prop` contracts, the nonzero completion element of the constant-one `ℕ → ℤ` family and its comparison image; no universal bijectivity proof |
+| [AdicCompletion.Exactness](../AdicModulesTest/AdicCompletion/Exactness.lean) | Completed submodule-quotient exactness with an arbitrary extra factor in the first source |
 | [AdicCompletion.FiniteNoetherian](../AdicModulesTest/AdicCompletion/FiniteNoetherian.lean) | Higher-universe `ULift (ZMod 2)` finite nonprojective tensor-comparison client |
 | [AdicCompletion.FinitePresentation](../AdicModulesTest/AdicCompletion/FinitePresentation.lean) | Finitely presented nonprojective integer residue module, independent cofinality and completed-exactness inputs |
 | [AdicCompletion.LinearMap](../AdicModulesTest/AdicCompletion/LinearMap.lean) | Independent nonzero integer `(2)`-adic map from `ℕ →₀ ℤ` and inverse-Hom client |
