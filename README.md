@@ -491,3 +491,22 @@ the endomorphism and Witt-vector constructions. The surjectivity criteria reuse
 Mathlib's completion, quotient, Nakayama and projective-module formalizations;
 the finite-cokernel approach is also formalized in Formal Frontier's Projective
 Modules library. Licensed under [Apache-2.0](LICENSE).
+
+
+## Noncommutative ideal quotients
+
+The following results allow noncommutative scalar rings or semirings.
+
+- Over a semiring, a submodule `P` with `P ≤ I • P` is zero whenever
+  `(I ^ n) • P = 0`. Neither finite generation nor nilpotence of the ideal
+  itself is required.
+- Over a ring, if `(I ^ n) • M = 0`, then `M` is finitely generated over the
+  original ring exactly when `M / (I • M)` is. The ideal may be an arbitrary
+  left ideal; it need not be two-sided or finitely generated. Both results
+  include exponent zero. See [ideal actions and quotients](AdicModules/LinearAlgebra/Quotient/Basic.lean).
+- For a two-sided ideal `I` and an arbitrary dependent family of left modules,
+  the canonical quotient of the dependent direct sum is linearly equivalent
+  over `R / I` to the dependent direct sum of the component quotients. The
+  comparison respects representatives, coordinates and inclusions between
+  two-sided ideals, without finite-index or finiteness hypotheses. See
+  [dependent direct sums](AdicModules/LinearAlgebra/Quotient/DFinsupp.lean).

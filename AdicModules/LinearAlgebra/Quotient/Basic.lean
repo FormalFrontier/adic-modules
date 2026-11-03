@@ -47,20 +47,21 @@ namespace Submodule
 
 /-- A submodule contained in its ideal multiple is zero if some fixed power of
 the ideal annihilates the submodule. No finite generation or nilpotence of the
-ideal itself is required. The exponent may be zero. -/
+ideal itself is required. The exponent may be zero, and the scalar semiring need
+not be commutative. -/
 theorem eq_bot_of_le_smul_of_pow_smul_eq_bot
-    {S : Type u} [CommSemiring S]
+    {S : Type u} [Semiring S]
     {V : Type v} [AddCommMonoid V] [Module S V]
     (q : Ideal S) (n : ℕ) (P : Submodule S V)
     (hkill : (q ^ n) • P = ⊥) (hP : P ≤ q • P) : P = ⊥ := by
   have hpow (k : ℕ) : P ≤ q ^ k • P := by
     induction k with
-    | zero => simpa only [pow_zero, one_smul] using (le_refl P)
+    | zero => simpa only [Submodule.pow_zero, Submodule.one_smul] using (le_refl P)
     | succ k ih =>
       calc
-        P ≤ q • P := hP
-        _ ≤ q • (q ^ k • P) := smul_mono_right q ih
-        _ = q ^ (k + 1) • P := by rw [pow_succ', Submodule.mul_smul]
+        P ≤ q ^ k • P := ih
+        _ ≤ q ^ k • (q • P) := Submodule.smul_mono (le_refl _) hP
+        _ = q ^ (k + 1) • P := by rw [Submodule.pow_succ, Submodule.mul_smul]
   refine le_antisymm ?_ bot_le
   simpa only [hkill] using hpow n
 
@@ -149,9 +150,10 @@ theorem Ideal.isNilpotent_map_quotient_pow
   simp only [← Ideal.map_pow, Ideal.map_quotient_self, Ideal.zero_eq_bot]
 
 /-- Finite generation lifts from reduction by an ideal whose power annihilates
-the module. No finiteness assumption on the ideal is needed. -/
+the module. The scalar ring need not be commutative, and no finiteness or
+two-sidedness assumption on the ideal is needed. -/
 theorem Module.finite_iff_quotient_smul_of_pow_smul_top_eq_bot
-    {S : Type uR} [CommRing S]
+    {S : Type uR} [Ring S]
     {V : Type uM} [AddCommGroup V] [Module S V]
     (q : Ideal S) (n : ℕ)
     (hkill : (q ^ n) • (⊤ : Submodule S V) = ⊥) :
