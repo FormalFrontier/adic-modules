@@ -14,7 +14,8 @@ public import Mathlib.LinearAlgebra.Pi
 
 An antitone family of submodules determines a diagram of quotient modules indexed by the
 opposite preorder. The quotient projections assemble into `Submodule.toQuotientSections`,
-whose kernel is the intersection of the family.
+whose kernel is the intersection of the family. The coordinate maps
+`Submodule.quotientSectionsEval` recover individual quotient classes and are surjective.
 
 ## Implementation notes
 
@@ -25,7 +26,8 @@ preorder may be empty. No smallness assumption is needed.
 ## References
 
 * Mathlib, `Algebra/Category/ModuleCat/Limits`, `LinearAlgebra/Quotient/Basic` and
-  `LinearAlgebra/Pi`: compatible families, quotient transitions and kernels of product maps.
+  `LinearAlgebra/Pi`: compatible families, quotient transitions, coordinate projections and
+  kernels of product maps.
 -/
 
 @[expose] public section
@@ -54,7 +56,8 @@ def quotientDiagram : Λᵒᵖ ⥤ ModuleCat.{uM} R where
     exact (Submodule.factor_comp
       (hF (leOfHom f.unop)) (hF (leOfHom g.unop))).symm
 
-@[simp]
+/-- The object of the quotient diagram at one index. This equation is a rewrite lemma,
+not a simp lemma, so simplification preserves the types of compatible section maps. -/
 theorem quotientDiagram_obj (i : Λᵒᵖ) :
     (quotientDiagram F hF).obj i = ModuleCat.of R (M ⧸ F i.unop) :=
   rfl
@@ -63,6 +66,17 @@ theorem quotientDiagram_obj (i : Λᵒᵖ) :
 theorem quotientDiagram_map {i j : Λᵒᵖ} (f : i ⟶ j) :
     (quotientDiagram F hF).map f =
       ModuleCat.ofHom (Submodule.factor (hF (leOfHom f.unop))) :=
+  rfl
+
+/-- Evaluation of compatible quotient sections at one index, as a linear map. -/
+def quotientSectionsEval (i : Λᵒᵖ) :
+    ModuleCat.sectionsSubmodule (quotientDiagram F hF) →ₗ[R] M ⧸ F i.unop :=
+  (LinearMap.proj i).comp (ModuleCat.sectionsSubmodule (quotientDiagram F hF)).subtype
+
+@[simp]
+theorem quotientSectionsEval_apply (i : Λᵒᵖ)
+    (b : ModuleCat.sectionsSubmodule (quotientDiagram F hF)) :
+    quotientSectionsEval F hF i b = b.val i :=
   rfl
 
 /-- The quotient projections as a linear map to compatible families of quotient classes. -/
@@ -76,6 +90,23 @@ def toQuotientSections : M →ₗ[R] ModuleCat.sectionsSubmodule (quotientDiagra
 theorem toQuotientSections_apply (x : M) (i : Λᵒᵖ) :
     (toQuotientSections F hF x).val i = (F i.unop).mkQ x :=
   rfl
+
+/-- Evaluating the quotient section of an element gives its class in that quotient. -/
+@[simp]
+theorem quotientSectionsEval_comp_toQuotientSections (i : Λᵒᵖ) :
+    (quotientSectionsEval F hF i).comp (toQuotientSections F hF) = (F i.unop).mkQ := by
+  ext x
+  rfl
+
+/-- Every quotient class is a coordinate of a compatible family of quotient sections. -/
+theorem quotientSectionsEval_surjective (i : Λᵒᵖ) :
+    Function.Surjective (quotientSectionsEval F hF i) := by
+  have hcomp : Function.Surjective
+      ((quotientSectionsEval F hF i).comp (toQuotientSections F hF)) := by
+    rw [quotientSectionsEval_comp_toQuotientSections]
+    exact (F i.unop).mkQ_surjective
+  exact Function.Surjective.of_comp (f := quotientSectionsEval F hF i)
+    (g := toQuotientSections F hF) hcomp
 
 /-- The kernel of the map to quotient sections is the intersection of the submodules. -/
 @[simp]
