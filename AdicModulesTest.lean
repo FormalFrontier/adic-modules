@@ -4,6 +4,7 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModulesTest.SubmoduleFamily
 public import AdicModulesTest.QuotientSectionsTopology
 
 public import AdicModulesTest.SeparatedProduct
