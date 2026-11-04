@@ -4,6 +4,8 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModulesTest.QuotientSectionsTopology
+
 public import AdicModulesTest.SeparatedProduct
 public import AdicModulesTest.CompleteProduct
 public import AdicModulesTest.HenselDeterminantImage

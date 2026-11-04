@@ -4,6 +4,8 @@ Authors: Formal Frontier Agents
 -/
 module
 
+public import AdicModules.Topology.Algebra.Module.QuotientSections
+
 public import AdicModules.Ideal.Cotangent
 public import AdicModules.Noetherian
 public import AdicModules.LinearAlgebra.Matrix.DeterminantPerturbation
