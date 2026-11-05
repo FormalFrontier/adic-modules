@@ -17,7 +17,7 @@ rev = "83abb3e776bdefcbc447a1e44d0debe4010039e5"
 [[require]]
 name = "groupTheory"
 git = "https://github.com/FormalFrontier/group-theory.git"
-rev = "4791da691c8cf6f7bf40caf2606e17e46b432e08"
+rev = "83b7c2f561318b0a6e125e687de2d87533dac657"
 
 [[require]]
 name = "multivariate-polynomials"

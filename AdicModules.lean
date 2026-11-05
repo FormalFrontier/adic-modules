@@ -5,6 +5,7 @@ Authors: Formal Frontier Agents
 module
 
 public import AdicModules.Topology.SubmoduleFamily
+public import AdicModules.Topology.Completion
 public import AdicModules.Topology.Algebra.Module.QuotientSections
 
 public import AdicModules.Ideal.Cotangent
